@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -117,26 +117,20 @@
         <h3>다운로드 가능한 쿠폰 목록</h3>
         <div class="available-coupon-grid">
 
-            <div class="download-coupon-card">
+            <div class="download-coupon-card" th:each="template : ${templates}">
                 <div class="coupon-info-text">
-                    <h4>신규 도서 10% 할인 쿠폰</h4>
-                    <p>최대 5,000원 할인 | 유효기간: 30일</p>
+                    <h4 th:text="${template.couponName}">쿠폰 이름</h4>
+                    <p th:text="${template.description}">쿠폰 설명</p>
                 </div>
 
-                <form method="post" action="">
-                    <button class="btn-download">다운로드</button>
+                <form method="post" th:action="@{/coupon/issue}">
+                    <input type="hidden" name="couponId" th:value="${template.id}">
+                    <button class="btn-download" type="submit">다운로드</button>
                 </form>
             </div>
 
-            <div class="download-coupon-card">
-                <div class="coupon-info-text">
-                    <h4>첫 구매 감사 3,000원</h4>
-                    <p>5,000원 이상 구매 시 사용 가능</p>
-                </div>
-
-                <form method="post" action="">
-                    <button class="btn-download">다운로드</button>
-                </form>
+            <div th:if="${#lists.isEmpty(templates)}">
+                발급 가능한 쿠폰이 없습니다.
             </div>
         </div>
     </div>

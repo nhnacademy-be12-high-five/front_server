@@ -534,7 +534,7 @@
 <!-- 헤더 -->
 <header id="header" role="banner">
     <div class="container">
-        <a href="./main.html" class="logo">
+        <a href="./" class="logo">
             <img src="../img/logo.png" alt="HIGH-FIVE 로고"/>
             <div class="brand">HIGH-FIVE BOOKS</div>
         </a>
@@ -565,6 +565,7 @@
             <a class="user-link" href="/cart">
                 <img src="../img/icon-cart.png" alt="장바구니" class="user-icon" />
             </a>
+
             <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
         </div>
 
@@ -578,11 +579,11 @@
             <div class="slides" id="slides">
                 <!-- slide 1 -->
                 <article class="slide" aria-roledescription="slide">
-                    <div class="copy">
-                       <div>이 책을 덮는 순간, '어제의 나'와 작별하게 될 겁니다</div>
-                       <img src="static/img/위로의 방식.jpg"
-                            width="700" height="500">
-                    </div>
+<!--                    <div class="copy">-->
+<!--                       <div>이 책을 덮는 순간, '어제의 나'와 작별하게 될 겁니다</div>-->
+<!--                       <img src="/img/위로의 방식.jpg"-->
+<!--                            width="700" height="500">-->
+<!--                    </div>-->
                     <div>
 
                     </div>
@@ -1015,7 +1016,7 @@
 
     // 탭 클릭 이벤트 수정
     tabBtns.forEach((btn) => {
-        btn.addEventListener("click", () => {+
+        btn.addEventListener("click", () => {
             // 탭 선택 표시 로직 (기존)
             tabBtns.forEach((b) => b.setAttribute("aria-selected", "false"));
             btn.setAttribute("aria-selected", "true");

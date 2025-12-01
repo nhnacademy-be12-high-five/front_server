@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -326,6 +326,7 @@
                 <a class="user-link" href="/cart">
                     <img src="../img/icon-cart.png" alt="장바구니" class="user-icon" />
                 </a>
+
                 <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
             </div>
 
@@ -449,11 +450,11 @@
       // 비회원 결제
       // const payment = tossPayments.payment({customerKey: TossPayments.ANONYMOUS})
       //
-      // function getPaymentAmount() {
-      //   const amountText = document.getElementById("finalAmount").textContent;
-      //   // '38,700원' -> 38700
-      //   return parseInt(amountText.replace(/[^0-9]/g, ''), 10);
-      // }
+      function getPaymentAmount() {
+        const amountText = document.getElementById("finalAmount").textContent;
+        // '38,700원' -> 38700
+        return parseInt(amountText.replace(/[^0-9]/g, ''), 10);
+      }
 
       // ------ '결제하기' 버튼 누르면 결제창 띄우기 ------
       // @docs https://docs.tosspayments.com/sdk/v2/js#paymentrequestpayment
