@@ -20,7 +20,7 @@ import java.util.List;
 public class AdminController {
     private final CouponService couponService;
 
-    @GetMapping("/admin/coupons")
+    @GetMapping("/api/coupons/admin/coupons")
     public String couponPage(Model model){
         List<CouponTemplateDto> coupons = couponService.getAdminCoupons();
         List<CouponPolicyResponseDto> policies = couponService.getAllPolicies();
@@ -29,21 +29,21 @@ public class AdminController {
         return "admin/coupons";
     }
 
-    @PostMapping("/admin/policy/create")
+    @PostMapping("/api/coupons/admin/policy/create")
     public String createPolicy(@ModelAttribute CouponPolicyRequestDto dto) {
         couponService.createCouponPolicy(dto);
 
         return "redirect:/admin/coupons.html";
     }
 
-    @PostMapping("/admin/coupons/create")
+    @PostMapping("/api/coupons/admin/coupons/create")
     public String createCouponTemplate(@ModelAttribute CouponCreateRequestDto dto) {
         // 폼 데이터를 받아 쿠폰 서버로 전송
         couponService.createCouponTemplate(dto);
         return "redirect:/admin/coupons.html";
     }
 
-    @PostMapping("/admin/policy/{id}")
+    @PostMapping("/api/coupons/admin/policy/{id}")
     public String disablePolicy(@PathVariable("id") Long id) {
         couponService.disableCouponPolicy(id);
         return "redirect:/admin/coupons.html";
