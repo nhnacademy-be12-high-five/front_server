@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -36,6 +36,9 @@
             display: flex;
             flex-direction: column;
             padding-top: 30px;
+            /* 고정 설정 */
+            position: fixed;
+            height: 100%;
         }
 
         .sidebar h2 {
@@ -69,11 +72,11 @@
             color: var(--color-accent);
         }
 
-        /* 메인 컨텐츠 */
-        main {
+        /* 메인 컨텐츠 영역 */
+        .content-area {
+            margin-left: 220px; /* 사이드바 너비만큼 왼쪽 여백 */
             flex: 1;
             background: var(--color-bg);
-            padding: 30px 50px;
         }
 
         header {
@@ -83,6 +86,11 @@
             font-weight: 700;
             font-size: 18px;
             letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+
+        main {
+            padding: 0px 50px 30px; /* 상하좌우 여백 */
         }
 
         .card {
@@ -90,8 +98,10 @@
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             padding: 30px 40px;
-            max-width: 700px;
-            margin-top: 30px;
+            /* Flexbox를 이용해 크기 균등 분할 및 높이 맞춤 */
+            flex: 1 1 48%; /* flex-grow: 1, flex-shrink: 1, basis: 48% (gap 포함 50%보다 조금 작게) */
+            margin-bottom: 0; /* 부모 컨테이너에서 간격 처리 */
+            /* max-width: 700px; 이 속성 삭제 (균등 크기 위해) */
         }
 
         .card h3 {
@@ -112,12 +122,22 @@
             font-weight: 600;
         }
 
-        .form-row input {
+        .form-row input,
+        .form-row select {
             flex: 1;
             padding: 10px 14px;
             border: 1px solid var(--color-border);
             border-radius: 6px;
             text-align: right;
+            min-width: 150px; /* 입력 필드가 너무 작아지는 것을 방지 */
+        }
+
+        .form-row select {
+            text-align: left;
+        }
+
+        .form-row input[type="datetime-local"] {
+            text-align: left;
         }
 
         .save-btn {
@@ -144,53 +164,236 @@
             color: #888;
             text-align: right;
         }
+
+        .coupon-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .coupon-table th, .coupon-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .coupon-table th {
+            background-color: #f1f1f1;
+            font-weight: bold;
+        }
+
+        /* 쿠폰 상세 컨테이너 (핵심 변경) */
+        .coupon-detail, .coupon-detail2 {
+            display: flex;
+            flex-direction: row;
+            gap: 30px; /* 좌우 패널 사이 간격 */
+            margin-bottom: 30px; /* 컨테이너 간의 세로 간격 */
+            align-items: stretch;
+            flex-wrap: wrap; /* 화면이 좁아지면 줄바꿈 허용 */
+        }
+
+        /* 반응형: 화면이 좁아지면 (1000px 이하) 카드가 세로로 배치 */
+        @media (max-width: 1000px) {
+            .coupon-detail, .coupon-detail2 {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .card {
+                flex-basis: auto; /* 줄바꿈 시 자동으로 크기 조절 */
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content-area {
+                margin-left: 0; /* 사이드바 고정 해제 시 여백 제거 */
+            }
+            .sidebar {
+                display: none; /* 모바일에서는 사이드바 숨김 */
+            }
+            header, main {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        }
     </style>
 </head>
 
 <body>
-<!-- 좌측 사이드바 -->
 <aside class="sidebar">
     <h2>HIGHFIVE 관리자</h2>
     <ul class="menu">
-        <li><a href="books.html" data-key="members">도서 관리</a></li>
-        <li><a href="points.html" data-key="points">포인트 정책 관리</a></li>
-        <li><a href="coupons.html" data-key="coupons">쿠폰 관리</a></li>
+        <li><a href="books.html">도서 관리</a></li>
+        <li><a href="points.html">포인트 정책 관리</a></li>
+        <li><a href="coupons.html" class="active">쿠폰 관리</a></li>
     </ul>
 </aside>
 
-<!-- 메인 콘텐츠 -->
-<div style="flex:1; display:flex; flex-direction:column;">
-    <header>쿠폰 관리</header>
+<div class="content-area">
+    <header>
+        <h1>쿠폰 관리</h1>
+    </header>
 
     <main>
-        <div class="card">
-            <h3>쿠폰 관리</h3>
-            <div class="form-row">
+        <div class="coupon-detail2">
+            <div class="card">
+                <h3>쿠폰 정책 생성</h3>
+                <form action="/admin/policy/create" method="post">
+                    <div class="form-row">
+                        <label>정책 이름</label>
+                        <input type="text" name="name" placeholder="예: 겨울 정기 세일 정책" required>
+                    </div>
+                    <div class="form-row">
+                        <label>쿠폰 용도</label>
+                        <select name="comment">
+                            <option value="WELCOME">WELCOME (신규 가입)</option>
+                            <option value="BIRTHDAY">BIRTHDAY (생일)</option>
+                            <option value="EVENT">EVENT (이벤트)</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>할인 타입</label>
+                        <select name="discountType">
+                            <option value="FIXED">정액 할인 (원)</option>
+                            <option value="PERCENTAGE">정률 할인 (%)</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>할인 값</label>
+                        <input type="number" name="discountValue" placeholder="금액 또는 %" required>
+                    </div>
+                    <div class="form-row">
+                        <label>최소 주문 금액</label>
+                        <input type="number" name="minOrderValue" placeholder="0" value="0">
+                    </div>
+                    <div class="form-row">
+                        <label>최대 할인 금액</label>
+                        <input type="number" name="maxDiscountValue" placeholder="정률 할인 시 적용" value="0">
+                    </div>
 
-            </div>
-            <div class="form-row">
-                <label>생일 축하 쿠폰 (%)</label>
-                <input type="number" value="200">
-            </div>
-            <div class="form-row">
-                <label>첫 구매 환영 쿠폰 (%)</label>
-                <input type="number" value="500">
-            </div>
-            <div class="form-row">
-                <label>오픈 기념 쿠폰 (%)</label>
-                <input type="number" step="0.1" value="0.5">
+                    <button type="submit" class="save-btn">정책 생성</button>
+                </form>
             </div>
 
-<!--            // action : 관리자 정책 저장하는 post api 주소-->
-            <form method="post" action="">
-                <input type="submit" value="정책 저장하기" class="save-btn">
-            </form>
+            <div class="card">
+                <h3>등록된 쿠폰 정책 목록</h3>
 
-            <div class="updated-info">최근 수정: 2025-11-10 (관리자 ID: 1)</div>
+                <table class="coupon-table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>쿠폰 이름</th>
+                        <th>할인 타입</th>
+                        <th>할인 값</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="policy : ${policies}">
+                        <td th:text="${policy.id}">1</td>
+                        <td th:text="${policy.name}">겨울 세일 정책</td>
+                        <td th:text="${policy.discountType}">FIXED</td>
+                        <td>
+                            <span th:text="${policy.discountValue}">1000</span>
+                            <span th:if="${policy.discountType == 'FIXED'}">원</span>
+                            <span th:if="${policy.discountType == 'PERCENTAGE'}">%</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(policies)}">
+                        <td colspan="5" style="text-align: center; padding: 20px;">등록된 쿠폰 정책이 없습니다.</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div class="updated-info">
+                    최근 조회: <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd HH:mm:ss')}"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="coupon-detail">
+            <div class="card">
+                <h3>쿠폰 템플릿 생성</h3>
+                <form action="/admin/coupons/create" method="post">
+                    <div class="form-row">
+                        <label>적용 정책 선택</label>
+                        <select name="id" required>
+                            <option value="">-- 정책을 선택하세요 --</option>
+                            <option th:each="policy : ${policies}"
+                                    th:value="${policy.id}"
+                                    th:text="${policy.name}">
+                                정책 이름
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <label>쿠폰 이름</label>
+                        <input type="text" name="couponName" placeholder="예: 2025 새해맞이 쿠폰" required>
+                    </div>
+
+                    <div class="form-row">
+                        <label>설명</label>
+                        <input type="text" name="description" placeholder="쿠폰 설명 (사용자 노출)">
+                    </div>
+
+                    <div class="form-row">
+                        <label>발행 수량</label>
+                        <input type="number" name="issueCount" placeholder="예: 1000" required>
+                    </div>
+
+                    <div class="form-row">
+                        <label>발급 시작 일시</label>
+                        <input type="datetime-local" name="issueStartAt" required>
+                    </div>
+
+                    <div class="form-row">
+                        <label>발급 종료 일시</label>
+                        <input type="datetime-local" name="issueEndAt" required>
+                    </div>
+
+                    <div class="form-row">
+                        <label>유효 기간 (일)</label>
+                        <input type="number" name="validPeriodDate" placeholder="예: 30 (발급일로부터 30일)" required>
+                    </div>
+
+                    <button type="submit" class="save-btn" style="background-color: var(--color-accent); border: none;">쿠폰 템플릿 생성</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3>등록된 쿠폰 목록</h3>
+
+                <table class="coupon-table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>쿠폰 이름</th>
+                        <th>설명</th>
+                        <th>발행 수량</th>
+                        <th>유효 기간</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="coupon : ${coupons}">
+                        <td th:text="${coupon.id}">1</td>
+                        <td th:text="${coupon.couponName}">신규 가입 쿠폰</td>
+                        <td th:text="${coupon.description}">설명</td>
+                        <td th:text="${coupon.issueCount} + '장'">1000장</td>
+                        <td th:text="${coupon.validPeriodDate} + '일'">30일</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(coupons)}">
+                        <td colspan="5" style="text-align: center; padding: 20px;">등록된 쿠폰이 없습니다.</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div class="updated-info">
+                    최근 조회: <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd HH:mm:ss')}"></span>
+                </div>
+            </div>
         </div>
     </main>
 </div>
-<script src="assets/admin.js"></script>
 
 </body>
 </html>

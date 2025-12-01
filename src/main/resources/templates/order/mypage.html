@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -89,7 +89,7 @@
         .logo .brand {
             font-size: 24px;
             font-weight: 900;
-            color: #000080;
+            color: black;
         }
 
         .gnb {
@@ -211,7 +211,7 @@
         .logo .brand {
             font-size: 21px;
             font-weight: 900;
-            color: #000080;
+            color: black;
             margin-top: 5px;
         }
 
@@ -223,7 +223,7 @@
             padding-bottom: 5px;
         }
 
-        .container2 nav button {
+        .container2 nav .tab-btn {
             background: none;
             padding: 10px 15px;
             font-size: 16px;
@@ -231,12 +231,25 @@
             color: var(--color-text-light);
             border-bottom: 3px solid transparent;
             transition: color 0.2s, border-bottom 0.2s;
+            text-decoration: none; /* 링크 밑줄 제거 */
+            cursor: pointer;
+            display: inline-block; /* a 태그 레이아웃 보정 */
         }
 
         .container2 nav button.active {
             color: var(--color-primary);
             font-weight: 700;
             border-bottom: 3px solid var(--color-primary);
+        }
+
+        .likes-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        .review-card {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
         }
 
         /* 공통 탭 콘텐츠 */
@@ -773,7 +786,7 @@
 <body>
 <header id="header" role="banner">
     <div class="container">
-        <a href="./mypage.html" class="logo">
+        <a href="./" class="logo">
             <img src="../img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100" />
             <div class="brand">HIGH-FIVE BOOKS</div>
         </a>
@@ -837,43 +850,29 @@
 <!--        -->
 
 <!--        // 타임리프 추가 -->
-        <button th:classappend="${currentTab == 'info'} ? 'active' : ''"
-                data-tab="info">
-            내 정보
-        </button>
+        <a th:href="@{/mypage(tab='info')}"
+           th:classappend="${currentTab == 'info'} ? 'active'" class="tab-btn">내 정보</a>
 
-        <button th:classappend="${currentTab == 'address'} ? 'active' : ''"
-                data-tab="address">
-            배송지
-        </button>
+        <a th:href="@{/mypage(tab='address')}"
+           th:classappend="${currentTab == 'address'} ? 'active'" class="tab-btn">배송지</a>
 
-        <button th:classappend="${currentTab == 'coupons'} ? 'active' : ''"
-                data-tab="coupons">
-            쿠폰
-        </button>
+        <a th:href="@{/mypage(tab='coupons')}"
+           th:classappend="${currentTab == 'coupons'} ? 'active'" class="tab-btn">쿠폰</a>
 
-        <button th:classappend="${currentTab == 'points'} ? 'active' : ''"
-                data-tab="points">
-            포인트
-        </button>
+        <a th:href="@{/mypage(tab='points')}"
+           th:classappend="${currentTab == 'points'} ? 'active'" class="tab-btn">포인트</a>
 
-        <button th:classappend="${currentTab == 'orders'} ? 'active' : ''"
-                data-tab="orders">
-            주문내역
-        </button>
+        <a th:href="@{/mypage(tab='orders')}"
+           th:classappend="${currentTab == 'orders'} ? 'active'" class="tab-btn">주문내역</a>
 
-        <button th:classappend="${currentTab == 'reviews'} ? 'active' : ''"
-                data-tab="reviews">
-            리뷰
-        </button>
+        <a th:href="@{/mypage(tab='reviews')}"
+           th:classappend="${currentTab == 'reviews'} ? 'active'" class="tab-btn">리뷰</a>
 
-        <button th:classappend="${currentTab == 'likes'} ? 'active' : ''"
-                data-tab="likes">
-            찜 목록
-        </button>
+        <a th:href="@{/mypage(tab='likes')}"
+           th:classappend="${currentTab == 'likes'} ? 'active'" class="tab-btn">찜 목록</a>
     </nav>
 
-    <section id="tab-info" class="tab-content active">
+    <section id="tab-info" class="tab-content" th:classappend="${currentTab == 'info'} ? 'active'">
         <h2 class="section-title">내 정보</h2>
         <div class="info-group">
             <div class="info-item">
@@ -900,164 +899,72 @@
 
         <br />
 
-        <form method="post" action="">
-            <button type="button" class="btn-edit">수정</button>
-        </form>
+        <button type="button" class="btn-edit">정보 수정</button>
     </section>
 
-    <section id="tab-address" class="tab-content">
+    <section id="tab-address" class="tab-content"
+             th:classappend="${currentTab == 'address'} ? 'active' : ''">
         <h2 class="section-title">배송지 관리</h2>
-
-        <!-- 상단 안내 -->
         <div style="margin-bottom: 15px; color: #777; font-size: 14px;">
             저장 가능한 배송지는 최대 <strong>10개</strong>입니다.
         </div>
-
-        <!-- 배송지 리스트 -->
         <div id="address-list" class="address-list">
-            <!-- 주소 카드 하나 -->
             <div class="address-card">
                 <div class="address-left">
-                    <div class="addr-name">홍길동</div>
+                    <div class="addr-name">홍길동 <span style="color:var(--color-primary); font-size:12px;">(기본)</span></div>
                     <div class="addr-phone">010-1234-5678</div>
-                    <div class="addr-addr">서울특별시 마포구 홍익로 12 (기본 배송지)</div>
+                    <div class="addr-addr">서울특별시 마포구 홍익로 12</div>
                 </div>
-
                 <div class="address-actions">
-                    <button class="btn-outline-yellow">기본 설정</button>
                     <button class="btn-outline">수정</button>
-                    <button class="btn-outline delete-btn">삭제</button>
-                </div>
-            </div>
-
-            <div class="address-card">
-                <div class="address-left">
-                    <div class="addr-name">홍길동</div>
-                    <div class="addr-phone">010-9876-5432</div>
-                    <div class="addr-addr">서울특별시 강남구 테헤란로 211</div>
-                </div>
-
-                <div class="address-actions">
-                    <button class="btn-outline-yellow">기본 설정</button>
-                    <button class="btn-outline">수정</button>
-                    <button class="btn-outline delete-btn">삭제</button>
+                    <button class="btn-outline">삭제</button>
                 </div>
             </div>
         </div>
-
-        <!-- 주소 등록 버튼 -->
-        <button id="add-address-btn" class="btn-edit" style="margin-top: 25px;">
-            + 배송지 추가하기
-        </button>
-
-        <!-- 주소 입력 모달 (간단버전) -->
-        <div id="address-modal" class="address-modal">
-            <div class="address-modal-content">
-                <h3>배송지 추가</h3>
-
-                <label>이름</label>
-                <input type="text" placeholder="이름 입력" class="input-line"/>
-
-                <label>연락처</label>
-                <input type="text" placeholder="ex) 010-1234-5678" class="input-line"/>
-
-                <label>주소</label>
-                <input type="text" placeholder="도로명 주소 입력" class="input-line"/>
-
-                <div class="modal-actions">
-                    <button class="btn-outline" id="modal-cancel">취소</button>
-                    <button class="btn-primary" id="modal-save">저장</button>
-                </div>
-            </div>
-        </div>
-
+        <button id="add-address-btn" class="btn-edit" style="margin-top: 25px;">+ 배송지 추가하기</button>
     </section>
 
 
-    <section id="tab-coupons" class="tab-content">
-        <h2 class="section-title">보유 쿠폰함 (4개)</h2>
+    <section id="tab-coupons" class="tab-content"
+             th:classappend="${currentTab == 'coupons'} ? 'active' : ''">
+        <h2 class="section-title">보유 쿠폰함 (<span th:text="${couponCount}">0</span>개)</h2>
+
         <div class="coupon-grid">
-            <div class="coupon-card">
+            <div class="coupon-card" th:each="coupon : ${myCoupons}">
                 <div class="coupon-header">
-                    <div class="coupon-title">생일 축하 쿠폰</div>
-                    <span class="coupon-badge badge-available">사용 가능</span>
+                    <div class="coupon-title" th:text="${coupon.couponName}">쿠폰 이름</div>
+                    <span class="coupon-badge"
+                          th:classappend="${coupon.status == 'ISSUED'} ? 'badge-available' :
+                                         (${coupon.status == 'USED'} ? 'badge-used' : 'badge-expired')"
+                          th:text="${coupon.status == 'ISSUED'} ? '사용 가능' :
+                                  (${coupon.status == 'USED'} ? '사용 완료' : '기한 만료')">
+                        상태
+                    </span>
                 </div>
                 <div class="coupon-info">
                     <div class="info-item">
                         <span class="info-label">할인 금액</span>
-                        <span class="info-value">10,000원</span>
+                        <span class="info-value" th:text="${#numbers.formatInteger(coupon.discountValue, 0, 'COMMA') + '원'}">0원</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">유효기간</span>
-                        <span class="info-value">2025.12.31까지</span>
+                        <span class="info-value" th:text="${#temporals.format(coupon.expiredAt, 'yyyy.MM.dd 까지')}">날짜</span>
                     </div>
                 </div>
-                <div class="coupon-condition">5만원 이상 구매 시 적용 가능</div>
+                <div class="coupon-condition" th:text="${coupon.condition}">조건</div>
             </div>
-            <div class="coupon-card">
-                <div class="coupon-header">
-                    <div class="coupon-title">특별 감사 쿠폰</div>
-                    <span class="coupon-badge badge-available">사용 가능</span>
-                </div>
-                <div class="coupon-info">
-                    <div class="info-item">
-                        <span class="info-label">할인율</span>
-                        <span class="info-value">10%</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">유효기간</span>
-                        <span class="info-value">2025.11.30까지</span>
-                    </div>
-                </div>
-                <div class="coupon-condition">최대 5,000원 할인 적용</div>
+
+            <div th:if="${couponCount == 0}" class="empty-message">
+                보유한 쿠폰이 없습니다.
             </div>
-            <div class="coupon-card">
-                <div class="coupon-header">
-                    <div class="coupon-title">첫 구매 환영 쿠폰</div>
-                    <span class="coupon-badge badge-used">사용 완료</span>
-                </div>
-                <div class="coupon-info">
-                    <div class="info-item">
-                        <span class="info-label">할인 금액</span>
-                        <span class="info-value">3,000원</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">사용일자</span>
-                        <span class="info-value">2025.10.15</span>
-                    </div>
-                </div>
-                <div class="coupon-condition">조건 없음</div>
-                <div class="coupon-actions">
-                    <button class="btn btn-secondary">내역 확인</button>
-                </div>
-            </div>
-            <div class="coupon-card">
-                <div class="coupon-header">
-                    <div class="coupon-title">오픈 기념 쿠폰</div>
-                    <span class="coupon-badge badge-expired">기한 만료</span>
-                </div>
-                <div class="coupon-info">
-                    <div class="info-item">
-                        <span class="info-label">할인율</span>
-                        <span class="info-value">7%</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">만료일</span>
-                        <span class="info-value">2025.09.30</span>
-                    </div>
-                </div>
-                <div class="coupon-condition">모든 도서에 적용 가능</div>
-                <div class="coupon-actions">
-<!--                    // action API로 수정 -->
-                   <form method="delete" action="./">
-                       <button class="btn btn-secondary">삭제</button>
-                   </form>
-                </div>
-            </div>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="/coupon" class="btn-outline" style="padding: 10px 20px;">쿠폰 존으로 이동 &gt;</a>
         </div>
     </section>
 
-    <section id="tab-points" class="tab-content">
+    <section id="tab-points" class="tab-content"
+             th:classappend="${currentTab == 'points'} ? 'active' : ''">
         <h2 class="section-title">포인트 관리</h2>
         <div class="points-container">
             <div class="points-box">
@@ -1066,32 +973,26 @@
                 <div class="points-unit">P</div>
             </div>
             <div class="points-box">
-                <div class="points-label">누적 포인트</div>
+                <div class="points-label">누적 적립 포인트</div>
                 <div class="points-value">82,650</div>
                 <div class="points-unit">P</div>
             </div>
         </div>
-
         <div class="points-history">
-            <h3>최근 포인트 거래 내역</h3>
+            <h3>최근 포인트 내역</h3>
             <div class="history-item">
                 <span class="history-desc">도서 구매 적립 - (2025.11.01)</span>
-                <span class="history-amount" style="color: var(--color-primary)"
-                >+ 3,000 P</span
-                >
+                <span class="history-amount" style="color: var(--color-primary)">+ 3,000 P</span>
             </div>
             <div class="history-item">
-                <span class="history-desc">포인트 사용 - 도서 할인 (2025.10.25)</span>
+                <span class="history-desc">포인트 사용 (2025.10.25)</span>
                 <span class="history-amount" style="color: #c0392b">- 5,000 P</span>
-            </div>
-            <div class="history-item">
-                <span class="history-desc">리뷰 작성 보너스 (2025.10.16)</span>
-                <span class="history-amount" style="color: var(--color-primary)">+ 500 P</span>
             </div>
         </div>
     </section>
 
-    <section id="tab-orders" class="tab-content">
+    <section id="tab-orders" class="tab-content"
+             th:classappend="${currentTab == 'orders'} ? 'active' : ''">
         <h2 class="section-title">주문 내역</h2>
 
         <!-- 안내 문구 -->

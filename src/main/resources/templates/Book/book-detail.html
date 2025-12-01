@@ -1,5 +1,5 @@
  <!DOCTYPE html>
-<html lang="ko">
+ <html lang="ko" xmlns:th="http://www.thymeleaf.org">
    <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -773,6 +773,7 @@
               <a class="user-link" href="/cart">
                   <img src="../img/icon-cart.png" alt="장바구니" class="user-icon" />
               </a>
+              <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
           </div>
 
       </div>
@@ -782,7 +783,7 @@
       <section class="book-detail-main">
         <div class="book-image">
 <!--          <img src=""../img/book1.jpeg" alt="도서 표지" />-->
-            <img th:src="@{img/book1.jpeg}" alt="표지"/>
+            <img th:src="@{/img/book1.jpeg}" alt="표지"/>
         </div>
         <div class="book-info">
           <h1>프론트엔드 개발자를 위한 자바스크립트 바이블</h1>
