@@ -33,19 +33,19 @@ public class AdminController {
     public String createPolicy(@ModelAttribute CouponPolicyRequestDto dto) {
         couponService.createCouponPolicy(dto);
 
-        return "redirect:/admin/coupons.html";
+        return "redirect:/admin/coupons";
     }
 
     @PostMapping("/api/coupons/admin/coupons/create")
     public String createCouponTemplate(@ModelAttribute CouponCreateRequestDto dto) {
         // 폼 데이터를 받아 쿠폰 서버로 전송
         couponService.createCouponTemplate(dto);
-        return "redirect:/admin/coupons.html";
+        return "redirect:/admin/coupons";
     }
 
     @PostMapping("/api/coupons/admin/policy/{id}")
     public String disablePolicy(@PathVariable("id") Long id) {
         couponService.disableCouponPolicy(id);
-        return "redirect:/admin/coupons.html";
+        return "redirect:/admin/coupons";
     }
 }
