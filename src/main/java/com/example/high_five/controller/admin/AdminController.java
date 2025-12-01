@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.List;
 public class AdminController {
     private final CouponService couponService;
 
-    @GetMapping("/admin/coupons.html")
+    @GetMapping("/admin/coupons")
     public String couponPage(Model model){
         List<CouponTemplateDto> coupons = couponService.getAdminCoupons();
         List<CouponPolicyResponseDto> policies = couponService.getAllPolicies();
@@ -39,6 +40,12 @@ public class AdminController {
     public String createCouponTemplate(@ModelAttribute CouponCreateRequestDto dto) {
         // 폼 데이터를 받아 쿠폰 서버로 전송
         couponService.createCouponTemplate(dto);
+        return "redirect:/admin/coupons.html";
+    }
+
+    @PostMapping("/admin/policy/{id}")
+    public String disablePolicy(@PathVariable("id") Long id) {
+        couponService.disableCouponPolicy(id);
         return "redirect:/admin/coupons.html";
     }
 }

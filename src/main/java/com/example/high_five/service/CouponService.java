@@ -34,4 +34,7 @@ public interface CouponService {
 
     @PostMapping("/api/admin/coupons")
     void createCouponTemplate(@RequestBody CouponCreateRequestDto dto);
+
+    @DeleteMapping("/api/admin/coupon-policy/{id}")
+    void disableCouponPolicy(@PathVariable("id") Long id);
 }

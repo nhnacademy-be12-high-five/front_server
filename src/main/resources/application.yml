@@ -1,3 +1,5 @@
 spring:
   application:
     name: frontend_server
+server:
+  port: 8081

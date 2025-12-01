@@ -169,6 +169,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            gap: 10px;
         }
 
         .coupon-table th, .coupon-table td {
@@ -285,6 +286,7 @@
                         <th>쿠폰 이름</th>
                         <th>할인 타입</th>
                         <th>할인 값</th>
+                        <th>상태</th> <th>관리</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -296,6 +298,24 @@
                             <span th:text="${policy.discountValue}">1000</span>
                             <span th:if="${policy.discountType == 'FIXED'}">원</span>
                             <span th:if="${policy.discountType == 'PERCENTAGE'}">%</span>
+                        </td>
+                        <td>
+                            <span th:text="${policy.status}"
+                                  th:style="${policy.status == 'ACTIVE'} ? 'color:green; font-weight:bold;' : 'color:gray;'">
+                                ACTIVE
+                            </span>
+                        </td>
+                        <td>
+                            <form th:if="${policy.status == 'ACTIVE'}"
+                                  th:action="@{/admin/policy/{id}(id=${policy.id})}"
+                                  method="post"
+                                  onsubmit="return confirm('정말 이 정책을 비활성화하시겠습니까?');">
+                                <button type="submit"
+                                        style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                                    비활성화
+                                </button>
+                            </form>
+                            <span th:unless="${policy.status == 'ACTIVE'}">-</span>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(policies)}">
@@ -371,6 +391,7 @@
                         <th>설명</th>
                         <th>발행 수량</th>
                         <th>유효 기간</th>
+                        <th>쿠폰 중단</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -380,6 +401,7 @@
                         <td th:text="${coupon.description}">설명</td>
                         <td th:text="${coupon.issueCount} + '장'">1000장</td>
                         <td th:text="${coupon.validPeriodDate} + '일'">30일</td>
+
                     </tr>
                     <tr th:if="${#lists.isEmpty(coupons)}">
                         <td colspan="5" style="text-align: center; padding: 20px;">등록된 쿠폰이 없습니다.</td>

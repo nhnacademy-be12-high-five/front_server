@@ -4,12 +4,14 @@ import com.example.high_five.dto.coupon.CouponTemplateDto;
 import com.example.high_five.dto.coupon.UserCouponIssueRequestDto;
 import com.example.high_five.service.CouponService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +50,7 @@ public class CouponController {
     }
 
     @PostMapping("/coupon/issue")
-    public String issueCoupon(@RequestParam Long couponId) {
+    public String issueCoupon(@RequestParam Long couponId, RedirectAttributes redirectAttributes) {
         // 1. 임시 사용자 ID (로그인 구현 전이므로 1번 사용자로 고정)
         Long userId = 1L;
 
@@ -57,9 +59,17 @@ public class CouponController {
 
             couponService.issueCoupon(userId, requestDto);
 
-            System.out.println("쿠폰 발급 성공! ID: " + couponId);
+            redirectAttributes.addFlashAttribute("message", "쿠폰이 성공적으로 발급되었습니다.");
 
+        } catch (FeignException e) {
+            if (e.status() == 409) {
+                redirectAttributes.addFlashAttribute("errorMessage", "이미 해당 쿠폰을 발급받으셨습니다.");
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "쿠폰 발급에 실패했습니다. (오류: " + e.status() + ")");
+            }
+            System.err.println("쿠폰 발급 실패: " + e.getMessage());
         } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "시스템 오류가 발생했습니다.");
             System.err.println("쿠폰 발급 실패: " + e.getMessage());
         }
         return "redirect:/mypage?tab=coupons";
