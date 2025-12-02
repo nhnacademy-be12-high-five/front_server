@@ -22,4 +22,5 @@ public class CouponTemplateDto {
     private Integer validPeriodDate;
     private LocalDateTime validEndAt;
     private Integer remainingCount;
+    private String status;
 }

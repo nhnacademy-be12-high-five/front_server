@@ -62,8 +62,16 @@ public class CouponController {
             redirectAttributes.addFlashAttribute("message", "쿠폰이 성공적으로 발급되었습니다.");
 
         } catch (FeignException e) {
+            String serverMessage = e.contentUTF8();
+
             if (e.status() == 409) {
                 redirectAttributes.addFlashAttribute("errorMessage", "이미 해당 쿠폰을 발급받으셨습니다.");
+            } else if (e.status() == 400) {
+                if (serverMessage != null && !serverMessage.isBlank()) {
+                    redirectAttributes.addFlashAttribute("errorMessage", serverMessage);
+                } else {
+                    redirectAttributes.addFlashAttribute("errorMessage", "잘못된 요청입니다.");
+                }
             } else {
                 redirectAttributes.addFlashAttribute("errorMessage", "쿠폰 발급에 실패했습니다. (오류: " + e.status() + ")");
             }
