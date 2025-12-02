@@ -15,4 +15,5 @@ public class CouponPolicyResponseDto {
     private Long discountValue;
     private Long minOrderValue;
     private Long maxDiscountValue;
+    private String status;
 }

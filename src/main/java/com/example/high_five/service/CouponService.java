@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "GATEWAY", url = "http://127.0.0.1:10485")
+@FeignClient(name = "GATEWAY", url = "http://gateway_server:8000")
 public interface CouponService {
 
     @GetMapping("/api/coupons/members/{memberId}")
@@ -34,4 +34,7 @@ public interface CouponService {
 
     @PostMapping("/api/admin/coupons")
     void createCouponTemplate(@RequestBody CouponCreateRequestDto dto);
+
+    @DeleteMapping("/api/admin/coupon-policy/{id}")
+    void disableCouponPolicy(@PathVariable("id") Long id);
 }

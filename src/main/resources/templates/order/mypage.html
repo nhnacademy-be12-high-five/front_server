@@ -1186,6 +1186,18 @@
 
     document.addEventListener("DOMContentLoaded", updateConfirmButtons);
 </script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const errorMessage = [[${errorMessage}]];
+    const message = [[${message}]];
+
+    if (errorMessage) {
+        alert(errorMessage);
+    } else if (message) {
+        alert(message);
+    }
+    /*]]>*/
+</script>
 
 
 
