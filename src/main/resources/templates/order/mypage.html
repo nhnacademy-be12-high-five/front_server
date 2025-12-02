@@ -933,13 +933,16 @@
             <div class="coupon-card" th:each="coupon : ${myCoupons}">
                 <div class="coupon-header">
                     <div class="coupon-title" th:text="${coupon.couponName}">쿠폰 이름</div>
-                    <span class="coupon-badge"
-                          th:classappend="${coupon.status == 'ISSUED'} ? 'badge-available' :
-                                         (${coupon.status == 'USED'} ? 'badge-used' : 'badge-expired')"
-                          th:text="${coupon.status == 'ISSUED'} ? '사용 가능' :
-                                  (${coupon.status == 'USED'} ? '사용 완료' : '기한 만료')">
-                        상태
-                    </span>
+
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="coupon-badge"
+                              th:classappend="${coupon.status == 'ISSUED'} ? 'badge-available' :
+                                             (${coupon.status == 'USED'} ? 'badge-used' : 'badge-expired')"
+                              th:text="${coupon.status == 'ISSUED'} ? '사용 가능' :
+                                      (${coupon.status == 'USED'} ? '사용 완료' : '기한 만료')">
+                            상태
+                        </span>
+                    </div>
                 </div>
                 <div class="coupon-info">
                     <div class="info-item">

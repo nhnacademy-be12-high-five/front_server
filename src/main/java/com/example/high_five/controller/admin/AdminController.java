@@ -1,17 +1,13 @@
 package com.example.high_five.controller.admin;
 
-import com.example.high_five.dto.coupon.CouponCreateRequestDto;
-import com.example.high_five.dto.coupon.CouponPolicyRequestDto;
-import com.example.high_five.dto.coupon.CouponPolicyResponseDto;
-import com.example.high_five.dto.coupon.CouponTemplateDto;
+import com.example.high_five.dto.coupon.*;
 import com.example.high_five.service.CouponService;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -33,19 +29,57 @@ public class AdminController {
     public String createPolicy(@ModelAttribute CouponPolicyRequestDto dto) {
         couponService.createCouponPolicy(dto);
 
-        return "redirect:/admin/coupons";
+        return "redirect:/api/coupons/admin/coupons";
     }
 
     @PostMapping("/api/coupons/admin/coupons/create")
-    public String createCouponTemplate(@ModelAttribute CouponCreateRequestDto dto) {
-        // 폼 데이터를 받아 쿠폰 서버로 전송
-        couponService.createCouponTemplate(dto);
-        return "redirect:/admin/coupons";
+    public String createCouponTemplate(@ModelAttribute CouponCreateRequestDto dto, RedirectAttributes redirectAttributes) {
+        try {
+            couponService.createCouponTemplate(dto);
+            redirectAttributes.addFlashAttribute("message", "쿠폰 템플릿이 성공적으로 생성되었습니다.");
+        } catch (FeignException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "템플릿 생성 실패: 정책이 비활성화 상태이거나 잘못된 요청입니다.");
+        }
+        return "redirect:/api/coupons/admin/coupons";
     }
 
     @PostMapping("/api/coupons/admin/policy/{id}")
-    public String disablePolicy(@PathVariable("id") Long id) {
-        couponService.disableCouponPolicy(id);
-        return "redirect:/admin/coupons";
+    public String disablePolicy(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        try {
+            couponService.disableCouponPolicy(id);
+            redirectAttributes.addFlashAttribute("message", "정책이 비활성화되었으며, 관련 쿠폰이 모두 만료 처리되었습니다.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "정책 비활성화 중 오류가 발생했습니다.");
+        }
+        return "redirect:/api/coupons/admin/coupons";
+    }
+
+    @PostMapping("/api/coupons/admin/issue-manual")
+    public String issueCouponManually(@RequestParam Long userId,
+                                      @RequestParam Long couponId,
+                                      RedirectAttributes redirectAttributes) {
+        try {
+            MemberCouponIssueRequestDto requestDto = new MemberCouponIssueRequestDto(couponId, userId);
+            couponService.issueCouponByAdmin(requestDto);
+
+            redirectAttributes.addFlashAttribute("message", "회원(" + userId + ")에게 쿠폰이 정상적으로 지급되었습니다.");
+        } catch (FeignException e) {
+            String serverMessage = e.contentUTF8();
+
+            if (e.status() == 400 && serverMessage != null) {
+                // "정책 중단" 또는 "잘못된 요청" 메시지 전달
+                redirectAttributes.addFlashAttribute("errorMessage", serverMessage);
+            } else if (e.status() == 409) {
+                redirectAttributes.addFlashAttribute("errorMessage", "이미 해당 쿠폰을 보유한 회원입니다.");
+            } else if (e.status() == 404) {
+                redirectAttributes.addFlashAttribute("errorMessage", "존재하지 않는 회원 또는 쿠폰입니다.");
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "쿠폰 지급 실패 (오류: " + e.status() + ")");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "시스템 오류가 발생했습니다.");
+        }
+
+        return "redirect:/api/coupons/admin/coupons";
     }
 }
