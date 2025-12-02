@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -370,8 +370,8 @@
     <!-- ===== 헤더 (메인과 동일 포맷) ===== -->
     <header id="header" role="banner">
         <div class="container">
-            <a href="./cart.html" class="logo">
-              <img src="../img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100" />
+            <a href="./" class="logo">
+                <img src="../img/logo.png" alt="HIGH-FIVE 로고"/>
                 <div class="brand">HIGH-FIVE BOOKS</div>
             </a>
 
@@ -408,8 +408,6 @@
                 <a class="user-link" href="/cart">
                     <img src="../img/icon-cart.png" alt="장바구니" class="user-icon" />
                 </a>
-
-                <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
             </div>
 
         </div>
@@ -431,57 +429,48 @@
             </div>
 
             <div class="cart-list" id="cartList">
-              <!-- 샘플 아이템 -->
-              <article class="item" data-id="1" data-price="20000">
-                <input type="checkbox" class="chk" />
-                <div class="thumb">
-                  <img
-                    src="./img/trend2026.jpg"
-                    alt="트렌드 코리아 2026 표지"
-                    onerror="this.parentNode.textContent='BOOK'"
-                  />
-                </div>
-                <div>
-                  <div class="item-title">트렌드 코리아 2026</div>
-                  <div class="item-meta">김난도 외 | 2025.09 | 미래의창</div>
-                  <div class="subrow">포장선택: 포장</div>
-                </div>
-                <div class="qty">
-                  <button class="dec">-</button>
-                  <input type="number" class="num" value="1" min="1" />
-                  <button class="inc">+</button>
-                </div>
-                <div class="price"><span class="p">20,000</span>원</div>
-                <button class="del" title="삭제">×</button>
-              </article>
-
-              <article class="item" data-id="2" data-price="19000">
-                <input type="checkbox" class="chk" />
-                <div class="thumb">
-                  <img
-                    src="./img/quantumworld.jpg"
-                    alt="처음 만나는 양자의 세계 표지"
-                    onerror="this.parentNode.textContent='BOOK'"
-                  />
-                </div>
-                <div>
-                  <div class="item-title">처음 만나는 양자의 세계</div>
-                  <div class="item-meta">채은미 | 2025.09 | 사이언스북스</div>
-                  <div class="subrow">포장선택: 포장 안 함</div>
-                </div>
-                <div class="qty">
-                  <button class="dec">-</button>
-                  <input type="number" class="num" value="1" min="1" />
-                  <button class="inc">+</button>
-                </div>
-                <div class="price"><span class="p">19,000</span>원</div>
-                <button class="del" title="삭제">×</button>
-              </article>
-
               <!-- 빈 상태 표현용 -->
               <div class="empty" id="emptyState" style="display: none">
                 장바구니가 비어 있습니다.
               </div>
+
+              <article class="item"
+                       th:unless="${cartList == null or cartList.items.isEmpty()}"
+                       th:each="item : ${cartList.items}"
+                       th:data-book-id="${item.bookId}"
+                       th:data-price="${item.price}"> <input type="checkbox" class="chk" checked />
+
+                <div class="thumb">
+                  <img th:src="${item.image}"
+                       th:alt="${item.bookTitle}"
+                       onerror="this.parentNode.textContent='BOOK'" />
+                </div>
+
+                <div>
+                  <div class="item-title" th:text="${item.bookTitle}">책 제목</div>
+                  <div class="item-meta">
+                    <span th:text="${#numbers.formatInteger(item.price, 0, 'COMMA')}">20,000</span>원
+                  </div>
+                </div>
+
+                <div class="qty">
+                  <button class="dec" type="button" onclick="changeQuantity(this, -1)">-</button>
+
+                  <input type="number" class="num"
+                         th:value="${item.quantity}"
+                         readonly /> <button class="inc" type="button" onclick="changeQuantity(this, 1)">+</button>
+                </div>
+
+                <div class="price">
+                <span class="p"
+                      th:text="${#numbers.formatInteger(item.price * item.quantity, 0, 'COMMA')}">
+                      20,000
+                </span>원
+                </div>
+
+                <button class="del" title="삭제" onclick="deleteItem(this)">×</button>
+              </article>
+
             </div>
 
             <div class="cart-toolbar">
@@ -554,111 +543,117 @@
       </div>
     </footer>
 
-    <script>
-      // 포맷터
+    <script th:inline="javascript">
+      // [1] 숫자 포맷터
       const fmt = (n) => n.toLocaleString("ko-KR");
 
-      const listEl = document.getElementById("cartList");
-      const emptyEl = document.getElementById("emptyState");
-      const sumProducts = document.getElementById("sumProducts");
-      const sumShipping = document.getElementById("sumShipping");
-      const sumTotal = document.getElementById("sumTotal");
-      const chkAllTop = document.getElementById("chkAll");
-      const chkAllBottom = document.getElementById("chkAllBottom");
+      // [2] 초기 로딩 시 합계 계산 실행
+      document.addEventListener("DOMContentLoaded", () => {
+        updateTotals();
+      });
 
+      // ==========================================
+      // [핵심] 서버 통신 로직 (수량 변경)
+      // ==========================================
+      function changeQuantity(btn, change) {
+        const itemRow = btn.closest(".item");
+        const bookId = itemRow.getAttribute("data-book-id");
+        const input = itemRow.querySelector(".num");
+
+        // 현재 값 + 변화량
+        let newQty = parseInt(input.value) + change;
+        if (newQty < 1) return; // 1 미만 방지
+
+        const requestData = {
+          bookId: bookId,
+          quantity: newQty
+        };
+
+        // PUT 요청 전송
+        fetch('/cart/items', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(requestData)
+        })
+                .then(response => {
+                  if (response.ok) {
+                    // 성공 시 페이지 새로고침 (가장 확실한 데이터 동기화)
+                    location.reload();
+                  } else {
+                    alert("수량 변경에 실패했습니다.");
+                  }
+                })
+                .catch(err => console.error(err));
+      }
+
+      // ==========================================
+      // [핵심] 서버 통신 로직 (삭제)
+      // ==========================================
+      function deleteItem(btn) {
+        if(!confirm("정말 삭제하시겠습니까?")) return;
+
+        const itemRow = btn.closest(".item");
+        const bookId = itemRow.getAttribute("data-book-id");
+
+        // DELETE 요청 (Controller에 매핑 필요, 없으면 생략 가능)
+        // 현재 Controller에는 PUT만 있으므로, 필요하다면 추가해야 합니다.
+        /*
+        fetch('/cart/items/' + bookId, { method: 'DELETE' })
+        .then(res => {
+            if(res.ok) location.reload();
+            else alert("삭제 실패");
+        });
+        */
+        alert("삭제 기능은 백엔드 API 연결이 필요합니다.");
+      }
+
+
+      // ==========================================
+      // [UI] 합계 계산 (기존 로직 재활용)
+      // ==========================================
       function updateTotals() {
+        const listEl = document.getElementById("cartList");
         const items = [...listEl.querySelectorAll(".item")];
+
+        // 선택된 아이템만 계산
         const selected = items.filter((it) => it.querySelector(".chk").checked);
+
         const productSum = selected.reduce((acc, it) => {
-          const price = Number(it.dataset.price);
-          const qty = Number(it.querySelector(".num").value || 1);
-          return acc + price * qty;
+          const price = Number(it.dataset.price); // th:data-price 값
+          const qty = Number(it.querySelector(".num").value);
+          return acc + (price * qty);
         }, 0);
-        const shipping = productSum > 0 && productSum < 20000 ? 3000 : 0;
-        sumProducts.textContent = fmt(productSum) + "원";
-        sumShipping.textContent = fmt(shipping) + "원";
-        sumTotal.textContent = fmt(productSum + shipping) + "원";
 
-        // 빈 상태
-        const hasItem = items.length > 0;
-        emptyEl.style.display = hasItem ? "none" : "block";
+        // 배송비 정책: 0원이면 0원, 2만원 미만이면 3000원, 그 이상 무료
+        let shipping = 0;
+        if (productSum > 0 && productSum < 20000) {
+          shipping = 3000;
+        }
 
-        // 개별 금액 표시 갱신
-        items.forEach((it) => {
-          const price = Number(it.dataset.price);
-          const qty = Number(it.querySelector(".num").value || 1);
-          it.querySelector(".p").textContent = fmt(price * qty);
-        });
-
-        // 전체선택 체크상태 동기화
-        const checks = items.map((it) => it.querySelector(".chk").checked);
-        const allChecked = checks.length > 0 && checks.every(Boolean);
-        chkAllTop.checked = allChecked;
-        chkAllBottom.checked = allChecked;
+        // 화면 업데이트
+        document.getElementById("sumProducts").textContent = fmt(productSum) + "원";
+        document.getElementById("sumShipping").textContent = fmt(shipping) + "원";
+        document.getElementById("sumTotal").textContent = fmt(productSum + shipping) + "원";
       }
 
-      // 수량 증감/삭제/체크 이벤트
-      listEl.addEventListener("click", (e) => {
-        const it = e.target.closest(".item");
-        if (!it) return;
-        if (e.target.classList.contains("inc")) {
-          const n = it.querySelector(".num");
-          n.value = Number(n.value || 1) + 1;
-          updateTotals();
-        }
-        if (e.target.classList.contains("dec")) {
-          const n = it.querySelector(".num");
-          n.value = Math.max(1, Number(n.value || 1) - 1);
-          updateTotals();
-        }
-        if (e.target.classList.contains("del")) {
-          it.remove();
-          updateTotals();
-        }
-      });
+      // 체크박스 클릭 시 합계 재계산 이벤트 연결
+      const listEl = document.getElementById("cartList");
       listEl.addEventListener("change", (e) => {
-        if (
-          e.target.classList.contains("num") ||
-          e.target.classList.contains("chk")
-        ) {
-          updateTotals();
+        if (e.target.classList.contains("chk")) {
+          updateTotals(); // 체크박스 상태 바뀌면 합계 다시 계산
         }
       });
 
-      // 전체선택/선택삭제/전체비우기
-      function setAll(checked) {
-        listEl
-          .querySelectorAll(".item .chk")
-          .forEach((ch) => (ch.checked = checked));
-        updateTotals();
-      }
-      chkAllTop.addEventListener("change", (e) => setAll(e.target.checked));
-      chkAllBottom.addEventListener("change", (e) => setAll(e.target.checked));
-
-      document
-        .getElementById("btnRemoveSelected")
-        .addEventListener("click", () => {
-          [...listEl.querySelectorAll(".item")].forEach((it) => {
-            if (it.querySelector(".chk").checked) it.remove();
-          });
-          updateTotals();
-        });
-      document.getElementById("btnClear").addEventListener("click", () => {
-        [...listEl.querySelectorAll(".item")].forEach((it) => it.remove());
+      // 전체 선택 로직
+      const chkAll = document.getElementById("chkAll");
+      chkAll.addEventListener("change", (e) => {
+        const isChecked = e.target.checked;
+        document.querySelectorAll(".item .chk").forEach(chk => chk.checked = isChecked);
         updateTotals();
       });
 
-      document.getElementById("btnOrder").addEventListener("click", () => {
-        if (listEl.querySelectorAll(".item").length === 0) {
-          alert("장바구니가 비어 있습니다.");
-          return;
-        }
-        alert("주문서로 이동합니다. (연동 필요)");
-        // location.href = '/order.html';
-      });
-
-      // 최초 계산
-      updateTotals();
     </script>
   </body>
 </html>

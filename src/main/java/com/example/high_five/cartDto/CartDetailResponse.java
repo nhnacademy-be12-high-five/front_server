@@ -1,0 +1,10 @@
+package com.example.high_five.cartDto;
+
+public record CartDetailResponse(Long bookId,
+                                 String title,
+                                 String author,
+                                 Long price,
+                                 int quantity,
+                                 Long totalPrice,
+                                 String image) {}
+// 제목 저자 가격 사진 수량 총가격
