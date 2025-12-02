@@ -978,8 +978,10 @@
             </div>
             <div class="points-box">
                 <div class="points-label">누적 적립 포인트</div>
-                <div class="points-value"> - </div>
-                <div class="points-unit">(집계 중)</div>
+                <div class="points-value"
+                     th:text="${#numbers.formatInteger((balance?.totalEarnedPoint ?: 0), 0, 'COMMA')}">0</div>
+
+                <div class="points-unit">P</div>
             </div>
         </div>
         <div class="points-history">

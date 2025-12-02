@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class PointBalanceResponse {
     private Long memberId;
     private Long currentPoint;
+    private Long totalEarnedPoint;
 }

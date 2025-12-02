@@ -73,7 +73,7 @@ public class OrderController {
             }
         } catch (Exception e) {
             // 포인트 서버 죽어도 마이페이지는 뜨게끔
-            model.addAttribute("balance", new PointBalanceResponse(testUserId, 0L));
+            model.addAttribute("balance", new PointBalanceResponse(testUserId, 0L, 0L));
             model.addAttribute("histories", Collections.emptyList());
         }
 
