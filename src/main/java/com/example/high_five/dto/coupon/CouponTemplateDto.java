@@ -23,4 +23,5 @@ public class CouponTemplateDto {
     private LocalDateTime validEndAt;
     private Integer remainingCount;
     private String status;
+    private String couponType;
 }

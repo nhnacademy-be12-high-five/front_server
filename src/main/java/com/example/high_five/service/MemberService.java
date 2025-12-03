@@ -1,12 +1,12 @@
 package com.example.high_five.service;
 
 import com.example.high_five.common.CustomPage;
-import com.example.high_five.dto.coupon.PointAdminAdjustmentRequest;
-import com.example.high_five.dto.coupon.PointAdminPolicyRequest;
-import com.example.high_five.dto.coupon.PointAdminPolicyResponse;
-import com.example.high_five.dto.coupon.PointBalanceResponse;
-import com.example.high_five.dto.coupon.PointHistoryResponse;
-import com.example.high_five.dto.coupon.PointTransactionResponse;
+import com.example.high_five.dto.point.PointAdminAdjustmentRequest;
+import com.example.high_five.dto.point.PointAdminPolicyRequest;
+import com.example.high_five.dto.point.PointAdminPolicyResponse;
+import com.example.high_five.dto.point.PointBalanceResponse;
+import com.example.high_five.dto.point.PointHistoryResponse;
+import com.example.high_five.dto.point.PointTransactionResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "gateway-service", contextId = "memberClient", url = "http://localhost:8082")
+@FeignClient(name = "gateway-server", contextId = "memberClient", url = "http://gateway-server:8000")
 public interface MemberService {
     // 관리자 - 정책 조회
     @GetMapping("/api/admin/points/policy")

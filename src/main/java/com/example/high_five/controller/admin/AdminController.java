@@ -1,6 +1,9 @@
 package com.example.high_five.controller.admin;
 
 import com.example.high_five.dto.coupon.*;
+import com.example.high_five.dto.point.PointAdminAdjustmentRequest;
+import com.example.high_five.dto.point.PointAdminPolicyRequest;
+import com.example.high_five.dto.point.PointAdminPolicyResponse;
 import com.example.high_five.service.CouponService;
 import com.example.high_five.service.MemberService;
 import feign.FeignException;

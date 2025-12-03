@@ -2,8 +2,8 @@ package com.example.high_five.controller.order;
 
 import com.example.high_five.common.CustomPage;
 import com.example.high_five.dto.coupon.MemberCouponResponseDto;
-import com.example.high_five.dto.coupon.PointBalanceResponse;
-import com.example.high_five.dto.coupon.PointHistoryResponse;
+import com.example.high_five.dto.point.PointBalanceResponse;
+import com.example.high_five.dto.point.PointHistoryResponse;
 import com.example.high_five.service.CouponService;
 import com.example.high_five.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
