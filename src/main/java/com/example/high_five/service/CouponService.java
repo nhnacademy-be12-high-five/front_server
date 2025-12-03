@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 @FeignClient(name = "gateway-server", contextId = "couponClient", url = "http://gateway-server:8000")
+//@FeignClient(name = "gateway-server", contextId = "couponClient", url = "http://localhost:8082")
 public interface CouponService {
 
     @GetMapping("/api/coupons/members/{memberId}")
@@ -44,4 +45,7 @@ public interface CouponService {
 
     @PostMapping("/api/coupons/admin/member-coupons/issue")
     void issueCouponByAdmin(@RequestBody MemberCouponIssueRequestDto requestDto);
+
+    @GetMapping("/api/coupons/admin/coupon-policy/{id}")
+    CouponPolicyResponseDto getCouponPolicy(@PathVariable("id") Long id);
 }

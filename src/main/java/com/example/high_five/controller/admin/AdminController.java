@@ -54,7 +54,7 @@ public class AdminController {
         return "redirect:/api/coupons/admin/coupons";
     }
 
-    @PostMapping("/api/coupons/admin/issue-manual")
+    @PostMapping("/api/coupons/admin/member-coupons/issue")
     public String issueCouponManually(@RequestParam Long userId,
                                       @RequestParam Long couponId,
                                       RedirectAttributes redirectAttributes) {
@@ -67,7 +67,6 @@ public class AdminController {
             String serverMessage = e.contentUTF8();
 
             if (e.status() == 400 && serverMessage != null) {
-                // "정책 중단" 또는 "잘못된 요청" 메시지 전달
                 redirectAttributes.addFlashAttribute("errorMessage", serverMessage);
             } else if (e.status() == 409) {
                 redirectAttributes.addFlashAttribute("errorMessage", "이미 해당 쿠폰을 보유한 회원입니다.");
@@ -78,9 +77,22 @@ public class AdminController {
             }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "시스템 오류가 발생했습니다.");
+            e.printStackTrace();
         }
 
         return "redirect:/api/coupons/admin/coupons";
+    }
+
+    @GetMapping("/api/coupons/admin/policy/{id}")
+    public String policyDetail(@PathVariable("id") Long id, Model model) {
+        // 1. Feign Client로 백엔드 데이터 조회
+        CouponPolicyResponseDto policy = couponService.getCouponPolicy(id);
+
+        // 2. 모델에 담기
+        model.addAttribute("policy", policy);
+
+        // 3. 상세 페이지 뷰 반환 (새로 만들 파일)
+        return "admin/policy-detail";
     }
 
     // 여기까지 쿠폰 어드민

@@ -1,8 +1,5 @@
 spring:
   application:
     name: frontend_server
-  cloud:
-    config:
-      enabled: false
 server:
   port: 8081
