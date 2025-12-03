@@ -292,7 +292,13 @@
                     <tbody>
                     <tr th:each="policy : ${policies}">
                         <td th:text="${policy.id}">1</td>
-                        <td th:text="${policy.name}">겨울 세일 정책</td>
+                        <td>
+                            <a th:href="@{/api/coupons/admin/policy/{id}(id=${policy.id})}"
+                               th:text="${policy.name}"
+                               style="color: #007bff; text-decoration: underline; cursor: pointer;">
+                                정책 이름
+                            </a>
+                        </td>
                         <td th:text="${policy.discountType}">FIXED</td>
                         <td>
                             <span th:text="${policy.discountValue}">1000</span>
@@ -309,7 +315,7 @@
                             <form th:if="${policy.status == 'ACTIVE'}"
                                   th:action="@{/api/coupons/admin/policy/{id}(id=${policy.id})}"
                                   method="post"
-                                  onsubmit="return confirm('정말 이 정책을 비활성화하시겠습니까?\\n\\n[주의] 해당 정책으로 발급된 모든 미사용 쿠폰이 \'만료(EXPIRED)\' 처리되며, 더 이상 복구할 수 없습니다.');">
+                                  onsubmit="return confirm('정말 이 정책을 비활성화하시겠습니까?\n\n[주의] 해당 정책으로 발급된 모든 미사용 쿠폰이 \'만료(EXPIRED)\' 처리되며, 더 이상 복구할 수 없습니다.');">
                                 <button type="submit"
                                         style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
                                     비활성화
@@ -465,10 +471,10 @@
             </div>
             <div class="card">
                 <h3>회원 쿠폰 수동 지급</h3>
-                <form action="/api/coupons/admin/issue-manual" method="post">
+                <form action="/api/coupons/admin/member-coupons/issue" method="post">
                     <div class="form-row">
                         <label>대상 회원 ID</label>
-                        <input type="number" name="userId" placeholder="회원 ID (예: 100)" required>
+                        <input type="number" name="userId" placeholder="회원 ID (예: 1)" required>
                     </div>
 
                     <div class="form-row">
@@ -477,7 +483,7 @@
                             <option value="">-- 쿠폰 선택 --</option>
                             <option th:each="coupon : ${coupons}"
                                     th:value="${coupon.id}"
-                                    th:text="|${coupon.couponName} (ID: ${coupon.id})|">
+                                    th:text="${coupon.couponName} + ' (ID: ' + ${coupon.id} + ')'">
                                 쿠폰명
                             </option>
                         </select>

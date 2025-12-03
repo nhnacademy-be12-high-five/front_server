@@ -25,4 +25,6 @@ public class CouponCreateRequestDto {
     private LocalDateTime issueEndAt;
 
     private Integer validPeriodDate;
+
+    private String couponType;
 }
