@@ -172,14 +172,14 @@
     <h2>HIGHFIVE 관리자</h2>
     <ul class="menu">
         <li><a href="/admin/books" data-key="members">도서 관리</a></li>
-        <li><a href="/admin/points/policy"  data-key="points">포인트 정책 관리</a></li>
+        <li><a href="/admin/points/policy"  data-key="points">포인트 관리</a></li>
         <li><a href="/admin/coupons" data-key="coupons">쿠폰 관리</a></li>
     </ul>
 </aside>
 
 <!-- 메인 콘텐츠 -->
 <div style="flex:1; display:flex; flex-direction:column;">
-    <header>포인트 정책 관리</header>
+    <header>포인트 관리</header>
     <main>
         <div class="card">
             <h3>포인트 적립 정책 수정</h3>
@@ -187,7 +187,7 @@
             <div th:if="${message}" class="alert-msg alert-success" th:text="${message}"></div>
             <div th:if="${errorMessage}" class="alert-msg alert-error" th:text="${errorMessage}"></div>
 
-            <form method="post" th:action="@{/api/admin/points/policy}">
+            <form method="post" th:action="@{/admin/points/policy}">
                 <div class="form-row">
                     <label>회원가입 적립 P</label>
                         <input type="number" name="signupPoint" th:value="${policy.signupPoint ?: 0}">
@@ -205,12 +205,17 @@
 
                 <input type="submit" value="정책 저장하기" class="save-btn">
             </form>
-
+            <div class="updated-info"
+                 th:if="${policy.updatedAt != null}"
+                 th:text="'최근 수정: ' + ${#temporals.format(policy.updatedAt, 'yyyy-MM-dd HH:mm:ss')}">
+            </div>
         </div>
 
         <div class="card">
             <h3>포인트 수동 조정</h3>
-            <form method="post" th:action="@{/api/admin/points/adjustment}">
+            <div th:if="${message2}" class="alert-msg alert-success" th:text="${message2}"></div>
+            <div th:if="${errorMessage2}" class="alert-msg alert-error" th:text="${errorMessage2}"></div>
+            <form method="post" th:action="@{/admin/points/adjustment}">
                 <div class="form-row">
                     <label>회원 ID</label>
                         <input type="number" name="memberId" placeholder="회원번호 입력">
