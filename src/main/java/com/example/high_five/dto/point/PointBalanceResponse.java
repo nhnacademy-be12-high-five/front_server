@@ -1,4 +1,4 @@
-package com.example.high_five.dto.coupon;
+package com.example.high_five.dto.point;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

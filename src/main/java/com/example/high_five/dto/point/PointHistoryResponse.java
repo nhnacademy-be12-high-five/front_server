@@ -1,4 +1,4 @@
-package com.example.high_five.dto.coupon;
+package com.example.high_five.dto.point;
 
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;

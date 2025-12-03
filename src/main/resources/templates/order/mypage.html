@@ -946,8 +946,18 @@
                 </div>
                 <div class="coupon-info">
                     <div class="info-item">
-                        <span class="info-label">할인 금액</span>
-                        <span class="info-value" th:text="${#numbers.formatInteger(coupon.discountValue, 0, 'COMMA') + '원'}">0원</span>
+                        <span class="info-label">할인 혜택</span>
+                        <span class="info-value">
+                            <span th:if="${coupon.discountType == 'FIXED'}"
+                                  th:text="${#numbers.formatInteger(coupon.discountValue, 0, 'COMMA') + '원'}">
+                                1,000원
+                            </span>
+
+                            <span th:if="${coupon.discountType == 'PERCENTAGE'}"
+                                  th:text="${coupon.discountValue + '%'}">
+                                10%
+                            </span>
+                        </span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">유효기간</span>

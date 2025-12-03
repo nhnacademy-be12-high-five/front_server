@@ -82,4 +82,6 @@ public class AdminController {
 
         return "redirect:/api/coupons/admin/coupons";
     }
+
+    // 여기까지 쿠폰 어드민
 }
