@@ -224,9 +224,9 @@
 <aside class="sidebar">
     <h2>HIGHFIVE 관리자</h2>
     <ul class="menu">
-        <li><a href="books.html">도서 관리</a></li>
-        <li><a href="points.html">포인트 정책 관리</a></li>
-        <li><a href="coupons.html" class="active">쿠폰 관리</a></li>
+        <li><a href="/admin/books">도서 관리</a></li>
+        <li><a href="/admin/points">포인트 정책 관리</a></li>
+        <li><a href="/admin/coupons" class="active">쿠폰 관리</a></li>
     </ul>
 </aside>
 
@@ -239,7 +239,7 @@
         <div class="coupon-detail2">
             <div class="card">
                 <h3>쿠폰 정책 생성</h3>
-                <form action="/admin/policy/create" method="post">
+                <form action="/api/coupons/admin/policy/create" method="post">
                     <div class="form-row">
                         <label>정책 이름</label>
                         <input type="text" name="name" placeholder="예: 겨울 정기 세일 정책" required>
@@ -307,9 +307,9 @@
                         </td>
                         <td>
                             <form th:if="${policy.status == 'ACTIVE'}"
-                                  th:action="@{/admin/policy/{id}(id=${policy.id})}"
+                                  th:action="@{/api/coupons/admin/policy/{id}(id=${policy.id})}"
                                   method="post"
-                                  onsubmit="return confirm('정말 이 정책을 비활성화하시겠습니까?');">
+                                  onsubmit="return confirm('정말 이 정책을 비활성화하시겠습니까?\\n\\n[주의] 해당 정책으로 발급된 모든 미사용 쿠폰이 \'만료(EXPIRED)\' 처리되며, 더 이상 복구할 수 없습니다.');">
                                 <button type="submit"
                                         style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
                                     비활성화
@@ -333,7 +333,7 @@
         <div class="coupon-detail">
             <div class="card">
                 <h3>쿠폰 템플릿 생성</h3>
-                <form action="/admin/coupons/create" method="post">
+                <form action="/api/coupons/admin/coupons/create" method="post">
                     <div class="form-row">
                         <label>적용 정책 선택</label>
                         <select name="id" required>
@@ -343,6 +343,14 @@
                                     th:text="${policy.name}">
                                 정책 이름
                             </option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <label>발급 방식</label>
+                        <select name="couponType">
+                            <option value="NORMAL">일반 (발급함 공개)</option>
+                            <option value="PRIVATE">비공개 (관리자 수동 지급용)</option>
                         </select>
                     </div>
 
@@ -389,9 +397,10 @@
                         <th>ID</th>
                         <th>쿠폰 이름</th>
                         <th>설명</th>
-                        <th>발행 수량</th>
+                        <th>발급 방식</th>
+                        <th>잔여 / 전체</th>
                         <th>유효 기간</th>
-                        <th>쿠폰 중단</th>
+                        <th>상태</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -399,12 +408,53 @@
                         <td th:text="${coupon.id}">1</td>
                         <td th:text="${coupon.couponName}">신규 가입 쿠폰</td>
                         <td th:text="${coupon.description}">설명</td>
-                        <td th:text="${coupon.issueCount} + '장'">1000장</td>
+                        <td>
+                            <span th:if="${coupon.couponType == 'NORMAL'}"
+                                  style="color: #666;">
+                                일반
+                            </span>
+                            <span th:if="${coupon.couponType == 'PRIVATE'}"
+                                              style="color: #6f42c1; font-weight: bold;">
+                                🔒 비공개
+                            </span>
+                        </td>
+                        <td>
+                            <span th:if="${coupon.issueCount != null}">
+                                <span th:text="${coupon.remainingCount}" style="color: var(--color-primary); font-weight: bold;">50</span>
+                                <span> / </span>
+                                <span th:text="${coupon.issueCount}">100</span>
+                                <span>장</span>
+                            </span>
+                            <span th:if="${coupon.issueCount == null}">
+                                무제한
+                            </span>
+                        </td>
                         <td th:text="${coupon.validPeriodDate} + '일'">30일</td>
-
+                        <td>
+                            <span th:if="${coupon.status == 'ACTIVE'}"
+                                  style="color: green; font-weight: bold;">
+                                발급 중
+                            </span>
+                            <span th:if="${coupon.status == 'INACTIVE'}"
+                                  style="color: red; font-weight: bold;">
+                                중단됨
+                            </span>
+                            <span th:if="${coupon.status == 'EXPIRED'}"
+                                  style="color: gray; font-weight: bold;">
+                                기간 만료
+                            </span>
+                            <span th:if="${coupon.status == 'SOLD_OUT'}"
+                                  style="color: orange; font-weight: bold;">
+                                소진됨
+                            </span>
+                            <span th:if="${coupon.status == 'WAITING'}"
+                                  style="color: blue; font-weight: bold;">
+                                대기 중
+                            </span>
+                        </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(coupons)}">
-                        <td colspan="5" style="text-align: center; padding: 20px;">등록된 쿠폰이 없습니다.</td>
+                        <td colspan="6" style="text-align: center; padding: 20px;">등록된 쿠폰이 없습니다.</td>
                     </tr>
                     </tbody>
                 </table>
@@ -413,9 +463,49 @@
                     최근 조회: <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd HH:mm:ss')}"></span>
                 </div>
             </div>
+            <div class="card">
+                <h3>회원 쿠폰 수동 지급</h3>
+                <form action="/api/coupons/admin/issue-manual" method="post">
+                    <div class="form-row">
+                        <label>대상 회원 ID</label>
+                        <input type="number" name="userId" placeholder="회원 ID (예: 100)" required>
+                    </div>
+
+                    <div class="form-row">
+                        <label>지급할 쿠폰</label>
+                        <select name="couponId" required>
+                            <option value="">-- 쿠폰 선택 --</option>
+                            <option th:each="coupon : ${coupons}"
+                                    th:value="${coupon.id}"
+                                    th:text="|${coupon.couponName} (ID: ${coupon.id})|">
+                                쿠폰명
+                            </option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="save-btn"
+                            onclick="return confirm('해당 회원에게 쿠폰을 지급하시겠습니까?');">
+                        쿠폰 지급하기
+                    </button>
+                </form>
+            </div>
         </div>
     </main>
 </div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const message = [[${message}]];
+    const errorMessage = [[${errorMessage}]];
+
+    if (message) {
+        alert(message);
+    }
+    if (errorMessage) {
+        alert(errorMessage);
+    }
+    /*]]>*/
+</script>
 
 </body>
 </html>

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "GATEWAY", url = "http://127.0.0.1:8000")
+@FeignClient(name = "gateway-server", contextId = "couponClient", url = "http://gateway-server:8000")
 public interface CouponService {
 
     @GetMapping("/api/coupons/members/{memberId}")
@@ -15,26 +15,33 @@ public interface CouponService {
                                          @RequestParam(value = "page", defaultValue = "0") int page,
                                          @RequestParam(value = "size", defaultValue = "10") int size);
 
-    @GetMapping("/api/admin/coupons")
+    @GetMapping("/api/coupons/admin/coupons")
     List<CouponTemplateDto> getAdminCoupons();
 
     @GetMapping("/api/coupons/templates")
     Map<String, Object> getIssuableCoupons(@RequestParam(value = "page", defaultValue = "0") int page,
                                            @RequestParam(value = "size", defaultValue = "10") int size);
 
-    @PostMapping("/api/admin/coupon-policy")
+    @PostMapping("/api/coupons/admin/coupon-policy")
     void createCouponPolicy(@RequestBody CouponPolicyRequestDto dto);
 
     @PostMapping("/api/coupons/issue")
     void issueCoupon(@RequestHeader("X-USER-ID") Long userId,
                      @RequestBody UserCouponIssueRequestDto requestDto);
 
-    @GetMapping("/api/admin/coupon-policy")
+    @GetMapping("/api/coupons/admin/coupon-policy")
     List<CouponPolicyResponseDto> getAllPolicies();
 
-    @PostMapping("/api/admin/coupons")
+    @PostMapping("/api/coupons/admin/coupons")
     void createCouponTemplate(@RequestBody CouponCreateRequestDto dto);
 
-    @DeleteMapping("/api/admin/coupon-policy/{id}")
+    @DeleteMapping("/api/coupons/admin/coupon-policy/{id}")
     void disableCouponPolicy(@PathVariable("id") Long id);
+
+    @DeleteMapping("/api/coupons/members/{memberId}/coupons/{memberCouponId}")
+    void deleteMemberCoupon(@PathVariable("memberId") Long memberId,
+                            @PathVariable("memberCouponId") Long memberCouponId);
+
+    @PostMapping("/api/coupons/admin/member-coupons/issue")
+    void issueCouponByAdmin(@RequestBody MemberCouponIssueRequestDto requestDto);
 }

@@ -933,18 +933,31 @@
             <div class="coupon-card" th:each="coupon : ${myCoupons}">
                 <div class="coupon-header">
                     <div class="coupon-title" th:text="${coupon.couponName}">쿠폰 이름</div>
-                    <span class="coupon-badge"
-                          th:classappend="${coupon.status == 'ISSUED'} ? 'badge-available' :
-                                         (${coupon.status == 'USED'} ? 'badge-used' : 'badge-expired')"
-                          th:text="${coupon.status == 'ISSUED'} ? '사용 가능' :
-                                  (${coupon.status == 'USED'} ? '사용 완료' : '기한 만료')">
-                        상태
-                    </span>
+
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="coupon-badge"
+                              th:classappend="${coupon.status == 'ISSUED'} ? 'badge-available' :
+                                             (${coupon.status == 'USED'} ? 'badge-used' : 'badge-expired')"
+                              th:text="${coupon.status == 'ISSUED'} ? '사용 가능' :
+                                      (${coupon.status == 'USED'} ? '사용 완료' : '기한 만료')">
+                            상태
+                        </span>
+                    </div>
                 </div>
                 <div class="coupon-info">
                     <div class="info-item">
-                        <span class="info-label">할인 금액</span>
-                        <span class="info-value" th:text="${#numbers.formatInteger(coupon.discountValue, 0, 'COMMA') + '원'}">0원</span>
+                        <span class="info-label">할인 혜택</span>
+                        <span class="info-value">
+                            <span th:if="${coupon.discountType == 'FIXED'}"
+                                  th:text="${#numbers.formatInteger(coupon.discountValue, 0, 'COMMA') + '원'}">
+                                1,000원
+                            </span>
+
+                            <span th:if="${coupon.discountType == 'PERCENTAGE'}"
+                                  th:text="${coupon.discountValue + '%'}">
+                                10%
+                            </span>
+                        </span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">유효기간</span>
@@ -969,28 +982,61 @@
         <div class="points-container">
             <div class="points-box">
                 <div class="points-label">보유 포인트</div>
-                <div class="points-value">15,420</div>
+                <div class="points-value"
+                     th:text="${#numbers.formatInteger((balance?.currentPoint ?: 0), 0, 'COMMA')}">0</div>
                 <div class="points-unit">P</div>
             </div>
             <div class="points-box">
                 <div class="points-label">누적 적립 포인트</div>
-                <div class="points-value">82,650</div>
+                <div class="points-value"
+                     th:text="${#numbers.formatInteger((balance?.totalEarnedPoint ?: 0), 0, 'COMMA')}">0</div>
+
                 <div class="points-unit">P</div>
             </div>
         </div>
         <div class="points-history">
             <h3>최근 포인트 내역</h3>
-            <div class="history-item">
-                <span class="history-desc">도서 구매 적립 - (2025.11.01)</span>
-                <span class="history-amount" style="color: var(--color-primary)">+ 3,000 P</span>
+
+            <div class="history-item" th:each="history : ${histories}">
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <span class="history-desc"
+                          th:text="${history.description}"
+                          style="font-weight: 600; color: #333;">상품 구매 적립</span>
+
+                    <span style="font-size: 12px; color: #999;"
+                          th:text="${#temporals.format(history.transactionDate, 'yyyy.MM.dd HH:mm')}">2025.01.01</span>
+                </div>
+
+                <div style="text-align: right;">
+                    <span class="history-amount"
+                          th:text="${(history.amount > 0 ? '+' : '') + #numbers.formatInteger(history.amount, 0, 'COMMA') + ' P'}"
+                          th:style="${history.amount > 0 ? 'color: #007bff' : 'color: #c0392b'}">
+                        + 3,000 P
+                    </span>
+                    <div style="font-size: 12px; color: #666; margin-top: 4px;">
+                        잔액: <span th:text="${#numbers.formatInteger(history.currentPoint, 0, 'COMMA')}">5,000</span> P
+                    </div>
+                </div>
             </div>
-            <div class="history-item">
-                <span class="history-desc">포인트 사용 (2025.10.25)</span>
-                <span class="history-amount" style="color: #c0392b">- 5,000 P</span>
+
+            <div th:if="${#lists.isEmpty(histories)}" class="empty-message">
+                포인트 내역이 없습니다.
             </div>
         </div>
-    </section>
 
+        <div style="margin-top: 20px; text-align: center;" th:if="${!#lists.isEmpty(histories)}">
+            <a th:if="${currentPage > 0}"
+               th:href="@{/mypage(tab='points', page=${currentPage - 1})}"
+               class="btn-outline" style="padding: 5px 10px;">&lt; 이전</a>
+
+            <span style="margin: 0 10px; font-weight: 600;"
+                  th:text="${currentPage + 1} + ' / ' + ${totalPages}">1 / 5</span>
+
+            <a th:if="${currentPage + 1 < totalPages}"
+               th:href="@{/mypage(tab='points', page=${currentPage + 1})}"
+               class="btn-outline" style="padding: 5px 10px;">다음 &gt;</a>
+        </div>
+    </section>
     <section id="tab-orders" class="tab-content"
              th:classappend="${currentTab == 'orders'} ? 'active' : ''">
         <h2 class="section-title">주문 내역</h2>
