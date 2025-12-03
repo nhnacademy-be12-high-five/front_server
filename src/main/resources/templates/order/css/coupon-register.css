@@ -1,0 +1,99 @@
+/* 기존 마이페이지의 모든 <style> 내용을 여기에 복사하거나, 외부 CSS 파일로 분리 */
+/* ... (기존 마이페이지의 CSS 내용) ... */
+
+/* ------------------------------------- */
+/* 5. 쿠폰 발급 페이지 전용 스타일 */
+/* ------------------------------------- */
+.register-page-container {
+    max-width: 800px; /* 마이페이지보다 조금 좁게 설정 */
+    margin: 30px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--color-border-light);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+}
+.page-title {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 30px;
+    color: var(--color-primary);
+    text-align: center;
+}
+
+/* 쿠폰 코드 등록 섹션 */
+.coupon-code-input {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 40px;
+    padding: 20px;
+    border: 1px dashed var(--color-accent); /* 점선으로 구분 */
+    border-radius: 8px;
+    background-color: #fffaf0; /* 밝은 배경 */
+}
+
+.coupon-code-input input {
+    flex-grow: 1;
+    padding: 12px 15px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    outline: none;
+    font-size: 16px;
+}
+
+.coupon-code-input .btn-primary {
+    flex-shrink: 0;
+    width: 120px;
+    padding: 12px 15px;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+/* 다운로드 가능한 쿠폰 목록 */
+.available-coupons h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    border-left: 5px solid var(--color-accent);
+    padding-left: 10px;
+}
+.available-coupon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+}
+.download-coupon-card {
+    border: 2px solid var(--color-primary);
+    border-radius: 8px;
+    padding: 20px;
+    background-color: orange;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.download-coupon-card .coupon-info-text {
+    flex-grow: 1;
+}
+.download-coupon-card h4 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+.download-coupon-card p {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-bottom: 3px;
+}
+.download-coupon-card .btn-download {
+    background-color: var(--color-accent);
+    color: white; /* 버튼 텍스트는 primary 색상으로 강조 */
+    padding: 10px 18px;
+    border-radius: 5px;
+    font-weight: 700;
+    transition: background-color 0.2s;
+    border: 1px solid white;
+}
+.download-coupon-card .btn-download:hover {
+    background-color: #f7e9c4;
+}
