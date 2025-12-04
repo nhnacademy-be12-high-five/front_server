@@ -24,7 +24,7 @@ public class MemberController {
     public String signup(@ModelAttribute MemberCreateRequestDto requestDto) {
         try {
             memberService.registerMember(requestDto);
-            return "redirect:/member/login";
+            return "redirect:/member/login.html";
         } catch (Exception e) {
             log.error(e.getMessage());
             return "redirect:/member/signup?error";
