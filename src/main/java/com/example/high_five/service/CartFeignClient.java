@@ -45,8 +45,4 @@ public interface CartFeignClient {
             @RequestHeader(value = "Cookie", required = false) String cookieHeader,
             @RequestHeader(value = "Authorization", required = false) String accessToken
     );
-
-    // 장바구니 개수 조회 (뱃지용)
-    // Member Controller에 이 메서드가 없다면 추가해야 합니다. (우리가 나중에 논의한 로직)
-    // 없으면 일단 생략하거나 Member 쪽에 추가 필요
 }

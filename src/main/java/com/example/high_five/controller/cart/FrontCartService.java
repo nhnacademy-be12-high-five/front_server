@@ -43,4 +43,5 @@ public class FrontCartService {
     public void clearCart(String cookieHeader) {
         cartFeignClient.deleteAllCartItem(cookieHeader, null);
     }
+
 }

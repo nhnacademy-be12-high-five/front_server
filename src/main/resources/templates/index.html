@@ -158,7 +158,42 @@
         opacity: 0.7;
     }
 
-    /* 메인 */
+    .user-menu .cart-link-wrap {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        overflow: visible;
+    }
+
+    .cart-badge {
+        position: absolute;
+        top: -4px;
+        right: -6px;
+
+        background-color: #ff4d4f;
+        color: white;
+
+        font-size: 10px;
+        font-weight: 800;
+        line-height: 14px;
+        min-width: 16px;
+        height: 16px;
+
+        border-radius: 10px;
+        text-align: center;
+        padding: 0 4px;
+
+        border: 2px solid #fff;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+
+        transition: transform 0.2s;
+        z-index: 10;
+    }
+
+    .user-menu .cart-link-wrap:hover .cart-badge {
+        transform: scale(1.1);
+
+        /* 메인 */
     main {
         flex: 1;
         padding: 20px 0;
@@ -529,7 +564,7 @@
     .user-menu .user-link.pill:hover {
         background: var(--color-accent);
         color: #fff;
-    }
+    }}
 </style>
 <body>
 <!-- 헤더 -->
@@ -563,9 +598,9 @@
             </a>
 
             <!-- 장바구니 -->
-            <a class="user-link" href="/api/cart">
+            <a th:href="@{/api/cart}" href="/api/cart" class="user-link cart-link-wrap">
                 <img src="../img/icon-cart.png" alt="장바구니" class="user-icon" />
-                <span id="cartBadge" class="cart-badge">0</span>
+                <span id="cartBadge" class="cart-badge" style="display: none;">0</span>
             </a>
 
             <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
@@ -1050,6 +1085,42 @@
             }
         });
     });
+    // [추가됨] 페이지 로드 시 뱃지 업데이트 + 뒤로가기 대응
+    document.addEventListener("DOMContentLoaded", () => {
+        updateCartBadge();
+    });
+
+    window.addEventListener("pageshow", (event) => {
+        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+            updateCartBadge();
+        }
+    });
+    function updateCartBadge() {
+        fetch('/api/cart/count', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        })
+            .then(res => {
+                if (res.ok) return res.json();
+                throw new Error('fail');
+            })
+            .then(count => {
+                const badge = document.getElementById('cartBadge');
+                if (badge) {
+                    badge.textContent = count || 0;
+                    badge.style.display = 'block'; // 0이어도 무조건 표시
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                const badge = document.getElementById('cartBadge');
+                if (badge) {
+                    badge.textContent = 0;
+                    badge.style.display = 'block';
+                }
+            });
+
+    }
 </script>
 </body>
 </html>
