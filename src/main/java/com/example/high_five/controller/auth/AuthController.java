@@ -2,7 +2,7 @@ package com.example.high_five.controller.auth;
 
 import com.example.high_five.dto.member.LoginRequest;
 import com.example.high_five.dto.member.LoginResponse;
-import com.example.high_five.dto.member.MemberRegisterRequestDto;
+import com.example.high_five.dto.member.MemberCreateRequestDto;
 import com.example.high_five.service.AuthService;
 import feign.FeignException;
 import jakarta.servlet.http.Cookie;
@@ -74,7 +74,7 @@ public class AuthController {
 
     // [추가] 회원가입 요청 처리
     @PostMapping("/auth/signup")
-    public String signup(@ModelAttribute MemberRegisterRequestDto request, Model model) {
+    public String signup(@ModelAttribute MemberCreateRequestDto request, Model model) {
         try {
             authService.signup(request);
             return "redirect:/member/login"; // 성공 시 로그인 페이지로
@@ -84,4 +84,6 @@ public class AuthController {
             return "member/signup";
         }
     }
+
+
 }

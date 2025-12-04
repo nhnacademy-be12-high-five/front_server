@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberRegisterRequestDto {
+public class MemberCreateRequestDto {
     private String loginId;
     private String password;
     private String name;

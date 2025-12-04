@@ -1,7 +1,7 @@
 package com.example.high_five.service;
 
 import com.example.high_five.common.CustomPage;
-import com.example.high_five.dto.member.MemberRegisterRequestDto;
+import com.example.high_five.dto.member.MemberCreateRequestDto;
 import com.example.high_five.dto.point.PointAdminAdjustmentRequest;
 import com.example.high_five.dto.point.PointAdminPolicyRequest;
 import com.example.high_five.dto.point.PointAdminPolicyResponse;
@@ -43,5 +43,5 @@ public interface MemberService {
                                                                    @RequestParam("size") int size);
     // 회원 가입
     @PostMapping("/api/auth/signup")
-    void registerMember(@RequestBody MemberRegisterRequestDto dto);
+    void registerMember(@RequestBody MemberCreateRequestDto dto);
 }

@@ -1,6 +1,6 @@
 package com.example.high_five.controller.member;
 
-import com.example.high_five.dto.member.MemberRegisterRequestDto;
+import com.example.high_five.dto.member.MemberCreateRequestDto;
 import com.example.high_five.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ public class MemberController {
 
     // 회원가입 처리
     @PostMapping("/member/signup")
-    public String signup(@ModelAttribute MemberRegisterRequestDto requestDto) {
+    public String signup(@ModelAttribute MemberCreateRequestDto requestDto) {
         try {
             memberService.registerMember(requestDto);
             return "redirect:/member/login";
