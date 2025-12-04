@@ -1,0 +1,14 @@
+server:
+  port: 8081
+
+
+spring:
+  application:
+    name: frontend_server
+
+book-server:
+  base-url: http://localhost:9003
+
+book:
+  api:
+    base-url: http://localhost:9003   # 일단 동일 주소로 맞춰도 됨

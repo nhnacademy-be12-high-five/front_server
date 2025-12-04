@@ -4,81 +4,66 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HIGH-FIVE BOOKS | 도서 리스트</title>
-    <link rel="stylesheet" href="/book-css/list.css">
+    <link rel="stylesheet" th:href="@{/book-css/list.css}">
 </head>
 <body>
 <header id="header">
     <div class="container">
-        <a href="/front_server/high-five/templates/index.html" class="logo">
-            <img src="../img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100" />
+        <a th:href="@{/}" class="logo">
+            <img th:src="@{/img/logo.png}" alt="HIGH-FIVE 로고" width="100" height="100" />
             <div class="brand">HIGH-FIVE BOOKS</div>
         </a>
 
         <nav class="gnb" aria-label="주요 메뉴">
-            <div class="search-box" role="search">
-                <input type="search" placeholder="도서명, 저자, ISBN, 태그 검색" aria-label="통합 검색" />
-                <button class="search-btn" aria-label="검색">검색</button>
-            </div>
+            <form class="search-box" role="search"
+                  th:action="@{/search}" method="get">
+                <input type="search" name="keyword"
+                       placeholder="도서명, 저자, ISBN, 태그 검색"
+                       aria-label="통합 검색"
+                       th:value="${keyword}" />
+                <button type="submit" class="search-btn" aria-label="검색">검색</button>
+            </form>
         </nav>
 
         <div class="user-menu">
-            <!-- 쿠폰 -->
             <a class="user-link" href="/coupon">
-                <img src="../img/icon-coupon.png" alt="쿠폰" class="user-icon" />
+                <img th:src="@{/img/icon-coupon.png}" alt="쿠폰" class="user-icon" />
             </a>
-
-            <!-- 마이페이지 -->
             <a class="user-link" href="/mypage">
-                <img src="../img/icon-mypage.png" alt="마이페이지" class="user-icon" />
+                <img th:src="@{/img/icon-mypage.png}" alt="마이페이지" class="user-icon" />
             </a>
-
-            <!-- 장바구니 -->
             <a class="user-link" href="/cart">
-                <img src="../img/icon-cart.png" alt="장바구니" class="user-icon" />
+                <img th:src="@{/img/icon-cart.png}" alt="장바구니" class="user-icon" />
             </a>
-
             <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
         </div>
-
     </div>
 </header>
 
 <main id="container">
     <div class="container">
         <section class="category-page">
-            <!-- 브레드크럼 (예: 경제 > 재무/회계) -->
+            <!-- 브레드크럼 -->
             <div class="breadcrumb">
                 <span>홈</span>
-                <span>경제</span>
-                <span>재무/회계</span>
+                <span th:text="'검색: ' + ${keyword}">검색 키워드</span>
             </div>
 
             <!-- 상단 카테고리 / 결과 수 -->
             <div class="category-header">
                 <div>
-                    <div class="category-title">재무/회계</div>
-                    <p class="category-desc">재무제표 분석, 회계 입문, 재무 관리 등 재무/회계를 다루는 도서를 모았습니다.</p>
+                    <div class="category-title" th:text="${keyword}">검색 결과</div>
+                    <p class="category-desc">
+                        <span th:text="${keyword}">키워드</span>
+                        에 대한 도서 검색 결과입니다.
+                    </p>
                 </div>
-                <div class="result-count">총 <strong>128</strong>권의 도서</div>
+                <div class="result-count">
+                    총 <strong th:text="${books != null ? #lists.size(books) : 0}">0</strong>권의 도서
+                </div>
             </div>
 
-            <!-- 상단 대분류 탭 -->
-            <div class="top-category-tabs">
-                <button>국내도서</button>
-                <button>외국도서</button>
-                <button>IT</button>
-                <button class="active">경제</button>
-                <button>자기계발</button>
-            </div>
-
-            <!-- 서브 카테고리 탭 -->
-            <div class="sub-category-tabs">
-                <button class="active">재무/회계</button>
-                <button>주식/투자</button>
-
-            </div>
-
-            <!-- 정렬/필터 바 -->
+            <!-- 정렬/필터 바 (UI만 유지) -->
             <div class="toolbar">
                 <div class="sort-options">
                     <button class="active">인기순</button>
@@ -87,83 +72,55 @@
                     <button>가격 높은순</button>
                     <button>평점순</button>
                     <button>리뷰순</button>
-
                 </div>
                 <div class="view-options">
-                    총 <strong>128</strong>개 중 1–20번째 도서
+                    검색 결과
                 </div>
             </div>
 
             <!-- 도서 목록 그리드 -->
             <div class="book-grid">
-                <!-- 1권 예시 -->
-                <article class="book-card">
+                <!-- book_server에서 넘어온 books를 순회 -->
+                <article class="book-card" th:each="book : ${books}">
                     <div class="book-cover">
-                        <!-- 실제 서비스에서는 img 태그로 교체 -->
-                        <span>표지 이미지</span>
+                        <!-- 이미지가 있다면 사용 -->
+                        <img th:if="${book.imageUrl != null}"
+                             th:src="${book.imageUrl}"
+                             alt="도서 표지" />
+                        <span th:if="${book.imageUrl == null}">표지 이미지</span>
                     </div>
-                    <h3 class="book-title">재무제표 모르면 주식투자 절대로 하지 마라</h3>
-                    <p class="book-author">홍길동 지음 · 하이파이브북스</p>
-                    <p class="book-meta">2024년 03월 | 경제/재무 · 회계</p>
+                    <h3 class="book-title" th:text="${book.title}">도서 제목</h3>
+                    <p class="book-author"
+                       th:text="${book.author} + ' 지음 · ' + ${book.publisher}">
+                        저자 지음 · 출판사
+                    </p>
+                    <p class="book-meta"
+                       th:text="${book.category}">
+                        카테고리/메타
+                    </p>
                     <div class="book-price-row">
                         <div class="price-main">
-                            <span class="discount">10%</span>
-                            <span class="amount">18,000</span><span class="won">원</span>
+                            <span class="discount"
+                                  th:if="${book.discountRate != null}"
+                                  th:text="${book.discountRate} + '%'">10%</span>
+                            <span class="amount"
+                                  th:text="${#numbers.formatInteger(book.price, 3, 'COMMA')}">18,000</span>
+                            <span class="won">원</span>
                         </div>
-                        <div class="point-info">최대 900P 적립</div>
+                        <div class="point-info"
+                             th:text="'최대 ' + ${book.price / 20} + 'P 적립'">
+                            최대 900P 적립
+                        </div>
                     </div>
                 </article>
 
-                <!-- 2권 예시 -->
-                <article class="book-card">
-                    <div class="book-cover">
-                        <span>표지 이미지</span>
-                    </div>
-                    <h3 class="book-title">한눈에 이해하는 회계 기초</h3>
-                    <p class="book-author">김회계 지음 · HF Books</p>
-                    <p class="book-meta">2023년 11월 | 회계 입문</p>
-                    <div class="book-price-row">
-                        <div class="price-main">
-                            <span class="discount">15%</span>
-                            <span class="amount">22,100</span><span class="won">원</span>
-                        </div>
-                        <div class="point-info">최대 1,100P 적립</div>
-                    </div>
-                </article>
-
-                <!-- 필요하면 동일 패턴으로 여러 권 추가 -->
-                <article class="book-card">
-                    <div class="book-cover"><span>표지 이미지</span></div>
-                    <h3 class="book-title">재무관리 완전정복</h3>
-                    <p class="book-author">이재무 · HF Press</p>
-                    <p class="book-meta">2022년 08월 | 재무 관리</p>
-                    <div class="book-price-row">
-                        <div class="price-main">
-                            <span class="discount">5%</span>
-                            <span class="amount">32,000</span><span class="won">원</span>
-                        </div>
-                        <div class="point-info">최대 1,600P 적립</div>
-                    </div>
-                </article>
-
-                <article class="book-card">
-                    <div class="book-cover"><span>표지 이미지</span></div>
-                    <h3 class="book-title">손익계산서로 보는 비즈니스 인사이트</h3>
-                    <p class="book-author">박인사이트 · Insight Lab</p>
-                    <p class="book-meta">2021년 05월 | 재무 분석</p>
-                    <div class="book-price-row">
-                        <div class="price-main">
-                            <span class="discount">20%</span>
-                            <span class="amount">19,200</span><span class="won">원</span>
-                        </div>
-                        <div class="point-info">최대 960P 적립</div>
-                    </div>
-                </article>
-
-                <!-- … 나머지 카드들도 이 패턴으로 반복 -->
+                <!-- books가 비어 있을 때 메시지 -->
+                <div th:if="${books == null || #lists.isEmpty(books)}">
+                    검색 결과가 없습니다.
+                </div>
             </div>
 
-            <!-- 페이지네이션 -->
+            <!-- 페이지네이션 (추후 구현용 UI) -->
             <div class="pagination">
                 <button>&laquo;</button>
                 <button class="active">1</button>
