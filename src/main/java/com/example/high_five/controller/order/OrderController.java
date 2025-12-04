@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -29,17 +30,17 @@ public class OrderController {
     private final ObjectMapper objectMapper;
 
     @GetMapping("/mypage")
-    public String myPage(@RequestParam(value = "tab", required = false, defaultValue = "info") String tab,
+    public String myPage(@CookieValue(value = "AccessToken", required = false) String accessToken,
+                         @RequestParam(value = "tab", required = false, defaultValue = "info") String tab,
                          @RequestParam(defaultValue = "0") int page,
                          Model model) {
         Long testUserId = 1L;
-        
-        // 쿠폰 서버에 요청을 보내 데이터 가져오기
+
         List<MemberCouponResponseDto> coupons = Collections.emptyList();
 
         try {
-            // 2. 쿠폰 서버 호출 (Page 객체가 Map 형태로 반환됨)
-            Map<String, Object> response = couponService.getMemberCoupons(testUserId, 0, 10);
+            String authHeader = "Bearer " + accessToken;
+            Map<String, Object> response = couponService.getMemberCoupons(authHeader, 0, 10);
 
             // 3. "content" 필드에서 리스트 추출 및 DTO 변환
             if (response != null && response.containsKey("content")) {
