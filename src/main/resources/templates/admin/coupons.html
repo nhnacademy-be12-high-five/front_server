@@ -4,220 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Highfive 관리자 - 쿠폰 관리</title>
-    <style>
-        :root {
-            --color-primary: #007bff;
-            --color-accent: #e9c46a;
-            --color-bg: #f6f8fb;
-            --color-dark: #333;
-            --color-light: #fff;
-            --color-border: #ddd;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
-            background-color: var(--color-bg);
-            color: var(--color-dark);
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* 사이드바 */
-        .sidebar {
-            width: 220px;
-            background-color: #1e1e2f;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            padding-top: 30px;
-            /* 고정 설정 */
-            position: fixed;
-            height: 100%;
-        }
-
-        .sidebar h2 {
-            text-align: center;
-            font-size: 20px;
-            margin-bottom: 40px;
-            font-weight: 800;
-            color: var(--color-accent);
-        }
-
-        .menu {
-            list-style: none;
-        }
-
-        .menu li {
-            margin-bottom: 10px;
-        }
-
-        .menu a {
-            display: block;
-            padding: 12px 20px;
-            color: #ccc;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-
-        .menu a:hover,
-        .menu a.active {
-            background-color: #2f2f45;
-            color: var(--color-accent);
-        }
-
-        /* 메인 컨텐츠 영역 */
-        .content-area {
-            margin-left: 220px; /* 사이드바 너비만큼 왼쪽 여백 */
-            flex: 1;
-            background: var(--color-bg);
-        }
-
-        header {
-            background-color: var(--color-primary);
-            color: #fff;
-            padding: 16px 40px;
-            font-weight: 700;
-            font-size: 18px;
-            letter-spacing: 0.5px;
-            margin-bottom: 20px;
-        }
-
-        main {
-            padding: 0px 50px 30px; /* 상하좌우 여백 */
-        }
-
-        .card {
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            padding: 30px 40px;
-            /* Flexbox를 이용해 크기 균등 분할 및 높이 맞춤 */
-            flex: 1 1 48%; /* flex-grow: 1, flex-shrink: 1, basis: 48% (gap 포함 50%보다 조금 작게) */
-            margin-bottom: 0; /* 부모 컨테이너에서 간격 처리 */
-            /* max-width: 700px; 이 속성 삭제 (균등 크기 위해) */
-        }
-
-        .card h3 {
-            font-size: 20px;
-            margin-bottom: 24px;
-        }
-
-        .form-row {
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .form-row label {
-            flex: 1;
-            color: #444;
-            font-weight: 600;
-        }
-
-        .form-row input,
-        .form-row select {
-            flex: 1;
-            padding: 10px 14px;
-            border: 1px solid var(--color-border);
-            border-radius: 6px;
-            text-align: right;
-            min-width: 150px; /* 입력 필드가 너무 작아지는 것을 방지 */
-        }
-
-        .form-row select {
-            text-align: left;
-        }
-
-        .form-row input[type="datetime-local"] {
-            text-align: left;
-        }
-
-        .save-btn {
-            margin-top: 20px;
-            width: 100%;
-            padding: 14px;
-            background-color: var(--color-primary);
-            border: none;
-            color: white;
-            font-size: 16px;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .save-btn:hover {
-            background-color: #0056b3;
-        }
-
-        .updated-info {
-            margin-top: 12px;
-            font-size: 13px;
-            color: #888;
-            text-align: right;
-        }
-
-        .coupon-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            gap: 10px;
-        }
-
-        .coupon-table th, .coupon-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--color-border);
-        }
-
-        .coupon-table th {
-            background-color: #f1f1f1;
-            font-weight: bold;
-        }
-
-        /* 쿠폰 상세 컨테이너 (핵심 변경) */
-        .coupon-detail, .coupon-detail2 {
-            display: flex;
-            flex-direction: row;
-            gap: 30px; /* 좌우 패널 사이 간격 */
-            margin-bottom: 30px; /* 컨테이너 간의 세로 간격 */
-            align-items: stretch;
-            flex-wrap: wrap; /* 화면이 좁아지면 줄바꿈 허용 */
-        }
-
-        /* 반응형: 화면이 좁아지면 (1000px 이하) 카드가 세로로 배치 */
-        @media (max-width: 1000px) {
-            .coupon-detail, .coupon-detail2 {
-                flex-direction: column;
-                gap: 20px;
-            }
-            .card {
-                flex-basis: auto; /* 줄바꿈 시 자동으로 크기 조절 */
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .content-area {
-                margin-left: 0; /* 사이드바 고정 해제 시 여백 제거 */
-            }
-            .sidebar {
-                display: none; /* 모바일에서는 사이드바 숨김 */
-            }
-            header, main {
-                padding-left: 20px;
-                padding-right: 20px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/admin-css/coupons.css">
 </head>
 
 <body>
@@ -292,7 +79,13 @@
                     <tbody>
                     <tr th:each="policy : ${policies}">
                         <td th:text="${policy.id}">1</td>
-                        <td th:text="${policy.name}">겨울 세일 정책</td>
+                        <td>
+                            <a th:href="@{/api/coupons/admin/policy/{id}(id=${policy.id})}"
+                               th:text="${policy.name}"
+                               style="color: #007bff; text-decoration: underline; cursor: pointer;">
+                                정책 이름
+                            </a>
+                        </td>
                         <td th:text="${policy.discountType}">FIXED</td>
                         <td>
                             <span th:text="${policy.discountValue}">1000</span>
@@ -309,7 +102,7 @@
                             <form th:if="${policy.status == 'ACTIVE'}"
                                   th:action="@{/api/coupons/admin/policy/{id}(id=${policy.id})}"
                                   method="post"
-                                  onsubmit="return confirm('정말 이 정책을 비활성화하시겠습니까?\\n\\n[주의] 해당 정책으로 발급된 모든 미사용 쿠폰이 \'만료(EXPIRED)\' 처리되며, 더 이상 복구할 수 없습니다.');">
+                                  onsubmit="return confirm('정말 이 정책을 비활성화하시겠습니까?\n\n[주의] 해당 정책으로 발급된 모든 미사용 쿠폰이 \'만료(EXPIRED)\' 처리되며, 더 이상 복구할 수 없습니다.');">
                                 <button type="submit"
                                         style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
                                     비활성화
@@ -465,10 +258,10 @@
             </div>
             <div class="card">
                 <h3>회원 쿠폰 수동 지급</h3>
-                <form action="/api/coupons/admin/issue-manual" method="post">
+                <form action="/api/coupons/admin/member-coupons/issue" method="post">
                     <div class="form-row">
                         <label>대상 회원 ID</label>
-                        <input type="number" name="userId" placeholder="회원 ID (예: 100)" required>
+                        <input type="number" name="userId" placeholder="회원 ID (예: 1)" required>
                     </div>
 
                     <div class="form-row">
@@ -477,7 +270,7 @@
                             <option value="">-- 쿠폰 선택 --</option>
                             <option th:each="coupon : ${coupons}"
                                     th:value="${coupon.id}"
-                                    th:text="|${coupon.couponName} (ID: ${coupon.id})|">
+                                    th:text="${coupon.couponName} + ' (ID: ' + ${coupon.id} + ')'">
                                 쿠폰명
                             </option>
                         </select>

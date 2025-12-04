@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>쿠폰 정책 상세</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f6f8fb; padding: 30px; }
+        .card { background: #fff; padding: 30px; border-radius: 10px; max-width: 600px; margin: 0 auto; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .row { margin-bottom: 15px; display: flex; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .label { font-weight: bold; width: 150px; color: #555; }
+        .value { flex: 1; color: #333; }
+        .btn-back { display: inline-block; margin-top: 20px; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2 style="margin-bottom: 30px; color: #333;">쿠폰 정책 상세 정보</h2>
+
+    <div class="row">
+        <div class="label">정책 ID</div>
+        <div class="value" th:text="${policy.id}">1</div>
+    </div>
+    <div class="row">
+        <div class="label">정책 이름</div>
+        <div class="value" th:text="${policy.name}">신규 가입 쿠폰</div>
+    </div>
+    <div class="row">
+        <div class="label">용도 (Comment)</div>
+        <div class="value" th:text="${policy.comment}">WELCOME</div>
+    </div>
+    <div class="row">
+        <div class="label">할인 타입</div>
+        <div class="value">
+            <span th:if="${policy.discountType == 'FIXED'}">정액 할인</span>
+            <span th:if="${policy.discountType == 'PERCENTAGE'}">정률 할인</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="label">할인 값</div>
+        <div class="value">
+            <span th:text="${#numbers.formatInteger(policy.discountValue, 0, 'COMMA')}">1,000</span>
+            <span th:text="${policy.discountType == 'FIXED' ? '원' : '%'}">원</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="label">최소 주문 금액</div>
+        <div class="value" th:text="${#numbers.formatInteger(policy.minOrderValue, 0, 'COMMA') + '원'}">10,000원</div>
+    </div>
+    <div class="row">
+        <div class="label">최대 할인 금액</div>
+        <div class="value" th:text="${#numbers.formatInteger(policy.maxDiscountValue, 0, 'COMMA') + '원'}">5,000원</div>
+    </div>
+    <div class="row">
+        <div class="label">상태</div>
+        <div class="value">
+            <span th:if="${policy.status == 'ACTIVE'}" style="color:green; font-weight:bold;">사용 중</span>
+            <span th:if="${policy.status == 'INACTIVE'}" style="color:red; font-weight:bold;">중단됨</span>
+        </div>
+    </div>
+
+    <div class="row" th:if="${not #lists.isEmpty(policy.targetBookIds)}">
+        <div class="label">적용 도서 ID</div>
+        <div class="value" th:text="${policy.targetBookIds}">1, 2</div>
+    </div>
+    <div class="row" th:if="${not #lists.isEmpty(policy.targetCategoryIds)}">
+        <div class="label">적용 카테고리 ID</div>
+        <div class="value" th:text="${policy.targetCategoryIds}">10</div>
+    </div>
+
+    <a href="/api/coupons/admin/coupons" class="btn-back">목록으로 돌아가기</a>
+</div>
+
+</body>
+</html>

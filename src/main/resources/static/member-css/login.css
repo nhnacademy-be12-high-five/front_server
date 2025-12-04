@@ -1,0 +1,516 @@
+/* style.css - 모던 & 아늑한 서점 테마 */
+
+/* ------------------------------------- */
+/* **핵심 서점 테마 컬러 변수** */
+/* ------------------------------------- */
+
+:root {
+    --color-primary: #007bff; /* 짙은 포레스트 블루 (기존 그린을 파란색으로 변경) */
+    --color-accent: #e9c46a; /* 빈티지 골드/옐로 (따뜻한 포인트) */
+    --color-background: #fcf8f5; /* (기존과 동일) */
+    --color-dark-footer: #3e2723; /* (기존과 동일) */
+    --color-text-light: #666;
+    --color-text-dark: #333;
+    --color-border-light: #eee;
+    --color-border: #ddd;
+}
+/* ------------------------------------- */
+/* 1. 기본 설정 및 초기화 */
+/* ------------------------------------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Noto Sans KR", sans-serif;
+    color: var(--color-text-dark);
+    line-height: 1.6;
+    background-color: var(--color-background); /* 베이지 배경 */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--color-accent); /* 호버 시 따뜻한 코랄 */
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+}
+
+input {
+    font-family: inherit;
+}
+
+/* 레이아웃 편의를 위한 .container 클래스 */
+.container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.writing {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+/* ------------------------------------- */
+/* 2. 헤더 스타일링 */
+/* ------------------------------------- */
+
+#header {
+    background-color: #ffffff;
+    border-bottom: 3px solid var(--color-primary); /* 딥 블루 라인 */
+    padding: 15px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+
+#header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 10rem;
+}
+
+.logo {
+    display: flex;
+    flex-direction: row;
+}
+
+.logo a {
+    font-size: 30px;
+    font-weight: 900;
+    color: var(--color-primary);
+}
+
+.gnb {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 30rem;
+    margin: 10px;
+}
+
+/* 검색창 */
+.gnb .search-box {
+    display: flex;
+    /* 검색 버튼을 입력창에 딱 붙이기 위해 테두리를 바깥으로 뺍니다. */
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-right: 0;
+    width: 360px; /* 검색창 너비 조정 */
+}
+
+.gnb .search-box input {
+    /* 인풋 필드가 남은 공간을 모두 차지하도록 */
+    flex-grow: 1;
+    border: none;
+    padding: 8px 15px;
+    outline: none;
+}
+
+.gnb .search-box .search-btn {
+    /* 버튼이 인풋과 같은 높이를 가지도록 */
+    padding: 8px 15px; /* 높이를 input과 맞추기 위해 조정 */
+    background-color: var(--color-primary);
+    color: white;
+    transition: background-color 0.2s ease;
+    /* 버튼의 둥근 모서리가 사라지도록 */
+    border-radius: 0;
+    white-space: nowrap; /* "검색" 텍스트가 줄바꿈되지 않도록 */
+}
+
+.gnb .search-box .search-btn:hover {
+    background-color: #0056b3; /* 더 진한 블루 */
+}
+
+/* GNB 메뉴 */
+.gnb ul {
+    display: flex;
+    list-style: none;
+    margin: 10px 10px;
+    gap: 20px;
+}
+
+.gnb ul li a {
+    font-weight: 500;
+    color: var(--color-text-dark);
+}
+
+/* 헤더 유저 메뉴 */
+.user-menu .login-btn-top {
+    border: 2px solid var(--color-accent); /* 코랄 테두리 */
+    color: var(--color-accent);
+    background-color: white;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.user-menu {
+    display: flex; /* 장바구니와 로그인 버튼을 가로로 정렬 */
+    align-items: center;
+    gap: 15px; /* 버튼과 아이콘 사이 간격 */
+}
+
+/* 장바구니 아이콘 스타일 추가 */
+.user-menu .cart-link {
+    color: black;
+    font-size: 16px;
+    font-weight: 700;
+    /* 유니코드나 아이콘 폰트 사용 시 패딩으로 크기 조정 */
+    padding: 5px;
+}
+
+.user-menu .login-btn-top:hover {
+    background-color: var(--color-accent);
+    color: white;
+}
+.user-menu .user-link {
+    display: flex;
+    align-items: center;
+    padding: 4px;
+}
+
+.user-menu .user-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    transition: opacity 0.2s ease;
+}
+
+.user-menu .user-link:hover .user-icon {
+    opacity: 0.7;
+}
+
+
+.writing {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.container2 {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+.logo {
+    /* 로고 컨테이너를 Flexbox로 설정 */
+    display: flex;
+    align-items: center; /* 수직 중앙 정렬 */
+    gap: 10px; /* 이미지와 텍스트 사이 간격 */
+    margin: 0; /* 불필요한 마진 제거 */
+}
+
+.logo .brand {
+    font-size: 21px;
+    font-weight: 900;
+    color: #000080;
+    margin-top: 5px;
+}
+
+.container2 nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 5px;
+}
+
+.container2 nav button {
+    background: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-text-light);
+    border-bottom: 3px solid transparent; /* 기본 밑줄 없음 */
+    transition: color 0.2s, border-bottom 0.2s;
+}
+
+.container2 nav button.active {
+    color: var(--color-primary);
+    font-weight: 700;
+    border-bottom: 3px solid var(--color-primary); /* 활성화 탭 표시 */
+}
+
+/* ------------------------------------- */
+/* 3. 메인 콘텐츠 (로그인 영역) */
+/* ------------------------------------- */
+
+#container {
+    flex-grow: 1; /* body 높이 100vh 중 헤더/푸터를 뺀 나머지 영역 차지 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 0;
+    background-color: #ffffff;
+}
+
+.login-area {
+    width: 100%;
+    max-width: 500px;
+    background-color: #ffffff;
+    padding: 50px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--color-border-light);
+}
+
+/* 탭 메뉴 */
+.tab-menu {
+    display: flex;
+    border-bottom: 2px solid var(--color-border-light);
+    margin-bottom: 30px;
+}
+
+.tab-btn {
+    flex: 1; /* 탭 버튼이 공간을 균등하게 차지 */
+    text-align: center;
+    padding: 12px 0;
+    font-size: 16px;
+    color: var(--color-text-light);
+    background: none;
+    position: relative; /* ::after 가상요소의 기준점 */
+}
+
+.tab-btn.active {
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+/* 탭 활성화 시 하단 라인 */
+.tab-btn.active::after {
+    content: "";
+    position: absolute;
+    bottom: -2px; /* 탭 메뉴의 border-bottom 위에 위치 */
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: var(--color-primary);
+}
+
+/* 폼 입력 필드 */
+.login-form .input-group {
+    margin-bottom: 20px;
+    /* 라벨과 인풋을 세로로 배치 */
+    display: flex;
+    flex-direction: column;
+}
+
+.login-form label {
+    font-size: 14px;
+    color: var(--color-text-light);
+    margin-bottom: 8px;
+}
+
+.login-form input[type="text"],
+.login-form input[type="password"] {
+    width: 100%;
+    padding: 14px 15px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px; /* CSS 변수에 4로 되어있어 4px로 수정 */
+    font-size: 15px;
+    transition: border-color 0.2s ease;
+}
+
+.login-form input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+}
+
+/* 메인 로그인 버튼 */
+.login-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: var(--color-primary); /* 파란색으로 변경 */
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 4px;
+    margin-top: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.login-btn:hover {
+    background-color: #0056b3; /* 더 진한 파란색 */
+}
+
+/* SNS 로그인 */
+.sns-login {
+    margin-top: 30px;
+    text-align: center;
+}
+.sns-login .divider {
+    color: var(--color-text-light);
+    font-size: 13px;
+    margin-bottom: 15px;
+}
+
+/* 회원가입 버튼 */
+.login2-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: skyblue;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 4px;
+    margin-top: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.login2-btn:hover {
+    background-color: #0056b3; /* 더 진한 파란색 */
+}
+
+.sns-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 15px;
+    font-weight: 500;
+    background-color: #007bff;
+    color: #191919;
+    margin: 10px;
+}
+
+.sns-btn.payco {
+    background-color: #e60000; /* PAYCO 예시 */
+    color: white;
+    border: none;
+}
+
+/* 💡 입력 필드와 아이콘을 묶는 컨테이너 */
+.input-wrapper {
+    position: relative; /* 자식 요소(아이콘)의 기준점 */
+    display: inline-block; /* 너비를 내용물만큼만 차지하도록 */
+}
+
+/* 💡 아이콘 스타일 */
+.input-wrapper .input-icon {
+    position: absolute; /* 부모(wrapper) 기준으로 위치 지정 */
+    top: 50%; /* 수직 중앙 */
+    right: 10px; /* 오른쪽에서 10px 떨어진 위치 */
+    transform: translateY(-50%); /* 정확한 수직 중앙 정렬 */
+    cursor: pointer; /* 클릭 가능한 모양 */
+    /* 이미지 크기는 여기서 직접 설정 */
+    width: 24px;
+    height: 24px;
+}
+
+/* 💡 아이콘을 담을 입력 필드 스타일 정의 */
+.input-with-icon {
+    /* 아이콘이 들어갈 공간 확보를 위해 오른쪽 패딩을 충분히 줍니다 */
+    padding-right: 40px !important;
+    /* 이미지 경로 설정 (Thymeleaf URL이 CSS로 변환된 최종 경로를 사용) */
+    background-image: url("/img/free-icon-eye.png");
+    /* 이미지를 한 번만 표시 */
+    background-repeat: no-repeat;
+    /* 이미지 위치를 오른쪽에서 10px, 수직 중앙에 배치 */
+    background-position: right 10px center;
+    /* 이미지 크기 설정 (원하는 크기로 조정) */
+    background-size: 20px 20px;
+}
+
+/* ⚠️ 참고: input 태그는 기본적으로 border-box이므로 padding이 크기에 영향을 줍니다. */
+
+/* ------------------------------------- */
+/* 4. 푸터 스타일링 */
+/* ------------------------------------- */
+#footer {
+    background-color: var(--color-dark-footer);
+    color: #a0a0a0; /* 어두운 배경에 밝은 텍스트 */
+    padding: 40px 0;
+    font-size: 13px;
+}
+
+#footer .container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.footer-links a {
+    color: #c0c0c0;
+    margin-right: 15px;
+}
+.footer-links a:hover {
+    color: white;
+}
+
+.footer-info {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.footer-info .copyright,
+.footer-info .customer-center {
+    flex: 1;
+    line-height: 1.8;
+}
+
+.footer-info .copyright strong {
+    color: #c0c0c0;
+}
+/* ==== 공통 우측 사용자 메뉴 (텍스트 2 + 노란 pill 1) ==== */
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-left: auto;
+
+}
+
+/* 기본 텍스트 링크(마이페이지/장바구니) */
+.user-menu .user-link {
+    display: inline-block;
+    font-weight: 700;
+    color: #333;
+    text-decoration: none;
+    padding: 6px 8px;
+    font-size: 20px;
+}
+.user-menu .user-link:hover {
+    color: var(--color-primary);
+}
+
+/* 로그인만 노란 pill 버튼 */
+.user-menu .user-link.pill {
+    border: 2px solid var(--color-accent);
+    color: var(--color-accent);
+    background: #fff;
+    padding: 6px 14px;
+    border-radius: 20px;
+}
+.user-menu .user-link.pill:hover {
+    background: var(--color-accent);
+    color: #fff;
+}
+
+.headerBar{
+    width: 500px;
+    height: 40px;
+    padding-left: 80px;
+    margin: 20px 20px;
+}
