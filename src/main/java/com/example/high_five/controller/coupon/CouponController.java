@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -50,14 +51,16 @@ public class CouponController {
     }
 
     @PostMapping("/coupon/issue")
-    public String issueCoupon(@RequestParam Long couponId, RedirectAttributes redirectAttributes) {
-        // 1. 임시 사용자 ID (로그인 구현 전이므로 1번 사용자로 고정)
-        Long userId = 1L;
+    public String issueCoupon(@RequestHeader("X-USER-ID") Long memberId, @RequestParam Long couponId, RedirectAttributes redirectAttributes) {
+        if (memberId == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "로그인이 필요한 서비스입니다.");
+            return "redirect:/member/login.html";
+        }
 
         try {
             UserCouponIssueRequestDto requestDto = new UserCouponIssueRequestDto(couponId);
 
-            couponService.issueCoupon(userId, requestDto);
+            couponService.issueCoupon(memberId, requestDto);
 
             redirectAttributes.addFlashAttribute("message", "쿠폰이 성공적으로 발급되었습니다.");
 

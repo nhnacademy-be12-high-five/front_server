@@ -522,12 +522,20 @@
           margin: 20px 20px;
       }
 
+      .error-message {
+          color: #dc3545;
+          font-size: 14px;
+          text-align: center;
+          margin-bottom: 15px;
+          font-weight: bold;
+      }
+
     </style>
   </head>
   <body>
   <header id="header" role="banner">
       <div class="container">
-          <a href="./login.html" class="logo">
+          <a href="./" class="logo">
               <img src="../img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100" />
               <div class="brand">HIGH-FIVE BOOKS</div>
           </a>
@@ -573,8 +581,9 @@
           <button type="button" class="tab-btn active">회원 로그인</button>
           <button type="button" class="tab-btn">비회원 로그인</button>
         </div>
+        <div th:if="${error}" class="error-message" th:text="${error}"></div>
 
-        <form class="login-form">
+        <form class="login-form" action="/auth/login" method="post">
           <div class="input-group">
             <label for="loginId">아이디</label>
             <div class="input-wrapper">
@@ -587,21 +596,22 @@
                   <input
                           type="password"
                           id="pwd"
+                          name="password"
                           placeholder="비밀번호를 입력하세요"
+                          required
                   />
                   <img
-                          class="input-icon" src="../img/free-icon-eye.png"
+                          class="input-icon" th:src="@{/img/free-icon-eye.png}"
                           alt="아이콘"
                           width="100"
                           height="100"
+                          onclick="togglePasswordVisibility()"
                   />
               </div>
           </div>
 
-<!--          form 태그 아님 -->
-<!--          <button type="submit" class="login-btn">로그인</button>-->
-<!--          <button type="submit" class="login2-btn">회원가입</button>-->
-
+          <button type="submit" class="login-btn" >로그인</button>
+          <button type="submit" class="login2-btn" onclick="location.href='/member/signup.html'">회원가입</button>
         </form>
 
         <div class="sns-login">
@@ -647,7 +657,7 @@
         event.preventDefault();
 
         // 회원가입 페이지 경로로 이동
-        window.location.href = "signup.html";
+        window.location.href = "/member/signup";
       });
     }
 
@@ -699,6 +709,15 @@
             if (eyeIcon) {
                 eyeIcon.src = "/img/free-icon-eye.png";
             }
+        }
+    }
+
+    function togglePasswordVisibility() {
+        const passwordField = document.getElementById("pwd");
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+        } else {
+            passwordField.type = "password";
         }
     }
   </script>

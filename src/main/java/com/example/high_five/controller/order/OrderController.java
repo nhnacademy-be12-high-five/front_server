@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Collections;
@@ -29,17 +30,20 @@ public class OrderController {
     private final ObjectMapper objectMapper;
 
     @GetMapping("/mypage")
-    public String myPage(@RequestParam(value = "tab", required = false, defaultValue = "info") String tab,
+    public String myPage(@RequestHeader("X-USER-ID") Long memberId,
+                         @RequestParam(value = "tab", required = false, defaultValue = "info") String tab,
                          @RequestParam(defaultValue = "0") int page,
                          Model model) {
-        Long testUserId = 1L;
+        if (memberId == null) {
+            return "redirect:/member/login.html";
+        }
         
         // 쿠폰 서버에 요청을 보내 데이터 가져오기
         List<MemberCouponResponseDto> coupons = Collections.emptyList();
 
         try {
             // 2. 쿠폰 서버 호출 (Page 객체가 Map 형태로 반환됨)
-            Map<String, Object> response = couponService.getMemberCoupons(testUserId, 0, 10);
+            Map<String, Object> response = couponService.getMemberCoupons(memberId, 0, 10);
 
             // 3. "content" 필드에서 리스트 추출 및 DTO 변환
             if (response != null && response.containsKey("content")) {
@@ -61,11 +65,11 @@ public class OrderController {
         // 포인트 데이터 가져오기
         try {
             // 잔액 조회
-            PointBalanceResponse balance = memberService.getMyBalance(testUserId).getBody();
+            PointBalanceResponse balance = memberService.getMyBalance(memberId).getBody();
             model.addAttribute("balance", balance);
 
             // 내역 조회
-            CustomPage<PointHistoryResponse> historyPage = memberService.getMyHistory(testUserId, page, 10).getBody();
+            CustomPage<PointHistoryResponse> historyPage = memberService.getMyHistory(memberId, page, 10).getBody();
             if (historyPage != null) {
                 model.addAttribute("histories", historyPage.getContent());
                 model.addAttribute("currentPage", page);
@@ -73,7 +77,7 @@ public class OrderController {
             }
         } catch (Exception e) {
             // 포인트 서버 죽어도 마이페이지는 뜨게끔
-            model.addAttribute("balance", new PointBalanceResponse(testUserId, 0L, 0L));
+            model.addAttribute("balance", new PointBalanceResponse(memberId, 0L, 0L));
             model.addAttribute("histories", Collections.emptyList());
         }
 
