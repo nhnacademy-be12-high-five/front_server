@@ -8,7 +8,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @EnableFeignClients
 @SpringBootApplication
-@EnableFeignClients
 public class HighFiveApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(HighFiveApplication.class, args);
