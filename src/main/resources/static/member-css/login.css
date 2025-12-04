@@ -57,9 +57,9 @@ input {
 /* 레이아웃 편의를 위한 .container 클래스 */
 .container {
     width: 100%;
-    max-width: 1100px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 10px 20px;
 }
 
 .writing {
