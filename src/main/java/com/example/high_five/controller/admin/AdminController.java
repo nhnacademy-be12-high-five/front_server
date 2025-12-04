@@ -59,7 +59,7 @@ public class AdminController {
                                       @RequestParam Long couponId,
                                       RedirectAttributes redirectAttributes) {
         try {
-            MemberCouponIssueRequestDto requestDto = new MemberCouponIssueRequestDto(couponId, userId);
+            MemberCouponIssueRequestDto requestDto = new MemberCouponIssueRequestDto(userId, couponId);
             couponService.issueCouponByAdmin(requestDto);
 
             redirectAttributes.addFlashAttribute("message", "회원(" + userId + ")에게 쿠폰이 정상적으로 지급되었습니다.");
