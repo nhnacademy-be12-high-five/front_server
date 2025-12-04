@@ -1,8 +1,8 @@
 package com.example.high_five.controller.auth;
 
-import com.example.high_five.dto.member.LoginRequest;
-import com.example.high_five.dto.member.LoginResponse;
-import com.example.high_five.dto.member.MemberCreateRequestDto;
+import com.example.high_five.dto.member.request.LoginRequest;
+import com.example.high_five.dto.member.request.LoginResponse;
+import com.example.high_five.dto.member.request.MemberCreateRequestDto;
 import com.example.high_five.service.AuthService;
 import feign.FeignException;
 import jakarta.servlet.http.Cookie;
@@ -23,24 +23,20 @@ public class AuthController {
 
     private final AuthService authService;
 
-    // 로그인 페이지 이동
     @GetMapping("/member/login.html")
     public String loginForm() {
         return "member/login";
     }
 
-    // 로그인 요청 처리
     @PostMapping("/auth/login")
     public String login(@ModelAttribute LoginRequest loginRequest, 
                         HttpServletResponse response, 
                         Model model) {
         try {
-            // 1. 멤버 서버에 로그인 요청
             ResponseEntity<LoginResponse> apiResponse = authService.login(loginRequest);
 
-            // 2. Access Token 쿠키 저장 (Body에서 추출)
             String accessToken = apiResponse.getBody().getAccessToken();
-            Cookie accessCookie = new Cookie("accessToken", accessToken);
+            Cookie accessCookie = new Cookie("access-token", accessToken);
             accessCookie.setPath("/");
             accessCookie.setHttpOnly(true);
             response.addCookie(accessCookie);

@@ -786,7 +786,7 @@
 <body>
 <header id="header" role="banner">
     <div class="container">
-        <a href="./" class="logo">
+        <a href="../order" class="logo">
             <img src="../img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100" />
             <div class="brand">HIGH-FIVE BOOKS</div>
         </a>
@@ -877,28 +877,26 @@
         <div class="info-group">
             <div class="info-item">
                 <label>이름</label>
-                <div></div>
+                <div th:text="${myInfo.name}">홍길동</div>
             </div>
             <div class="info-item">
                 <label>이메일</label>
-                <div>sun.kim@example.com</div>
+                <div th:text="${myInfo.email}">sun.kim@example.com</div>
             </div>
             <div class="info-item">
                 <label>생일</label>
-                <div>1995-01-01</div>
+                <div th:text="${#temporals.format(myInfo.birthDate, 'yyyy-MM-dd')}">1995-01-01</div>
             </div>
             <div class="info-item">
                 <label>연락처</label>
-                <div>010-1234-5678</div>
+                <div th:text="${myInfo.phone}">010-1234-5678</div>
             </div>
             <div class="info-item">
                 <label>회원 등급</label>
-                <div>일반</div>
+                <div th:text="${myInfo.gradeName}">일반</div>
             </div>
         </div>
-
         <br />
-
         <button type="button" class="btn-edit">정보 수정</button>
     </section>
 

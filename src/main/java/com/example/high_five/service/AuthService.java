@@ -1,11 +1,10 @@
 package com.example.high_five.service;
 
-import com.example.high_five.dto.member.LoginRequest;
-import com.example.high_five.dto.member.LoginResponse;
-import com.example.high_five.dto.member.MemberCreateRequestDto;
+import com.example.high_five.dto.member.request.LoginRequest;
+import com.example.high_five.dto.member.request.LoginResponse;
+import com.example.high_five.dto.member.request.MemberCreateRequestDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -18,6 +17,4 @@ public interface AuthService {
     @PostMapping("/api/auth/signup")
     ResponseEntity<MemberCreateRequestDto> signup(@RequestBody MemberCreateRequestDto memberRegisterRequestDto);
 
-    @GetMapping("/api/auth/my-page")
-    ResponseEntity<String> mypage();
 }
