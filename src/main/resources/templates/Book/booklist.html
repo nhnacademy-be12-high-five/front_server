@@ -4,647 +4,135 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HIGH-FIVE BOOKS | 도서 리스트</title>
-    <style>
-        :root {
-            --color-primary: #007bff;
-            --color-accent: #e9c46a;
-            --color-background: #fcf8f5;
-            --color-dark-footer: #3e2723;
-            --color-text-light: #666;
-            --color-text-dark: #333;
-            --color-border-light: #eee;
-            --color-border: #ddd;
-            --color-danger: #dc3545;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-            "Noto Sans KR", sans-serif;
-            color: var(--color-text-dark);
-            background-color: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 10px 20px;
-        }
-
-        /* -------------------- 헤더 -------------------- */
-
-        #header {
-            background-color: #ffffff;
-            border-bottom: 3px solid var(--color-primary);
-            padding: 5px 0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        #header .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo img {
-            height: 36px;
-            object-fit: contain;
-        }
-
-        .logo .brand {
-            font-size: 21px;
-            font-weight: 900;
-            color: #000080;
-        }
-
-        .gnb {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .gnb .search-box {
-            display: flex;
-            border: 1px solid var(--color-border);
-            border-radius: 20px;
-            overflow: hidden;
-            width: 360px;
-        }
-
-        .gnb .search-box input {
-            flex-grow: 1;
-            border: none;
-            padding: 8px 15px;
-            outline: none;
-        }
-
-        .gnb .search-box .search-btn {
-            padding: 8px 15px;
-            background-color: var(--color-primary);
-            color: white;
-            border: none;
-            white-space: nowrap;
-            cursor: pointer;
-        }
-
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .user-menu .user-link {
-            display: flex;
-            align-items: center;
-            padding: 4px;
-        }
-
-        .user-menu .user-icon {
-            width: 24px;
-            height: 24px;
-            object-fit: contain;
-            transition: opacity 0.2s ease;
-        }
-
-        .user-menu .user-link:hover .user-icon {
-            opacity: 0.7;
-        }
-
-
-        .user-link {
-            font-size: 14px;
-            color: #000;
-            font-weight: 600;
-        }
-
-        .user-link.pill {
-            border: 2px solid var(--color-accent);
-            color: var(--color-accent);
-            padding: 6px 14px;
-            border-radius: 20px;
-        }
-
-        /* -------------------- 메인 -------------------- */
-
-        #container {
-            flex: 1;
-            background-color: var(--color-background);
-            padding: 30px 0 60px;
-        }
-
-        .category-page {
-            background-color: #fff;
-            border-radius: 12px;
-            padding: 25px 25px 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-        }
-
-        /* 브레드크럼 */
-        .breadcrumb {
-            font-size: 13px;
-            color: var(--color-text-light);
-            margin-bottom: 10px;
-        }
-
-        .breadcrumb span + span::before {
-            content: ">";
-            margin: 0 4px;
-            color: #aaa;
-        }
-
-        /* 상단 카테고리 타이틀 */
-        .category-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 18px;
-        }
-
-        .category-title {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--color-primary);
-        }
-
-        .category-desc {
-            font-size: 13px;
-            color: var(--color-text-light);
-            margin-top: 4px;
-        }
-
-        .result-count {
-            font-size: 13px;
-            color: var(--color-text-light);
-        }
-
-        /* 상단 탭 (국내도서 / 외국도서 / IT / 경제 / 자기계발 ...) */
-        .top-category-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-
-        .top-category-tabs button {
-            border-radius: 999px;
-            border: 1px solid #dde2f0;
-            padding: 6px 14px;
-            font-size: 13px;
-            background-color: #f5f7ff;
-            cursor: pointer;
-            color: #4a4a4a;
-        }
-
-        .top-category-tabs button.active {
-            background-color: #1a73e8;
-            border-color: #1a73e8;
-            color: #fff;
-            font-weight: 600;
-        }
-
-        /* 서브 카테고리 pill */
-        .sub-category-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .sub-category-tabs button {
-            border-radius: 999px;
-            border: 1px solid #e1e4f0;
-            padding: 5px 12px;
-            font-size: 12px;
-            background-color: #fff;
-            cursor: pointer;
-            color: #555;
-        }
-
-        .sub-category-tabs button.active {
-            background-color: #e6f0ff;
-            border-color: var(--color-primary);
-            color: var(--color-primary);
-            font-weight: 600;
-        }
-
-        /* 정렬/필터 바 */
-        .toolbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            padding: 8px 12px;
-            border-radius: 8px;
-            background-color: #f8f9fc;
-            border: 1px solid #edf0f6;
-        }
-
-        .sort-options {
-            display: flex;
-            gap: 10px;
-            font-size: 13px;
-        }
-
-        .sort-options button {
-            border: none;
-            background: none;
-            padding: 3px 6px;
-            cursor: pointer;
-            color: var(--color-text-light);
-        }
-
-        .sort-options button.active {
-            color: var(--color-primary);
-            font-weight: 600;
-            border-bottom: 2px solid var(--color-primary);
-        }
-
-        .view-options {
-            font-size: 13px;
-            color: var(--color-text-light);
-        }
-
-        /* 도서 카드 그리드 */
-        .book-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 18px;
-        }
-
-        .book-card {
-            background-color: #fff;
-            border-radius: 10px;
-            border: 1px solid #f0f0f0;
-            padding: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.12s ease, box-shadow 0.12s ease;
-            cursor: pointer;
-        }
-
-        .book-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
-        }
-
-        .book-cover {
-            width: 100%;
-            aspect-ratio: 3 / 4.3;
-            border-radius: 6px;
-            background-color: #f5f5f5;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #bbb;
-            font-size: 12px;
-            overflow: hidden;
-        }
-
-        .book-cover img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .book-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 4px;
-            line-height: 1.4;
-            min-height: 2.8em;
-        }
-
-        .book-author {
-            font-size: 12px;
-            color: var(--color-text-light);
-            margin-bottom: 4px;
-        }
-
-        .book-meta {
-            font-size: 11px;
-            color: #999;
-            margin-bottom: 6px;
-        }
-
-        .book-price-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-top: auto;
-        }
-
-        .price-main {
-            font-size: 15px;
-            font-weight: 700;
-        }
-
-        .price-main .discount {
-            color: var(--color-danger);
-            margin-right: 4px;
-        }
-
-        .price-main .amount {
-            color: #222;
-        }
-
-        .price-main .won {
-            font-size: 13px;
-        }
-
-        .point-info {
-            font-size: 11px;
-            color: var(--color-text-light);
-        }
-
-        /* 페이지네이션 */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 24px;
-            font-size: 13px;
-        }
-
-        .pagination button {
-            min-width: 28px;
-            height: 28px;
-            border-radius: 999px;
-            border: 1px solid #dde0eb;
-            background-color: #fff;
-            cursor: pointer;
-            color: #555;
-        }
-
-        .pagination button.active {
-            background-color: var(--color-primary);
-            color: #fff;
-            border-color: var(--color-primary);
-            font-weight: 600;
-        }
-
-        /* -------------------- 푸터 -------------------- */
-
-        #footer {
-            background-color: var(--color-dark-footer);
-            color: #a0a0a0;
-            padding: 40px 0;
-            font-size: 13px;
-        }
-
-        #footer .container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .footer-links a {
-            color: #c0c0c0;
-            margin-right: 15px;
-        }
-
-        .footer-links a:hover {
-            color: #fff;
-        }
-
-        .footer-info {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
-        }
-
-        .footer-info .copyright,
-        .footer-info .customer-center {
-            flex: 1;
-            line-height: 1.8;
-        }
-
-        .footer-info strong {
-            color: #c0c0c0;
-        }
-
-        @media (max-width: 900px) {
-            .book-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .category-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 6px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/book-css/list.css}">
 </head>
 <body>
-<header id="header">
+<header id="header" role="banner">
     <div class="container">
-        <a href="/front_server/high-five/templates/index.html" class="logo">
-            <img src="../img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100" />
+        <a th:href="@{ / }" class="logo">
+            <img th:src="@{/img/logo.png}" alt="HIGH-FIVE 로고" width="100" height="100" />
             <div class="brand">HIGH-FIVE BOOKS</div>
         </a>
 
         <nav class="gnb" aria-label="주요 메뉴">
-            <div class="search-box" role="search">
-                <input type="search" placeholder="도서명, 저자, ISBN, 태그 검색" aria-label="통합 검색" />
-                <button class="search-btn" aria-label="검색">검색</button>
-            </div>
+            <!-- 검색 폼: sort 유지용 hidden 추가 -->
+            <form class="search-box"
+                  role="search"
+                  th:action="@{/search}"
+                  method="get">
+                <input type="search"
+                       name="keyword"
+                       placeholder="도서명, 저자, ISBN, 태그 검색"
+                       aria-label="통합 검색"
+                       th:value="${keyword}" />
+                <input type="hidden" name="sort" th:value="${sort != null ? sort : 'POPULAR'}"/>
+                <button type="submit" class="search-btn" aria-label="검색">검색</button>
+            </form>
         </nav>
 
         <div class="user-menu">
-            <!-- 쿠폰 -->
             <a class="user-link" href="/coupon">
-                <img src="../img/icon-coupon.png" alt="쿠폰" class="user-icon" />
+                <img th:src="@{/img/icon-coupon.png}" alt="쿠폰" class="user-icon" />
             </a>
-
-            <!-- 마이페이지 -->
             <a class="user-link" href="/mypage">
-                <img src="../img/icon-mypage.png" alt="마이페이지" class="user-icon" />
+                <img th:src="@{/img/icon-mypage.png}" alt="마이페이지" class="user-icon" />
             </a>
-
-            <!-- 장바구니 -->
             <a class="user-link" href="/cart">
-                <img src="../img/icon-cart.png" alt="장바구니" class="user-icon" />
+                <img th:src="@{/img/icon-cart.png}" alt="장바구니" class="user-icon" />
             </a>
-
             <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
         </div>
-
     </div>
 </header>
 
 <main id="container">
     <div class="container">
         <section class="category-page">
-            <!-- 브레드크럼 (예: 경제 > 재무/회계) -->
             <div class="breadcrumb">
                 <span>홈</span>
-                <span>경제</span>
-                <span>재무/회계</span>
+                <span th:text="'검색: ' + ${keyword}">검색 키워드</span>
             </div>
 
-            <!-- 상단 카테고리 / 결과 수 -->
             <div class="category-header">
                 <div>
-                    <div class="category-title">재무/회계</div>
-                    <p class="category-desc">재무제표 분석, 회계 입문, 재무 관리 등 재무/회계를 다루는 도서를 모았습니다.</p>
+                    <div class="category-title" th:text="${keyword}">검색 결과</div>
+                    <p class="category-desc">
+                        <span th:text="${keyword}">키워드</span>
+                        에 대한 도서 검색 결과입니다.
+                    </p>
                 </div>
-                <div class="result-count">총 <strong>128</strong>권의 도서</div>
+                <div class="result-count">
+                    <!-- 전체 건수: pageInfo.totalElements 사용 -->
+                    총 <strong th:text="${pageInfo != null ? pageInfo.totalElements : 0}">0</strong>권의 도서
+                </div>
             </div>
 
-            <!-- 상단 대분류 탭 -->
-            <div class="top-category-tabs">
-                <button>국내도서</button>
-                <button>외국도서</button>
-                <button>IT</button>
-                <button class="active">경제</button>
-                <button>자기계발</button>
-            </div>
-
-            <!-- 서브 카테고리 탭 -->
-            <div class="sub-category-tabs">
-                <button class="active">재무/회계</button>
-                <button>주식/투자</button>
-
-            </div>
-
-            <!-- 정렬/필터 바 -->
+            <!-- 정렬 UI: 실제 /search 링크로 연결 -->
             <div class="toolbar">
                 <div class="sort-options">
-                    <button class="active">인기순</button>
-                    <button>신간순</button>
-                    <button>가격 낮은순</button>
-                    <button>가격 높은순</button>
-                    <button>평점순</button>
-                    <button>리뷰순</button>
+                    <a th:href="@{/search(keyword=${keyword}, sort='POPULAR', page=0)}"
+                       th:classappend="${sort} == 'POPULAR' ? ' active' : ''">인기순</a>
 
+                    <a th:href="@{/search(keyword=${keyword}, sort='NEW', page=0)}"
+                       th:classappend="${sort} == 'NEW' ? ' active' : ''">신간순</a>
+
+                    <a th:href="@{/search(keyword=${keyword}, sort='LOW_PRICE', page=0)}"
+                       th:classappend="${sort} == 'LOW_PRICE' ? ' active' : ''">가격 낮은순</a>
+
+                    <a th:href="@{/search(keyword=${keyword}, sort='HIGH_PRICE', page=0)}"
+                       th:classappend="${sort} == 'HIGH_PRICE' ? ' active' : ''">가격 높은순</a>
+
+                    <a th:href="@{/search(keyword=${keyword}, sort='RATING', page=0)}"
+                       th:classappend="${sort} == 'RATING' ? ' active' : ''">평점순</a>
+
+                    <a th:href="@{/search(keyword=${keyword}, sort='REVIEW', page=0)}"
+                       th:classappend="${sort} == 'REVIEW' ? ' active' : ''">리뷰순</a>
                 </div>
                 <div class="view-options">
-                    총 <strong>128</strong>개 중 1–20번째 도서
+                    검색 결과
                 </div>
             </div>
 
-            <!-- 도서 목록 그리드 -->
             <div class="book-grid">
-                <!-- 1권 예시 -->
-                <article class="book-card">
+                <!-- 검색 결과 없음 -->
+                <div th:if="${books == null || #lists.isEmpty(books)}">
+                    검색 결과가 없습니다.
+                </div>
+
+                <!-- 도서 카드 -->
+                <article class="book-card"
+                         th:each="book : ${books}">
                     <div class="book-cover">
-                        <!-- 실제 서비스에서는 img 태그로 교체 -->
-                        <span>표지 이미지</span>
+                        <img th:if="${book.image != null}"
+                             th:src="${book.image}"
+                             alt="도서 표지" />
+                        <span th:if="${book.image == null}">표지 이미지</span>
                     </div>
-                    <h3 class="book-title">재무제표 모르면 주식투자 절대로 하지 마라</h3>
-                    <p class="book-author">홍길동 지음 · 하이파이브북스</p>
-                    <p class="book-meta">2024년 03월 | 경제/재무 · 회계</p>
+
+                    <h3 class="book-title" th:text="${book.title}">도서 제목</h3>
+
+                    <p class="book-author">
+                        <span th:text="${book.author}">저자</span>
+                        <span th:if="${book.publisher != null}"
+                              th:text="' · ' + ${book.publisher}"> · 출판사</span>
+                    </p>
+
                     <div class="book-price-row">
-                        <div class="price-main">
-                            <span class="discount">10%</span>
-                            <span class="amount">18,000</span><span class="won">원</span>
-                        </div>
-                        <div class="point-info">최대 900P 적립</div>
+                        <span class="amount"
+                              th:text="${book.price != null ? #numbers.formatInteger(book.price, 3, 'COMMA') : '-'}">
+                            0
+                        </span>
+                        <span class="won">원</span>
+                    </div>
+
+                    <div class="rating-row" th:if="${book.avgRating != null}">
+                        <span th:text="${#numbers.formatDecimal(book.avgRating, 1, 1)}">4.5</span> 점
+                        (<span th:text="${book.reviewCount}">0</span>건)
                     </div>
                 </article>
-
-                <!-- 2권 예시 -->
-                <article class="book-card">
-                    <div class="book-cover">
-                        <span>표지 이미지</span>
-                    </div>
-                    <h3 class="book-title">한눈에 이해하는 회계 기초</h3>
-                    <p class="book-author">김회계 지음 · HF Books</p>
-                    <p class="book-meta">2023년 11월 | 회계 입문</p>
-                    <div class="book-price-row">
-                        <div class="price-main">
-                            <span class="discount">15%</span>
-                            <span class="amount">22,100</span><span class="won">원</span>
-                        </div>
-                        <div class="point-info">최대 1,100P 적립</div>
-                    </div>
-                </article>
-
-                <!-- 필요하면 동일 패턴으로 여러 권 추가 -->
-                <article class="book-card">
-                    <div class="book-cover"><span>표지 이미지</span></div>
-                    <h3 class="book-title">재무관리 완전정복</h3>
-                    <p class="book-author">이재무 · HF Press</p>
-                    <p class="book-meta">2022년 08월 | 재무 관리</p>
-                    <div class="book-price-row">
-                        <div class="price-main">
-                            <span class="discount">5%</span>
-                            <span class="amount">32,000</span><span class="won">원</span>
-                        </div>
-                        <div class="point-info">최대 1,600P 적립</div>
-                    </div>
-                </article>
-
-                <article class="book-card">
-                    <div class="book-cover"><span>표지 이미지</span></div>
-                    <h3 class="book-title">손익계산서로 보는 비즈니스 인사이트</h3>
-                    <p class="book-author">박인사이트 · Insight Lab</p>
-                    <p class="book-meta">2021년 05월 | 재무 분석</p>
-                    <div class="book-price-row">
-                        <div class="price-main">
-                            <span class="discount">20%</span>
-                            <span class="amount">19,200</span><span class="won">원</span>
-                        </div>
-                        <div class="point-info">최대 960P 적립</div>
-                    </div>
-                </article>
-
-                <!-- … 나머지 카드들도 이 패턴으로 반복 -->
-            </div>
-
-            <!-- 페이지네이션 -->
-            <div class="pagination">
-                <button>&laquo;</button>
-                <button class="active">1</button>
-                <button>2</button>
-                <button>3</button>
-                <button>4</button>
-                <button>&raquo;</button>
             </div>
         </section>
     </div>
 </main>
-
-<footer id="footer">
-    <div class="container">
-        <div class="footer-links">
-            <a href="#">회사소개</a>
-            <a href="#">이용약관</a>
-            <a href="#"><strong>개인정보처리방침</strong></a>
-            <a href="#">관리자</a>
-        </div>
-
-        <div class="footer-info">
-            <div class="copyright">
-                <strong>대표이사 마르코</strong> | 사업자등록번호 123-456-7890<br />
-                통신판매업신고 2024-광주동구-01211 | 이메일: marco@nhn.com<br />
-                호스팅 제공자 NHN24 © NHN24. All Rights Reserved.
-            </div>
-            <div class="customer-center">
-                <strong>고객센터 1544-8282</strong> (발신자 부담)<br />
-                광주광역시 동구 서석동 조선대학교 1층 NHN아카데미<br />
-                Fax 062-1234-5678
-            </div>
-        </div>
-    </div>
-</footer>
 </body>
 </html>

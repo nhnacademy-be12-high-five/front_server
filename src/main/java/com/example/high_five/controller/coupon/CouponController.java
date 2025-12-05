@@ -8,6 +8,7 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,7 +31,6 @@ public class CouponController {
         List<CouponTemplateDto> templates = Collections.emptyList();
 
         try {
-            // 1. 쿠폰 서버에서 발급 가능한 쿠폰 목록 조회 (Page 객체 -> Map)
             Map<String, Object> response = couponService.getIssuableCoupons(0, 20);
 
             // 2. "content" 필드 추출 및 DTO 변환
@@ -50,20 +50,33 @@ public class CouponController {
     }
 
     @PostMapping("/coupon/issue")
-    public String issueCoupon(@RequestParam Long couponId, RedirectAttributes redirectAttributes) {
+    public String issueCoupon(@RequestParam Long couponId,
+                              @CookieValue(value = "AccessToken", required = false) String accessToken,
+                              RedirectAttributes redirectAttributes) {
         // 1. 임시 사용자 ID (로그인 구현 전이므로 1번 사용자로 고정)
-        Long userId = 1L;
+        if (accessToken == null || accessToken.isBlank()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "로그인이 필요한 서비스입니다.");
+            return "redirect:/member/login.html";
+        }
 
         try {
             UserCouponIssueRequestDto requestDto = new UserCouponIssueRequestDto(couponId);
 
-            couponService.issueCoupon(userId, requestDto);
+            couponService.issueCoupon("Bearer " + accessToken, requestDto);
 
             redirectAttributes.addFlashAttribute("message", "쿠폰이 성공적으로 발급되었습니다.");
 
         } catch (FeignException e) {
+            String serverMessage = e.contentUTF8();
+
             if (e.status() == 409) {
                 redirectAttributes.addFlashAttribute("errorMessage", "이미 해당 쿠폰을 발급받으셨습니다.");
+            } else if (e.status() == 400) {
+                if (serverMessage != null && !serverMessage.isBlank()) {
+                    redirectAttributes.addFlashAttribute("errorMessage", serverMessage);
+                } else {
+                    redirectAttributes.addFlashAttribute("errorMessage", "잘못된 요청입니다.");
+                }
             } else {
                 redirectAttributes.addFlashAttribute("errorMessage", "쿠폰 발급에 실패했습니다. (오류: " + e.status() + ")");
             }
