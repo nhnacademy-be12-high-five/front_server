@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>상품 목록 (테스트용)</title>
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; padding: 40px; background-color: #f4f4f4; }
+        .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 30px; text-align: center; }
+
+        .product-card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #fff;
+            transition: transform 0.2s;
+        }
+        .product-card:hover { transform: translateY(-3px); box-shadow: 0 5px 10px rgba(0,0,0,0.05); }
+
+        .info { flex: 1; }
+        .info label { display: block; font-weight: bold; margin-bottom: 8px; color: #333; font-size: 1.1em; }
+        .info input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 150px;
+        }
+
+        .actions { display: flex; gap: 10px; align-items: center; }
+        .actions input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 60px;
+            text-align: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .btn-cart { background-color: #28a745; }
+        .btn-cart:hover { background-color: #218838; }
+
+        .btn-link {
+            display: inline-block;
+            background-color: #007bff;
+            text-decoration: none;
+            margin-top: 20px;
+        }
+        .btn-link:hover { background-color: #0056b3; }
+
+        .guide {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📚 상품 담기 테스트</h1>
+
+    <div class="guide">
+        💡 <b>사용법:</b><br>
+        1. Book-Service 데이터베이스에 저장된 <b>실제 책 ID (PK)</b>를 입력하세요.<br>
+        2. 수량을 입력하고 [담기] 버튼을 누르세요.<br>
+        3. 장바구니 페이지로 이동하여 확인하세요.
+    </div>
+
+    <div class="product-card">
+        <div class="info">
+            <label>📖 테스트 도서 A</label>
+            ID: <input type="number" id="bookId1" placeholder="책 ID 입력 (예: 1)">
+        </div>
+        <div class="actions">
+            수량: <input type="number" id="qty1" value="1" min="1">
+            <button class="btn btn-cart" onclick="addToCart(1)">장바구니 담기</button>
+        </div>
+    </div>
+
+    <div class="product-card">
+        <div class="info">
+            <label>📘 테스트 도서 B</label>
+            ID: <input type="number" id="bookId2" placeholder="책 ID 입력 (예: 2)">
+        </div>
+        <div class="actions">
+            수량: <input type="number" id="qty2" value="2" min="1">
+            <button class="btn btn-cart" onclick="addToCart(2)">장바구니 담기</button>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="/api/cart" class="btn btn-link">🛒 장바구니 확인하러 가기</a>
+    </div>
+</div>
+
+<script>
+    function addToCart(index) {
+        const bookIdVal = document.getElementById('bookId' + index).value;
+        const qtyVal = document.getElementById('qty' + index).value;
+
+        if (!bookIdVal || !qtyVal) {
+            alert("책 ID와 수량을 정확히 입력해주세요!");
+            return;
+        }
+
+        const requestData = {
+            bookId: parseInt(bookIdVal),
+            quantity: parseInt(qtyVal)
+        };
+
+        // [중요] API 주소 확인: /api/cart/items
+        fetch('/api/cart/items', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    // 성공 시 메시지 확인 및 이동
+                    if(confirm("✅ 장바구니에 담았습니다!\n바로 확인하러 갈까요?")) {
+                        location.href = "/api/cart"; // 장바구니 페이지로 이동
+                    }
+                } else {
+                    alert("❌ 담기 실패!\n\n1. Book ID가 DB에 있는지 확인하세요.\n2. 서버 로그를 확인하세요.");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("서버와 통신 중 오류가 발생했습니다.");
+            });
+    }
+</script>
+
+</body>
+</html>

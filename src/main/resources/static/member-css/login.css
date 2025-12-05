@@ -62,6 +62,7 @@ input {
     padding: 10px 20px;
 }
 
+
 .writing {
     width: 100%;
     display: flex;
@@ -224,7 +225,7 @@ input {
 .logo .brand {
     font-size: 21px;
     font-weight: 900;
-    color: #000080;
+    color: black;
     margin-top: 5px;
 }
 
@@ -252,6 +253,26 @@ input {
     border-bottom: 3px solid var(--color-primary); /* 활성화 탭 표시 */
 }
 
+/* 헤더 */
+#header {
+    background: #fff;
+    border-bottom: 3px solid var(--color-primary);
+    padding: 12px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+#header .container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
 /* ------------------------------------- */
 /* 3. 메인 콘텐츠 (로그인 영역) */
 /* ------------------------------------- */
@@ -262,7 +283,7 @@ input {
     justify-content: center;
     align-items: center;
     padding: 60px 0;
-    background-color: #ffffff;
+    background-color: var(--color-background);
 }
 
 .login-area {
@@ -360,6 +381,7 @@ input {
     margin-top: 30px;
     text-align: center;
 }
+
 .sns-login .divider {
     color: var(--color-text-light);
     font-size: 13px;
@@ -369,7 +391,7 @@ input {
 /* 회원가입 버튼 */
 .login2-btn {
     width: 100%;
-    padding: 15px;
+    padding: 10px;
     background-color: skyblue;
     color: white;
     font-size: 16px;
@@ -385,13 +407,14 @@ input {
 
 .sns-btn {
     width: 100%;
-    padding: 12px;
     border-radius: 4px;
     font-size: 15px;
-    font-weight: 500;
+    font-weight: 700;
     background-color: #007bff;
     color: #191919;
-    margin: 10px;
+    padding-left: 10px;
+    margin-right: 10px;
+    height: 50px;
 }
 
 .sns-btn.payco {
@@ -399,7 +422,6 @@ input {
     color: white;
     border: none;
 }
-
 /* 💡 입력 필드와 아이콘을 묶는 컨테이너 */
 .input-wrapper {
     position: relative; /* 자식 요소(아이콘)의 기준점 */
@@ -423,7 +445,7 @@ input {
     /* 아이콘이 들어갈 공간 확보를 위해 오른쪽 패딩을 충분히 줍니다 */
     padding-right: 40px !important;
     /* 이미지 경로 설정 (Thymeleaf URL이 CSS로 변환된 최종 경로를 사용) */
-    background-image: url("/img/free-icon-eye.png");
+    background-image: url("/static/img/free-icon-eye.png");
     /* 이미지를 한 번만 표시 */
     background-repeat: no-repeat;
     /* 이미지 위치를 오른쪽에서 10px, 수직 중앙에 배치 */

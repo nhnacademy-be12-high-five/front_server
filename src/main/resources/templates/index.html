@@ -58,6 +58,7 @@
         padding: 10px 20px;
     }
 
+
     /* 헤더 */
     #header {
         background: #fff;
@@ -535,36 +536,37 @@
 <!-- 헤더 -->
 <header id="header" role="banner">
     <div class="container">
-        <a href="./" class="logo">
-            <img src="../img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100" />
+        <a th:href="@{/}" class="logo">
+            <img th:src="@{/img/logo.png}" alt="HIGH-FIVE 로고" width="100" height="100" />
             <div class="brand">HIGH-FIVE BOOKS</div>
         </a>
 
         <nav class="gnb" aria-label="주요 메뉴">
-            <div class="search-box" role="search">
+            <form class="search-box"
+                  role="search"
+                  th:action="@{/search}"
+                  method="get">
                 <input
                         type="search"
+                        name="keyword"
                         placeholder="도서명, 저자, ISBN, 태그 검색"
                         aria-label="통합 검색"
                 />
-                <button class="search-btn" aria-label="검색">검색</button>
-            </div>
+                <button type="submit" class="search-btn" aria-label="검색">검색</button>
+            </form>
+
         </nav>
 
         <div class="user-menu">
             <!-- 쿠폰 -->
             <a class="user-link" href="/coupon">
-                <img src="../img/icon-coupon.png" alt="쿠폰" class="user-icon" />
+                <img th:src="@{/img/icon-coupon.png}" alt="쿠폰" class="user-icon" />
             </a>
-
-            <!-- 마이페이지 -->
             <a class="user-link" href="/mypage">
-                <img src="../img/icon-mypage.png" alt="마이페이지" class="user-icon" />
+                <img th:src="@{/img/icon-mypage.png}" alt="마이페이지" class="user-icon" />
             </a>
-
-            <!-- 장바구니 -->
             <a class="user-link" href="/cart">
-                <img src="../img/icon-cart.png" alt="장바구니" class="user-icon" />
+                <img th:src="@{/img/icon-cart.png}" alt="장바구니" class="user-icon" />
             </a>
 
             <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
@@ -649,8 +651,6 @@
                         IT
                     </button>
                     <div class="sub-menu">
-                        <a href="#">컴퓨터공학</a>
-                        <a href="#">전자공학</a>
                         <a href="#">프로그래밍</a>
                         <a href="#">데이터·인공지능</a>
                     </div>
@@ -682,7 +682,6 @@
                     </button>
                     <div class="sub-menu">
                         <a href="#">여행</a>
-                        <a href="#">건강</a>
                         <a href="#">요리</a>
                     </div>
                 </div>
@@ -977,18 +976,18 @@
         });
     });
 
-    // 검색 버튼(데모용)
-    document
-        .querySelector(".search-box button")
-        .addEventListener("click", () => {
-            const q = document.querySelector(".search-box input").value.trim();
-            if (!q) {
-                alert("검색어를 입력해 주세요.");
-                return;
-            }
-            // 실제 서비스에서는 /search?q= 로 라우팅
-            alert(`검색: ${q}`);
-        });
+    // // 검색 버튼(데모용)
+    // document
+    //     .querySelector(".search-box button")
+    //     .addEventListener("click", () => {
+    //         const q = document.querySelector(".search-box input").value.trim();
+    //         if (!q) {
+    //             alert("검색어를 입력해 주세요.");
+    //             return;
+    //         }
+    //         // 실제 서비스에서는 /search?q= 로 라우팅
+    //         alert(`검색: ${q}`);
+    //     });
 
 
     const subCategories = {
