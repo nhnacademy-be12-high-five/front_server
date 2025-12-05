@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
-//@FeignClient(name = "gateway-server", contextId = "memberClient", url = "http://gateway-server:8000")
-@FeignClient(name = "gateway-server", contextId = "memberClient", url = "http://localhost:8082")
+@FeignClient(name = "gateway-server", contextId = "memberClient", url = "http://gateway-server:8000")
+//@FeignClient(name = "gateway-server", contextId = "memberClient", url = "http://localhost:8082")
 public interface MemberService {
     // 관리자 - 정책 조회
     @GetMapping("/api/admin/points/policy")
@@ -45,8 +45,6 @@ public interface MemberService {
     @PostMapping("/api/auth/signup")
     void registerMember(@RequestBody MemberCreateRequestDto dto);
 
-//    @GetMapping("/api/members")
-//    ResponseEntity<MemberResponse> getMyInfo(@RequestHeader("Authorization") String token);
 
     @GetMapping("/api/members")
     ResponseEntity<MemberResponse> getMyInfo();
