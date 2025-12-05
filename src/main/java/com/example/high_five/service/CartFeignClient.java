@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.awt.print.Pageable;
 
-// Member-Server의 이름과 경로 확인 (Eureka 이름: member-service)
-@FeignClient(name = "gateway-server", contextId = "cartClient", url = "http://localhost:8082")
+@FeignClient(name = "gateway-server", contextId = "cartClient", url = "${gateway.uri}")
 public interface CartFeignClient {
 
     @PostMapping("/api/cart/items")

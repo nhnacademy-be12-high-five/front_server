@@ -1,18 +1,42 @@
+# application-local.yml
+
 server:
   port: 8081
   tomcat:
-    uri-encoding: UTF-8      # URL 한글 인코딩 (쿼리 파라미터)
+    uri-encoding: UTF-8
 
 spring:
   application:
-    name: frontend_server
-
+    name: frontend-server
   servlet:
-    encoding:                # 요청/응답 body 인코딩
+    encoding:
       charset: UTF-8
       enabled: true
-      force: true            # 항상 UTF-8 강제
+      force: true
 
+# 로컬 유레카 설정
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+# 로컬 게이트웨이 주소 (IntelliJ에서 실행 중인 게이트웨이)
+gateway:
+  uri: http://localhost:8000
+
+# Book API 기본 URL (로컬 게이트웨이 경유)
 book:
   api:
-    base-url: http://localhost:9003   # Book 서버 주소 (SearchController에서 사용)
+    base-url: ${gateway.uri}/api/books
+
+# 로컬 로깅 (콘솔 출력 위주)
+logging:
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"
+  level:
+    root: INFO
+    com.example.high_five: DEBUG # 내 프로젝트 패키지명에 맞게 수정
