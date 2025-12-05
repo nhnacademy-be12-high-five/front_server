@@ -34,14 +34,13 @@ public interface MemberService {
 
     // 포인트 잔액 조회
     @GetMapping("/api/points/balance")
-    ResponseEntity<PointBalanceResponse> getMyBalance(@RequestHeader("X-USER-ID") Long memberId);
+    ResponseEntity<PointBalanceResponse> getMyBalance(@RequestHeader("Authorization") String token);
 
     // 포인트 이력 조회
     @GetMapping("/api/points/history")
-    ResponseEntity<CustomPage<PointHistoryResponse>> getMyHistory(
-                                                                   @RequestHeader("X-USER-ID") Long memberId,
-                                                                   @RequestParam("page") int page,
-                                                                   @RequestParam("size") int size);
+    ResponseEntity<CustomPage<PointHistoryResponse>> getMyHistory(@RequestHeader("Authorization") String token,
+                                                                  @RequestParam("page") int page,
+                                                                  @RequestParam("size") int size);
     // 회원 가입
     @PostMapping("/api/auth/signup")
     void registerMember(@RequestBody MemberCreateRequestDto dto);
