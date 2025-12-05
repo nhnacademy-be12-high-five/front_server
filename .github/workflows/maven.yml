@@ -4,13 +4,25 @@ on:
   push:
     branches: [ "main", "dev" ]
   pull_request:
-    branches: [ "main", "dev", "feature/**" ]
+    # PR이 닫히는(closed) 시점을 감지하기 위해 types를 명시해야 합니다.
+    # opened, synchronize, reopened는 기본값이지만 closed를 넣기 위해 모두 명시합니다.
+    types: [opened, synchronize, reopened, closed]
+    branches: [ "main", "dev" ]
 
 jobs:
   build-deploy:
+    # PR이 닫혔는데 머지되지 않고 그냥 닫힌 경우(closed but not merged)에는
+    # 아예 이 잡을 실행하지 않도록 전체 조건을 걸어 불필요한 리소스 낭비를 막습니다.
+    if: >
+      github.event_name == 'push' ||
+      github.event.action != 'closed' ||
+      (github.event.action == 'closed' && github.event.pull_request.merged == true)
     runs-on: ubuntu-latest
 
     steps:
+      # ======================================================
+      # [검증 단계] - PR 오픈, 동기화 시에도 항상 실행됨
+      # ======================================================
       # 1. 코드 체크아웃
       - name: 코드 체크아웃
         uses: actions/checkout@v4
@@ -27,8 +39,15 @@ jobs:
       - name: Maven 빌드
         run: mvn clean package -B -DskipTests
 
+      # ======================================================
+      # [배포 단계] - PUSH거나 PR이 MERGE된 경우에만 실행됨
+      # ======================================================
       # 4. Docker Hub 로그인
       - name: Docker Hub 로그인
+        # [핵심 조건] PUSH 이벤트이거나 OR (PR 이벤트이고, 닫혔으며, 머지된 경우)
+        if: >
+          github.event_name == 'push' ||
+          (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true)
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -36,6 +55,10 @@ jobs:
 
       # 5. Docker 이미지 빌드 및 푸시
       - name: Docker 이미지 빌드 및 푸시
+        # [핵심 조건] 위와 동일
+        if: >
+          github.event_name == 'push' ||
+          (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true)
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -46,6 +69,10 @@ jobs:
 
       # 6. 서버 접속 및 배포 (인스턴스별 순차 배포 적용)
       - name: 서버 배포 (SSH)
+        # [핵심 조건] 위와 동일
+        if: >
+          github.event_name == 'push' ||
+          (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true)
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_IP }}
