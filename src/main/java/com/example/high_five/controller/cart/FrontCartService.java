@@ -26,6 +26,7 @@ public class FrontCartService {
     }
 
     public CartListResponse getCartItems(String cookieHeader) {
+        // null 대신 unpaged() 사용
         return cartService.getCartItems(cookieHeader, Pageable.unpaged()).getBody();
     }
 

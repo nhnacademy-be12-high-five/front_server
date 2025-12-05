@@ -19,7 +19,6 @@ public class CartController {
     public String viewCartItems(Model model,
                                 @RequestHeader(value = "Cookie", required = false) String cookie) {
         CartListResponse cartList = cartService.getCartItems(cookie);
-
         model.addAttribute("cartList", cartList);
         return "order/cart";
     }
@@ -72,8 +71,6 @@ public class CartController {
             return ResponseEntity.ok(0);
         }
     }
-
-    // 장바구니 책 넣기 테스트
     @GetMapping("/test")
     public String viewTestPage() {
         return "order/test-products";

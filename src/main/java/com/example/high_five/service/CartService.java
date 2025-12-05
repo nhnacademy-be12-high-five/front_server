@@ -3,11 +3,12 @@ package com.example.high_five.service;
 import com.example.high_five.dto.cart.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
-import org.springframework.data.domain.Pageable; // [주의] awt 아님!
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @FeignClient(name = "gateway-server", contextId = "cartClient", url = "http://localhost:8082")
+//@FeignClient(name = "gateway-server", contextId = "memberClient", url = "http://gateway-server:8000")
 public interface CartService {
 
     @PostMapping("/api/cart/items")

@@ -35,6 +35,32 @@ public class MemberController {
 
 
 
+//    @GetMapping("/mypage")
+//    public String myPage(
+//            @CookieValue(value = "access-token", required = false) String accessToken,
+//            @RequestParam(value = "tab", required = false, defaultValue = "info") String tab,
+//            Model model) {
+
+//        if (accessToken == null) {
+//            return "redirect:/member/login.html";
+//        }
+//        try {
+//            var myInfo = memberService.getMyInfo().getBody();
+//            model.addAttribute("myInfo", myInfo);
+//
+//        } catch (FeignException e) {
+//            log.error("내 정보 조회 실패 (Feign): {}", e.getMessage());
+//            return "redirect:/member/login.html";
+//        } catch (Exception e) {
+//            log.error("시스템 오류: {}", e.getMessage());
+//            return "redirect:/";
+//        }
+//
+//        model.addAttribute("currentTab", tab);
+//        return "member/mypage";
+//    }
+
+
 
     @LoginRequired
     @GetMapping("/mypage")
