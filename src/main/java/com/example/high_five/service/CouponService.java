@@ -11,8 +11,8 @@ import java.util.Map;
 @FeignClient(name = "gateway-server", contextId = "couponClient", url = "http://localhost:8082")
 public interface CouponService {
 
-    @GetMapping("/api/coupons/members/{memberId}")
-    Map<String, Object> getMemberCoupons(@PathVariable("memberId") Long memberId,
+    @GetMapping("/api/coupons/members")
+    Map<String, Object> getMemberCoupons(@CookieValue("AccessToken") String accessToken,
                                          @RequestParam(value = "page", defaultValue = "0") int page,
                                          @RequestParam(value = "size", defaultValue = "10") int size);
 
@@ -27,7 +27,7 @@ public interface CouponService {
     void createCouponPolicy(@RequestBody CouponPolicyRequestDto dto);
 
     @PostMapping("/api/coupons/issue")
-    void issueCoupon(@RequestHeader("X-USER-ID") Long userId,
+    void issueCoupon(@CookieValue("AccessToken") String accessToken,
                      @RequestBody UserCouponIssueRequestDto requestDto);
 
     @GetMapping("/api/coupons/admin/coupon-policy")

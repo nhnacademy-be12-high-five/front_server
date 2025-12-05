@@ -1,6 +1,8 @@
 package com.example.high_five.service;
 
 import com.example.high_five.common.CustomPage;
+import com.example.high_five.dto.member.request.MemberCreateRequestDto;
+import com.example.high_five.dto.member.response.MemberResponse;
 import com.example.high_five.dto.point.PointAdminAdjustmentRequest;
 import com.example.high_five.dto.point.PointAdminPolicyRequest;
 import com.example.high_five.dto.point.PointAdminPolicyResponse;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 //@FeignClient(name = "gateway-server", contextId = "memberClient", url = "http://gateway-server:8000")
@@ -32,11 +35,17 @@ public interface MemberService {
 
     // 포인트 잔액 조회
     @GetMapping("/api/points/balance")
-    ResponseEntity<PointBalanceResponse> getMyBalance(@CookieValue("AccessToken") String accessToken);
+    ResponseEntity<PointBalanceResponse> getMyBalance(@RequestHeader("Authorization") String token);
 
     // 포인트 이력 조회
     @GetMapping("/api/points/history")
-    ResponseEntity<CustomPage<PointHistoryResponse>> getMyHistory(@CookieValue("AccessToken") String accessToken,
+    ResponseEntity<CustomPage<PointHistoryResponse>> getMyHistory(@RequestHeader("Authorization") String token,
                                                                   @RequestParam("page") int page,
                                                                   @RequestParam("size") int size);
+    // 회원 가입
+    @PostMapping("/api/auth/signup")
+    void registerMember(@RequestBody MemberCreateRequestDto dto);
+
+    @GetMapping("/api/members")
+    ResponseEntity<MemberResponse> getMyInfo(@RequestHeader("Authorization") String token);
 }

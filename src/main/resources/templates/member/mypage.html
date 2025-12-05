@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -786,7 +787,7 @@
 <body>
 <header id="header" role="banner">
     <div class="container">
-        <a href="./" class="logo">
+        <a href="../order" class="logo">
             <img src="../img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100" />
             <div class="brand">HIGH-FIVE BOOKS</div>
         </a>
@@ -823,6 +824,8 @@
             <a class="user-link" href="/cart">
                 <img src="../img/icon-cart.png" alt="장바구니" class="user-icon" />
             </a>
+
+            <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
         </div>
 
     </div>
@@ -831,25 +834,25 @@
 <div class="container2">
     <nav class="box">
 
-<!--        // category controller에 추가하기-->
+        <!--        // category controller에 추가하기-->
 
-<!--        @GetMapping("/mypage/{tab}")-->
-<!--        public String myPage(@PathVariable("tab") String activeTab, Model model) {-->
-<!--        // 1. URL 경로 변수로 현재 탭의 값을 받습니다. (예: /mypage/info)-->
+        <!--        @GetMapping("/mypage/{tab}")-->
+        <!--        public String myPage(@PathVariable("tab") String activeTab, Model model) {-->
+        <!--        // 1. URL 경로 변수로 현재 탭의 값을 받습니다. (예: /mypage/info)-->
 
-<!--        // 2. 모델에 현재 활성화된 탭의 값을 담아 HTML로 전달합니다.-->
-<!--        model.addAttribute("currentTab", activeTab);-->
+        <!--        // 2. 모델에 현재 활성화된 탭의 값을 담아 HTML로 전달합니다.-->
+        <!--        model.addAttribute("currentTab", activeTab);-->
 
-<!--        // 3. (선택) 해당 탭에 필요한 데이터를 모델에 추가로 담아 보냅니다.-->
-<!--        // if ("info".equals(activeTab)) {-->
-<!--        //     model.addAttribute("userInfo", userService.getUserInfo());-->
-<!--        // }-->
+        <!--        // 3. (선택) 해당 탭에 필요한 데이터를 모델에 추가로 담아 보냅니다.-->
+        <!--        // if ("info".equals(activeTab)) {-->
+        <!--        //     model.addAttribute("userInfo", userService.getUserInfo());-->
+        <!--        // }-->
 
-<!--        return "mypage/myPageTemplate"; // Thymeleaf 템플릿 이름-->
-<!--        }-->
-<!--        -->
+        <!--        return "mypage/myPageTemplate"; // Thymeleaf 템플릿 이름-->
+        <!--        }-->
+        <!--        -->
 
-<!--        // 타임리프 추가 -->
+        <!--        // 타임리프 추가 -->
         <a th:href="@{/mypage(tab='info')}"
            th:classappend="${currentTab == 'info'} ? 'active'" class="tab-btn">내 정보</a>
 
@@ -877,28 +880,26 @@
         <div class="info-group">
             <div class="info-item">
                 <label>이름</label>
-                <div></div>
+                <div th:text="${myInfo.name}">홍길동</div>
             </div>
             <div class="info-item">
                 <label>이메일</label>
-                <div>sun.kim@example.com</div>
+                <div th:text="${myInfo.email}">sun.kim@example.com</div>
             </div>
             <div class="info-item">
                 <label>생일</label>
-                <div>1995-01-01</div>
+                <div th:text="${#temporals.format(myInfo.birthDate, 'yyyy-MM-dd')}">1995-01-01</div>
             </div>
             <div class="info-item">
                 <label>연락처</label>
-                <div>010-1234-5678</div>
+                <div th:text="${myInfo.phone}">010-1234-5678</div>
             </div>
             <div class="info-item">
                 <label>회원 등급</label>
-                <div>일반</div>
+                <div th:text="${myInfo.gradeName}">일반</div>
             </div>
         </div>
-
         <br />
-
         <button type="button" class="btn-edit">정보 수정</button>
     </section>
 

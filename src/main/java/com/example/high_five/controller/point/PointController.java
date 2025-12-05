@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -20,6 +21,7 @@ public class PointController {
 
     private final MemberService memberService;
 
+    @GetMapping
     public String pointPage(Model model,
                             @RequestParam(defaultValue = "0") int page,
                             @CookieValue(value = "access-token", required = false) String accessToken) {
@@ -43,6 +45,6 @@ public class PointController {
 
         model.addAttribute("currentTab", "points");
 
-        return "order/mypage";
+        return "member/mypage";
     }
 }
