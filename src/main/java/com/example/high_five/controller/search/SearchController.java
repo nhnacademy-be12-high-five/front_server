@@ -1,5 +1,6 @@
 package com.example.high_five.controller.search;
 
+import com.example.high_five.dto.book.BookResponse;
 import com.example.high_five.dto.book.PagedResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,12 +32,11 @@ public class SearchController {
                          @RequestParam(defaultValue = "0") int page,
                          Model model) {
 
-        int size = 20;  // 페이지당 도서 개수
-
+        int size = 20;
 
         URI uri = UriComponentsBuilder
                 .fromHttpUrl(bookApiBaseUrl + "/api/search")
-                .queryParam("keyword", keyword)       // raw 값
+                .queryParam("keyword", keyword)
                 .queryParam("sort", sort)
                 .queryParam("page", page)
                 .queryParam("size", size)
@@ -54,13 +54,75 @@ public class SearchController {
 
         PagedResponse body = response.getBody();
 
+        // null 방어용
+        if (body == null) {
+            body = new PagedResponse();
+        }
+
         model.addAttribute("keyword", keyword);
-        model.addAttribute("books", body != null ? body.getContent() : null);
-        model.addAttribute("totalElements", body != null ? body.getTotalElements() : 0);
-        model.addAttribute("totalPages", body != null ? body.getTotalPages() : 0);
+        model.addAttribute("books", body.getContent());
+        model.addAttribute("pageInfo", body);   // ★ 템플릿에서 pageInfo.totalElements 사용
         model.addAttribute("page", page);
         model.addAttribute("sort", sort);
 
-        return "Book/booklist"; // 검색 결과 템플릿 이름
+        return "Book/booklist";
     }
+
+
+    @GetMapping("/rag-search")
+    public String ragSearch(@RequestParam String keyword,
+                            @RequestParam(defaultValue = "POPULAR") String sort,
+                            @RequestParam(defaultValue = "0") int page,
+                            Model model) {
+
+        int size = 20;
+
+        // 1) 도서 목록 (RAG 하이브리드 검색)
+        URI searchUri = UriComponentsBuilder
+                .fromHttpUrl(bookApiBaseUrl + "/api/search/rag-search")
+                .queryParam("keyword", keyword)
+                .queryParam("page", page)
+                .queryParam("size", size)
+                .encode(StandardCharsets.UTF_8)
+                .build()
+                .toUri();
+
+        ResponseEntity<PagedResponse> response =
+                restTemplate.exchange(
+                        searchUri,
+                        HttpMethod.GET,
+                        null,
+                        new ParameterizedTypeReference<PagedResponse>() {}
+                );
+
+        PagedResponse body = response.getBody();
+        if (body == null) {
+            body = new PagedResponse();
+        }
+
+        // 2) AI 요약/추천 문장
+        URI answerUri = UriComponentsBuilder
+                .fromHttpUrl(bookApiBaseUrl + "/api/search/rag-answer")
+                .queryParam("keyword", keyword)
+                .encode(StandardCharsets.UTF_8)
+                .build()
+                .toUri();
+
+        ResponseEntity<String> aiResponse =
+                restTemplate.getForEntity(answerUri, String.class);
+
+        String aiMessage = aiResponse.getBody();
+
+        // 3) 모델에 담기
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("books", body.getContent());
+        model.addAttribute("pageInfo", body);
+        model.addAttribute("page", page);
+        model.addAttribute("sort", sort);
+        model.addAttribute("aiMessage", aiMessage);   // ★ 추가
+
+        return "Book/booklist";
+    }
+
+
 }
