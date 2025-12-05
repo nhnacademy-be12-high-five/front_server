@@ -21,11 +21,17 @@ body {
     "Noto Sans KR", sans-serif;
     color: var(--color-text-dark);
     line-height: 1.6;
-    background-color: var(--color-background); /* 베이지 배경 */
+    background-color: var(--color-background);
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+
+    /* --- 추가 --- */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    letter-spacing: -0.02em;  /* 한글 자간 살짝 좁게 */
 }
+
 
 a {
     color: var(--color-primary);
@@ -352,7 +358,7 @@ input {
 
 .book-info h1 {
     font-size: 32px;
-    font-weight: 800;
+    font-weight: 700;
     color: var(--color-text-dark);
     margin-bottom: 5px;
     line-height: 1.3;
@@ -381,8 +387,8 @@ input {
     margin-bottom: 5px;
 }
 .price-section .discount-price {
-    font-size: 36px;
-    font-weight: 800;
+    font-size: 32px;
+    font-weight: 700;
     color: #c0392b; /* 진한 빨간색으로 할인 강조 */
     display: flex;
     align-items: flex-end;
@@ -399,6 +405,20 @@ input {
     font-weight: 700;
     margin-left: 10px;
 }
+/* 가격 정보 - 통화 단위 크기 보정 */
+.price-section .discount-price {
+    align-items: baseline;        /* 숫자와 원을 한 줄 기준선에 맞추기 */
+}
+
+.price-section .discount-price .final-price {
+    font-size: 28px;              /* 숫자는 약간만 작게 */
+}
+
+.price-section .discount-price .currency {
+    font-size: 18px;              /* '원'은 더 작게 */
+    margin-left: 4px;
+}
+
 
 /* ========= 포장 옵션(색상 선택 스타일) ========= */
 .option-block {

@@ -1,0 +1,41 @@
+package com.example.high_five.controller.book;
+
+import com.example.high_five.dto.book.BookResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.client.RestTemplate;
+
+@Controller
+@RequiredArgsConstructor
+public class BookController {
+
+    private final RestTemplate restTemplate;
+
+    @Value("${book.api.base-url}")
+    private String bookApiBaseUrl;    // 예: http://localhost:9003
+
+    /**
+     * 도서 상세 화면
+     * 예: /book/1 -> 북서버 /api/books/1 호출 후 book-detail.html 렌더링
+     */
+    @GetMapping("/book/{bookId}")
+    public String getBookDetail(@PathVariable Long bookId, Model model) {
+
+        // ★ 북서버 상세 API URL 규칙에 맞게만 수정해 주세요.
+        String url = bookApiBaseUrl + "/api/books/" + bookId;
+
+        ResponseEntity<BookResponse> response =
+                restTemplate.getForEntity(url, BookResponse.class);
+
+        BookResponse book = response.getBody();
+        model.addAttribute("book", book);
+
+        // templates/Book/book-detail.html 을 렌더링한다고 가정
+        return "Book/book-detail";
+    }
+}
