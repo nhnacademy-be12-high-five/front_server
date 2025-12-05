@@ -45,6 +45,9 @@ public interface MemberService {
     @PostMapping("/api/auth/signup")
     void registerMember(@RequestBody MemberCreateRequestDto dto);
 
+//    @GetMapping("/api/members")
+//    ResponseEntity<MemberResponse> getMyInfo(@RequestHeader("Authorization") String token);
+
     @GetMapping("/api/members")
-    ResponseEntity<MemberResponse> getMyInfo(@RequestHeader("Authorization") String token);
+    ResponseEntity<MemberResponse> getMyInfo();
 }
