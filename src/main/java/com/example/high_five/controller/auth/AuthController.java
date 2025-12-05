@@ -68,18 +68,6 @@ public class AuthController {
         return "member/signup";
     }
 
-    // [추가] 회원가입 요청 처리
-    @PostMapping("/auth/signup")
-    public String signup(@ModelAttribute MemberCreateRequestDto request, Model model) {
-        try {
-            authService.signup(request);
-            return "redirect:/member/login"; // 성공 시 로그인 페이지로
-        } catch (FeignException e) {
-            // 실패 시 에러 메시지와 함께 다시 가입 페이지로
-            model.addAttribute("error", "회원가입에 실패했습니다. 입력 정보를 확인해주세요.");
-            return "member/signup";
-        }
-    }
 
 
 }
