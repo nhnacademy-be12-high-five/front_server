@@ -1,8 +1,10 @@
 package com.example.high_five.controller.cart;
+
 import com.example.high_five.dto.cart.*;
-import com.example.high_five.service.CartFeignClient;
+import com.example.high_five.service.CartService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -12,10 +14,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FrontCartService {
 
-    private final CartFeignClient cartFeignClient;
+    private final CartService cartService;
 
-    // [핵심] 백엔드에서 온 Set-Cookie를 브라우저 응답에 복사
+    // 백엔드 쿠키 동기화
     private void syncCookie(ResponseEntity<?> responseEntity, HttpServletResponse servletResponse) {
+        if (responseEntity == null) return;
         List<String> cookies = responseEntity.getHeaders().get("Set-Cookie");
         if (cookies != null && !cookies.isEmpty()) {
             cookies.forEach(cookie -> servletResponse.addHeader("Set-Cookie", cookie));
@@ -23,25 +26,23 @@ public class FrontCartService {
     }
 
     public CartListResponse getCartItems(String cookieHeader) {
-        // GET은 쿠키 갱신이 거의 없으므로 Body만 추출
-        return cartFeignClient.getCartItems(cookieHeader, null, null).getBody();
+        return cartService.getCartItems(cookieHeader, Pageable.unpaged()).getBody();
     }
 
     public void addToCart(String cookieHeader, CartAddRequest request, HttpServletResponse servletResponse) {
-        ResponseEntity<CartAddResponse> response = cartFeignClient.addItemToCart(request, cookieHeader, null);
-        syncCookie(response, servletResponse); // 쿠키 동기화 필수!
+        ResponseEntity<CartAddResponse> response = cartService.addItemToCart(request, cookieHeader);
+        syncCookie(response, servletResponse);
     }
 
     public void updateQuantity(String cookieHeader, CartItemUpdateRequest request) {
-        cartFeignClient.updateQuantity(request, cookieHeader, null);
+        cartService.updateQuantity(request, cookieHeader);
     }
 
     public void deleteItem(String cookieHeader, Long bookId) {
-        cartFeignClient.deleteOneItem(bookId, cookieHeader, null);
+        cartService.deleteOneItem(bookId, cookieHeader);
     }
 
     public void clearCart(String cookieHeader) {
-        cartFeignClient.deleteAllCartItem(cookieHeader, null);
+        cartService.deleteAllCartItem(cookieHeader);
     }
-
 }
