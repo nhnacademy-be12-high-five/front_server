@@ -69,7 +69,6 @@ jobs:
 
       # 6. 서버 접속 및 배포 (인스턴스별 순차 배포 적용)
       - name: 서버 배포 (SSH)
-        # [핵심 조건] 위와 동일
         if: >
           github.event_name == 'push' ||
           (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true)
@@ -83,32 +82,27 @@ jobs:
             echo "🚀 Front Server (인스턴스 1, 2) 배포 시작..."
             cd ~/www/nhnbook
 
-            SERVICE_BASE="front_server"
+            SERVICE_BASE="front-server"
 
-            # 두 개의 인스턴스(_1, _2)를 순차적으로 배포
             for i in 1 2; do
-              CONTAINER_NAME="team5-${SERVICE_BASE}-${i}"
-              SERVICE_NAME="${SERVICE_BASE}_${i}"
-            
+              CONTAINER_NAME="team5-${SERVICE_BASE}-${i}"   # team5-front-server-1, 2
+              SERVICE_NAME="${SERVICE_BASE}-${i}"           # front-server-1, 2
+
               echo "---------------"
               echo "🔄 [인스턴스 $i] 배포 진행 중: $SERVICE_NAME ($CONTAINER_NAME)"
 
-              # 1. 기존 컨테이너 중지 및 제거 (명시적 수행)
               echo "🛑 기존 컨테이너 중지 및 제거..."
               docker stop $CONTAINER_NAME || true
               docker rm $CONTAINER_NAME || true
-            
-              # 2. 최신 이미지 pull 및 서비스 시작
+
               echo "📥 최신 이미지 Pull 및 컨테이너 시작..."
-              # docker compose up -d가 pull을 포함하므로 한 줄로 처리 가능합니다.
               docker compose pull $SERVICE_NAME
               docker compose up -d $SERVICE_NAME
 
-              # 다음 인스턴스 배포 전 잠시 대기 (선택 사항)
               echo "⏳ 안정화를 위해 5초 대기..."
               sleep 5
             done
-            
+
             echo "---------------"
             docker image prune -f
             echo "✅ Front Server 모든 인스턴스 배포 완료!"
