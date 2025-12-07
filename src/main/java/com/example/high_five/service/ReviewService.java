@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 // name은 유레카 등에 등록된 백엔드 서비스 이름, url은 직접 지정 시 사용
-@FeignClient(name = "gateway-server", contextId = "reviewClient", url = "http://localhost:8082")
+@FeignClient(name = "gateway-server", contextId = "reviewClient", url = "http://localhost:8000")
 public interface ReviewService {
 
     //리뷰 등록

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 //@FeignClient(name = "gateway-server", contextId = "couponClient", url = "http://gateway-server:8000")
-@FeignClient(name = "gateway-server", contextId = "couponClient", url = "http://localhost:8082")
+@FeignClient(name = "gateway-server", contextId = "couponClient", url = "http://localhost:8000")
 public interface CouponService {
 
     @GetMapping("/api/coupons/members")
