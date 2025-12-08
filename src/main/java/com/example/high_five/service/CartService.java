@@ -39,4 +39,15 @@ public interface CartService {
             @PathVariable("bookId") Long bookId,
             @RequestHeader(value = "Cookie", required = false) String cookieHeader
     );
+
+    @PostMapping("/api/cart/merge")
+    ResponseEntity<Void> mergeGuestCart(
+            @RequestHeader(value = "Cookie", required = false) String cookieHeader
+    );
+
+    // [추가] 비회원 장바구니 삭제 요청 (백엔드로)
+    @DeleteMapping("/api/cart/guest")
+    ResponseEntity<Void> deleteGuestCartOnly(
+            @RequestHeader(value = "Cookie", required = false) String cookieHeader
+    );
 }

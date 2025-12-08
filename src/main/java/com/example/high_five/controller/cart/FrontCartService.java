@@ -46,4 +46,18 @@ public class FrontCartService {
     public void clearCart(String cookieHeader) {
         cartService.deleteAllCartItem(cookieHeader);
     }
+
+    public void mergeCart(String cookieHeader, HttpServletResponse servletResponse) {
+        // 1. 백엔드 호출
+        ResponseEntity<Void> response = cartService.mergeGuestCart(cookieHeader);
+        // 2. 백엔드에서 "쿠키 지워라"라는 헤더가 오면 브라우저로 전달
+        syncCookie(response, servletResponse);
+    }
+
+    public void deleteGuestCart(String cookieHeader, HttpServletResponse servletResponse) {
+        // 1. 백엔드 호출
+        ResponseEntity<Void> response = cartService.deleteGuestCartOnly(cookieHeader);
+        // 2. 쿠키 동기화
+        syncCookie(response, servletResponse);
+    }
 }

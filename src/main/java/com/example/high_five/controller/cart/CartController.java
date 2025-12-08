@@ -1,6 +1,7 @@
 package com.example.high_five.controller.cart;
 
 import com.example.high_five.dto.cart.*;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -71,6 +72,36 @@ public class CartController {
             return ResponseEntity.ok(0);
         }
     }
+
+    @PostMapping("/api/cart/merge")
+    @ResponseBody
+    public ResponseEntity<Void> mergeCart(@RequestHeader(value = "Cookie", required = false) String cookie,
+                                          HttpServletResponse response) {
+        cartService.mergeCart(cookie, response);
+
+        expireCookie(response, "guestCookie");
+
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/api/cart/guest")
+    @ResponseBody
+    public ResponseEntity<Void> deleteGuestCart(@RequestHeader(value = "Cookie", required = false) String cookie,
+                                                HttpServletResponse response) {
+        cartService.deleteGuestCart(cookie, response);
+
+        expireCookie(response, "guestCookie");
+
+        return ResponseEntity.ok().build();
+    }
+
+    private void expireCookie(HttpServletResponse response, String cookieName) {
+        Cookie cookie = new Cookie(cookieName, null);
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // 수명 0 = 즉시 삭제
+        response.addCookie(cookie);
+    }
+
     @GetMapping("/test")
     public String viewTestPage() {
         return "order/test-products";

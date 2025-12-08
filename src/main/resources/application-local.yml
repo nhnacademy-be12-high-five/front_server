@@ -1,7 +1,7 @@
 # application-local.yml
 
 server:
-  port: 8081
+  port: 9000
   tomcat:
     uri-encoding: UTF-8
 
@@ -14,16 +14,6 @@ spring:
       enabled: true
       force: true
 
-# 로컬 유레카 설정
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-  instance:
-    prefer-ip-address: true
-
 # 로컬 게이트웨이 주소 (IntelliJ에서 실행 중인 게이트웨이)
 gateway:
   uri: http://localhost:8000
@@ -33,10 +23,6 @@ book:
   api:
     base-url: ${gateway.uri}/api/books
 
-# 로컬 로깅 (콘솔 출력 위주)
-logging:
-  pattern:
-    console: "%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"
-  level:
-    root: INFO
-    com.example.high_five: DEBUG # 내 프로젝트 패키지명에 맞게 수정
+jwt:
+  expiration_time: 500000
+  refresh_expiration_time: 1000000
