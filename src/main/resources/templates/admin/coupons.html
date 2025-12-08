@@ -58,6 +58,15 @@
                         <label>최대 할인 금액</label>
                         <input type="number" name="maxDiscountValue" placeholder="정률 할인 시 적용" value="0">
                     </div>
+                    <div class="form-row">
+                        <label>적용 카테고리 ID</label>
+                        <input type="text" name="targetCategoryIds" placeholder="예: 1, 2 (쉼표로 구분)">
+                    </div>
+
+                    <div class="form-row">
+                        <label>적용 도서 ID</label>
+                        <input type="text" name="targetBookIds" placeholder="예: 100, 101 (쉼표로 구분)">
+                    </div>
 
                     <button type="submit" class="save-btn">정책 생성</button>
                 </form>
