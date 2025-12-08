@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,4 +18,6 @@ public class CouponPolicyRequestDto {
     private Long discountValue;
     private Long minOrderValue;
     private Long maxDiscountValue;
+    private List<Long> targetCategoryIds;
+    private List<Long> targetBookIds;
 }
