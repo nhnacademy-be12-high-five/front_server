@@ -85,10 +85,10 @@ public class SearchController {
 
         int size = 20;
 
+        // 1) 도서 목록 (RAG 하이브리드 검색)
         URI searchUri = UriComponentsBuilder
                 .fromHttpUrl(bookApiBaseUrl + "/api/search/rag-search")
                 .queryParam("keyword", keyword)
-                .queryParam("sort", sort)
                 .queryParam("page", page)
                 .queryParam("size", size)
                 .encode(StandardCharsets.UTF_8)
@@ -108,7 +108,7 @@ public class SearchController {
             body = new PagedResponse();
         }
 
-        // AI 요약
+        // 2) AI 요약/추천 문장
         URI answerUri = UriComponentsBuilder
                 .fromHttpUrl(bookApiBaseUrl + "/api/search/rag-answer")
                 .queryParam("keyword", keyword)
@@ -119,13 +119,18 @@ public class SearchController {
         ResponseEntity<String> aiResponse =
                 restTemplate.getForEntity(answerUri, String.class);
 
+        String aiMessage = aiResponse.getBody();
+
+        // 3) 모델에 담기
         model.addAttribute("keyword", keyword);
         model.addAttribute("books", body.getContent());
         model.addAttribute("pageInfo", body);
         model.addAttribute("page", page);
         model.addAttribute("sort", sort);
+
+        // 템플릿에서 사용하는 이름과 맞추기
         model.addAttribute("searchType", "AI");
-        model.addAttribute("aiSummary", aiResponse.getBody());
+        model.addAttribute("aiSummary", aiMessage);
 
         return "Book/booklist";
     }

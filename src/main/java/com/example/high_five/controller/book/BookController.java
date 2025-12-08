@@ -17,16 +17,16 @@ public class BookController {
     private final RestTemplate restTemplate;
 
     @Value("${book.api.base-url}")
-    private String bookApiBaseUrl;    // 예: http://localhost:9003
+    private String bookApiBaseUrl;
 
     /**
      * 도서 상세 화면
      * 예: /book/1 -> 북서버 /api/books/1 호출 후 book-detail.html 렌더링
      */
     @GetMapping("/book/{bookId}")
-    public String getBookDetail(@PathVariable Long bookId, Model model) {
+    public String getBookDetail(@PathVariable Long id, Model model) {
 
-        String url = bookApiBaseUrl + "/api/books/" + bookId;
+        String url = bookApiBaseUrl + "/api/books/" + id;
 
         ResponseEntity<BookResponse> response =
                 restTemplate.getForEntity(url, BookResponse.class);

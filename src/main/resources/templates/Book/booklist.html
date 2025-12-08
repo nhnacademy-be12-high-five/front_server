@@ -193,7 +193,7 @@
                     검색 결과가 없습니다.
                 </div>
 
-                <!-- 도서 카드 (카드 전체 클릭 시 상세 페이지로 이동) -->
+                <!-- 도서 카드 -->
                 <a class="book-card"
                    th:each="book : ${books}"
                    th:href="@{/book/{id}(id=${book.id})}">
@@ -212,33 +212,32 @@
                         <span th:text="${book.author}">저자</span>
                         <span th:if="${book.publisher != null}"
                               th:text="' · ' + ${book.publisher}">
-                · 출판사
-            </span>
+                            · 출판사
+                        </span>
                     </p>
 
                     <div class="book-price-row">
                         <div class="price-main">
-                <span class="amount"
-                      th:text="${book.price != null ?
-                               #numbers.formatInteger(book.price, 3, 'COMMA')
-                               : '-'}">
-                    0
-                </span>
+                            <span class="amount"
+                                  th:text="${book.price != null ?
+                                           #numbers.formatInteger(book.price, 3, 'COMMA')
+                                           : '-'}">
+                                0
+                            </span>
                             <span class="won">원</span>
                         </div>
                     </div>
 
                     <div class="book-meta" th:if="${book.avgRating != null}">
-            <span th:text="${#numbers.formatDecimal(book.avgRating, 1, 1)}">
-                0.0
-            </span>
+                        <span th:text="${#numbers.formatDecimal(book.avgRating, 1, 1)}">
+                            0.0
+                        </span>
                         점 (
                         <span th:text="${book.reviewCount}">0</span>건
                         )
                     </div>
                 </a>
             </div>
-
 
             <!-- =================== 페이지네이션 =================== -->
             <!-- NORMAL 검색 페이지네이션 -->
