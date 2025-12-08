@@ -1,6 +1,31 @@
-spring:
-  application:
-    name: frontend_server
+# application.yml
 
 server:
-  port: 9000
+  port: 9000 # 기본 포트 (prod에서는 0 또는 다른 값으로 덮어씌워짐)
+
+spring:
+  application:
+    name: frontend-server # 서비스 이름 (공통)
+
+  # 기본 활성 프로파일 설정
+  # IntelliJ에서 별도 옵션 없이 실행하면 자동으로 'local' 설정을 불러옵니다.
+  # Docker에서는 환경변수(SPRING_PROFILES_ACTIVE=prod)로 인해 'prod'가 적용됩니다.
+  profiles:
+    active: local
+
+  # 공통 인코딩 설정 (한글 깨짐 방지)
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+  # (선택) Thymeleaf 공통 설정
+  thymeleaf:
+    cache: false # 개발 편의를 위해 캐시 끄기 (Prod에서 true로 변경 가능)
+    prefix: classpath:/templates/
+    suffix: .html
+
+# 주의: gateway.uri, jwt.*, book.api.base-url 등 환경마다 다른 설정은
+# application-local.yml과 application-prod.yml로 각각 이동했습니다.
+# 이곳에 남겨두면 로컬 실행 시 환경 변수(${...})를 찾지 못해 에러가 날 수 있습니다.
