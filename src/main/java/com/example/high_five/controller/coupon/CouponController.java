@@ -1,11 +1,14 @@
 package com.example.high_five.controller.coupon;
 
+import com.example.high_five.common.annotation.LoginRequired;
 import com.example.high_five.dto.coupon.CouponTemplateDto;
+import com.example.high_five.dto.coupon.MemberCouponResponseDto;
 import com.example.high_five.dto.coupon.UserCouponIssueRequestDto;
 import com.example.high_five.service.CouponService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -21,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class CouponController {
 
     private final CouponService couponService;
@@ -85,6 +89,55 @@ public class CouponController {
             redirectAttributes.addFlashAttribute("errorMessage", "시스템 오류가 발생했습니다.");
             System.err.println("쿠폰 발급 실패: " + e.getMessage());
         }
-        return "redirect:/mypage?tab=coupons";
+        return "redirect:/mypage/coupons";
+    }
+
+    @LoginRequired // 인터셉터가 로그인 여부 체크 (설정되어 있다면)
+    @GetMapping("/mypage/coupons")
+    public String myCouponPage(@RequestParam(defaultValue = "0") int page,
+                               @CookieValue(value = "access-token", required = false) String accessToken,
+                               Model model) {
+
+        if (accessToken == null) {
+            return "redirect:/member/login.html";
+        }
+
+        List<MemberCouponResponseDto> myCoupons = Collections.emptyList();
+        int totalPages = 0;
+        long totalElements = 0;
+
+        try {
+            Map<String, Object> response = couponService.getMemberCoupons(accessToken, page, 10);
+
+            if (response != null && response.containsKey("content")) {
+                List<Map<String, Object>> content = (List<Map<String, Object>>) response.get("content");
+
+                myCoupons = content.stream()
+                        .map(item -> objectMapper.convertValue(item, MemberCouponResponseDto.class))
+                        .collect(Collectors.toList());
+
+                // 페이징 정보 추출 (PageImpl의 필드명에 따라 다를 수 있음)
+                if (response.containsKey("totalPages")) {
+                    totalPages = (int) response.get("totalPages");
+                }
+                if (response.containsKey("totalElements")) {
+                    totalElements = ((Number) response.get("totalElements")).longValue();
+                }
+            }
+        } catch (FeignException e) {
+            log.error("쿠폰 조회 실패 (Feign): {}", e.getMessage());
+            if(e.status() == 401) return "redirect:/member/login.html";
+        } catch (Exception e) {
+            log.error("시스템 오류: {}", e.getMessage());
+        }
+
+        model.addAttribute("myCoupons", myCoupons);
+        model.addAttribute("couponCount", totalElements); // 전체 개수
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+
+        model.addAttribute("currentTab", "coupons");
+
+        return "mypage/coupons";
     }
 }
