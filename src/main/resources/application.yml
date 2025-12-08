@@ -1,7 +1,7 @@
 # application.yml
 
 server:
-  port: 8081 # 기본 포트 (prod에서는 0 또는 다른 값으로 덮어씌워짐)
+  port: 9000 # 기본 포트 (prod에서는 0 또는 다른 값으로 덮어씌워짐)
 
 spring:
   application:

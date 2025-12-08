@@ -80,7 +80,7 @@ public class MemberController {
         }
 
         model.addAttribute("currentTab", tab);
-        return "member/mypage";
+        return "mypage/mypage";
     }
 
 }
