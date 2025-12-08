@@ -5,17 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title th:text="${book.title} + ' | HIGH-FIVE BOOKS'">도서 상세</title>
 
-    <link rel="stylesheet" th:href="@{/book-css/detail.css}" />
+    <!-- 도서 상세 전용 CSS (시안과 동일 스타일) -->
+    <link rel="stylesheet" href="/book-css/detail-style.css">
 </head>
 <body>
 <!-- =================== 헤더 =================== -->
 <header id="header" role="banner">
     <div class="container">
+        <!-- 로고 -->
         <a th:href="@{/}" class="logo">
             <img th:src="@{/img/logo.png}" alt="HIGH-FIVE 로고" width="100" height="100" />
             <div class="brand">HIGH-FIVE BOOKS</div>
         </a>
 
+        <!-- 검색 박스 -->
         <nav class="gnb" aria-label="주요 메뉴">
             <form class="search-box"
                   role="search"
@@ -26,15 +29,25 @@
                        placeholder="도서명, 저자, ISBN, 태그 검색"
                        aria-label="통합 검색" />
                 <input type="hidden" name="sort" value="POPULAR" />
-                <button type="submit" class="search-btn">검색</button>
+
+                <!-- 일반 검색 버튼 -->
+                <button type="submit"
+                        class="search-btn"
+                        aria-label="일반 검색">
+                    검색
+                </button>
+
+                <!-- AI 검색 버튼: rag-search 사용 -->
                 <button type="submit"
                         class="search-btn ai"
-                        th:formaction="@{/search/ai}">
+                        aria-label="AI 검색"
+                        th:formaction="@{/rag-search}">
                     AI 검색
                 </button>
             </form>
         </nav>
 
+        <!-- 우측 아이콘 메뉴 -->
         <div class="user-menu">
             <a class="user-link" th:href="@{/coupon}">
                 <img th:src="@{/img/icon-coupon.png}" alt="쿠폰" class="user-icon" />
@@ -52,7 +65,8 @@
 
 <!-- =================== 메인 =================== -->
 <main id="container">
-    <div class="container">
+    <!-- 상세 페이지 전용 컨테이너 (CSS .container2) -->
+    <div class="container2">
         <!-- 브레드크럼 -->
         <div class="breadcrumb">
             <span>홈</span>
@@ -61,9 +75,10 @@
         </div>
 
         <section class="book-detail">
+            <!-- 상단 상세 정보 카드 -->
             <div class="book-detail-main">
                 <!-- 표지 -->
-                <div class="book-detail-cover">
+                <div class="book-image">
                     <img th:if="${book.image != null}"
                          th:src="${book.image}"
                          alt="도서 표지" />
@@ -73,12 +88,13 @@
                 </div>
 
                 <!-- 주요 정보 -->
-                <div class="book-detail-info">
-                    <h1 class="book-detail-title" th:text="${book.title}">
+                <div class="book-info">
+                    <h1 th:text="${book.title}">
                         도서 제목
                     </h1>
 
-                    <p class="book-detail-meta">
+                    <!-- 저자/출판사/발행일/ISBN -->
+                    <p class="author-publisher">
                         <span th:text="${book.author}">저자</span>
                         <span th:if="${book.publisher != null}"
                               th:text="' · ' + ${book.publisher}">
@@ -94,69 +110,151 @@
                         </span>
                     </p>
 
-                    <!-- 가격 -->
-                    <div class="book-detail-price-row">
-                        <div class="price-main">
-                            <span class="amount"
+                    <!-- ===== 가격 영역: 시안과 동일 구조 (정가 / 할인 / 최종가 / 포인트) ===== -->
+                    <div class="price-section" th:if="${book.price != null}">
+                        <!-- 정가 (10% 할인 전 금액으로 가정) -->
+                        <div class="original-price">
+                            <span th:text="${#numbers.formatInteger(book.price * 110 / 100, 3, 'COMMA')}">
+                                0
+                            </span>
+                            원
+                        </div>
+
+                        <!-- 할인 가격 -->
+                        <div class="discount-price">
+                            <span class="discount-rate">10%</span>
+                            <span class="final-price"
                                   th:text="${#numbers.formatInteger(book.price, 3, 'COMMA')}">
                                 0
                             </span>
-                            <span class="won">원</span>
+                            <span class="currency">원</span>
+                        </div>
+
+                        <!-- 포인트 안내 (대략 1% 적립 예시) -->
+                        <div class="point-info">
+                            적립
+                            <span th:text="${#numbers.formatInteger(book.price / 100, 1, 'COMMA')}">
+                                0
+                            </span>
+                            P (구매 금액 1% 기준)
                         </div>
                     </div>
 
-                    <!-- 평점/리뷰 -->
-                    <div class="book-detail-rating" th:if="${book.avgRating != null}">
-                        <span class="rating-score"
-                              th:text="${#numbers.formatDecimal(book.avgRating, 1, 1)}">
-                            0.0
-                        </span>
-                        점 (
-                        <span th:text="${book.reviewCount}">0</span>건의 리뷰
-                        )
+                    <!-- ===== 포맷/포장 옵션 블록 (CSS .option-block / .option-item) ===== -->
+                    <div class="option-block">
+                        <div class="option-block-title">포장 선택</div>
+                        <div class="option-items">
+                            <button type="button" class="option-item active">
+                                포장 안함
+                                <small>기본</small>
+                            </button>
+                            <button type="button" class="option-item">
+                                선물 포장
+                                <small>추가 요금 발생 가능</small>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- 장바구니/구매 버튼 -->
-                    <div class="book-detail-actions">
-                        <a class="btn primary"
+                    <!-- 구매 버튼 -->
+                    <div class="purchase-actions">
+                        <button type="button" class="btn-heart" aria-label="관심도서">
+                            &#9829;
+                        </button>
+                        <a class="btn-primary"
                            th:href="@{/cart/add(bookId=${book.id})}">
                             장바구니 담기
                         </a>
-                        <a class="btn secondary"
+                        <a class="btn-secondary"
                            th:href="@{/order/now(bookId=${book.id})}">
                             바로 구매
                         </a>
                     </div>
+
+                    <!-- 도서 기본 정보 요약 테이블 -->
+                    <table class="summary-table">
+                        <tbody>
+                        <tr th:if="${book.publisher != null}">
+                            <th>출판사</th>
+                            <td th:text="${book.publisher}">출판사명</td>
+                        </tr>
+                        <tr th:if="${book.publishedDate != null}">
+                            <th>발행일</th>
+                            <td th:text="${book.publishedDate}">2025-01-01</td>
+                        </tr>
+                        <tr th:if="${book.isbn != null}">
+                            <th>ISBN</th>
+                            <td th:text="${book.isbn}">0000000000000</td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <!-- 상세 설명 -->
-            <section class="book-detail-section">
+            <!-- ===== 아래 탭 영역: 도서 소개 / 목차 / 리뷰 / Q&A / 배송정보 ===== -->
+            <div class="book-detail-tabs">
+                <button type="button" class="active" data-tab="tab-intro">도서 소개</button>
+                <button type="button" data-tab="tab-contents">목차</button>
+                <button type="button" data-tab="tab-review">리뷰</button>
+                <button type="button" data-tab="tab-qna">Q&amp;A</button>
+                <button type="button" data-tab="tab-shipping">배송/반품 정보</button>
+            </div>
+
+            <!-- 도서 소개 탭 -->
+            <div id="tab-intro" class="detail-tab-content active">
                 <h2>도서 소개</h2>
                 <p th:text="${book.content}">
                     도서 소개 내용이 표시됩니다.
                 </p>
-            </section>
+            </div>
 
-            <!-- 태그 -->
-            <section class="book-detail-section" th:if="${book.tags != null}">
-                <h2>태그</h2>
-                <div class="tag-list">
-                    <span class="tag"
-                          th:each="tag : ${book.tags}"
-                          th:text="'#' + ${tag}">
-                        #태그
-                    </span>
-                </div>
-            </section>
+            <!-- 목차 탭 (더미 문구) -->
+            <div id="tab-contents" class="detail-tab-content">
+                <h2>목차</h2>
+                <p>목차 정보는 추후 연동 예정입니다.</p>
+            </div>
 
-            <!-- 리뷰 -->
-            <section class="book-detail-section">
+            <!-- 리뷰 탭 (평점 정보 활용 가능) -->
+            <div id="tab-review" class="detail-tab-content">
                 <h2>리뷰</h2>
                 <p>리뷰 기능은 추후 연동 예정입니다.</p>
-            </section>
+            </div>
+
+            <!-- Q&A 탭 -->
+            <div id="tab-qna" class="detail-tab-content">
+                <h2>Q&amp;A</h2>
+                <p>상품 문의 기능은 추후 연동 예정입니다.</p>
+            </div>
+
+            <!-- 배송/반품 정보 탭 -->
+            <div id="tab-shipping" class="detail-tab-content">
+                <h2>배송/반품 정보</h2>
+                <p>배송 및 반품 안내 문구가 들어갈 영역입니다.</p>
+            </div>
         </section>
     </div>
 </main>
+
+<!-- 탭 전환용 간단 스크립트 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabButtons = document.querySelectorAll('.book-detail-tabs button');
+        const tabContents = document.querySelectorAll('.detail-tab-content');
+
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.dataset.tab;
+
+                tabButtons.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+
+                btn.classList.add('active');
+                const target = document.getElementById(targetId);
+                if (target) {
+                    target.classList.add('active');
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>

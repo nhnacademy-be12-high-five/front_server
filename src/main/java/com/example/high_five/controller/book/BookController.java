@@ -23,8 +23,8 @@ public class BookController {
      * 도서 상세 화면
      * 예: /book/1 -> 북서버 /api/books/1 호출 후 book-detail.html 렌더링
      */
-    @GetMapping("/book/{bookId}")
-    public String getBookDetail(@PathVariable Long id, Model model) {
+    @GetMapping("/book/{id}")
+    public String getBookDetail(@PathVariable("id") Long id, Model model) {
 
         String url = bookApiBaseUrl + "/api/books/" + id;
 
