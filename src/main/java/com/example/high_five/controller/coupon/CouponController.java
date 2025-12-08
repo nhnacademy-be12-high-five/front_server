@@ -55,7 +55,7 @@ public class CouponController {
 
     @PostMapping("/coupon/issue")
     public String issueCoupon(@RequestParam Long couponId,
-                              @CookieValue(value = "AccessToken", required = false) String accessToken,
+                              @CookieValue(value = "access-token", required = false) String accessToken,
                               RedirectAttributes redirectAttributes) {
         // 1. 임시 사용자 ID (로그인 구현 전이므로 1번 사용자로 고정)
         if (accessToken == null || accessToken.isBlank()) {
