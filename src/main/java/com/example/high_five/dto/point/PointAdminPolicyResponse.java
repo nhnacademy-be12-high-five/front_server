@@ -1,5 +1,6 @@
 package com.example.high_five.dto.point;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,4 +14,5 @@ public class PointAdminPolicyResponse {
     private Integer signupPoint;
     private Integer reviewPoint;
     private Integer photoPoint;
+    private LocalDateTime updatedAt;
 }
