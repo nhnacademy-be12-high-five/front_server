@@ -487,8 +487,8 @@
 </script>
 <script th:inline="javascript">
     /*<![CDATA[*/
-    const errorMessage = [[${errorMessage}]];
-    const message = [[${message}]];
+    const errorMessage = /*[[${errorMessage}]];*/ false;
+    const message = /*[[${message}]];*/ false;
 
     if (errorMessage) {
         alert(errorMessage);
