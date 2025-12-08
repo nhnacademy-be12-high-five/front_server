@@ -26,7 +26,6 @@ public class BookController {
     @GetMapping("/book/{bookId}")
     public String getBookDetail(@PathVariable Long bookId, Model model) {
 
-        // ★ 북서버 상세 API URL 규칙에 맞게만 수정해 주세요.
         String url = bookApiBaseUrl + "/api/books/" + bookId;
 
         ResponseEntity<BookResponse> response =
@@ -35,7 +34,7 @@ public class BookController {
         BookResponse book = response.getBody();
         model.addAttribute("book", book);
 
-        // templates/Book/book-detail.html 을 렌더링한다고 가정
+        // templates/Book/book-detail.html
         return "Book/book-detail";
     }
 }

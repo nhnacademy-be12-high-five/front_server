@@ -3,24 +3,19 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title th:text="${book.title} + ' | HIGH-FIVE BOOKS'">
-        HIGH-FIVE BOOKS | 도서 상세
-    </title>
+    <title th:text="${book.title} + ' | HIGH-FIVE BOOKS'">도서 상세</title>
 
-    <!-- 필요 시 별도 CSS. list.css를 재사용해도 됨 -->
-    <link rel="stylesheet" th:href="@{/book-css/detail.css}">
+    <link rel="stylesheet" th:href="@{/book-css/detail-style.css}" />
 </head>
 <body>
-<!-- =================== 헤더 (검색 결과와 동일) =================== -->
+<!-- =================== 헤더 =================== -->
 <header id="header" role="banner">
     <div class="container">
-        <!-- 로고: 누르면 홈으로 이동 -->
         <a th:href="@{/}" class="logo">
             <img th:src="@{/img/logo.png}" alt="HIGH-FIVE 로고" width="100" height="100" />
             <div class="brand">HIGH-FIVE BOOKS</div>
         </a>
 
-        <!-- 검색 박스: 상세에서도 바로 검색 가능 -->
         <nav class="gnb" aria-label="주요 메뉴">
             <form class="search-box"
                   role="search"
@@ -31,22 +26,15 @@
                        placeholder="도서명, 저자, ISBN, 태그 검색"
                        aria-label="통합 검색" />
                 <input type="hidden" name="sort" value="POPULAR" />
-
-                <button type="submit"
-                        class="search-btn"
-                        aria-label="일반 검색">
-                    검색
-                </button>
+                <button type="submit" class="search-btn">검색</button>
                 <button type="submit"
                         class="search-btn ai"
-                        aria-label="AI 검색"
                         th:formaction="@{/search/ai}">
                     AI 검색
                 </button>
             </form>
         </nav>
 
-        <!-- 우측 아이콘 메뉴 -->
         <div class="user-menu">
             <a class="user-link" th:href="@{/coupon}">
                 <img th:src="@{/img/icon-coupon.png}" alt="쿠폰" class="user-icon" />
@@ -65,147 +53,108 @@
 <!-- =================== 메인 =================== -->
 <main id="container">
     <div class="container">
-        <section class="category-page">
-            <!-- 브레드크럼 -->
-            <div class="breadcrumb">
-                <span>홈</span>
-                <span>도서 상세</span>
-                <span th:text="${book.title}">도서 제목</span>
-            </div>
+        <!-- 브레드크럼 -->
+        <div class="breadcrumb">
+            <span>홈</span>
+            <span>도서 상세</span>
+            <span th:text="${book.title}">도서 제목</span>
+        </div>
 
-            <!-- 상단 도서 요약 영역 -->
-            <div class="book-detail-top">
+        <section class="book-detail">
+            <div class="book-detail-main">
                 <!-- 표지 -->
                 <div class="book-detail-cover">
                     <img th:if="${book.image != null}"
                          th:src="${book.image}"
                          alt="도서 표지" />
-                    <div class="no-cover" th:if="${book.image == null}">
-                        표지 이미지 준비중
+                    <div th:if="${book.image == null}" class="no-cover">
+                        도서 이미지
                     </div>
                 </div>
 
-                <!-- 도서 기본 정보 -->
+                <!-- 주요 정보 -->
                 <div class="book-detail-info">
-                    <h1 class="detail-title" th:text="${book.title}">
+                    <h1 class="book-detail-title" th:text="${book.title}">
                         도서 제목
                     </h1>
 
-                    <div class="detail-meta">
-                        <p>
-                            저자 :
-                            <span th:text="${book.author}">저자</span>
-                        </p>
-                        <p th:if="${book.publisher != null}">
-                            출판사 :
-                            <span th:text="${book.publisher}">출판사</span>
-                        </p>
-                        <p th:if="${book.publishedAt != null}">
-                            발행일 :
-                            <span th:text="${#temporals.format(book.publishedAt,'yyyy.MM.dd')}">
-                                2025.01.01
-                            </span>
-                        </p>
-                        <p th:if="${book.isbn != null}">
-                            ISBN :
-                            <span th:text="${book.isbn}">0000000000</span>
-                        </p>
-                    </div>
+                    <p class="book-detail-meta">
+                        <span th:text="${book.author}">저자</span>
+                        <span th:if="${book.publisher != null}"
+                              th:text="' · ' + ${book.publisher}">
+                            · 출판사
+                        </span>
+                        <span th:if="${book.publishedDate != null}"
+                              th:text="' · ' + ${book.publishedDate}">
+                            · 발행일
+                        </span>
+                        <span th:if="${book.isbn != null}"
+                              th:text="' · ISBN ' + ${book.isbn}">
+                            · ISBN
+                        </span>
+                    </p>
 
-                    <!-- 가격 / 평점 -->
-                    <div class="detail-price-rating">
-                        <div class="detail-price">
+                    <!-- 가격 -->
+                    <div class="book-detail-price-row">
+                        <div class="price-main">
                             <span class="amount"
-                                  th:text="${book.price != null ?
-                                           #numbers.formatInteger(book.price, 3, 'COMMA')
-                                           : '-'}">
+                                  th:text="${#numbers.formatInteger(book.price, 3, 'COMMA')}">
                                 0
                             </span>
                             <span class="won">원</span>
                         </div>
-
-                        <div class="detail-rating" th:if="${book.avgRating != null}">
-                            <strong th:text="${#numbers.formatDecimal(book.avgRating,1,1)}">
-                                0.0
-                            </strong>
-                            점 (
-                            <span th:text="${book.reviewCount}">0</span>건
-                            )
-                        </div>
                     </div>
 
-                    <!-- 버튼 영역 -->
-                    <div class="detail-actions">
-                        <button type="button" class="btn btn-primary"
-                                th:onclick="'location.href=\'/cart/add?bookId=' + ${book.id} + '\''">
+                    <!-- 평점/리뷰 -->
+                    <div class="book-detail-rating" th:if="${book.avgRating != null}">
+                        <span class="rating-score"
+                              th:text="${#numbers.formatDecimal(book.avgRating, 1, 1)}">
+                            0.0
+                        </span>
+                        점 (
+                        <span th:text="${book.reviewCount}">0</span>건의 리뷰
+                        )
+                    </div>
+
+                    <!-- 장바구니/구매 버튼 -->
+                    <div class="book-detail-actions">
+                        <a class="btn primary"
+                           th:href="@{/cart/add(bookId=${book.id})}">
                             장바구니 담기
-                        </button>
-                        <button type="button" class="btn btn-secondary"
-                                th:onclick="'location.href=\'/order/now?bookId=' + ${book.id} + '\''">
+                        </a>
+                        <a class="btn secondary"
+                           th:href="@{/order/now(bookId=${book.id})}">
                             바로 구매
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <!-- =================== 상세 내용 / 리뷰 탭 =================== -->
-            <div class="detail-tabs">
-                <input type="radio" id="tab-desc"   name="tab" checked />
-                <input type="radio" id="tab-review" name="tab" />
+            <!-- 상세 설명 -->
+            <section class="book-detail-section">
+                <h2>도서 소개</h2>
+                <p th:text="${book.content}">
+                    도서 소개 내용이 표시됩니다.
+                </p>
+            </section>
 
-                <div class="tab-labels">
-                    <label for="tab-desc">상세 정보</label>
-                    <label for="tab-review">리뷰</label>
+            <!-- 태그 -->
+            <section class="book-detail-section" th:if="${book.tags != null}">
+                <h2>태그</h2>
+                <div class="tag-list">
+                    <span class="tag"
+                          th:each="tag : ${book.tags}"
+                          th:text="'#' + ${tag}">
+                        #태그
+                    </span>
                 </div>
+            </section>
 
-                <div class="tab-contents">
-                    <!-- 상세 정보 탭 -->
-                    <div class="tab-content desc">
-                        <h2>도서 소개</h2>
-                        <p th:text="${book.content}">
-                            도서 상세 설명이 표시됩니다.
-                        </p>
-
-                        <h2>목차</h2>
-                        <p th:text="${book.tableOfContents}"
-                           th:if="${book.tableOfContents != null}">
-                            목차 정보
-                        </p>
-                    </div>
-
-                    <!-- 리뷰 탭 -->
-                    <div class="tab-content review">
-                        <h2>리뷰</h2>
-
-                        <!-- 리뷰가 없는 경우 -->
-                        <p th:if="${reviews == null || #lists.isEmpty(reviews)}">
-                            아직 등록된 리뷰가 없습니다.
-                        </p>
-
-                        <!-- 리뷰 리스트 -->
-                        <article class="review-item"
-                                 th:each="rv : ${reviews}">
-                            <div class="review-header">
-                                <strong th:text="${rv.nickname}">
-                                    닉네임
-                                </strong>
-                                <span class="review-rating"
-                                      th:text="${rv.rating + '점'}">
-                                    5점
-                                </span>
-                                <span class="review-date"
-                                      th:text="${#temporals.format(rv.createdAt,'yyyy.MM.dd')}">
-                                    2025.01.01
-                                </span>
-                            </div>
-                            <p class="review-content"
-                               th:text="${rv.content}">
-                                리뷰 내용
-                            </p>
-                        </article>
-                    </div>
-                </div>
-            </div>
+            <!-- 리뷰 -->
+            <section class="book-detail-section">
+                <h2>리뷰</h2>
+                <p>리뷰 기능은 추후 연동 예정입니다.</p>
+            </section>
         </section>
     </div>
 </main>
