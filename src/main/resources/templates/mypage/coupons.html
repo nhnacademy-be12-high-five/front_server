@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>마이페이지 - 내 쿠폰함</title>
+    <link rel="stylesheet" href="/member-css/mypage.css">
+    <style>
+        /* 페이징 버튼 스타일 추가 */
+        .pagination { display: flex; justify-content: center; gap: 5px; margin-top: 20px; }
+        .page-link { padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; color: #333; text-decoration: none; }
+        .page-link.active { background-color: var(--color-primary); color: white; border-color: var(--color-primary); }
+    </style>
+</head>
+<body>
+<header id="header" role="banner">
+    <div class="container">
+        <a href="/" class="logo">
+            <img src="/img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100" />
+            <div class="brand">HIGH-FIVE BOOKS</div>
+        </a>
+        <div class="user-menu">
+            <a class="user-link" href="/coupon"><img src="/img/icon-coupon.png" alt="쿠폰" class="user-icon"/></a>
+            <a class="user-link" href="/mypage"><img src="/img/icon-mypage.png" alt="마이페이지" class="user-icon"/></a>
+            <a class="user-link" href="/api/cart"><img src="/img/icon-cart.png" alt="장바구니" class="user-icon"/></a>
+        </div>
+    </div>
+</header>
+
+<div class="container2">
+    <nav class="box">
+        <a href="/mypage" class="tab-btn">내 정보</a>
+        <a href="/mypage/address" class="tab-btn">배송지</a>
+        <a href="/mypage/coupons" class="tab-btn active">쿠폰</a>
+        <a href="/mypage/points" class="tab-btn">포인트</a>
+        <a href="/mypage/orders" class="tab-btn">주문내역</a>
+        <a href="/mypage/reviews" class="tab-btn">리뷰</a>
+        <a href="/mypage/likes" class="tab-btn">찜 목록</a>
+    </nav>
+
+    <section class="tab-content active" style="display: block;">
+        <h2 class="section-title">보유 쿠폰함 (<span th:text="${couponCount}">0</span>개)</h2>
+
+        <div class="coupon-grid">
+            <div class="coupon-card" th:each="coupon : ${myCoupons}">
+                <div class="coupon-header">
+                    <div class="coupon-title" th:text="${coupon.couponName}">쿠폰 이름</div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                         <span class="coupon-badge"
+                               th:classappend="${coupon.status == 'ISSUED'} ? 'badge-available' :
+                                              (${coupon.status == 'USED'} ? 'badge-used' : 'badge-expired')"
+                               th:text="${coupon.status == 'ISSUED'} ? '사용 가능' :
+                                       (${coupon.status == 'USED'} ? '사용 완료' : '기한 만료')">
+                             상태
+                         </span>
+                    </div>
+                </div>
+
+                <div class="coupon-info">
+                    <div class="info-item">
+                        <span class="info-label">할인 혜택</span>
+                        <span class="info-value">
+                            <span th:if="${coupon.discountType == 'FIXED'}"
+                                  th:text="${#numbers.formatInteger(coupon.discountValue, 0, 'COMMA') + '원'}">1,000원</span>
+                            <span th:if="${coupon.discountType == 'PERCENTAGE'}"
+                                  th:text="${coupon.discountValue + '%'}">10%</span>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">유효기간</span>
+                        <span class="info-value"
+                              th:text="${#temporals.format(coupon.expiredAt, 'yyyy-MM-dd HH:mm')} + ' 까지'">날짜</span>
+                    </div>
+                </div>
+                <div class="coupon-condition" th:text="${coupon.condition}">조건</div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(myCoupons)}" class="empty-message">
+                보유한 쿠폰이 없습니다.
+            </div>
+        </div>
+
+        <div class="pagination" th:if="${totalPages > 1}">
+            <a th:if="${currentPage > 0}"
+               th:href="@{/mypage/coupons(page=${currentPage - 1})}" class="page-link">&lt;</a>
+
+            <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                <a th:href="@{/mypage/coupons(page=${i})}"
+                   th:text="${i + 1}"
+                   th:classappend="${i == currentPage} ? 'active' : ''"
+                   class="page-link">1</a>
+            </span>
+
+            <a th:if="${currentPage < totalPages - 1}"
+               th:href="@{/mypage/coupons(page=${currentPage + 1})}" class="page-link">&gt;</a>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/coupon" class="btn-outline" style="padding: 12px 24px;">+ 쿠폰 받으러 가기</a>
+        </div>
+    </section>
+</div>
+
+<footer id="footer">
+</footer>
+</body>
+</html>

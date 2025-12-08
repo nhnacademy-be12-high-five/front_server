@@ -1,352 +1,260 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>HIGH-FIVE Books - 도서 상세</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${book.title} + ' | HIGH-FIVE BOOKS'">도서 상세</title>
+
+    <!-- 도서 상세 전용 CSS (시안과 동일 스타일) -->
     <link rel="stylesheet" href="/book-css/detail-style.css">
-    <style>
-        /* 모달 스타일 (간단 구현) */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-        .modal-content {
-            background-color: #fff;
-            margin: 10% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 500px;
-            border-radius: 8px;
-            position: relative;
-        }
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 20px;
-            cursor: pointer;
-        }
-    </style>
 </head>
 <body>
-
+<!-- =================== 헤더 =================== -->
 <header id="header" role="banner">
     <div class="container">
-        <a href="/" class="logo">
-            <img src="/img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100"/>
+        <!-- 로고 -->
+        <a th:href="@{/}" class="logo">
+            <img th:src="@{/img/logo.png}" alt="HIGH-FIVE 로고" width="100" height="100" />
             <div class="brand">HIGH-FIVE BOOKS</div>
         </a>
 
-        <nav class="gnb">
-            <div class="search-box">
-                <form method="get" action="/search">
-                    <input type="search" name="keyword" placeholder="도서명, 저자, ISBN 검색" aria-label="통합 검색"/>
-                    <button class="search-btn" type="submit">검색</button>
-                </form>
-            </div>
+        <!-- 검색 박스 -->
+        <nav class="gnb" aria-label="주요 메뉴">
+            <form class="search-box"
+                  role="search"
+                  th:action="@{/search}"
+                  method="get">
+                <input type="search"
+                       name="keyword"
+                       placeholder="도서명, 저자, ISBN, 태그 검색"
+                       aria-label="통합 검색" />
+                <input type="hidden" name="sort" value="POPULAR" />
+
+                <!-- 일반 검색 버튼 -->
+                <button type="submit"
+                        class="search-btn"
+                        aria-label="일반 검색">
+                    검색
+                </button>
+
+                <!-- AI 검색 버튼: rag-search 사용 -->
+                <button type="submit"
+                        class="search-btn ai"
+                        aria-label="AI 검색"
+                        th:formaction="@{/rag-search}">
+                    AI 검색
+                </button>
+            </form>
         </nav>
 
+        <!-- 우측 아이콘 메뉴 -->
         <div class="user-menu">
-            <a class="user-link" href="/coupon"><img src="/img/icon-coupon.png" alt="쿠폰" class="user-icon"/></a>
-            <a class="user-link" href="/mypage"><img src="/img/icon-mypage.png" alt="마이페이지" class="user-icon"/></a>
-            <a class="user-link" href="/api/cart"><img src="/img/icon-cart.png" alt="장바구니" class="user-icon"/></a>
+            <a class="user-link" th:href="@{/coupon}">
+                <img th:src="@{/img/icon-coupon.png}" alt="쿠폰" class="user-icon" />
+            </a>
+            <a class="user-link" th:href="@{/mypage}">
+                <img th:src="@{/img/icon-mypage.png}" alt="마이페이지" class="user-icon" />
+            </a>
+            <a class="user-link" th:href="@{/cart}">
+                <img th:src="@{/img/icon-cart.png}" alt="장바구니" class="user-icon" />
+            </a>
             <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
         </div>
     </div>
 </header>
 
-<div class="container2">
-    <section class="book-detail-main">
-        <div class="book-image">
-            <img th:src="${book.image}" alt="표지" onerror="this.src='/img/no-img.png'"/>
+<!-- =================== 메인 =================== -->
+<main id="container">
+    <!-- 상세 페이지 전용 컨테이너 (CSS .container2) -->
+    <div class="container2">
+        <!-- 브레드크럼 -->
+        <div class="breadcrumb">
+            <span>홈</span>
+            <span>도서 상세</span>
+            <span th:text="${book.title}">도서 제목</span>
         </div>
-        <div class="book-info">
-            <h1 th:text="${book.title}">책 제목</h1>
-            <p class="author-publisher">
-                저자: <span th:text="${book.author}">저자</span> |
-                출판사: <span th:text="${book.publisher}">출판사</span> |
-                <span th:text="${book.pubDate}">2024-01-01</span>
-            </p>
 
-            <div class="price-section">
-                <p class="original-price" th:text="${#numbers.formatInteger(book.price, 0, 'COMMA') + '원'}">45,000원</p>
-            </div>
-
-            <div class="option-block">
-                <div class="option-block-title">포장 선택</div>
-                <div class="option-items" id="wrap-options">
-                    <button type="button" class="option-item active" data-value="N">포장안함</button>
-                    <button type="button" class="option-item" data-value="Y">포장 (+1,000원)</button>
+        <section class="book-detail">
+            <!-- 상단 상세 정보 카드 -->
+            <div class="book-detail-main">
+                <!-- 표지 -->
+                <div class="book-image">
+                    <img th:if="${book.image != null}"
+                         th:src="${book.image}"
+                         alt="도서 표지" />
+                    <div th:if="${book.image == null}" class="no-cover">
+                        도서 이미지
+                    </div>
                 </div>
-                <input type="hidden" name="wrapYn" id="wrapYn" value="N">
+
+                <!-- 주요 정보 -->
+                <div class="book-info">
+                    <h1 th:text="${book.title}">
+                        도서 제목
+                    </h1>
+
+                    <!-- 저자/출판사/발행일/ISBN -->
+                    <p class="author-publisher">
+                        <span th:text="${book.author}">저자</span>
+                        <span th:if="${book.publisher != null}"
+                              th:text="' · ' + ${book.publisher}">
+                            · 출판사
+                        </span>
+                        <span th:if="${book.publishedDate != null}"
+                              th:text="' · ' + ${book.publishedDate}">
+                            · 발행일
+                        </span>
+                        <span th:if="${book.isbn != null}"
+                              th:text="' · ISBN ' + ${book.isbn}">
+                            · ISBN
+                        </span>
+                    </p>
+
+                    <!-- ===== 가격 영역: 시안과 동일 구조 (정가 / 할인 / 최종가 / 포인트) ===== -->
+                    <div class="price-section" th:if="${book.price != null}">
+                        <!-- 정가 (10% 할인 전 금액으로 가정) -->
+                        <div class="original-price">
+                            <span th:text="${#numbers.formatInteger(book.price * 110 / 100, 3, 'COMMA')}">
+                                0
+                            </span>
+                            원
+                        </div>
+
+                        <!-- 할인 가격 -->
+                        <div class="discount-price">
+                            <span class="discount-rate">10%</span>
+                            <span class="final-price"
+                                  th:text="${#numbers.formatInteger(book.price, 3, 'COMMA')}">
+                                0
+                            </span>
+                            <span class="currency">원</span>
+                        </div>
+
+                        <!-- 포인트 안내 (대략 1% 적립 예시) -->
+                        <div class="point-info">
+                            적립
+                            <span th:text="${#numbers.formatInteger(book.price / 100, 1, 'COMMA')}">
+                                0
+                            </span>
+                            P (구매 금액 1% 기준)
+                        </div>
+                    </div>
+
+                    <!-- ===== 포맷/포장 옵션 블록 (CSS .option-block / .option-item) ===== -->
+                    <div class="option-block">
+                        <div class="option-block-title">포장 선택</div>
+                        <div class="option-items">
+                            <button type="button" class="option-item active">
+                                포장 안함
+                                <small>기본</small>
+                            </button>
+                            <button type="button" class="option-item">
+                                선물 포장
+                                <small>추가 요금 발생 가능</small>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 구매 버튼 -->
+                    <div class="purchase-actions">
+                        <button type="button" class="btn-heart" aria-label="관심도서">
+                            &#9829;
+                        </button>
+                        <a class="btn-primary"
+                           th:href="@{/cart/add(bookId=${book.id})}">
+                            장바구니 담기
+                        </a>
+                        <a class="btn-secondary"
+                           th:href="@{/order/now(bookId=${book.id})}">
+                            바로 구매
+                        </a>
+                    </div>
+
+                    <!-- 도서 기본 정보 요약 테이블 -->
+                    <table class="summary-table">
+                        <tbody>
+                        <tr th:if="${book.publisher != null}">
+                            <th>출판사</th>
+                            <td th:text="${book.publisher}">출판사명</td>
+                        </tr>
+                        <tr th:if="${book.publishedDate != null}">
+                            <th>발행일</th>
+                            <td th:text="${book.publishedDate}">2025-01-01</td>
+                        </tr>
+                        <tr th:if="${book.isbn != null}">
+                            <th>ISBN</th>
+                            <td th:text="${book.isbn}">0000000000000</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div class="purchase-actions">
-                <button class="btn-secondary">❤️</button>
-                <button class="btn-secondary" onclick="addToCart()">장바구니 담기</button>
-                <button class="btn-primary">바로 구매</button>
+            <!-- ===== 아래 탭 영역: 도서 소개 / 목차 / 리뷰 / Q&A / 배송정보 ===== -->
+            <div class="book-detail-tabs">
+                <button type="button" class="active" data-tab="tab-intro">도서 소개</button>
+                <button type="button" data-tab="tab-contents">목차</button>
+                <button type="button" data-tab="tab-review">리뷰</button>
+                <button type="button" data-tab="tab-qna">Q&amp;A</button>
+                <button type="button" data-tab="tab-shipping">배송/반품 정보</button>
             </div>
-        </div>
-    </section>
 
-    <nav class="book-detail-tabs">
-        <button class="active" data-tab="description">도서 소개</button>
-        <button data-tab="contents">목차</button>
-        <button data-tab="review">리뷰</button>
-        <button data-tab="qna">상품 문의</button>
-    </nav>
+            <!-- 도서 소개 탭 -->
+            <div id="tab-intro" class="detail-tab-content active">
+                <h2>도서 소개</h2>
+                <p th:text="${book.content}">
+                    도서 소개 내용이 표시됩니다.
+                </p>
+            </div>
 
-    <section id="tab-description" class="detail-tab-content active">
-        <h2 class="section-title">도서 소개</h2>
-        <div th:utext="${book.description}">내용...</div>
-    </section>
+            <!-- 목차 탭 (더미 문구) -->
+            <div id="tab-contents" class="detail-tab-content">
+                <h2>목차</h2>
+                <p>목차 정보는 추후 연동 예정입니다.</p>
+            </div>
 
-    <section id="tab-contents" class="detail-tab-content">
-        <h2 class="section-title">목차</h2>
-        <div>목차 내용...</div>
-    </section>
+            <!-- 리뷰 탭 (평점 정보 활용 가능) -->
+            <div id="tab-review" class="detail-tab-content">
+                <h2>리뷰</h2>
+                <p>리뷰 기능은 추후 연동 예정입니다.</p>
+            </div>
 
-    <section id="tab-review" class="detail-tab-content">
-        <h2 class="section-title">리뷰</h2>
+            <!-- Q&A 탭 -->
+            <div id="tab-qna" class="detail-tab-content">
+                <h2>Q&amp;A</h2>
+                <p>상품 문의 기능은 추후 연동 예정입니다.</p>
+            </div>
 
-        <div id="my-review-area" style="margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 20px;">
-            <p style="color: #999;">내 리뷰 정보를 불러오는 중...</p>
-        </div>
-
-        <div id="review-display-area">
-            <p style="color: #999;">리뷰 리스트를 불러오는 중...</p>
-        </div>
-    </section>
-
-    <section id="tab-qna" class="detail-tab-content">
-        <h2 class="section-title">상품 문의</h2>
-        <div class="qna-list">
-            <div class="empty-message">문의 내역이 없습니다.</div>
-            <button class="btn-primary">문의 등록하기</button>
-        </div>
-    </section>
-</div>
-
-<footer id="footer">
-    <div class="container">
-        <div class="copyright">© HIGH-FIVE BOOKS. All Rights Reserved.</div>
+            <!-- 배송/반품 정보 탭 -->
+            <div id="tab-shipping" class="detail-tab-content">
+                <h2>배송/반품 정보</h2>
+                <p>배송 및 반품 안내 문구가 들어갈 영역입니다.</p>
+            </div>
+        </section>
     </div>
-</footer>
+</main>
 
-<div id="reviewModal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeReviewModal()">&times;</span>
-        <h3 id="modalTitle" style="margin-top: 0;">리뷰 작성</h3>
+<!-- 탭 전환용 간단 스크립트 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabButtons = document.querySelectorAll('.book-detail-tabs button');
+        const tabContents = document.querySelectorAll('.detail-tab-content');
 
-        <form id="reviewForm">
-            <input type="hidden" id="reviewId" name="reviewId"> <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold;">별점</label>
-            <select id="reviewRating" style="width: 100%; padding: 8px; margin-top: 5px;">
-                <option value="5">★★★★★ (5점)</option>
-                <option value="4">★★★★☆ (4점)</option>
-                <option value="3">★★★☆☆ (3점)</option>
-                <option value="2">★★☆☆☆ (2점)</option>
-                <option value="1">★☆☆☆☆ (1점)</option>
-            </select>
-        </div>
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.dataset.tab;
 
-            <div style="margin-bottom: 15px;">
-                <label style="font-weight: bold;">내용</label>
-                <textarea id="reviewContent" rows="5" style="width: 100%; padding: 10px; margin-top: 5px;" placeholder="리뷰를 작성해주세요."></textarea>
-            </div>
+                tabButtons.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
 
-            <div style="margin-bottom: 15px;">
-                <label style="font-weight: bold;">이미지 첨부 (선택)</label>
-                <input type="file" id="reviewImages" multiple accept="image/*" style="display: block; margin-top: 5px;">
-            </div>
-
-            <div style="text-align: right;">
-                <button type="button" onclick="closeReviewModal()" class="btn-secondary" style="margin-right: 5px;">취소</button>
-                <button type="submit" class="btn-primary">저장하기</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    // Thymeleaf 변수를 JS로 안전하게 가져오기
-    const bookId = /*[[${book.id}]]*/ 1;
-    /*]]>*/
-
-    // =========================================
-    // 1. 리뷰 관련 로직 (Fragment 로드 & API 호출)
-    // =========================================
-
-    // (1) 내 리뷰 조각 불러오기 (HTML 반환)
-    function loadMyReview() {
-        // FrontController의 @GetMapping("/books/{id}/reviews/me/view") 호출
-        fetch(`/books/${bookId}/reviews/me/view`)
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('my-review-area').innerHTML = html;
-            })
-            .catch(err => console.error("내 리뷰 로드 실패:", err));
-    }
-
-    // (2) 전체 리뷰 리스트 조각 불러오기 (HTML 반환)
-    function loadReviewList(page = 0) {
-        // FrontController의 @GetMapping("/books/{id}/reviews?page=...") 호출
-        fetch(`/books/${bookId}/reviews?page=${page}`)
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('review-display-area').innerHTML = html;
-            })
-            .catch(err => console.error("리뷰 리스트 로드 실패:", err));
-    }
-
-    // (3) 리뷰 저장 (작성 & 수정) - Multipart/form-data 처리
-    document.getElementById('reviewForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const reviewId = document.getElementById('reviewId').value;
-        const content = document.getElementById('reviewContent').value;
-        const rating = document.getElementById('reviewRating').value;
-        const fileInput = document.getElementById('reviewImages');
-
-        // URL & Method 결정
-        const url = reviewId ? `/api/books/${bookId}/reviews/${reviewId}` : `/api/books/${bookId}/reviews`;
-        const method = reviewId ? 'PUT' : 'POST';
-
-        // FormData 생성
-        const formData = new FormData();
-
-        // 1. JSON 데이터를 Blob으로 변환하여 'request' 파트에 추가
-        const reviewJson = JSON.stringify({
-            content: content,
-            rating: parseInt(rating)
-        });
-        formData.append("request", new Blob([reviewJson], { type: "application/json" }));
-
-        // 2. 이미지 파일이 있다면 'images' 파트에 추가
-        if (fileInput.files.length > 0) {
-            for (let i = 0; i < fileInput.files.length; i++) {
-                formData.append("images", fileInput.files[i]);
-            }
-        }
-
-        // 3. 전송
-        fetch(url, {
-            method: method,
-            body: formData
-            // 주의: Content-Type 헤더는 fetch가 자동으로 설정하므로 직접 쓰지 않음!
-        })
-            .then(res => {
-                if (res.ok) {
-                    alert(reviewId ? "리뷰가 수정되었습니다." : "리뷰가 등록되었습니다.");
-                    closeReviewModal();
-                    loadMyReview();    // 내 리뷰 영역 갱신
-                    loadReviewList(0); // 전체 리스트 갱신
-                } else {
-                    res.text().then(msg => alert("실패: " + msg));
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert("서버 통신 중 오류가 발생했습니다.");
-            });
-    });
-
-    // (4) 리뷰 삭제
-    function deleteReview(reviewId) {
-        if (!confirm("정말 삭제하시겠습니까?")) return;
-
-        fetch(`/api/reviews/${reviewId}`, { method: 'DELETE' })
-            .then(res => {
-                if (res.ok) {
-                    alert("삭제되었습니다.");
-                    loadMyReview();
-                    loadReviewList(0);
-                } else {
-                    alert("삭제 실패");
+                btn.classList.add('active');
+                const target = document.getElementById(targetId);
+                if (target) {
+                    target.classList.add('active');
                 }
             });
-    }
-
-    // (5) 모달 제어 함수들 (HTML onclick에서 호출됨)
-    const modal = document.getElementById('reviewModal');
-
-    // 작성 모달 열기
-    function openWriteForm() {
-        document.getElementById('modalTitle').innerText = "리뷰 작성";
-        document.getElementById('reviewId').value = ""; // ID 비움
-        document.getElementById('reviewContent').value = "";
-        document.getElementById('reviewRating').value = "5";
-        document.getElementById('reviewImages').value = ""; // 파일 초기화
-        modal.style.display = "block";
-    }
-
-    // 수정 모달 열기 (기존 내용 채우기)
-    function openEditForm(rating, content, id) {
-        document.getElementById('modalTitle').innerText = "리뷰 수정";
-        document.getElementById('reviewId').value = id;
-        document.getElementById('reviewContent').value = content;
-        document.getElementById('reviewRating').value = rating;
-        document.getElementById('reviewImages').value = ""; // 파일은 보안상 초기화
-        modal.style.display = "block";
-    }
-
-    function closeReviewModal() {
-        modal.style.display = "none";
-    }
-
-    // =========================================
-    // 2. UI 관련 로직 (탭, 포장 등)
-    // =========================================
-
-    // 페이지 로드 시 실행
-    document.addEventListener("DOMContentLoaded", () => {
-        loadMyReview();      // 내 리뷰 확인
-        loadReviewList(0);   // 전체 리뷰 로드
-    });
-
-    // 탭 전환
-    const tabButtons = document.querySelectorAll(".book-detail-tabs button");
-    const tabSections = document.querySelectorAll(".detail-tab-content");
-
-    tabButtons.forEach(btn => {
-        btn.addEventListener("click", () => {
-            tabButtons.forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-
-            const tabId = "tab-" + btn.dataset.tab;
-            tabSections.forEach(sec => {
-                sec.classList.remove("active");
-                if (sec.id === tabId) sec.classList.add("active");
-            });
         });
     });
-
-    // 포장 옵션 선택
-    const wrapButtons = document.querySelectorAll("#wrap-options .option-item");
-    const wrapInput = document.getElementById("wrapYn");
-
-    wrapButtons.forEach(btn => {
-        btn.addEventListener("click", () => {
-            wrapButtons.forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            if (wrapInput) wrapInput.value = btn.dataset.value;
-        });
-    });
-
-    // 장바구니 담기 (예시)
-    function addToCart() {
-        // 장바구니 API 호출 로직...
-        alert("장바구니 담기 기능은 CartController와 연동 필요");
-    }
-
 </script>
 </body>
 </html>
