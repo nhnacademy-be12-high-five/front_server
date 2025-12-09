@@ -106,11 +106,12 @@ main {
     margin-bottom: 18px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 15px;
+    position: relative;
 }
 
 .form-row label {
-    flex: 1;
+    flex: 0 0 140px;
     color: #444;
     font-weight: 600;
 }
@@ -121,8 +122,29 @@ main {
     padding: 10px 14px;
     border: 1px solid var(--color-border);
     border-radius: 6px;
-    text-align: right;
+    /*text-align: right;*/
     min-width: 150px; /* 입력 필드가 너무 작아지는 것을 방지 */
+}
+
+.input-group {
+    flex: 1;
+    display: flex;
+    gap: 5px;
+}
+
+.input-group input {
+    flex: 1;
+    text-align: left;
+}
+
+.input-group button {
+    padding: 0 15px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
 }
 
 .form-row select {
@@ -184,6 +206,15 @@ main {
     margin-bottom: 30px; /* 컨테이너 간의 세로 간격 */
     align-items: stretch;
     flex-wrap: wrap; /* 화면이 좁아지면 줄바꿈 허용 */
+}
+
+#bookSearchResultList {
+    margin-top: 5px;
+    border: 1px solid #007bff;
+    border-radius: 6px;
+    background: white;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 /* 반응형: 화면이 좁아지면 (1000px 이하) 카드가 세로로 배치 */
