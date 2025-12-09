@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "gateway-server", contextId = "memberClient", url = "${gateway.uri}")
+@FeignClient(name = "gateway-server", contextId = "memberClient", url = "localhost:8000")
 public interface MemberService {
     // 관리자 - 정책 조회
     @GetMapping("/api/admin/points/policy")
