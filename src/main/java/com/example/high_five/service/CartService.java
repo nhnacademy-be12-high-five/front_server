@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "gateway-server", contextId = "cartClient", url = "localhost:8000")
+@FeignClient(name = "gateway-server", contextId = "cartClient", url = "${gateway.uri}")
 //@FeignClient(name = "gateway-server", contextId = "memberClient", url = "http://gateway-server:8000")
 public interface CartService {
 
