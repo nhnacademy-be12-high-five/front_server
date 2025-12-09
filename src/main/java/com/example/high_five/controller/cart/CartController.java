@@ -16,7 +16,7 @@ public class CartController {
     private final FrontCartService cartService;
 
     // 장바구니 페이지 조회
-    @GetMapping("/api/cart")
+    @GetMapping("/cart")
     public String viewCartItems(Model model,
                                 @RequestHeader(value = "Cookie", required = false) String cookie) {
         CartListResponse cartList = cartService.getCartItems(cookie);
@@ -25,7 +25,7 @@ public class CartController {
     }
 
     // 장바구니 담기
-    @PostMapping("/api/cart/items")
+    @PostMapping("/cart/items")
     @ResponseBody
     public ResponseEntity<String> addItem(@RequestBody CartAddRequest request,
                                           @RequestHeader(value = "Cookie", required = false) String cookie,
@@ -35,7 +35,7 @@ public class CartController {
     }
 
     // 수량 변경
-    @PutMapping("/api/cart/items")
+    @PutMapping("/cart/items")
     @ResponseBody
     public ResponseEntity<Void> updateQuantity(@RequestBody CartItemUpdateRequest request,
                                                @RequestHeader(value = "Cookie", required = false) String cookie) {
@@ -44,7 +44,7 @@ public class CartController {
     }
 
     // 단건 삭제
-    @DeleteMapping("/api/cart/items/{bookId}")
+    @DeleteMapping("/cart/items/{bookId}")
     @ResponseBody
     public ResponseEntity<Void> deleteItem(@PathVariable Long bookId,
                                            @RequestHeader(value = "Cookie", required = false) String cookie) {
@@ -53,7 +53,7 @@ public class CartController {
     }
 
     // 전체 삭제
-    @DeleteMapping("/api/cart/items")
+    @DeleteMapping("/cart/items")
     @ResponseBody
     public ResponseEntity<Void> clearCart(@RequestHeader(value = "Cookie", required = false) String cookie) {
         cartService.clearCart(cookie);
@@ -61,7 +61,7 @@ public class CartController {
     }
 
     // 카운트 뱃지
-    @GetMapping("/api/cart/count")
+    @GetMapping("/cart/count")
     @ResponseBody
     public ResponseEntity<Integer> getCartCount(@RequestHeader(value = "Cookie", required = false) String cookie) {
         try {
@@ -73,7 +73,7 @@ public class CartController {
         }
     }
 
-    @PostMapping("/api/cart/merge")
+    @PostMapping("/cart/merge")
     @ResponseBody
     public ResponseEntity<Void> mergeCart(@RequestHeader(value = "Cookie", required = false) String cookie,
                                           HttpServletResponse response) {
@@ -84,7 +84,7 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/api/cart/guest")
+    @DeleteMapping("/cart/guest")
     @ResponseBody
     public ResponseEntity<Void> deleteGuestCart(@RequestHeader(value = "Cookie", required = false) String cookie,
                                                 HttpServletResponse response) {
