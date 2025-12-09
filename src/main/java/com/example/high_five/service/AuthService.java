@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "gateway-server", contextId = "authClient", url = "${gateway.uri}")
+@FeignClient(name = "gateway-server", contextId = "authClient", url = "localhost:8000")
 public interface AuthService {
 
     @PostMapping("/api/auth/login")
