@@ -1,20 +1,26 @@
 package com.example.high_five.controller.admin;
 
+import com.example.high_five.dto.PagedResponse;
+import com.example.high_five.dto.book.BookResponse;
 import com.example.high_five.dto.coupon.*;
+import com.example.high_five.service.BookFeignClient;
 import com.example.high_five.service.CouponService;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Collections;
 import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
 public class AdminController {
     private final CouponService couponService;
+    private final BookFeignClient bookFeignClient;
 
     @GetMapping("/api/coupons/admin/coupons")
     public String couponPage(Model model){
@@ -95,5 +101,22 @@ public class AdminController {
         return "admin/policy-detail";
     }
 
-    // 여기까지 쿠폰 어드민
+    @GetMapping("/api/coupons/admin/books/search")
+    @ResponseBody // JSON 데이터를 반환하기 위해 사용
+    public ResponseEntity<List<BookResponse>> searchBooksForCoupon(@RequestParam("keyword") String keyword) {
+        try {
+            // Book Server 검색 API 호출 (첫 페이지, 10개만 조회)
+            PagedResponse<BookResponse> response = bookFeignClient.searchBooks(keyword, 0, 10);
+
+            if (response != null && response.getContent() != null) {
+                return ResponseEntity.ok(response.getContent());
+            } else {
+                return ResponseEntity.ok(Collections.emptyList());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            // 에러 발생 시 빈 리스트 반환 혹은 에러 처리
+            return ResponseEntity.ok(Collections.emptyList());
+        }
+    }
 }
