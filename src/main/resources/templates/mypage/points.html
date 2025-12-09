@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>마이페이지 - 포인트</title>
+    <link rel="stylesheet" href="/member-css/mypage.css">
+    <style>
+        /* 포인트 페이지 전용 추가 스타일 */
+        .pagination { display: flex; justify-content: center; gap: 5px; margin-top: 20px; }
+        .page-link { padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; color: #333; text-decoration: none; }
+        .page-link.active { background-color: var(--color-primary); color: white; border-color: var(--color-primary); }
+    </style>
+</head>
+<body>
+<header id="header" role="banner">
+    <div class="container">
+        <a href="/" class="logo">
+            <img src="/img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100" />
+            <div class="brand">HIGH-FIVE BOOKS</div>
+        </a>
+        <nav class="gnb" aria-label="주요 메뉴">
+            <div class="search-box" role="search">
+                <input type="search" placeholder="검색어를 입력하세요" aria-label="통합 검색" />
+                <form method="get" action="/search">
+                    <button class="search-btn" type="submit">검색</button>
+                </form>
+            </div>
+        </nav>
+        <div class="user-menu">
+            <a class="user-link" href="/coupon"><img src="/img/icon-coupon.png" alt="쿠폰" class="user-icon"/></a>
+            <a class="user-link" href="/mypage"><img src="/img/icon-mypage.png" alt="마이페이지" class="user-icon"/></a>
+            <a class="user-link" href="/api/cart"><img src="/img/icon-cart.png" alt="장바구니" class="user-icon"/></a>
+        </div>
+    </div>
+</header>
+
+<div class="container2">
+    <nav class="box">
+        <a href="/mypage" class="tab-btn">내 정보</a>
+        <a href="/mypage/address" class="tab-btn">배송지</a>
+        <a href="/mypage/coupons" class="tab-btn">쿠폰</a>
+        <a href="/mypage/points" class="tab-btn active">포인트</a>
+        <a href="/mypage/orders" class="tab-btn">주문내역</a>
+        <a href="/mypage/reviews" class="tab-btn">리뷰</a>
+        <a href="/mypage/likes" class="tab-btn">찜 목록</a>
+    </nav>
+
+    <section class="tab-content active" style="display: block;">
+        <h2 class="section-title">포인트 관리</h2>
+
+        <div class="points-container">
+            <div class="points-box">
+                <div class="points-label">보유 포인트</div>
+                <div class="points-value"
+                     th:text="${#numbers.formatInteger((balance?.currentPoint ?: 0), 0, 'COMMA')}">0</div>
+                <div class="points-unit">P</div>
+            </div>
+            <div class="points-box">
+                <div class="points-label">누적 적립 포인트</div>
+                <div class="points-value"
+                     th:text="${#numbers.formatInteger((balance?.totalEarnedPoint ?: 0), 0, 'COMMA')}">0</div>
+                <div class="points-unit">P</div>
+            </div>
+        </div>
+
+        <div class="points-history">
+            <h3>최근 포인트 내역</h3>
+
+            <div class="history-item" th:each="history : ${histories}">
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <span class="history-desc"
+                          th:text="${history.description}"
+                          style="font-weight: 600; color: #333;">상품 구매 적립</span>
+
+                    <span style="font-size: 12px; color: #999;"
+                          th:text="${#temporals.format(history.transactionDate, 'yyyy-MM-dd HH:mm')}">2025.01.01</span>
+                </div>
+
+                <div style="text-align: right;">
+                    <span class="history-amount"
+                          th:text="${(history.amount > 0 ? '+' : '') + #numbers.formatInteger(history.amount, 0, 'COMMA') + ' P'}"
+                          th:style="${history.amount > 0 ? 'color: #007bff' : 'color: #c0392b'}">
+                        + 3,000 P
+                    </span>
+                    <div style="font-size: 12px; color: #666; margin-top: 4px;">
+                        잔액: <span th:text="${#numbers.formatInteger(history.currentPoint, 0, 'COMMA')}">5,000</span> P
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(histories)}" class="empty-message">
+                포인트 내역이 없습니다.
+            </div>
+        </div>
+
+        <div class="pagination" th:if="${totalPages > 1}">
+            <a th:if="${currentPage > 0}"
+               th:href="@{/mypage/points(page=${currentPage - 1})}" class="page-link">&lt;</a>
+
+            <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                <a th:href="@{/mypage/points(page=${i})}"
+                   th:text="${i + 1}"
+                   th:classappend="${i == currentPage} ? 'active' : ''"
+                   class="page-link">1</a>
+            </span>
+
+            <a th:if="${currentPage < totalPages - 1}"
+               th:href="@{/mypage/points(page=${currentPage + 1})}" class="page-link">&gt;</a>
+        </div>
+    </section>
+</div>
+
+<footer id="footer">
+    <div class="container">
+    </div>
+</footer>
+</body>
+</html>

@@ -12,8 +12,8 @@
     <h2>HIGHFIVE 관리자</h2>
     <ul class="menu">
         <li><a href="/admin/books">도서 관리</a></li>
-        <li><a href="/admin/points">포인트 정책 관리</a></li>
-        <li><a href="/admin/coupons" class="active">쿠폰 관리</a></li>
+        <li><a href="/admin/points">포인트 관리</a></li>
+        <li><a href="/api/coupons/admin/coupons" class="active">쿠폰 관리</a></li>
     </ul>
 </aside>
 
@@ -57,6 +57,23 @@
                     <div class="form-row">
                         <label>최대 할인 금액</label>
                         <input type="number" name="maxDiscountValue" placeholder="정률 할인 시 적용" value="0">
+                    </div>
+                    <div class="form-row">
+                        <label>적용 카테고리 ID</label>
+                        <input type="text" name="targetCategoryIds" placeholder="예: 1, 2 (쉼표로 구분)">
+                    </div>
+
+                    <div class="form-row">
+                        <label>적용 도서 검색</label>
+                        <div class="input-group">
+                            <input type="text" id="bookSearchKeyword" placeholder="도서명 입력">
+                            <button type="button" onclick="searchBooks()">검색</button>
+                        </div>
+                    </div>
+
+                    <div class="form-row" style="margin-top: -10px; margin-bottom: 20px;">
+                        <label></label> <ul id="bookSearchResultList" style="flex: 1; list-style: none; padding: 0; display: none;">
+                    </ul>
                     </div>
 
                     <button type="submit" class="save-btn">정책 생성</button>

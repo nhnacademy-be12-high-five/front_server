@@ -5,6 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Highfive 관리자 - 포인트 정책 관리</title>
     <link rel="stylesheet" href="/admin-css/point.css">
+    <style>
+        .alert-msg {
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: 600;
+            padding: 10px 0;
+            border-radius: 6px;
+        }
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
 </head>
 
 <body>
@@ -14,45 +33,70 @@
     <h2>HIGHFIVE 관리자</h2>
     <ul class="menu">
         <li><a href="/admin/books" data-key="members">도서 관리</a></li>
-        <li><a href="/admin/points"  data-key="points">포인트 정책 관리</a></li>
-        <li><a href="/admin/coupons" data-key="coupons">쿠폰 관리</a></li>
+        <li><a href="/admin/points/policy"  data-key="points">포인트 관리</a></li>
+        <li><a href="/api/coupons/admin/coupons" data-key="coupons">쿠폰 관리</a></li>
     </ul>
 </aside>
 
 <!-- 메인 콘텐츠 -->
 <div style="flex:1; display:flex; flex-direction:column;">
-    <header>포인트 정책 관리</header>
+    <header>포인트 관리</header>
     <main>
         <div class="card">
-            <h3>포인트 정책 관리</h3>
-            <div class="form-row">
-                <label>회원가입 적립 P</label>
-                <input type="number" value="5000">
-            </div>
-            <div class="form-row">
-                <label>사진리뷰 적립 P</label>
-                <input type="number" value="200">
-            </div>
-            <div class="form-row">
-                <label>텍스트리뷰 적립 P</label>
-                <input type="number" value="200">
-            </div>
-            <div class="form-row">
-                <label>독후감 적립 P</label>
-                <input type="number" value="500">
-            </div>
-            <div class="form-row">
-                <label>도서 구매 기본 적립률 (%)</label>
-                <input type="number" step="0.1" value="0.5">
-            </div>
+            <h3>포인트 적립 정책 수정</h3>
 
-<!--            // action : 정책 저장하는 api 수정하기-->
-            <form method="post" action="">
+            <div th:if="${message}" class="alert-msg alert-success" th:text="${message}"></div>
+            <div th:if="${errorMessage}" class="alert-msg alert-error" th:text="${errorMessage}"></div>
+
+            <form method="post" th:action="@{/admin/points/policy}">
+                <div class="form-row">
+                    <label>회원가입 적립 P</label>
+                        <input type="number" name="signupPoint" th:value="${policy.signupPoint ?: 0}">
+                </div>
+
+                <div class="form-row">
+                    <label>일반 리뷰 적립 P</label>
+                        <input type="number" name="reviewPoint" th:value="${policy.reviewPoint ?: 0}">
+                </div>
+
+                <div class="form-row">
+                    <label>포토 리뷰 적립 P</label>
+                        <input type="number" name="photoPoint" th:value="${policy.photoPoint ?: 0}">
+                </div>
+
                 <input type="submit" value="정책 저장하기" class="save-btn">
             </form>
-
-            <div class="updated-info">최근 수정: 2025-11-10 (관리자 ID: 1)</div>
+            <div class="updated-info"
+                 th:if="${policy.updatedAt != null}"
+                 th:text="'최근 수정: ' + ${#temporals.format(policy.updatedAt, 'yyyy-MM-dd HH:mm:ss')}">
+            </div>
         </div>
+
+        <div class="card">
+            <h3>포인트 수동 조정</h3>
+            <div th:if="${message2}" class="alert-msg alert-success" th:text="${message2}"></div>
+            <div th:if="${errorMessage2}" class="alert-msg alert-error" th:text="${errorMessage2}"></div>
+            <form method="post" th:action="@{/admin/points/adjustment}">
+                <div class="form-row">
+                    <label>회원 ID</label>
+                        <input type="number" name="memberId" placeholder="회원번호 입력">
+                </div>
+
+                <div class="form-row">
+                    <label>조정 금액 (+/-)</label>
+                        <input type="number" name="amount" placeholder="예: 1000 or -500">
+                </div>
+
+                <div class="form-row">
+                    <label>사유</label>
+                        <input type="text" name="reason" placeholder="예: 배송 지연 보상" style="text-align: left;">
+                </div>
+
+                <input type="submit" value="포인트 조정 실행" class="save-btn" style="background-color: #e9c46a;">
+            </form>
+
+        </div>
+
     </main>
 </div>
 <script src="assets/admin.js"></script>

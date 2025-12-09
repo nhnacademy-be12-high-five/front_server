@@ -10,7 +10,7 @@
 <body>
 <header id="header" role="banner">
     <div class="container">
-        <a href="../order" class="logo">
+        <a href="/" class="logo">
             <img src="../img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100" />
             <div class="brand">HIGH-FIVE BOOKS</div>
         </a>
@@ -48,7 +48,7 @@
                 <img src="../img/icon-cart.png" alt="장바구니" class="user-icon" />
             </a>
 
-            <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
+            <a class="user-link pill" th:href="@{/templates/member/login.html}">로그인</a>
         </div>
 
     </div>
@@ -76,26 +76,55 @@
         <!--        -->
 
         <!--        // 타임리프 추가 -->
-        <a th:href="@{/mypage(tab='info')}"
-           th:classappend="${currentTab == 'info'} ? 'active'" class="tab-btn">내 정보</a>
+<!--        <a th:href="@{/mypage(tab='info')}"-->
+<!--           th:classappend="${currentTab == 'info'} ? 'active'" class="tab-btn">내 정보</a>-->
 
-        <a th:href="@{/mypage(tab='address')}"
-           th:classappend="${currentTab == 'address'} ? 'active'" class="tab-btn">배송지</a>
+<!--        <a th:href="@{/mypage(tab='address')}"-->
+<!--           th:classappend="${currentTab == 'address'} ? 'active'" class="tab-btn">배송지</a>-->
 
-        <a th:href="@{/mypage(tab='coupons')}"
-           th:classappend="${currentTab == 'coupons'} ? 'active'" class="tab-btn">쿠폰</a>
+<!--        <a th:href="@{/mypage(tab='coupons')}"-->
+<!--           th:classappend="${currentTab == 'coupons'} ? 'active'" class="tab-btn">쿠폰</a>-->
 
-        <a th:href="@{/mypage(tab='points')}"
-           th:classappend="${currentTab == 'points'} ? 'active'" class="tab-btn">포인트</a>
+<!--        <a th:href="@{/mypage(tab='points')}"-->
+<!--           th:classappend="${currentTab == 'points'} ? 'active'" class="tab-btn">포인트</a>-->
 
-        <a th:href="@{/mypage(tab='orders')}"
-           th:classappend="${currentTab == 'orders'} ? 'active'" class="tab-btn">주문내역</a>
+<!--        <a th:href="@{/mypage(tab='orders')}"-->
+<!--           th:classappend="${currentTab == 'orders'} ? 'active'" class="tab-btn">주문내역</a>-->
 
-        <a th:href="@{/mypage(tab='reviews')}"
-           th:classappend="${currentTab == 'reviews'} ? 'active'" class="tab-btn">리뷰</a>
+<!--        <a th:href="@{/mypage(tab='reviews')}"-->
+<!--           th:classappend="${currentTab == 'reviews'} ? 'active'" class="tab-btn">리뷰</a>-->
 
-        <a th:href="@{/mypage(tab='likes')}"
-           th:classappend="${currentTab == 'likes'} ? 'active'" class="tab-btn">찜 목록</a>
+<!--        <a th:href="@{/mypage(tab='likes')}"-->
+<!--           th:classappend="${currentTab == 'likes'} ? 'active'" class="tab-btn">찜 목록</a>-->
+
+        <a th:href="@{/templates/mypage}"
+           th:classappend="${currentTab == 'info'} ? 'active'"
+           class="tab-btn">내 정보</a>
+
+        <a th:href="@{/mypage/address}"
+           th:classappend="${currentTab == 'address'} ? 'active'"
+           class="tab-btn">배송지</a>
+
+        <a th:href="@{/mypage/coupons}"
+           th:classappend="${currentTab == 'coupons'} ? 'active'"
+           class="tab-btn">쿠폰</a>
+
+        <a th:href="@{/mypage/points}"
+           th:classappend="${currentTab == 'points'} ? 'active'"
+           class="tab-btn">포인트</a>
+
+        <a th:href="@{/mypage/orders}"
+           th:classappend="${currentTab == 'orders'} ? 'active'"
+           class="tab-btn">주문내역</a>
+
+        <a th:href="@{/mypage/reviews}"
+           th:classappend="${currentTab == 'reviews'} ? 'active'"
+           class="tab-btn">리뷰</a>
+
+        <a th:href="@{/mypage/likes}"
+           th:classappend="${currentTab == 'likes'} ? 'active'"
+           class="tab-btn">찜 목록</a>
+
     </nav>
 
     <section id="tab-info" class="tab-content" th:classappend="${currentTab == 'info'} ? 'active'">
@@ -250,14 +279,14 @@
 
         <div style="margin-top: 20px; text-align: center;" th:if="${!#lists.isEmpty(histories)}">
             <a th:if="${currentPage > 0}"
-               th:href="@{/mypage(tab='points', page=${currentPage - 1})}"
+               th:href="@{/templates/mypage(tab='points', page=${currentPage - 1})}"
                class="btn-outline" style="padding: 5px 10px;">&lt; 이전</a>
 
             <span style="margin: 0 10px; font-weight: 600;"
                   th:text="${currentPage + 1} + ' / ' + ${totalPages}">1 / 5</span>
 
             <a th:if="${currentPage + 1 < totalPages}"
-               th:href="@{/mypage(tab='points', page=${currentPage + 1})}"
+               th:href="@{/templates/mypage(tab='points', page=${currentPage + 1})}"
                class="btn-outline" style="padding: 5px 10px;">다음 &gt;</a>
         </div>
     </section>

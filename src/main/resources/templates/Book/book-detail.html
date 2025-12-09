@@ -1,328 +1,260 @@
- <!DOCTYPE html>
- <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Booktown - 도서 상세</title>
-       <link rel="stylesheet" href="/book-css/detail-style.css">
-  </head>
-  <body>
-  <header id="header" role="banner">
-      <div class="container">
-          <a href="./book-detail.html" class="logo">
-              <img src="../img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100" />
-              <div class="brand">HIGH-FIVE BOOKS</div>
-          </a>
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${book.title} + ' | HIGH-FIVE BOOKS'">도서 상세</title>
 
-          <nav class="gnb" aria-label="주요 메뉴">
-              <div class="search-box" role="search">
-                  <input
-                          type="search"
-                          placeholder="도서명, 저자, ISBN, 태그 검색"
-                          aria-label="통합 검색"
-                  />
+    <!-- 도서 상세 전용 CSS (시안과 동일 스타일) -->
+    <link rel="stylesheet" href="/book-css/detail-style.css">
+</head>
+<body>
+<!-- =================== 헤더 =================== -->
+<header id="header" role="banner">
+    <div class="container">
+        <!-- 로고 -->
+        <a th:href="@{/}" class="logo">
+            <img th:src="@{/img/logo.png}" alt="HIGH-FIVE 로고" width="100" height="100" />
+            <div class="brand">HIGH-FIVE BOOKS</div>
+        </a>
 
-<!--                  // action="/search" 수정-->
-                  <form method="get" action="/search">
-                      <button class="search-btn"
-                              aria-label="검색"
-                              type="submit">
-                          검색
-                      </button>
-                  </form>
+        <!-- 검색 박스 -->
+        <nav class="gnb" aria-label="주요 메뉴">
+            <form class="search-box"
+                  role="search"
+                  th:action="@{/search}"
+                  method="get">
+                <input type="search"
+                       name="keyword"
+                       placeholder="도서명, 저자, ISBN, 태그 검색"
+                       aria-label="통합 검색" />
+                <input type="hidden" name="sort" value="POPULAR" />
 
-              </div>
-          </nav>
+                <!-- 일반 검색 버튼 -->
+                <button type="submit"
+                        class="search-btn"
+                        aria-label="일반 검색">
+                    검색
+                </button>
 
-          <div class="user-menu">
-              <!-- 쿠폰 -->
-              <a class="user-link" href="/coupon">
-                  <img src="../img/icon-coupon.png" alt="쿠폰" class="user-icon" />
-              </a>
+                <!-- AI 검색 버튼: rag-search 사용 -->
+                <button type="submit"
+                        class="search-btn ai"
+                        aria-label="AI 검색"
+                        th:formaction="@{/rag-search}">
+                    AI 검색
+                </button>
+            </form>
+        </nav>
 
-              <!-- 마이페이지 -->
-              <a class="user-link" href="/mypage">
-                  <img src="../img/icon-mypage.png" alt="마이페이지" class="user-icon" />
-              </a>
-
-              <!-- 장바구니 -->
-              <a class="user-link" href="/cart">
-                  <img src="../img/icon-cart.png" alt="장바구니" class="user-icon" />
-              </a>
-              <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
-          </div>
-      </div>
-  </header>
-
-    <div class="container2">
-      <section class="book-detail-main">
-        <div class="book-image">
-<!--          <img src=""../img/book1.jpeg" alt="도서 표지" />-->
-            <img th:src="@{/img/book1.jpeg}" alt="표지"/>
+        <!-- 우측 아이콘 메뉴 -->
+        <div class="user-menu">
+            <a class="user-link" th:href="@{/coupon}">
+                <img th:src="@{/img/icon-coupon.png}" alt="쿠폰" class="user-icon" />
+            </a>
+            <a class="user-link" th:href="@{/mypage}">
+                <img th:src="@{/img/icon-mypage.png}" alt="마이페이지" class="user-icon" />
+            </a>
+            <a class="user-link" th:href="@{/cart}">
+                <img th:src="@{/img/icon-cart.png}" alt="장바구니" class="user-icon" />
+            </a>
+            <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
         </div>
-        <div class="book-info">
-          <h1>프론트엔드 개발자를 위한 자바스크립트 바이블</h1>
-          <p class="author-publisher">
-            저자: <a href="#">홍길동</a> | 출판사:
-            <a href="#">HIGH-FIVE 출판사</a> | 2024년 11월 1일 출간
-          </p>
-
-          <div class="price-section">
-            <p class="original-price">정가: 45,000원</p>
-            <div class="discount-price">
-              <span class="discount-rate">10%</span>
-              <span class="final-price">40,500원</span>
-            </div>
-
-            <p
-              style="
-                font-size: 14px;
-                color: var(--color-text-light);
-                margin-top: 10px;
-              "
-            >
-              [적립] 포인트 405P (구매 금액의 1%)
-            </p>
-          </div>
-            <div class="option-block">
-                <div class="option-block-title">포장 선택</div>
-                <div class="option-items" id="wrap-options">
-
-                    <form method="post" action="" >
-                        <input type="submit" class="option-item active" data-value="N" value="포장안함">
-                    </form>
-
-                    <form method="post" action="" >
-                        <input type="submit"  class="option-item" data-value="Y" value="포장">
-                    </form>
-
-                </div>
-                <input type="hidden" name="wrapYn" id="wrapYn" value="N">
-            </div>
-
-
-          <div class="purchase-actions">
-            <button class="btn-secondary">❤️</button>
-
-              <form class="btn-secondary" method="post" action="">
-                  <div>장바구니 담기</div>
-              </form>
-
-            <button class="btn-primary">바로 구매</button>
-          </div>
-
-          <table class="summary-table">
-            <tr>
-              <th>ISBN</th>
-              <td>9791168921868</td>
-            </tr>
-            <tr>
-              <th>배송</th>
-              <td>2일 이내 (3만원 이상 무료)</td>
-            </tr>
-            <tr>
-              <th>재고</th>
-              <td>재고 있음 (50권 이상)</td>
-            </tr>
-          </table>
-        </div>
-      </section>
-
-      <nav class="book-detail-tabs">
-        <button class="active" data-tab="description">도서 소개</button>
-        <button data-tab="contents">목차</button>
-        <button data-tab="review">리뷰 (128)</button>
-        <button data-tab="qna">Q&A (3)</button>
-        <button data-tab="info">배송/환불 정보</button>
-      </nav>
-
-      <section id="tab-description" class="detail-tab-content active">
-        <h2 class="section-title">도서 소개</h2>
-        <div style="font-size: 15px; line-height: 1.8">
-          <p>
-            이 책은 최신 자바스크립트(ES2024) 문법부터 비동기 처리, 웹 컴포넌트,
-            프레임워크 없는 모던 프론트엔드 개발 방법론까지 모두 다룹니다.
-            자바스크립트의 깊은 원리를 이해하고 실제 서비스에 적용하는 방법을
-            배우고자 하는 모든 프론트엔드 개발자에게 필수적인 가이드입니다.
-            복잡한 내용을 시각적인 예시와 실습 코드로 쉽게 풀어내어 초급자와
-            숙련자 모두에게 유용합니다.
-          </p>
-          <br />
-          <p style="font-weight: 600">✨ 주요 내용:</p>
-          <ul>
-            <li>반복되는 자바스크립트 면접 질문 완벽 대비</li>
-            <li>Node.js를 활용한 백엔드와의 통합 방법</li>
-            <li>성능 최적화 및 테스트 자동화 기법</li>
-          </ul>
-        </div>
-      </section>
-
-      <section id="tab-contents" class="detail-tab-content">
-        <h2 class="section-title">목차</h2>
-        <ol style="margin-left: 20px; font-size: 15px">
-          <li>Chapter 1. 자바스크립트의 기본 구조와 역사</li>
-          <li>Chapter 2. 비동기 프로그래밍 (Promise, async/await)</li>
-          <li>Chapter 3. 모던 웹 컴포넌트와 상태 관리</li>
-          <li>Chapter 4. 테스트 자동화와 디버깅</li>
-          <li>...더보기</li>
-        </ol>
-      </section>
-
-      <section id="tab-review" class="detail-tab-content">
-        <h2 class="section-title">리뷰</h2>
-        <div class="review-list">
-          <div class="review-item">
-            <div class="review-header">
-              <span class="review-user">사용자***</span>
-              <span class="review-date">2025.11.05</span>
-            </div>
-
-            <div class="review-rating">
-                <select id="score" class="score">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3" selected>3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                </select>
-            </div>
-            <div class="review-body">
-              바이블이라는 제목에 걸맞게 내용이 정말 방대하고 깊이가 있습니다.
-              특히 비동기 처리 부분에서 막혔던 개념을 명확히 이해하게
-              되었습니다.
-            </div>
-            <div class="review-helpful">도움이 됐어요 (15)</div>
-          </div>
-          <div class="review-item">
-            <div class="review-header">
-              <span class="review-user">개발자**</span>
-              <span class="review-date">2025.10.28</span>
-            </div>
-            <div class="review-rating">
-                <select id="score2" class="score">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3" selected>3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                </select>
-            </div>
-            <div class="review-body">
-              초보자가 보기엔 조금 어려울 수 있지만, 중급 이상 개발자에게는
-              필수적인 책입니다. 다만, 예제 코드의 업데이트가 조금 아쉽습니다.
-            </div>
-            <div class="review-helpful">도움이 됐어요 (5)</div>
-          </div>
-        </div>
-      </section>
-
-      <section id="tab-qna" class="detail-tab-content">
-        <h2 class="section-title">상품 문의</h2>
-        <div class="qna-list">
-          <div
-            class="empty-message"
-            style="margin-top: 0; padding: 20px; border: none; background: none"
-          >
-            궁금한 점이 있으신가요? 문의를 남겨주세요.
-          </div>
-
-<!--            // action : 문의 등록하는 api로 수정-->
-           <form method="post" action="">
-               <input type="submit" value="문의 등록하기"  class="btn btn-primary"
-                      style="align-self: flex-start; padding: 10px 20px">
-           </form>
-
-        </div>
-      </section>
-
-<!--        // 이걸 추가해야할까 .. -->
-<!--      <section id="tab-info" class="detail-tab-content">-->
-<!--        <h2 class="section-title">배송/환불 정보</h2>-->
-<!--        <p style="font-size: 15px; line-height: 1.8">-->
-<!--          **배송 정보:** 영업일 기준 2일 이내 출고되며, 3만원 이상 구매 시 무료-->
-<!--          배송입니다.-->
-<!--          <br />-->
-<!--          **교환/환불:** 상품 수령 후 7일 이내에 신청 가능하며, 고객 변심 시-->
-<!--          왕복 배송비가 부과될 수 있습니다. 자세한 내용은 고객센터를 통해 확인해-->
-<!--          주세요.-->
-<!--        </p>-->
-<!--      </section>-->
-
     </div>
-    <footer id="footer">
-      <div class="container">
-        <div class="footer-links">
-          <a href="#">회사소개</a>
-          <a href="#">이용약관</a>
-          <a href="#"><strong>개인정보처리방침</strong></a>
-          <a href="#">관리자</a>
+</header>
+
+<!-- =================== 메인 =================== -->
+<main id="container">
+    <!-- 상세 페이지 전용 컨테이너 (CSS .container2) -->
+    <div class="container2">
+        <!-- 브레드크럼 -->
+        <div class="breadcrumb">
+            <span>홈</span>
+            <span>도서 상세</span>
+            <span th:text="${book.title}">도서 제목</span>
         </div>
 
-        <div class="footer-info">
-          <div class="copyright">
-            <strong>대표이사 마르코</strong> | 사업자등록번호 123-456-7890<br />
-            통신판매업신고 2024-광주동구-01211 | 이메일: marco@nhn.com<br />
-            호스팅 제공자 NHN24 © NHN24. All Rights Reserved.
-          </div>
-          <div class="customer-center">
-            <strong>고객센터 1544-8282</strong> (발신자 부담)<br />
-            광주광역시 동구 서석동 조선대학교 1층 NHN아카데미<br />
-            Fax 062-1234-5678
-          </div>
-        </div>
-      </div>
-    </footer>
+        <section class="book-detail">
+            <!-- 상단 상세 정보 카드 -->
+            <div class="book-detail-main">
+                <!-- 표지 -->
+                <div class="book-image">
+                    <img th:if="${book.image != null}"
+                         th:src="${book.image}"
+                         alt="도서 표지" />
+                    <div th:if="${book.image == null}" class="no-cover">
+                        도서 이미지
+                    </div>
+                </div>
 
-    <script>
-      // ⭐️ 도서 상세페이지 탭 스크립트
-      const tabButtons = document.querySelectorAll(".book-detail-tabs button");
-      const tabSections = document.querySelectorAll(".detail-tab-content");
+                <!-- 주요 정보 -->
+                <div class="book-info">
+                    <h1 th:text="${book.title}">
+                        도서 제목
+                    </h1>
 
-      tabButtons.forEach((btn) => {
-        btn.addEventListener("click", () => {
-          // 1. 모든 버튼의 'active' 클래스 제거
-          tabButtons.forEach((b) => b.classList.remove("active"));
-          // 2. 클릭된 버튼에 'active' 클래스 추가
-          btn.classList.add("active");
+                    <!-- 저자/출판사/발행일/ISBN -->
+                    <p class="author-publisher">
+                        <span th:text="${book.author}">저자</span>
+                        <span th:if="${book.publisher != null}"
+                              th:text="' · ' + ${book.publisher}">
+                            · 출판사
+                        </span>
+                        <span th:if="${book.publishedDate != null}"
+                              th:text="' · ' + ${book.publishedDate}">
+                            · 발행일
+                        </span>
+                        <span th:if="${book.isbn != null}"
+                              th:text="' · ISBN ' + ${book.isbn}">
+                            · ISBN
+                        </span>
+                    </p>
 
-          const tab = btn.dataset.tab; // 예: "description", "review"
-          const tabId = "tab-" + tab; // 예: "tab-description"
+                    <!-- ===== 가격 영역: 시안과 동일 구조 (정가 / 할인 / 최종가 / 포인트) ===== -->
+                    <div class="price-section" th:if="${book.price != null}">
+                        <!-- 정가 (10% 할인 전 금액으로 가정) -->
+                        <div class="original-price">
+                            <span th:text="${#numbers.formatInteger(book.price * 110 / 100, 3, 'COMMA')}">
+                                0
+                            </span>
+                            원
+                        </div>
 
-          // 3. 모든 섹션의 'active' 클래스 제거 (모두 숨기기)
-          tabSections.forEach((section) => {
-            section.classList.remove("active");
-          });
+                        <!-- 할인 가격 -->
+                        <div class="discount-price">
+                            <span class="discount-rate">10%</span>
+                            <span class="final-price"
+                                  th:text="${#numbers.formatInteger(book.price, 3, 'COMMA')}">
+                                0
+                            </span>
+                            <span class="currency">원</span>
+                        </div>
 
-          // 4. 해당하는 섹션에 'active' 클래스 추가 (보이기)
-          const activeSection = document.getElementById(tabId);
-          if (activeSection) {
-            activeSection.classList.add("active");
-          }
+                        <!-- 포인트 안내 (대략 1% 적립 예시) -->
+                        <div class="point-info">
+                            적립
+                            <span th:text="${#numbers.formatInteger(book.price / 100, 1, 'COMMA')}">
+                                0
+                            </span>
+                            P (구매 금액 1% 기준)
+                        </div>
+                    </div>
+
+                    <!-- ===== 포맷/포장 옵션 블록 (CSS .option-block / .option-item) ===== -->
+                    <div class="option-block">
+                        <div class="option-block-title">포장 선택</div>
+                        <div class="option-items">
+                            <button type="button" class="option-item active">
+                                포장 안함
+                                <small>기본</small>
+                            </button>
+                            <button type="button" class="option-item">
+                                선물 포장
+                                <small>추가 요금 발생 가능</small>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 구매 버튼 -->
+                    <div class="purchase-actions">
+                        <button type="button" class="btn-heart" aria-label="관심도서">
+                            &#9829;
+                        </button>
+                        <a class="btn-primary"
+                           th:href="@{/cart/add(bookId=${book.id})}">
+                            장바구니 담기
+                        </a>
+                        <a class="btn-secondary"
+                           th:href="@{/order/now(bookId=${book.id})}">
+                            바로 구매
+                        </a>
+                    </div>
+
+                    <!-- 도서 기본 정보 요약 테이블 -->
+                    <table class="summary-table">
+                        <tbody>
+                        <tr th:if="${book.publisher != null}">
+                            <th>출판사</th>
+                            <td th:text="${book.publisher}">출판사명</td>
+                        </tr>
+                        <tr th:if="${book.publishedDate != null}">
+                            <th>발행일</th>
+                            <td th:text="${book.publishedDate}">2025-01-01</td>
+                        </tr>
+                        <tr th:if="${book.isbn != null}">
+                            <th>ISBN</th>
+                            <td th:text="${book.isbn}">0000000000000</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ===== 아래 탭 영역: 도서 소개 / 목차 / 리뷰 / Q&A / 배송정보 ===== -->
+            <div class="book-detail-tabs">
+                <button type="button" class="active" data-tab="tab-intro">도서 소개</button>
+                <button type="button" data-tab="tab-contents">목차</button>
+                <button type="button" data-tab="tab-review">리뷰</button>
+                <button type="button" data-tab="tab-qna">Q&amp;A</button>
+                <button type="button" data-tab="tab-shipping">배송/반품 정보</button>
+            </div>
+
+            <!-- 도서 소개 탭 -->
+            <div id="tab-intro" class="detail-tab-content active">
+                <h2>도서 소개</h2>
+                <p th:text="${book.content}">
+                    도서 소개 내용이 표시됩니다.
+                </p>
+            </div>
+
+            <!-- 목차 탭 (더미 문구) -->
+            <div id="tab-contents" class="detail-tab-content">
+                <h2>목차</h2>
+                <p>목차 정보는 추후 연동 예정입니다.</p>
+            </div>
+
+            <!-- 리뷰 탭 (평점 정보 활용 가능) -->
+            <div id="tab-review" class="detail-tab-content">
+                <h2>리뷰</h2>
+                <p>리뷰 기능은 추후 연동 예정입니다.</p>
+            </div>
+
+            <!-- Q&A 탭 -->
+            <div id="tab-qna" class="detail-tab-content">
+                <h2>Q&amp;A</h2>
+                <p>상품 문의 기능은 추후 연동 예정입니다.</p>
+            </div>
+
+            <!-- 배송/반품 정보 탭 -->
+            <div id="tab-shipping" class="detail-tab-content">
+                <h2>배송/반품 정보</h2>
+                <p>배송 및 반품 안내 문구가 들어갈 영역입니다.</p>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- 탭 전환용 간단 스크립트 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabButtons = document.querySelectorAll('.book-detail-tabs button');
+        const tabContents = document.querySelectorAll('.detail-tab-content');
+
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.dataset.tab;
+
+                tabButtons.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+
+                btn.classList.add('active');
+                const target = document.getElementById(targetId);
+                if (target) {
+                    target.classList.add('active');
+                }
+            });
         });
-      });
-
-      // ⭐️ 로그인 버튼 이동 스크립트 (기존 코드와 동일)
-      const loginButton = document.querySelector(".login-btn-top");
-      if (loginButton) {
-        loginButton.addEventListener("click", function () {
-          window.location.href = "../member/login.html";
-        });
-      }
-
-      // ⭐️ 포장 옵션 선택 (예 / 아니요)
-      const wrapButtons = document.querySelectorAll("#wrap-options .option-item");
-      const wrapInput = document.getElementById("wrapYn");
-
-      wrapButtons.forEach((btn) => {
-          btn.addEventListener("click", () => {
-              wrapButtons.forEach((b) => b.classList.remove("active"));
-              btn.classList.add("active");
-              if (wrapInput) {
-                  wrapInput.value = btn.dataset.value; // N / Y
-              }
-          });
-      });
-
-    </script>
-  </body>
+    });
+</script>
+</body>
 </html>
