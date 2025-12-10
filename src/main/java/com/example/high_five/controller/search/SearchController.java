@@ -2,7 +2,7 @@ package com.example.high_five.controller.search;
 
 import com.example.high_five.dto.book.BookResponse;
 import com.example.high_five.dto.book.PagedResponse;
-import com.example.high_five.service.BookClient;
+import com.example.high_five.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 public class SearchController {
 
-    private final BookClient bookClient; // FeignClient 주입
+    private final BookService bookService; // FeignClient 주입
 
     /**
      * 일반 검색
@@ -27,7 +27,7 @@ public class SearchController {
         int size = 20;
 
         // Feign 호출 (PagedResponse<BookResponse>로 반환됨)
-        PagedResponse<BookResponse> body = bookClient.search(keyword, sort, page, size);
+        PagedResponse<BookResponse> body = bookService.search(keyword, sort, page, size);
 
         // Null 처리 (Feign은 보통 예외를 던지거나 null을 줄 수 있음, 필요 시 빈 객체 처리)
         if (body == null) {
@@ -58,14 +58,14 @@ public class SearchController {
         int size = 20;
 
         // 1) 도서 목록 (RAG 하이브리드 검색)
-        PagedResponse<BookResponse> body = bookClient.ragSearch(keyword, page, size);
+        PagedResponse<BookResponse> body = bookService.ragSearch(keyword, page, size);
 
         if (body == null) {
             body = new PagedResponse<>();
         }
 
         // 2) AI 요약/추천 문장
-        String aiMessage = bookClient.ragAnswer(keyword);
+        String aiMessage = bookService.ragAnswer(keyword);
 
         // 3) 모델에 담기
         model.addAttribute("keyword", keyword);

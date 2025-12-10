@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "gateway-server", contextId = "couponClient", url = "${gateway.uri}")
+@FeignClient(name = "TEAM5-GATEWAY-SERVER", contextId = "couponClient", url = "${gateway.uri}")
 public interface CouponService {
 
     @GetMapping("/api/coupons/members")

@@ -4,6 +4,9 @@ server:
   port: 9000 # 기본 포트 (prod에서는 0 또는 다른 값으로 덮어씌워짐)
 
 spring:
+  cloud:
+    config:
+      enabled: false
   application:
     name: frontend-server # 서비스 이름 (공통)
 
@@ -11,7 +14,7 @@ spring:
   # IntelliJ에서 별도 옵션 없이 실행하면 자동으로 'local' 설정을 불러옵니다.
   # Docker에서는 환경변수(SPRING_PROFILES_ACTIVE=prod)로 인해 'prod'가 적용됩니다.
   profiles:
-    active: prod
+    active: local
 
   # 공통 인코딩 설정 (한글 깨짐 방지)
   servlet:
