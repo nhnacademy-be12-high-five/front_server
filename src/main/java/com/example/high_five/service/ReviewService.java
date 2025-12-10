@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@FeignClient(name = "review-service", contextId = "reviewClient", url = "${gateway.uri}") // url은 yml로 관리 권장
+@FeignClient(name = "TEAM5-GATEWAY-SERVER", contextId = "reviewClient", url = "${gateway.uri}") // url은 yml로 관리 권장
 public interface ReviewService {
 
     // 리뷰 등록

@@ -190,42 +190,34 @@
                 </div>
             </div>
 
-            <!-- ===== 아래 탭 영역: 도서 소개 / 목차 / 리뷰 / Q&A / 배송정보 ===== -->
-            <div class="book-detail-tabs">
-                <button type="button" class="active" data-tab="tab-intro">도서 소개</button>
-                <button type="button" data-tab="tab-contents">목차</button>
-                <button type="button" data-tab="tab-review">리뷰</button>
-                <button type="button" data-tab="tab-qna">Q&amp;A</button>
-                <button type="button" data-tab="tab-shipping">배송/반품 정보</button>
-            </div>
-
-            <!-- 도서 소개 탭 -->
-            <div id="tab-intro" class="detail-tab-content active">
+            <div id="tab-intro" class="detail-tab-content">
                 <h2>도서 소개</h2>
-                <p th:text="${book.content}">
-                    도서 소개 내용이 표시됩니다.
-                </p>
+                <p th:text="${book.content}"></p>
             </div>
 
-            <!-- 목차 탭 (더미 문구) -->
+            <hr />
+
             <div id="tab-contents" class="detail-tab-content">
                 <h2>목차</h2>
                 <p>목차 정보는 추후 연동 예정입니다.</p>
             </div>
 
-            <!-- 리뷰 탭 (평점 정보 활용 가능) -->
+            <hr />
+
             <div id="tab-review" class="detail-tab-content">
                 <h2>리뷰</h2>
                 <p>리뷰 기능은 추후 연동 예정입니다.</p>
             </div>
 
-            <!-- Q&A 탭 -->
+            <hr />
+
             <div id="tab-qna" class="detail-tab-content">
-                <h2>Q&amp;A</h2>
+                <h2>Q&A</h2>
                 <p>상품 문의 기능은 추후 연동 예정입니다.</p>
             </div>
 
-            <!-- 배송/반품 정보 탭 -->
+            <hr />
+
             <div id="tab-shipping" class="detail-tab-content">
                 <h2>배송/반품 정보</h2>
                 <p>배송 및 반품 안내 문구가 들어갈 영역입니다.</p>
@@ -233,28 +225,5 @@
         </section>
     </div>
 </main>
-
-<!-- 탭 전환용 간단 스크립트 -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const tabButtons = document.querySelectorAll('.book-detail-tabs button');
-        const tabContents = document.querySelectorAll('.detail-tab-content');
-
-        tabButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const targetId = btn.dataset.tab;
-
-                tabButtons.forEach(b => b.classList.remove('active'));
-                tabContents.forEach(c => c.classList.remove('active'));
-
-                btn.classList.add('active');
-                const target = document.getElementById(targetId);
-                if (target) {
-                    target.classList.add('active');
-                }
-            });
-        });
-    });
-</script>
 </body>
 </html>
