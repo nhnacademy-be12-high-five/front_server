@@ -2,8 +2,10 @@ package com.example.high_five.controller.admin;
 
 import com.example.high_five.dto.PagedResponse;
 import com.example.high_five.dto.book.BookResponse;
+import com.example.high_five.dto.book.CategoryResponse;
 import com.example.high_five.dto.coupon.*;
 import com.example.high_five.service.BookFeignClient;
+import com.example.high_five.service.CategoryFeignClient;
 import com.example.high_five.service.CouponService;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ import java.util.List;
 public class AdminController {
     private final CouponService couponService;
     private final BookFeignClient bookFeignClient;
+    private final CategoryFeignClient categoryFeignClient;
 
     @GetMapping("/api/coupons/admin/coupons")
     public String couponPage(Model model){
@@ -118,5 +121,23 @@ public class AdminController {
             // 에러 발생 시 빈 리스트 반환 혹은 에러 처리
             return ResponseEntity.ok(Collections.emptyList());
         }
+    }
+
+    /**
+     * [추가] 1차 카테고리 목록 조회 (AJAX용)
+     */
+    @GetMapping("/api/coupons/admin/categories/parent")
+    @ResponseBody
+    public ResponseEntity<List<CategoryResponse>> getParentCategories() {
+        return ResponseEntity.ok(categoryFeignClient.getParentCategories());
+    }
+
+    /**
+     * [추가] 2차 카테고리 목록 조회 (AJAX용)
+     */
+    @GetMapping("/api/coupons/admin/categories/{parentId}/child")
+    @ResponseBody
+    public ResponseEntity<List<CategoryResponse>> getChildCategories(@PathVariable int parentId) {
+        return ResponseEntity.ok(categoryFeignClient.getChildCategories(parentId));
     }
 }
