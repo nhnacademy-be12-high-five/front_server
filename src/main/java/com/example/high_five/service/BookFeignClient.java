@@ -2,11 +2,13 @@ package com.example.high_five.service;
 
 import com.example.high_five.dto.PagedResponse;
 import com.example.high_five.dto.book.response.BookResponse;
+import com.example.high_five.dto.book.BookPagedResponse;
+import com.example.high_five.dto.book.BookResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "gateway-server", contextId = "bookSearchClient", url = "${gateway.uri}")
+@FeignClient(name = "gateway-server", contextId = "couponBookSearchClient", url = "${gateway.uri}")
 public interface BookFeignClient {
 
     /**
@@ -15,7 +17,7 @@ public interface BookFeignClient {
      */
 
     @GetMapping("/api/search")
-    PagedResponse<BookResponse> searchBooks(
+    BookPagedResponse<BookResponse> searchBooks(
             @RequestParam("keyword") String keyword,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size

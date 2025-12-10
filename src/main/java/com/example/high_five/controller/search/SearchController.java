@@ -2,21 +2,33 @@ package com.example.high_five.controller.search;
 
 import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.book.PagedResponse;
-import com.example.high_five.service.BookClient;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 @Controller
 @RequiredArgsConstructor
 public class SearchController {
 
-    private final BookClient bookClient; // FeignClient 주입
+    private final RestTemplate restTemplate;
+
+    @Value("${book.api.base-url}")
+    private String bookApiBaseUrl;
 
     /**
      * 일반 검색
+     * 예: /search?keyword=유아&sort=POPULAR&page=0
      */
     @GetMapping("/search")
     public String search(@RequestParam String keyword,
@@ -24,22 +36,42 @@ public class SearchController {
                          @RequestParam(defaultValue = "0") int page,
                          Model model) {
 
-        int size = 20;
+        int size = 10; // 한 페이지에 10권
 
-        // Feign 호출 (PagedResponse<BookResponse>로 반환됨)
-        PagedResponse<BookResponse> body = bookClient.search(keyword, sort, page, size);
+        URI uri = UriComponentsBuilder
+                .fromHttpUrl(bookApiBaseUrl + "/api/search")
+                .queryParam("keyword", keyword)
+                .queryParam("sort", sort)
+                .queryParam("page", page)
+                .queryParam("size", size)
+                .encode(StandardCharsets.UTF_8)
+                .build()
+                .toUri();
 
-        // Null 처리 (Feign은 보통 예외를 던지거나 null을 줄 수 있음, 필요 시 빈 객체 처리)
+        ResponseEntity<PagedResponse> response =
+                restTemplate.exchange(
+                        uri,
+                        HttpMethod.GET,
+                        null,
+                        new ParameterizedTypeReference<PagedResponse>() {}
+                );
+
+        PagedResponse body = response.getBody();
         if (body == null) {
-            body = new PagedResponse<>();
+            body = new PagedResponse();
         }
+
+        // ★ 서버에서 내려준 현재 페이지 번호(number)를 page 필드와 모델에 같이 넣기
+        int currentPage = body.getNumber(); // 0부터 시작
+        body.setPage(currentPage);
 
         model.addAttribute("keyword", keyword);
         model.addAttribute("books", body.getContent());
-        model.addAttribute("pageInfo", body);
-        model.addAttribute("page", page);
+        model.addAttribute("pageInfo", body);     // totalPages, totalElements 등
+        model.addAttribute("page", currentPage);  // 템플릿에서 편하게 쓰라고 별도 제공
         model.addAttribute("sort", sort);
 
+        // 탭/AI 박스 표시용
         model.addAttribute("searchType", "NORMAL");
         model.addAttribute("aiSummary", null);
 
@@ -48,6 +80,7 @@ public class SearchController {
 
     /**
      * AI 검색 (RAG 기반)
+     * 예: /rag-search?keyword=유아&sort=REVIEW&page=0
      */
     @GetMapping("/rag-search")
     public String ragSearch(@RequestParam String keyword,
@@ -55,23 +88,58 @@ public class SearchController {
                             @RequestParam(defaultValue = "0") int page,
                             Model model) {
 
-        int size = 20;
+        int size = 10;
 
         // 1) 도서 목록 (RAG 하이브리드 검색)
-        PagedResponse<BookResponse> body = bookClient.ragSearch(keyword, page, size);
+        URI searchUri = UriComponentsBuilder
+                .fromHttpUrl(bookApiBaseUrl + "/api/search/rag-search")
+                .queryParam("keyword", keyword)
+                .queryParam("sort", sort)
+                .queryParam("page", page)
+                .queryParam("size", size)
+                .encode(StandardCharsets.UTF_8)
+                .build()
+                .toUri();
 
+        ResponseEntity<PagedResponse> response =
+                restTemplate.exchange(
+                        searchUri,
+                        HttpMethod.GET,
+                        null,
+                        new ParameterizedTypeReference<PagedResponse>() {}
+                );
+
+        PagedResponse body = response.getBody();
         if (body == null) {
-            body = new PagedResponse<>();
+            body = new PagedResponse();
         }
 
+        int currentPage = body.getNumber();
+        body.setPage(currentPage);
+
         // 2) AI 요약/추천 문장
-        String aiMessage = bookClient.ragAnswer(keyword);
+        String aiMessage;
+        try {
+            URI answerUri = UriComponentsBuilder
+                    .fromHttpUrl(bookApiBaseUrl + "/api/search/rag-answer")
+                    .queryParam("keyword", keyword)
+                    .encode(StandardCharsets.UTF_8)
+                    .build()
+                    .toUri();
+
+            ResponseEntity<String> aiResponse =
+                    restTemplate.getForEntity(answerUri, String.class);
+
+            aiMessage = aiResponse.getBody();
+        } catch (Exception e) {
+            aiMessage = "현재 AI 추천 설명을 불러오지 못했습니다. 나중에 다시 시도해 주세요.";
+        }
 
         // 3) 모델에 담기
         model.addAttribute("keyword", keyword);
         model.addAttribute("books", body.getContent());
         model.addAttribute("pageInfo", body);
-        model.addAttribute("page", page);
+        model.addAttribute("page", currentPage);
         model.addAttribute("sort", sort);
 
         model.addAttribute("searchType", "AI");
