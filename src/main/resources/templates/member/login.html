@@ -7,45 +7,46 @@
     <link rel="stylesheet" href="/member-css/login.css">
 </head>
 <body>
+<!-- 헤더 -->
 <header id="header" role="banner">
     <div class="container">
-        <a href="/" class="logo">
-            <img src="../img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100" />
+        <a th:href="@{/}" class="logo">
+            <img th:src="@{/img/logo.png}" alt="HIGH-FIVE 로고" width="100" height="100" />
             <div class="brand">HIGH-FIVE BOOKS</div>
         </a>
 
         <nav class="gnb" aria-label="주요 메뉴">
-            <div class="search-box" role="search">
+            <form class="search-box"
+                  role="search"
+                  th:action="@{/search}"
+                  method="get">
                 <input
                         type="search"
-                        placeholder="검색어를 입력하세요"
+                        name="keyword"
+                        placeholder="도서명, 저자, ISBN, 태그 검색"
                         aria-label="통합 검색"
                 />
-                <button class="search-btn" aria-label="검색">검색</button>
-            </div>
+                <button type="submit" class="search-btn" aria-label="검색">검색</button>
+            </form>
+
         </nav>
 
-        <div class="headerBar">
-            <div class="user-menu">
-                <!-- 쿠폰 -->
-                <a class="user-link" href="/coupon">
-                    <img src="../img/icon-coupon.png" alt="쿠폰" class="user-icon" />
-                </a>
+        <div class="user-menu">
+            <!-- 쿠폰 -->
+            <a class="user-link" href="/coupon">
+                <img th:src="@{/img/icon-coupon.png}" alt="쿠폰" class="user-icon" />
+            </a>
+            <a class="user-link" href="/mypage">
+                <img th:src="@{/img/icon-mypage.png}" alt="마이페이지" class="user-icon" />
+            </a>
+            <a th:href="@{/api/cart}" href="/api/cart" class="user-link cart-link-wrap">
+                <img th:src="@{/img/icon-cart.png}" alt="장바구니" class="user-icon" />
+                <span id="cartBadge" class="cart-badge" style="display: none;">0</span>
+            </a>
 
-                <!-- 마이페이지 -->
-                <a class="user-link" href="/mypage">
-                    <img src="../img/icon-mypage.png" alt="마이페이지" class="user-icon" />
-                </a>
-
-                <!-- 장바구니 -->
-                <a class="user-link" href="/cart">
-                    <img src="../img/icon-cart.png" alt="장바구니" class="user-icon" />
-                </a>
-
-                <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
-            </div>
-
+            <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
         </div>
+
     </div>
 </header>
 

@@ -67,16 +67,27 @@ input {
 /* ------------------------------------- */
 
 #header {
-    background-color: #ffffff;
-    border-bottom: 3px solid var(--color-primary); /* 딥 블루 라인 */
-    padding: 15px 0;
+    border-bottom: 3px solid var(--color-primary);
+    padding: 12px 0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    height: 7rem;
 }
 
 #header .container {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 16px;
+    height: auto; /* 고정 높이 제거 */
+    justify-content: flex-start; /* 양쪽 정렬 대신 gap으로 제어 */
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
 }
 
 .logo a {
@@ -85,6 +96,12 @@ input {
     color: var(--color-primary);
     display: flex;
     flex-direction: row;
+}
+
+.logo .brand {
+    font-size: 24px;
+    font-weight: 900;
+    color: black;
 }
 
 .gnb {
@@ -169,6 +186,30 @@ input {
     background-color: var(--color-accent);
     color: white;
 }
+.user-menu .user-link {
+    display: inline-block;
+    font-weight: 700;
+    color: #333;
+    text-decoration: none;
+    padding: 6px 8px;
+}
+
+.user-menu .user-link:hover {
+    color: var(--color-primary);
+}
+
+.user-menu .user-link.pill {
+    border: 2px solid var(--color-accent);
+    color: var(--color-accent);
+    background: #fff;
+    padding: 6px 14px;
+    border-radius: 20px;
+}
+.user-menu .user-link.pill:hover {
+    background: var(--color-accent);
+    color: #fff;
+}
+
 .user-menu .user-link {
     display: flex;
     align-items: center;
