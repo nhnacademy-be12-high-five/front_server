@@ -44,6 +44,7 @@ public interface MemberService {
     @PostMapping("/api/auth/signup")
     void registerMember(@RequestBody MemberCreateRequestDto dto);
 
+
     @GetMapping("/api/members/me")
     ResponseEntity<MemberResponse> getMyInfo();
 }
