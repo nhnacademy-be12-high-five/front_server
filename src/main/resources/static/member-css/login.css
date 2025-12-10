@@ -37,22 +37,28 @@ body {
 a {
     color: var(--color-primary);
     text-decoration: none;
-    transition: color 0.2s ease;
+    transition: 0.2s;
 }
 
 a:hover {
-    color: var(--color-accent); /* 호버 시 따뜻한 코랄 */
+    color: #0056b3;
 }
 
 button {
     font-family: inherit;
     cursor: pointer;
-    border: none;
+    border: 0;
 }
 
-input {
-    font-family: inherit;
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
 }
+
+/*input {*/
+/*    font-family: inherit;*/
+/*}*/
 
 /* 레이아웃 편의를 위한 .container 클래스 */
 .container {
@@ -63,34 +69,44 @@ input {
 }
 
 
-.writing {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-}
+/*.writing {*/
+/*    width: 100%;*/
+/*    display: flex;*/
+/*    justify-content: center;*/
+/*}*/
 
 /* ------------------------------------- */
 /* 2. 헤더 스타일링 */
 /* ------------------------------------- */
 
 #header {
-    background-color: #ffffff;
-    border-bottom: 3px solid var(--color-primary); /* 딥 블루 라인 */
-    padding: 15px 0;
+    background: #fff;
+    border-bottom: 3px solid var(--color-primary);
+    padding: 12px 0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
 }
-
 
 #header .container {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    height: 10rem;
+    gap: 16px;
+    height: auto; /* 고정 높이 제거 */
+    justify-content: flex-start; /* 양쪽 정렬 대신 gap으로 제어 */
 }
 
 .logo {
     display: flex;
-    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.logo img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
 }
 
 .logo a {

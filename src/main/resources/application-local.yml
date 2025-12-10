@@ -13,6 +13,9 @@ spring:
       charset: UTF-8
       enabled: true
       force: true
+  cloud:
+    config:
+      enabled: false
 
 # 로컬 게이트웨이 주소 (IntelliJ에서 실행 중인 게이트웨이)
 gateway:
