@@ -99,24 +99,31 @@
                 </div>
             </div>
 
-            <!-- =================== AI 검색 말풍선 박스 =================== -->
-            <!-- aiSummary 가 있을 때만 노출 -->
-            <div class="ai-summary-box" th:if="${aiSummary != null}">
-                <div class="ai-summary-title">
-                    AI 검색 요약 · HIGH-FIVE 추천
+            <!-- =================== AI 검색 요약 (AI 검색일 때만) =================== -->
+            <div class="ai-main-summary"
+                 th:if="${searchType != null and searchType == 'AI' and aiSummary != null}">
+                <div class="ai-main-summary-header">
+                    <span class="ai-main-badge">AI 검색 요약 · HIGH-FIVE 추천</span>
+                    <button type="button"
+                            class="ai-main-toggle-btn"
+                            onclick="toggleMainAiSummary(this)">
+                        자세히 보기 ▾
+                    </button>
                 </div>
-                <p class="ai-summary-text"
-                   th:text="${aiSummary}">
-                    이 키워드에 대해 AI가 요약한 추천/요약 내용이 표시됩니다.
-                </p>
+
+                <!-- 기본은 collapsed 클래스로 3~4줄만 보이게 -->
+                <div class="ai-main-summary-body collapsed">
+                    <p th:text="${aiSummary}">
+                        AI 검색 요약 내용이 여기에 표시됩니다.
+                    </p>
+                </div>
             </div>
 
             <!-- =================== 정렬/보기 옵션 =================== -->
             <div class="toolbar">
-                <!-- 정렬 옵션: NORMAL / AI 분리 -->
                 <!-- NORMAL 검색일 때 -->
                 <div class="sort-options"
-                     th:if="${searchType} == null or ${searchType} == 'NORMAL'">
+                     th:if="${searchType == null or searchType == 'NORMAL'}">
                     <a th:href="@{/search(keyword=${keyword}, sort='POPULAR', page=0, searchType='NORMAL')}"
                        th:classappend="${sort} == 'POPULAR' ? ' active' : ''">
                         인기순
@@ -145,7 +152,7 @@
 
                 <!-- AI 검색일 때 -->
                 <div class="sort-options"
-                     th:if="${searchType} == 'AI'">
+                     th:if="${searchType == 'AI'}">
                     <a th:href="@{/rag-search(keyword=${keyword}, sort='POPULAR', page=0, searchType='AI')}"
                        th:classappend="${sort} == 'POPULAR' ? ' active' : ''">
                         인기순
@@ -174,19 +181,19 @@
 
                 <!-- 일반 검색 / AI 검색 결과 탭 -->
                 <div class="view-options">
-                    <a th:classappend="${searchType} == null or ${searchType} == 'NORMAL' ? ' active' : ''"
+                    <a th:classappend="${searchType == null or searchType == 'NORMAL'} ? ' active' : ''"
                        th:href="@{/search(keyword=${keyword}, sort=${sort}, page=0, searchType='NORMAL')}">
                         일반 검색
                     </a>
                     &nbsp;|&nbsp;
-                    <a th:classappend="${searchType} == 'AI' ? ' active' : ''"
+                    <a th:classappend="${searchType == 'AI'} ? ' active' : ''"
                        th:href="@{/rag-search(keyword=${keyword}, sort=${sort}, page=0, searchType='AI')}">
                         AI 검색 결과
                     </a>
                 </div>
             </div>
 
-            <!-- =================== 도서 카드 그리드 =================== -->
+            <!-- =================== 도서 카드 그리드 (2열) =================== -->
             <div class="book-grid">
                 <!-- 검색 결과 없음 -->
                 <div th:if="${books == null or #lists.isEmpty(books)}">
@@ -197,127 +204,172 @@
                 <a class="book-card"
                    th:each="book : ${books}"
                    th:href="@{/book/{id}(id=${book.id})}">
-                    <div class="book-cover">
-                        <img th:if="${book.image != null}"
-                             th:src="${book.image}"
-                             alt="도서 표지" />
-                        <span th:if="${book.image == null}">도서 표지</span>
-                    </div>
-
-                    <h3 class="book-title" th:text="${book.title}">
-                        도서 제목
-                    </h3>
-
-                    <p class="book-author">
-                        <span th:text="${book.author}">저자</span>
-                        <span th:if="${book.publisher != null}"
-                              th:text="' · ' + ${book.publisher}">
-                            · 출판사
-                        </span>
-                    </p>
-
-                    <div class="book-price-row">
-                        <div class="price-main">
-                            <span class="amount"
-                                  th:text="${book.price != null ?
-                                           #numbers.formatInteger(book.price, 3, 'COMMA')
-                                           : '-'}">
-                                0
-                            </span>
-                            <span class="won">원</span>
+                    <div class="book-card-inner">
+                        <!-- 왼쪽: 도서 이미지 -->
+                        <div class="book-cover">
+                            <img th:if="${book.image != null}"
+                                 th:src="${book.image}"
+                                 alt="도서 표지" />
+                            <span th:if="${book.image == null}">도서 표지</span>
                         </div>
-                    </div>
 
-                    <div class="book-meta" th:if="${book.avgRating != null}">
-                        <span th:text="${#numbers.formatDecimal(book.avgRating, 1, 1)}">
-                            0.0
-                        </span>
-                        점 (
-                        <span th:text="${book.reviewCount}">0</span>건
-                        )
+                        <!-- 오른쪽: 텍스트 + AI 설명 -->
+                        <div class="book-info">
+                            <h3 class="book-title" th:text="${book.title}">
+                                도서 제목
+                            </h3>
+
+                            <p class="book-author">
+                                <span th:text="${book.author}">저자</span>
+                                <span th:if="${book.publisher != null}"
+                                      th:text="' · ' + ${book.publisher}">
+                                    · 출판사
+                                </span>
+                            </p>
+
+                            <div class="book-price-row">
+                                <div class="price-main">
+                                    <span class="amount"
+                                          th:text="${book.price != null ?
+                                                   #numbers.formatInteger(book.price, 3, 'COMMA')
+                                                   : '-'}">
+                                        0
+                                    </span>
+                                    <span class="won">원</span>
+                                </div>
+                            </div>
+
+                            <div class="book-meta" th:if="${book.avgRating != null}">
+                                <span th:text="${#numbers.formatDecimal(book.avgRating, 1, 1)}">
+                                    0.0
+                                </span>
+                                점 (
+                                <span th:text="${book.reviewCount}">0</span>건
+                                )
+                            </div>
+
+                            <!-- ===== AI 설명 (AI 검색일 때만, 카드 안에서만 스크롤) ===== -->
+                            <div class="ai-snippet"
+                                 th:if="${searchType != null and searchType == 'AI'}">
+                                <div class="ai-snippet-header">
+                                    <span class="ai-badge">AI 추천 설명</span>
+                                    <button type="button"
+                                            class="ai-toggle-btn"
+                                            th:attr="data-target=${'ai-desc-' + book['id']}"
+                                            onclick="toggleAiDesc(this, event)">
+                                        자세히 보기 ▾
+                                    </button>
+                                </div>
+
+                                <!-- 짧은 미리보기 -->
+                                <p class="ai-snippet-preview"
+                                   th:text="${book['aiSummary'] != null ?
+                                            #strings.abbreviate(book['aiSummary'], 80) :
+                                            #strings.abbreviate(book['content'], 80)}">
+                                    이 도서에 대한 AI 요약이 짧게 표시됩니다.
+                                </p>
+
+                                <!-- 전체 설명: 카드 안 고정 높이 + 스크롤 -->
+                                <div class="ai-snippet-full"
+                                     th:id="${'ai-desc-' + book['id']}"
+                                     style="display:none;">
+                                    <div class="ai-snippet-scroll">
+                                        <p th:text="${book['aiSummary'] != null ? book['aiSummary'] : book['content']}">
+                                            이 도서에 대한 AI 전체 설명이 표시됩니다.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </a>
             </div>
 
             <!-- =================== 페이지네이션 =================== -->
-            <!-- NORMAL 검색 페이지네이션 -->
             <div class="pagination"
-                 th:if="${pageInfo != null and pageInfo.totalPages > 1
-                         and (searchType == null or searchType == 'NORMAL')}">
-
-                <a th:if="${pageInfo.page > 0}"
-                   th:href="@{/search(
-                         keyword=${keyword},
-                         sort=${sort},
-                         page=${pageInfo.page - 1},
-                         searchType='NORMAL'
-                   )}">
-                    &lt;
+                 th:if="${pageInfo != null and pageInfo.totalPages > 1}">
+                <!-- 이전 버튼 -->
+                <a class="page-link prev"
+                   th:if="${page > 0}"
+                   th:href="@{${searchType == 'AI' ? '/rag-search' : '/search'}(
+            keyword=${keyword},
+            sort=${sort},
+            page=${page - 1}
+       )}">
+                    이전
                 </a>
 
-                <a th:each="pageNum : ${#numbers.sequence(0, pageInfo.totalPages - 1)}"
-                   th:text="${pageNum + 1}"
-                   th:classappend="${pageNum} == ${pageInfo.page} ? ' active' : ''"
-                   th:href="@{/search(
-                         keyword=${keyword},
-                         sort=${sort},
-                         page=${pageNum},
-                         searchType='NORMAL'
-                   )}">
-                    1
-                </a>
+                <!-- 번호 버튼 -->
+                <span th:each="p : ${#numbers.sequence(0, pageInfo.totalPages - 1)}">
+        <a th:if="${p != page}"
+           class="page-link"
+           th:href="@{${searchType == 'AI' ? '/rag-search' : '/search'}(
+                keyword=${keyword},
+                sort=${sort},
+                page=${p}
+           )}"
+           th:text="${p + 1}">1</a>
 
-                <a th:if="${pageInfo.page < pageInfo.totalPages - 1}"
-                   th:href="@{/search(
-                        keyword=${keyword},
-                        sort=${sort},
-                        page=${pageInfo.page + 1},
-                        searchType='NORMAL'
-                   )}">
-                    &gt;
+        <span th:if="${p == page}"
+              class="page-link active"
+              th:text="${p + 1}">1</span>
+    </span>
+
+                <!-- 다음 버튼 -->
+                <a class="page-link next"
+                   th:if="${page < pageInfo.totalPages - 1}"
+                   th:href="@{${searchType == 'AI' ? '/rag-search' : '/search'}(
+            keyword=${keyword},
+            sort=${sort},
+            page=${page + 1}
+       )}">
+                    다음
                 </a>
             </div>
-
-            <!-- AI 검색 페이지네이션 -->
-            <div class="pagination"
-                 th:if="${pageInfo != null and pageInfo.totalPages > 1
-                         and searchType == 'AI'}">
-
-                <a th:if="${pageInfo.page > 0}"
-                   th:href="@{/rag-search(
-                         keyword=${keyword},
-                         sort=${sort},
-                         page=${pageInfo.page - 1},
-                         searchType='AI'
-                   )}">
-                    &lt;
-                </a>
-
-                <a th:each="pageNum : ${#numbers.sequence(0, pageInfo.totalPages - 1)}"
-                   th:text="${pageNum + 1}"
-                   th:classappend="${pageNum} == ${pageInfo.page} ? ' active' : ''"
-                   th:href="@{/rag-search(
-                         keyword=${keyword},
-                         sort=${sort},
-                         page=${pageNum},
-                         searchType='AI'
-                   )}">
-                    1
-                </a>
-
-                <a th:if="${pageInfo.page < pageInfo.totalPages - 1}"
-                   th:href="@{/rag-search(
-                        keyword=${keyword},
-                        sort=${sort},
-                        page=${pageInfo.page + 1},
-                        searchType='AI'
-                   )}">
-                    &gt;
-                </a>
-            </div>
-
         </section>
     </div>
 </main>
+
+<!-- ===== JS: AI 말풍선 / 카드 토글 ===== -->
+<script>
+    // 상단 AI 요약 토글
+    function toggleMainAiSummary(btn) {
+        const wrapper = btn.closest('.ai-main-summary');
+        if (!wrapper) return;
+
+        const body = wrapper.querySelector('.ai-main-summary-body');
+        if (!body) return;
+
+        const isCollapsed = body.classList.contains('collapsed');
+
+        if (isCollapsed) {
+            body.classList.remove('collapsed');
+            body.classList.add('expanded');
+            btn.textContent = '간략히 보기 ▴';
+        } else {
+            body.classList.remove('expanded');
+            body.classList.add('collapsed');
+            btn.textContent = '자세히 보기 ▾';
+        }
+    }
+
+    // 카드 안 AI 설명 토글 (상세페이지로 이동하지 않도록 이벤트 막기)
+    function toggleAiDesc(btn, e) {
+        if (e) {
+            e.preventDefault();    // 링크 이동 막기
+            e.stopPropagation();   // <a> 클릭 이벤트 전파 막기
+        }
+
+        const targetId = btn.getAttribute('data-target');
+        const box = document.getElementById(targetId);
+        if (!box) return;
+
+        const isOpen = box.style.display === 'block';
+        box.style.display = isOpen ? 'none' : 'block';
+
+        btn.textContent = isOpen ? '자세히 보기 ▾' : '간략히 보기 ▴';
+    }
+</script>
+
 </body>
 </html>
