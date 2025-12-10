@@ -1,7 +1,7 @@
 package com.example.high_five.controller.book;
 
 import com.example.high_five.dto.book.response.BookResponse;
-import com.example.high_five.service.BookClient;
+import com.example.high_five.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequiredArgsConstructor
 public class BookController {
 
-    private final BookClient bookClient;
+    private final BookService bookClient;
 
     /**
      * 도서 상세 화면

@@ -1,7 +1,7 @@
 package com.example.high_five.controller;
 
 import com.example.high_five.dto.book.response.BookResponse;
-import com.example.high_five.service.BookClient;
+import com.example.high_five.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class testController {
 
-    private final BookClient bookClient; // FeignClient 주입
+    private final BookService bookClient; // FeignClient 주입
 
     @GetMapping("/")
     public String mainPage(Model model) {
