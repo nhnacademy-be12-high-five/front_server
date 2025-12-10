@@ -27,5 +27,5 @@ book:
     base-url: ${gateway.uri}/api/books
 
 jwt:
-  expiration_time: 500000
-  refresh_expiration_time: 1000000
+  expiration_time: 1800000
+  refresh_expiration_time: 3600000

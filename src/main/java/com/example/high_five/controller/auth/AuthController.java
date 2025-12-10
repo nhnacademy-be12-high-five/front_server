@@ -1,26 +1,25 @@
 package com.example.high_five.controller.auth;
 
 import com.example.high_five.dto.member.request.LoginRequest;
-import com.example.high_five.dto.member.request.LoginResponse;
 import com.example.high_five.dto.member.response.TokenDto;
 import com.example.high_five.service.AuthService;
-import feign.FeignException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.List;
-
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
 
     private final AuthService authService;
@@ -30,6 +29,8 @@ public class AuthController {
 
     @Value("${jwt.refresh_expiration_time}")
     private Long refreshExpirationTime;
+
+    private static final boolean IS_SECURE = true;
 
     @GetMapping("/member/login.html")
     public String loginForm() {
@@ -45,22 +46,39 @@ public class AuthController {
         if (tokens == null) {
             throw new RuntimeException("로그인 실패: 토큰이 없습니다.");
         }
-        ResponseCookie accessCookie = ResponseCookie.from("access-token", tokens.getAccessToken())
-                .path("/")
-                .httpOnly(true)
-                .secure(true) // HTTPS 적용 시 true로 변경
-                .maxAge(accessExpirationTime)
-                .build();
+        setCookie(response, "access-token", tokens.getAccessToken(), accessExpirationTime);
+        setCookie(response, "refresh-token", tokens.getRefreshToken(), refreshExpirationTime);
 
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh-token", tokens.getRefreshToken())
-                .path("/")
-                .httpOnly(true)
-                .secure(true) // HTTPS 적용 시 true로 변경
-                .maxAge(refreshExpirationTime)
-                .build();
+        return "redirect:/";
+    }
 
-        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+    @PostMapping("/auth/reissue")
+    public ResponseEntity<Void> reissue(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = resolveCookie(request, "refresh-token");
+
+        if (refreshToken == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        ResponseEntity<TokenDto> apiResponse = authService.reissue(refreshToken);
+        TokenDto newTokens = apiResponse.getBody();
+
+        setCookie(response, "access-token", newTokens.getAccessToken(), accessExpirationTime);
+        setCookie(response, "refresh-token", newTokens.getRefreshToken(), refreshExpirationTime);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/auth/logout")
+    public String logout(HttpServletResponse response) {
+        try {
+            authService.logout(); // 파라미터 없이 호출
+        } catch (Exception e) {
+            log.warn("로그아웃 처리 중 오류 (무시): {}", e.getMessage());
+        }
+
+        setCookie(response, "access-token", "", 0);
+        setCookie(response, "refresh-token", "", 0);
 
         return "redirect:/";
     }
@@ -70,4 +88,27 @@ public class AuthController {
         return "member/signup";
     }
 
+    // 쿠키 설정 중복 제거를 위한 헬퍼 메서드
+    private void setCookie(HttpServletResponse response, String name, String value, long maxAgeSeconds) {
+        ResponseCookie cookie = ResponseCookie.from(name, value)
+                .path("/")
+                .httpOnly(true)
+                .secure(IS_SECURE) // ★ 모든 메서드에서 동일하게 적용
+                .sameSite("Strict") // ★ 모든 메서드에서 동일하게 적용
+                .maxAge(maxAgeSeconds / 1000)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+
+    private String resolveCookie(HttpServletRequest request, String name) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie c : cookies) {
+                if (name.equals(c.getName())) {
+                    return c.getValue();
+                }
+            }
+        }
+        return null;
+    }
 }
