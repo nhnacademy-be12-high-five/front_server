@@ -59,8 +59,25 @@
                         <input type="number" name="maxDiscountValue" placeholder="정률 할인 시 적용" value="0">
                     </div>
                     <div class="form-row">
-                        <label>적용 카테고리 ID</label>
-                        <input type="text" name="targetCategoryIds" placeholder="예: 1, 2 (쉼표로 구분)">
+                        <label>카테고리 선택</label>
+                        <div style="flex: 1; display: flex; gap: 5px;">
+                            <select id="parentCategory" onchange="loadChildCategories(this.value)" style="flex: 1;">
+                                <option value="">1차 선택</option>
+                            </select>
+                            <select id="childCategory" style="flex: 1;">
+                                <option value="">2차 선택</option>
+                            </select>
+                            <button type="button" onclick="addCategory()" style="padding: 0 10px; background-color: #333; color: white; border-radius: 6px; border:none; cursor: pointer;">추가</button>
+                        </div>
+                    </div>
+
+                    <div class="form-row" style="margin-top: -10px;">
+                        <label></label>
+                        <ul id="selectedCategoryList" style="flex: 1; list-style: none; padding: 0; margin-top: 5px;">
+                        </ul>
+                    </div>
+
+                    <div class="form-row" style="display:none;"> <input type="text" name="targetCategoryIds" id="targetCategoryIds">
                     </div>
 
                     <div class="form-row">
@@ -313,6 +330,104 @@
     }
     if (errorMessage) {
         alert(errorMessage);
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        loadParentCategories();
+    });
+
+    function loadParentCategories() {
+        fetch('/api/coupons/admin/categories/parent')
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById('parentCategory');
+                data.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.categoryId;
+                    option.text = cat.categoryName;
+                    select.appendChild(option);
+                });
+            })
+            .catch(err => console.error("카테고리 로드 실패:", err));
+    }
+
+    // 2. 1차 선택 시 2차 카테고리 가져오기
+    function loadChildCategories(parentId) {
+        const childSelect = document.getElementById('childCategory');
+        childSelect.innerHTML = '<option value="">2차 선택</option>'; // 초기화
+
+        if (!parentId) return;
+
+        fetch(`/api/coupons/admin/categories/${parentId}/child`)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.categoryId;
+                    option.text = cat.categoryName;
+                    childSelect.appendChild(option);
+                });
+            });
+    }
+
+    // 3. '추가' 버튼 클릭 시 목록에 담기
+    function addCategory() {
+        const parentSelect = document.getElementById('parentCategory');
+        const childSelect = document.getElementById('childCategory');
+
+        // 2차를 선택했으면 2차 ID, 아니면 1차 ID 사용 (상황에 따라 정책 결정)
+        // 보통 책은 2차 카테고리에 속하므로 2차까지 선택을 권장하지만,
+        // 1차 전체 할인이라면 parentId를 넣을 수도 있습니다.
+
+        let selectedId = childSelect.value;
+        let selectedName = childSelect.options[childSelect.selectedIndex].text;
+
+        if (!selectedId) {
+            selectedId = parentSelect.value;
+            selectedName = parentSelect.options[parentSelect.selectedIndex].text;
+        }
+
+        if (!selectedId) {
+            alert("카테고리를 선택해주세요.");
+            return;
+        }
+
+        // 목록에 추가
+        const list = document.getElementById('selectedCategoryList');
+        const input = document.getElementById('targetCategoryIds');
+
+        // 중복 체크
+        let currentIds = input.value ? input.value.split(',').map(s=>s.trim()) : [];
+        if (currentIds.includes(selectedId)) {
+            alert("이미 추가된 카테고리입니다.");
+            return;
+        }
+
+        // UI 추가
+        const li = document.createElement('li');
+        li.textContent = `[${selectedId}] ${selectedName} `;
+        li.style.marginBottom = "5px";
+
+        const delBtn = document.createElement('button');
+        delBtn.textContent = "x";
+        delBtn.style.marginLeft = "10px";
+        delBtn.style.cursor = "pointer";
+        delBtn.style.border = "none";
+        delBtn.style.background = "transparent";
+        delBtn.style.color = "red";
+        delBtn.onclick = function() {
+            // 삭제 로직
+            list.removeChild(li);
+            currentIds = currentIds.filter(id => id !== selectedId);
+            input.value = currentIds.join(',');
+        };
+
+        li.appendChild(delBtn);
+        list.appendChild(li);
+
+        // 값 업데이트
+        currentIds.push(selectedId);
+        input.value = currentIds.join(',');
     }
     /*]]>*/
 </script>
