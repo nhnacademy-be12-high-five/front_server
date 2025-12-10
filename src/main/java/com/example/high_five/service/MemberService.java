@@ -45,6 +45,6 @@ public interface MemberService {
     void registerMember(@RequestBody MemberCreateRequestDto dto);
 
 
-    @GetMapping("/api/members")
+    @GetMapping("/api/members/me")
     ResponseEntity<MemberResponse> getMyInfo();
 }
