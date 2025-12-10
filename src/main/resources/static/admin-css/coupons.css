@@ -95,6 +95,7 @@ main {
     flex: 1 1 48%; /* flex-grow: 1, flex-shrink: 1, basis: 48% (gap 포함 50%보다 조금 작게) */
     margin-bottom: 0; /* 부모 컨테이너에서 간격 처리 */
     /* max-width: 700px; 이 속성 삭제 (균등 크기 위해) */
+    min-width: 0;
 }
 
 .card h3 {
@@ -191,6 +192,7 @@ main {
     padding: 12px;
     text-align: left;
     border-bottom: 1px solid var(--color-border);
+    white-space: nowrap;
 }
 
 .coupon-table th {
@@ -206,6 +208,33 @@ main {
     margin-bottom: 30px; /* 컨테이너 간의 세로 간격 */
     align-items: stretch;
     flex-wrap: wrap; /* 화면이 좁아지면 줄바꿈 허용 */
+}
+
+.scrollable-container {
+    width: 100%;
+    max-width: 100%;
+    height: 400px;       /* 1. 고정하고 싶은 높이 설정 (예: 400px, 50vh 등) */
+    overflow-y: auto;    /* 2. 내용이 높이를 넘어가면 세로 스크롤바 생성 */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid #ddd; /* (선택사항) 테두리를 줘서 영역 구분 */
+    background-color: #fff; /* (선택사항) 배경색 */
+    white-space: nowrap;
+}
+
+.scrollable-container thead th {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa; /* 헤더 배경색 (없으면 글씨가 겹침) */
+    z-index: 1;
+}
+
+.truncate-text {
+    max-width: 200px; /* 원하는 너비로 설정 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; /* 기존 설정 유지 */
+    display: block; /* 중요: td 안에서 width 먹히게 하려면 필요할 수 있음 */
 }
 
 #bookSearchResultList {
