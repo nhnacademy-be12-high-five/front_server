@@ -11,3 +11,4 @@ public class HighFiveApplication {
 		SpringApplication.run(HighFiveApplication.class, args);
 	}
 }
+
