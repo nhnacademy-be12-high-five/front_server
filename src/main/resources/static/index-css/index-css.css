@@ -1,3 +1,4 @@
+
 :root {
     --color-primary: #007bff;
     --color-accent: #e9c46a;
@@ -56,7 +57,7 @@ img {
     padding: 12px 0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
-#header .container {
+#header {
     display: flex;
     align-items: center;
     gap: 16px;
@@ -147,6 +148,42 @@ img {
 
 .user-menu .user-link:hover .user-icon {
     opacity: 0.7;
+}
+
+.user-menu .cart-link-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    overflow: visible;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -4px;
+    right: -6px;
+
+    background-color: #ff4d4f;
+    color: white;
+
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 14px;
+    min-width: 16px;
+    height: 16px;
+
+    border-radius: 10px;
+    text-align: center;
+    padding: 0 4px;
+
+    border: 2px solid #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+
+    transition: transform 0.2s;
+    z-index: 10;
+}
+
+.user-menu .cart-link-wrap:hover .cart-badge {
+    transform: scale(1.1);
 }
 
 /* 메인 */
@@ -520,4 +557,18 @@ main {
 .user-menu .user-link.pill:hover {
     background: var(--color-accent);
     color: #fff;
+}
+
+
+.gnb .search-box .search-btn {
+    padding: 8px 15px;
+    background-color: var(--color-primary);
+    color: white;
+    transition: background-color 0.2s ease;
+    border-radius: 0;
+    white-space: nowrap;
+}
+
+.gnb .search-box .search-btn:hover {
+    background-color: #0056b3;
 }
