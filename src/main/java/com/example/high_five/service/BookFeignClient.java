@@ -1,5 +1,7 @@
 package com.example.high_five.service;
 
+import com.example.high_five.dto.PagedResponse;
+import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.book.BookPagedResponse;
 import com.example.high_five.dto.book.BookResponse;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -13,6 +15,7 @@ public interface BookFeignClient {
      * Book Server의 SearchController 호출
      * GET /api/search?keyword={keyword}&page={page}&size={size}
      */
+
     @GetMapping("/api/search")
     BookPagedResponse<BookResponse> searchBooks(
             @RequestParam("keyword") String keyword,
