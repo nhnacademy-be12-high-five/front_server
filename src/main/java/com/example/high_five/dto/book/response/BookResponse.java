@@ -1,4 +1,4 @@
-package com.example.high_five.dto.book;
+package com.example.high_five.dto.book.response;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +25,5 @@ public class BookResponse {
     private Long reviewCount;
 
     // book-detail.html 에서 사용하는 태그 필드
-
     private List<String> tags;
 }

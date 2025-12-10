@@ -1,6 +1,6 @@
 package com.example.high_five.controller.search;
 
-import com.example.high_five.dto.book.BookResponse;
+import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.book.PagedResponse;
 import com.example.high_five.service.BookClient;
 import lombok.RequiredArgsConstructor;
