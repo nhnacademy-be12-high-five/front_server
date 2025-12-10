@@ -1,66 +1,82 @@
 package com.example.high_five.controller.search;
 
+import com.example.high_five.dto.book.BookResponse;
 import com.example.high_five.dto.book.PagedResponse;
+import com.example.high_five.service.BookClient;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
 
 @Controller
 @RequiredArgsConstructor
 public class SearchController {
 
-    private final RestTemplate restTemplate;
+    private final BookClient bookClient; // FeignClient 주입
 
-    @Value("${book.api.base-url}")
-    private String bookApiBaseUrl;
-
+    /**
+     * 일반 검색
+     */
     @GetMapping("/search")
     public String search(@RequestParam String keyword,
                          @RequestParam(defaultValue = "POPULAR") String sort,
                          @RequestParam(defaultValue = "0") int page,
                          Model model) {
 
-        int size = 20;  // 페이지당 도서 개수
+        int size = 20;
 
+        // Feign 호출 (PagedResponse<BookResponse>로 반환됨)
+        PagedResponse<BookResponse> body = bookClient.search(keyword, sort, page, size);
 
-        URI uri = UriComponentsBuilder
-                .fromHttpUrl(bookApiBaseUrl + "/api/search")
-                .queryParam("keyword", keyword)       // raw 값
-                .queryParam("sort", sort)
-                .queryParam("page", page)
-                .queryParam("size", size)
-                .encode(StandardCharsets.UTF_8)
-                .build()
-                .toUri();
-
-        ResponseEntity<PagedResponse> response =
-                restTemplate.exchange(
-                        uri,
-                        HttpMethod.GET,
-                        null,
-                        new ParameterizedTypeReference<PagedResponse>() {}
-                );
-
-        PagedResponse body = response.getBody();
+        // Null 처리 (Feign은 보통 예외를 던지거나 null을 줄 수 있음, 필요 시 빈 객체 처리)
+        if (body == null) {
+            body = new PagedResponse<>();
+        }
 
         model.addAttribute("keyword", keyword);
-        model.addAttribute("books", body != null ? body.getContent() : null);
-        model.addAttribute("totalElements", body != null ? body.getTotalElements() : 0);
-        model.addAttribute("totalPages", body != null ? body.getTotalPages() : 0);
+        model.addAttribute("books", body.getContent());
+        model.addAttribute("pageInfo", body);
         model.addAttribute("page", page);
         model.addAttribute("sort", sort);
 
-        return "Book/booklist"; // 검색 결과 템플릿 이름
+        model.addAttribute("searchType", "NORMAL");
+        model.addAttribute("aiSummary", null);
+
+        return "Book/booklist";
+    }
+
+    /**
+     * AI 검색 (RAG 기반)
+     */
+    @GetMapping("/rag-search")
+    public String ragSearch(@RequestParam String keyword,
+                            @RequestParam(defaultValue = "POPULAR") String sort,
+                            @RequestParam(defaultValue = "0") int page,
+                            Model model) {
+
+        int size = 20;
+
+        // 1) 도서 목록 (RAG 하이브리드 검색)
+        PagedResponse<BookResponse> body = bookClient.ragSearch(keyword, page, size);
+
+        if (body == null) {
+            body = new PagedResponse<>();
+        }
+
+        // 2) AI 요약/추천 문장
+        String aiMessage = bookClient.ragAnswer(keyword);
+
+        // 3) 모델에 담기
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("books", body.getContent());
+        model.addAttribute("pageInfo", body);
+        model.addAttribute("page", page);
+        model.addAttribute("sort", sort);
+
+        model.addAttribute("searchType", "AI");
+        model.addAttribute("aiSummary", aiMessage);
+
+        return "Book/booklist";
     }
 }
