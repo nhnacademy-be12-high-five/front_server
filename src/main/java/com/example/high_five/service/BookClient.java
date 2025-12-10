@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "book-service", contextId = "bookClient", url = "${gateway.uri}")
+@FeignClient(name = "book-service", contextId = "bookClient", url = "${book.api.base-url}")
 public interface BookClient {
 
     // 1. 도서 상세 조회

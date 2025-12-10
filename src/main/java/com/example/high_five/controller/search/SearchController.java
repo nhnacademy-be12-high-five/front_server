@@ -35,7 +35,7 @@ public class SearchController {
                          @RequestParam(defaultValue = "0") int page,
                          Model model) {
 
-        int size = 20;
+        int size = 10; // 한 페이지에 10권
 
         URI uri = UriComponentsBuilder
                 .fromHttpUrl(bookApiBaseUrl + "/api/search")
@@ -60,10 +60,14 @@ public class SearchController {
             body = new PagedResponse();
         }
 
+        // ★ 서버에서 내려준 현재 페이지 번호(number)를 page 필드와 모델에 같이 넣기
+        int currentPage = body.getNumber(); // 0부터 시작
+        body.setPage(currentPage);
+
         model.addAttribute("keyword", keyword);
         model.addAttribute("books", body.getContent());
-        model.addAttribute("pageInfo", body);   // totalElements, totalPages 등
-        model.addAttribute("page", page);
+        model.addAttribute("pageInfo", body);     // totalPages, totalElements 등
+        model.addAttribute("page", currentPage);  // 템플릿에서 편하게 쓰라고 별도 제공
         model.addAttribute("sort", sort);
 
         // 탭/AI 박스 표시용
@@ -83,13 +87,13 @@ public class SearchController {
                             @RequestParam(defaultValue = "0") int page,
                             Model model) {
 
-        int size = 20;
+        int size = 10;
 
         // 1) 도서 목록 (RAG 하이브리드 검색)
         URI searchUri = UriComponentsBuilder
                 .fromHttpUrl(bookApiBaseUrl + "/api/search/rag-search")
                 .queryParam("keyword", keyword)
-                .queryParam("sort", sort)              // ★ sort 전달 추가
+                .queryParam("sort", sort)
                 .queryParam("page", page)
                 .queryParam("size", size)
                 .encode(StandardCharsets.UTF_8)
@@ -109,8 +113,11 @@ public class SearchController {
             body = new PagedResponse();
         }
 
-        // 2) AI 요약/추천 문장 (에러 나도 화면은 유지)
-        String aiMessage = null;
+        int currentPage = body.getNumber();
+        body.setPage(currentPage);
+
+        // 2) AI 요약/추천 문장
+        String aiMessage;
         try {
             URI answerUri = UriComponentsBuilder
                     .fromHttpUrl(bookApiBaseUrl + "/api/search/rag-answer")
@@ -124,7 +131,6 @@ public class SearchController {
 
             aiMessage = aiResponse.getBody();
         } catch (Exception e) {
-            // Gemini 쪽 에러가 나도 검색 결과는 보여줄 수 있게만 처리
             aiMessage = "현재 AI 추천 설명을 불러오지 못했습니다. 나중에 다시 시도해 주세요.";
         }
 
@@ -132,7 +138,7 @@ public class SearchController {
         model.addAttribute("keyword", keyword);
         model.addAttribute("books", body.getContent());
         model.addAttribute("pageInfo", body);
-        model.addAttribute("page", page);
+        model.addAttribute("page", currentPage);
         model.addAttribute("sort", sort);
 
         model.addAttribute("searchType", "AI");

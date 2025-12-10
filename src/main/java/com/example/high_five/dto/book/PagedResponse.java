@@ -22,7 +22,7 @@ public class PagedResponse<T> {
     private int number;            // 현재 페이지 번호(0부터)
     private int size;              // 페이지 크기
     private int numberOfElements;  // 현재 페이지에 담긴 요소 수
-
+    private int page;
     private boolean first;
     private boolean last;
     private boolean empty;

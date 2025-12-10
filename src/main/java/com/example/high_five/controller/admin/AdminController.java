@@ -1,6 +1,6 @@
 package com.example.high_five.controller.admin;
 
-import com.example.high_five.dto.PagedResponse;
+import com.example.high_five.dto.book.BookPagedResponse;
 import com.example.high_five.dto.book.BookResponse;
 import com.example.high_five.dto.book.CategoryResponse;
 import com.example.high_five.dto.coupon.*;
@@ -109,7 +109,7 @@ public class AdminController {
     public ResponseEntity<List<BookResponse>> searchBooksForCoupon(@RequestParam("keyword") String keyword) {
         try {
             // Book Server 검색 API 호출 (첫 페이지, 10개만 조회)
-            PagedResponse<BookResponse> response = bookFeignClient.searchBooks(keyword, 0, 10);
+            BookPagedResponse<BookResponse> response = bookFeignClient.searchBooks(keyword, 0, 10);
 
             if (response != null && response.getContent() != null) {
                 return ResponseEntity.ok(response.getContent());
