@@ -24,8 +24,7 @@ gateway:
 # Book API 기본 URL (로컬 게이트웨이 경유)
 book:
   api:
-    base-url: ${gateway.uri}/api/books
-
+    base-url: http://localhost:9002   # Book 서버 주소 (SearchController에서 사용)
 jwt:
   expiration_time: 500000
   refresh_expiration_time: 1000000
