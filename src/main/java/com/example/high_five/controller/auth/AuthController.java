@@ -2,6 +2,7 @@ package com.example.high_five.controller.auth;
 
 import com.example.high_five.dto.member.request.LoginRequest;
 import com.example.high_five.dto.member.request.LoginResponse;
+import com.example.high_five.dto.member.response.TokenDto;
 import com.example.high_five.service.AuthService;
 import feign.FeignException;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,48 +37,32 @@ public class AuthController {
     }
 
     @PostMapping("/auth/login")
-    public String login(@ModelAttribute LoginRequest loginRequest,
-                        HttpServletResponse response,
-                        Model model) {
-        try {
-            ResponseEntity<LoginResponse> apiResponse = authService.login(loginRequest);
-            String accessToken = apiResponse.getBody().getAccessToken();
+    public String login(@ModelAttribute LoginRequest loginRequest, HttpServletResponse response) {
 
-            ResponseCookie accessCookie = ResponseCookie.from("access-token", accessToken)
-                    .path("/")
-                    .httpOnly(true)
-                    .secure(false) // 배포(HTTPS) 시 true
-                    .sameSite("Strict")
-                    .maxAge(accessExpirationTime)
-                    .build();
+        ResponseEntity<TokenDto> apiResponse = authService.login(loginRequest);
+        TokenDto tokens = apiResponse.getBody();
 
-            response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
-
-            List<String> cookies = apiResponse.getHeaders().get(HttpHeaders.SET_COOKIE);
-            if (cookies != null) {
-                for (String cookieStr : cookies) {
-                    if (cookieStr.contains("refresh-token")) {
-                        String refreshTokenValue = cookieStr.split(";")[0].split("=")[1];
-
-                        ResponseCookie refreshCookie = ResponseCookie.from("refresh-token", refreshTokenValue)
-                                .path("/")
-                                .httpOnly(true)
-                                .secure(false) // 배포(HTTPS) 시 true
-                                .sameSite("Strict")
-                                .maxAge(refreshExpirationTime)
-                                .build();
-
-                        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-                    }
-                }
-            }
-
-            return "redirect:/";
-
-        } catch (FeignException e) {
-            model.addAttribute("error", "아이디 또는 비밀번호가 올바르지 않습니다.");
-            return "member/login";
+        if (tokens == null) {
+            throw new RuntimeException("로그인 실패: 토큰이 없습니다.");
         }
+        ResponseCookie accessCookie = ResponseCookie.from("access-token", tokens.getAccessToken())
+                .path("/")
+                .httpOnly(true)
+                .secure(true) // HTTPS 적용 시 true로 변경
+                .maxAge(accessExpirationTime)
+                .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh-token", tokens.getRefreshToken())
+                .path("/")
+                .httpOnly(true)
+                .secure(true) // HTTPS 적용 시 true로 변경
+                .maxAge(refreshExpirationTime)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+        return "redirect:/";
     }
 
     @GetMapping("/member/signup.html")
