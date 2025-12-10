@@ -1,10 +1,10 @@
 package com.example.high_five.controller.admin;
 
-import com.example.high_five.dto.book.BookPagedResponse;
 import com.example.high_five.dto.book.BookResponse;
 import com.example.high_five.dto.book.CategoryResponse;
+import com.example.high_five.dto.book.PagedResponse;
 import com.example.high_five.dto.coupon.*;
-import com.example.high_five.service.BookFeignClient;
+import com.example.high_five.service.BookService;
 import com.example.high_five.service.CategoryFeignClient;
 import com.example.high_five.service.CouponService;
 import feign.FeignException;
@@ -22,8 +22,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminController {
     private final CouponService couponService;
-    private final BookFeignClient bookFeignClient;
     private final CategoryFeignClient categoryFeignClient;
+    private final BookService bookService;
 
     @GetMapping("/api/coupons/admin/coupons")
     public String couponPage(Model model){
@@ -109,7 +109,7 @@ public class AdminController {
     public ResponseEntity<List<BookResponse>> searchBooksForCoupon(@RequestParam("keyword") String keyword) {
         try {
             // Book Server 검색 API 호출 (첫 페이지, 10개만 조회)
-            BookPagedResponse<BookResponse> response = bookFeignClient.searchBooks(keyword, 0, 10);
+            PagedResponse<BookResponse> response = bookService.search(keyword, null,0, 10);
 
             if (response != null && response.getContent() != null) {
                 return ResponseEntity.ok(response.getContent());
