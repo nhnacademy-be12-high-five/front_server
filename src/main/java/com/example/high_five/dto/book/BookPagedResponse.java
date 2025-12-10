@@ -1,11 +1,11 @@
-package com.example.high_five.dto;
+package com.example.high_five.dto.book;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true) // pageable, sort 같은 필드는 무시
-public class PagedResponse<T> {
+public class BookPagedResponse<T> {
 
     private List<T> content;
     private int totalPages;
