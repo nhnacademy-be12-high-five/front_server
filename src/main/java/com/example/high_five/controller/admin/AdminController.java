@@ -1,8 +1,8 @@
 package com.example.high_five.controller.admin;
 
-import com.example.high_five.dto.PagedResponse;
-import com.example.high_five.dto.book.response.BookResponse;
+import com.example.high_five.dto.book.BookPagedResponse;
 import com.example.high_five.dto.book.CategoryResponse;
+import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.coupon.*;
 import com.example.high_five.service.BookFeignClient;
 import com.example.high_five.service.CategoryFeignClient;
