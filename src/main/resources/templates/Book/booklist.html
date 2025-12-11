@@ -203,7 +203,8 @@
                 <!-- 도서 카드 -->
                 <a class="book-card"
                    th:each="book : ${books}"
-                   th:href="@{/book/{id}(id=${book.id})}">
+                   th:href="@{/book/{book-id}(book-id=${book['bookId'] != null ? book['bookId'] : book['id']})}">
+
                     <div class="book-card-inner">
                         <!-- 왼쪽: 도서 이미지 -->
                         <div class="book-cover">
@@ -255,7 +256,7 @@
                                     <span class="ai-badge">AI 추천 설명</span>
                                     <button type="button"
                                             class="ai-toggle-btn"
-                                            th:attr="data-target=${'ai-desc-' + book['id']}"
+                                            th:attr="data-target=${'ai-desc-' + (book['bookId'] != null ? book['bookId'] : book['id'])}"
                                             onclick="toggleAiDesc(this, event)">
                                         자세히 보기 ▾
                                     </button>
@@ -271,7 +272,7 @@
 
                                 <!-- 전체 설명: 카드 안 고정 높이 + 스크롤 -->
                                 <div class="ai-snippet-full"
-                                     th:id="${'ai-desc-' + book['id']}"
+                                     th:id="${'ai-desc-' + (book['bookId'] != null ? book['bookId'] : book['id'])}"
                                      style="display:none;">
                                     <div class="ai-snippet-scroll">
                                         <p th:text="${book['aiSummary'] != null ? book['aiSummary'] : book['content']}">
@@ -292,37 +293,37 @@
                 <a class="page-link prev"
                    th:if="${page > 0}"
                    th:href="@{${searchType == 'AI' ? '/rag-search' : '/search'}(
-            keyword=${keyword},
-            sort=${sort},
-            page=${page - 1}
-       )}">
+                        keyword=${keyword},
+                        sort=${sort},
+                        page=${page - 1}
+                   )}">
                     이전
                 </a>
 
                 <!-- 번호 버튼 -->
                 <span th:each="p : ${#numbers.sequence(0, pageInfo.totalPages - 1)}">
-        <a th:if="${p != page}"
-           class="page-link"
-           th:href="@{${searchType == 'AI' ? '/rag-search' : '/search'}(
-                keyword=${keyword},
-                sort=${sort},
-                page=${p}
-           )}"
-           th:text="${p + 1}">1</a>
+                    <a th:if="${p != page}"
+                       class="page-link"
+                       th:href="@{${searchType == 'AI' ? '/rag-search' : '/search'}(
+                            keyword=${keyword},
+                            sort=${sort},
+                            page=${p}
+                       )}"
+                       th:text="${p + 1}">1</a>
 
-        <span th:if="${p == page}"
-              class="page-link active"
-              th:text="${p + 1}">1</span>
-    </span>
+                    <span th:if="${p == page}"
+                          class="page-link active"
+                          th:text="${p + 1}">1</span>
+                </span>
 
                 <!-- 다음 버튼 -->
                 <a class="page-link next"
                    th:if="${page < pageInfo.totalPages - 1}"
                    th:href="@{${searchType == 'AI' ? '/rag-search' : '/search'}(
-            keyword=${keyword},
-            sort=${sort},
-            page=${page + 1}
-       )}">
+                        keyword=${keyword},
+                        sort=${sort},
+                        page=${page + 1}
+                   )}">
                     다음
                 </a>
             </div>

@@ -1497,7 +1497,7 @@
     // [추가됨] 뱃지 카운트 로직 (서버 API 호출)
     // ==========================================
     function updateCartBadge() {
-        fetch('/api/cart/count', {
+        fetch('/cart/count', {
             method: 'GET',
             headers: {'Content-Type': 'application/json'}
         })
