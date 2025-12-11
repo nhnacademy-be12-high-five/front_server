@@ -3,6 +3,7 @@ package com.example.high_five.controller.search;
 import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.book.PagedResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -17,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class SearchController {
@@ -26,17 +28,14 @@ public class SearchController {
     @Value("${book.api.base-url}")
     private String bookApiBaseUrl;
 
-    /**
-     * 일반 검색
-     * 예: /search?keyword=유아&sort=POPULAR&page=0
-     */
+    // === (기존) 일반 검색 메서드는 그대로 두고 ===
     @GetMapping("/search")
     public String search(@RequestParam String keyword,
                          @RequestParam(defaultValue = "POPULAR") String sort,
                          @RequestParam(defaultValue = "0") int page,
                          Model model) {
 
-        int size = 10; // 한 페이지에 10권
+        int size = 10;
 
         URI uri = UriComponentsBuilder
                 .fromHttpUrl(bookApiBaseUrl + "/api/search")
@@ -61,17 +60,12 @@ public class SearchController {
             body = new PagedResponse();
         }
 
-        // ★ 서버에서 내려준 현재 페이지 번호(number)를 page 필드와 모델에 같이 넣기
-        int currentPage = body.getNumber(); // 0부터 시작
-        body.setPage(currentPage);
-
         model.addAttribute("keyword", keyword);
         model.addAttribute("books", body.getContent());
-        model.addAttribute("pageInfo", body);     // totalPages, totalElements 등
-        model.addAttribute("page", currentPage);  // 템플릿에서 편하게 쓰라고 별도 제공
+        model.addAttribute("pageInfo", body);
+        model.addAttribute("page", page);
         model.addAttribute("sort", sort);
 
-        // 탭/AI 박스 표시용
         model.addAttribute("searchType", "NORMAL");
         model.addAttribute("aiSummary", null);
 
@@ -80,7 +74,6 @@ public class SearchController {
 
     /**
      * AI 검색 (RAG 기반)
-     * 예: /rag-search?keyword=유아&sort=REVIEW&page=0
      */
     @GetMapping("/rag-search")
     public String ragSearch(@RequestParam String keyword,
@@ -91,33 +84,37 @@ public class SearchController {
         int size = 10;
 
         // 1) 도서 목록 (RAG 하이브리드 검색)
-        URI searchUri = UriComponentsBuilder
-                .fromHttpUrl(bookApiBaseUrl + "/api/search/rag-search")
-                .queryParam("keyword", keyword)
-                .queryParam("sort", sort)
-                .queryParam("page", page)
-                .queryParam("size", size)
-                .encode(StandardCharsets.UTF_8)
-                .build()
-                .toUri();
+        PagedResponse body;
+        try {
+            URI searchUri = UriComponentsBuilder
+                    .fromHttpUrl(bookApiBaseUrl + "/api/search/rag-search")
+                    .queryParam("keyword", keyword)
+                    .queryParam("sort", sort)
+                    .queryParam("page", page)
+                    .queryParam("size", size)
+                    .encode(StandardCharsets.UTF_8)
+                    .build()
+                    .toUri();
 
-        ResponseEntity<PagedResponse> response =
-                restTemplate.exchange(
-                        searchUri,
-                        HttpMethod.GET,
-                        null,
-                        new ParameterizedTypeReference<PagedResponse>() {}
-                );
+            ResponseEntity<PagedResponse> response =
+                    restTemplate.exchange(
+                            searchUri,
+                            HttpMethod.GET,
+                            null,
+                            new ParameterizedTypeReference<PagedResponse>() {}
+                    );
 
-        PagedResponse body = response.getBody();
-        if (body == null) {
-            body = new PagedResponse();
+            body = response.getBody();
+            if (body == null) {
+                body = new PagedResponse();
+            }
+        } catch (Exception e) {
+            // 북서버가 500을 주더라도 여기서 한 번 막고, 화면은 살려 둡니다.
+            log.error("RAG 검색 API 호출 실패", e);
+            body = new PagedResponse();   // content 비어있는 상태
         }
 
-        int currentPage = body.getNumber();
-        body.setPage(currentPage);
-
-        // 2) AI 요약/추천 문장
+        // 2) AI 요약/추천 문장 (에러 나도 화면은 유지)
         String aiMessage;
         try {
             URI answerUri = UriComponentsBuilder
@@ -135,11 +132,11 @@ public class SearchController {
             aiMessage = "현재 AI 추천 설명을 불러오지 못했습니다. 나중에 다시 시도해 주세요.";
         }
 
-        // 3) 모델에 담기
+        // 3) 모델 세팅
         model.addAttribute("keyword", keyword);
         model.addAttribute("books", body.getContent());
         model.addAttribute("pageInfo", body);
-        model.addAttribute("page", currentPage);
+        model.addAttribute("page", page);
         model.addAttribute("sort", sort);
 
         model.addAttribute("searchType", "AI");
