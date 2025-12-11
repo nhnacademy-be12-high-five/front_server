@@ -1,7 +1,7 @@
 package com.example.high_five.service;
 
-import com.example.high_five.dto.book.PagedResponse;
 import com.example.high_five.dto.book.response.BookResponse;
+import com.example.high_five.dto.book.PagedResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(name = "book-service", contextId = "bookClient", url = "${gateway.uri}")
+@FeignClient(name = "book-service", contextId = "booClient", url = "${gateway.uri}")
 public interface BookClient {
 
     // 1. 도서 상세 조회
@@ -40,4 +40,8 @@ public interface BookClient {
     // 5. 신간 추천 책 리스트
     @GetMapping("/api/books/new")
     List<BookResponse> getNewBooks();
+
+    // 주간 인기 급상승 로직
+    @GetMapping("/api/books/popular")
+    List<BookResponse> getPopularBooks();
 }
