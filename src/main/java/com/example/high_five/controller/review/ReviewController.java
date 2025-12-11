@@ -2,6 +2,9 @@ package com.example.high_five.controller.review;
 
 import com.example.high_five.dto.review.*;
 import com.example.high_five.service.ReviewService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -12,7 +15,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -32,6 +37,9 @@ public class ReviewController {
             @ModelAttribute ReviewCreateRequest request,
             @RequestPart(value = "images", required = false) List<MultipartFile> images
     ) {
+        if (images == null) {
+            images = List.of();
+        }
         reviewService.createReview(bookId, request, images);
         return "redirect:/books/" + bookId;
     }
@@ -60,16 +68,25 @@ public class ReviewController {
     }
 
     // 4. 리뷰 수정 처리
-    @PostMapping("/books/{book-id}/{review-id}/update")
-    public String modifyReview(
+    @PostMapping("/reviews/books/{book-id}/{review-id}")
+    @ResponseBody
+    public ResponseEntity<Void> updateReviewPut(
             @PathVariable("book-id") Long bookId,
             @PathVariable("review-id") Long reviewId,
-            @ModelAttribute ReviewUpdateRequest request,
+            @RequestPart("request") String requestJson,
             @RequestPart(value = "images", required = false) List<MultipartFile> images
-    ) {
-        reviewService.updateMyReview(bookId, reviewId, request, images);
-        return "redirect:/books/" + bookId;
+    ) throws JsonProcessingException {
+        if (images == null) images = List.of();
+
+        // JSON → DTO 변환
+        ReviewUpdateRequest request =
+                new ObjectMapper().readValue(requestJson, ReviewUpdateRequest.class);
+
+        reviewService.updateMyReview(bookId, reviewId, requestJson, images);
+        return ResponseEntity.ok().build();
     }
+
+
 
     // ★ 5. 리뷰 삭제 처리 (이게 빠져있어서 추가했습니다!)
     // HTML: th:action="@{.../delete}" method="post" 와 매핑됨

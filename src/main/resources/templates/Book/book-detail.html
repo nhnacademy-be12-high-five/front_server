@@ -82,8 +82,8 @@
 
                     <div class="purchase-actions">
                         <button type="button" class="btn-heart" aria-label="관심도서">&#9829;</button>
-                        <button type="button" class="btn-primary" id="add-to-cart-btn" th:data-book-id="${book.id}">장바구니 담기</button>
-                        <a class="btn-secondary" th:href="@{/order/now(bookId=${book.id})}">바로 구매</a>
+                        <button type="button" class="btn-primary" id="add-to-cart-btn" th:data-book-id="${book.bookId}">장바구니 담기</button>
+                        <a class="btn-secondary" th:href="@{/order/now(bookId=${book.bookId})}">바로 구매</a>
                     </div>
 
                     <table class="summary-table">
@@ -124,7 +124,7 @@
 
             <div id="tab-review" class="detail-tab-content">
                 <h2>리뷰</h2>
-                <div th:replace="~{/Book/review/review-section :: review-section}"></div>
+                <div th:replace="~{/Book/review/review-section :: review-section(book=${book})}"></div>
             </div>
 
             <div id="tab-qna" class="detail-tab-content">
@@ -275,5 +275,92 @@
             });
     }
 </script>
+<script>
+    function startEditReview(btn) {
+        const reviewId = btn.dataset.reviewId;
+        const bookId = btn.dataset.bookId;
+        const content = btn.dataset.content;
+        const rating = btn.dataset.rating;
+
+        const container = document.querySelector(".my-review-card");
+
+        container.innerHTML = `
+        <h3>리뷰 수정</h3>
+        <form id="updateReviewForm" enctype="multipart/form-data">
+
+            <div class="star-rating">
+                <span class="rating-label">별점</span>
+                <select name="rating" class="form-select">
+                    <option value="5" ${rating == 5 ? "selected" : ""}>★★★★★ (5점)</option>
+                    <option value="4" ${rating == 4 ? "selected" : ""}>★★★★☆ (4점)</option>
+                    <option value="3" ${rating == 3 ? "selected" : ""}>★★★☆☆ (3점)</option>
+                    <option value="2" ${rating == 2 ? "selected" : ""}>★★☆☆☆ (2점)</option>
+                    <option value="1" ${rating == 1 ? "selected" : ""}>★☆☆☆☆ (1점)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <textarea name="content" required>${content}</textarea>
+            </div>
+
+            <div class="file-group">
+                <input type="file" name="images" multiple accept="image/*">
+            </div>
+
+            <button type="button" class="btn-primary full-width"
+                    onclick="submitUpdateReview(${reviewId}, ${bookId})">
+                수정 완료
+            </button>
+
+            <button type="button" class="btn-secondary full-width" onclick="location.reload()">
+                취소
+            </button>
+        </form>
+    `;
+    }
+</script>
+
+
+<script>
+    async function submitUpdateReview(reviewId, bookId) {
+        const form = document.getElementById("updateReviewForm");
+
+        const rating = form.querySelector("select[name='rating']").value;
+        const content = form.querySelector("textarea[name='content']").value;
+
+        const requestDto = {
+            content: content,
+            rating: Number(rating),
+            deleteImageIds: []   // 이미지 삭제 기능 미사용
+        };
+
+        const formData = new FormData();
+        formData.append("request",
+            new Blob([JSON.stringify(requestDto)], { type: "application/json" })
+        );
+
+        const fileInput = form.querySelector("input[name='images']");
+        for (const file of fileInput.files) {
+            formData.append("images", file);
+        }
+
+        const response = await fetch(`/reviews/books/${bookId}/${reviewId}`, {
+            method: "POST",
+            headers: {
+                "x-user-id": '6' // 실제 로그인한 회원 ID로 교체
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            alert("리뷰 수정 실패");
+            return;
+        }
+
+        alert("리뷰가 수정되었습니다.");
+        location.reload();
+    }
+</script>
+
 </body>
 </html>

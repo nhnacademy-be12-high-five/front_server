@@ -1312,7 +1312,7 @@
                 </div>
 
                 <article class="card" th:unless="${newBooks == null}" th:each="book : ${newBooks}">
-                    <a th:href="@{/books/{id}(id=${book.id})}" class="book-link" style="display:block; color:inherit;">
+                    <a th:href="@{/books/{bookId}(bookId=${book.bookId})}" class="book-link" style="display:block; color:inherit;">
                         <div class="thumb">
                             <img th:src="${book.image}"
                                  th:alt="${book.image}"

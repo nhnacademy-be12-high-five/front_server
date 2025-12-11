@@ -1,6 +1,7 @@
 package com.example.high_five.controller.book;
 
 import com.example.high_five.dto.book.response.BookResponse;
+import com.example.high_five.dto.review.BookReviewResponse;
 import com.example.high_five.service.BookClient;
 import com.example.high_five.service.ReviewService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class BookController {
 
     private final BookClient bookClient;
+    private final ReviewService reviewService;
 
     /**
      * 도서 상세 화면

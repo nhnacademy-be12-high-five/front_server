@@ -1,5 +1,6 @@
 package com.example.high_five.service;
 
+import com.example.high_five.config.FeignMultipartConfig;
 import com.example.high_five.dto.review.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap; // Pageable 처리용 권장
@@ -11,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@FeignClient(name = "TEAM5-GATEWAY-SERVER", contextId = "reviewClient", url = "${gateway.uri}") // url은 yml로 관리 권장
+@FeignClient(name = "TEAM5-GATEWAY-SERVER", contextId = "reviewClient", url = "${gateway.uri}", configuration = FeignMultipartConfig.class) // url은 yml로 관리 권장
 public interface ReviewService {
 
     // 리뷰 등록
@@ -42,13 +43,15 @@ public interface ReviewService {
     );
 
     // 리뷰 수정
-    @PutMapping(value = "/api/books/{book-id}/reviews/{review-id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/api/books/{book-id}/reviews/{review-id}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     void updateMyReview(
             @PathVariable("book-id") Long bookId,
             @PathVariable("review-id") Long reviewId,
-            @RequestPart(value = "review") ReviewUpdateRequest request,
+            @RequestPart("request") String requestJson,
             @RequestPart(value = "images", required = false) List<MultipartFile> images
     );
+}
 
     // 6. 리뷰 삭제 (로그인 필요)
 //    @LoginRequired
@@ -56,4 +59,3 @@ public interface ReviewService {
 //    ResponseEntity<Void> removeReview(
 //            @PathVariable("reviewId") Long reviewId
 //    );
-}

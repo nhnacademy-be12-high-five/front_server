@@ -1,7 +1,7 @@
 package com.example.high_five.service;
 
-import com.example.high_five.dto.book.BookResponse;
 import com.example.high_five.dto.book.PagedResponse;
+import com.example.high_five.dto.book.response.BookResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
