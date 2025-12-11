@@ -22,20 +22,20 @@ public interface CouponService {
     Map<String, Object> getIssuableCoupons(@RequestParam(value = "page", defaultValue = "0") int page,
                                            @RequestParam(value = "size", defaultValue = "10") int size);
 
-    @PostMapping("/api/coupons/admin/coupon-policy")
+    @PostMapping("/api/coupons/admin/coupon-policies")
     void createCouponPolicy(@RequestBody CouponPolicyRequestDto dto);
 
     @PostMapping("/api/coupons/issue")
     void issueCoupon(@CookieValue("AccessToken") String accessToken,
                      @RequestBody UserCouponIssueRequestDto requestDto);
 
-    @GetMapping("/api/coupons/admin/coupon-policy")
+    @GetMapping("/api/coupons/admin/coupon-policies")
     List<CouponPolicyResponseDto> getAllPolicies();
 
     @PostMapping("/api/coupons/admin/coupons")
     void createCouponTemplate(@RequestBody CouponCreateRequestDto dto);
 
-    @DeleteMapping("/api/coupons/admin/coupon-policy/{id}")
+    @DeleteMapping("/api/coupons/admin/coupon-policies/{id}")
     void disableCouponPolicy(@PathVariable("id") Long id);
 
     @DeleteMapping("/api/coupons/members/{memberId}/coupons/{memberCouponId}")
@@ -45,6 +45,6 @@ public interface CouponService {
     @PostMapping("/api/coupons/admin/member-coupons/issue")
     void issueCouponByAdmin(@RequestBody MemberCouponIssueRequestDto requestDto);
 
-    @GetMapping("/api/coupons/admin/coupon-policy/{id}")
+    @GetMapping("/api/coupons/admin/coupon-policies/{id}")
     CouponPolicyResponseDto getCouponPolicy(@PathVariable("id") Long id);
 }

@@ -13,8 +13,8 @@ import java.util.List;
 public interface BookClient {
 
     // 1. 도서 상세 조회
-    @GetMapping("/api/books/{id}")
-    BookResponse getBookDetail(@PathVariable("id") Long id);
+    @GetMapping("/api/books/{book-id}")
+    BookResponse getBookDetail(@PathVariable("book-id") Long id);
 
     // 2. 일반 검색
     @GetMapping("/api/search")

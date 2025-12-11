@@ -37,7 +37,7 @@
             <a class="user-link" href="/mypage">
                 <img th:src="@{/img/icon-mypage.png}" alt="마이페이지" class="user-icon" />
             </a>
-            <a th:href="@{/api/cart}" href="/api/cart" class="user-link cart-link-wrap">
+            <a th:href="@{/cart}" href="/cart" class="user-link cart-link-wrap">
                 <img th:src="@{/img/icon-cart.png}" alt="장바구니" class="user-icon"/>
                 <span id="cartBadge" class="cart-badge" style="display: none;">0</span>
             </a>
@@ -151,7 +151,7 @@
         if (hasGuestCart) {
             if (confirm("로그인 전 담아둔 장바구니 내역이 있습니다.\n회원 장바구니와 합치시겠습니까?")) {
                 // Yes -> 합치기 요청
-                fetch('/api/cart/merge', { method: 'POST' })
+                fetch('/cart/merge', { method: 'POST' })
                     .then(res => {
                         if(res.ok) {
                             alert("장바구니가 통합되었습니다.");
@@ -160,7 +160,7 @@
                     });
             } else {
                 if(confirm("그럼 이전 장바구니 내역을 삭제할까요?\n(취소 시 유지됩니다)")) {
-                    fetch('/api/cart/guest', { method: 'DELETE' })
+                    fetch('/cart/guest', { method: 'DELETE' })
                         .then(res => {
                             if(res.ok) location.reload();
                         });
@@ -178,7 +178,7 @@
 
     // 뱃지 업데이트
     function updateCartBadge() {
-        fetch('/api/cart/count', {
+        fetch('/cart/count', {
             method: 'GET',
             headers: {'Content-Type': 'application/json'}
         })
@@ -208,7 +208,7 @@
         if (newQty < 1) return; // 1 미만 방지
 
         // 서버에 요청
-        fetch('/api/cart/items', {
+        fetch('/cart/items', {
             method: 'PUT',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({bookId: bookId, quantity: newQty})
@@ -242,7 +242,7 @@
         const itemRow = btn.closest(".item");
         const bookId = itemRow.getAttribute("data-book-id");
 
-        fetch(`/api/cart/items/${bookId}`, {method: 'DELETE'})
+        fetch(`/cart/items/${bookId}`, {method: 'DELETE'})
             .then(res => {
                 if (res.ok) {
                     // 성공 시 해당 줄(row)만 삭제
@@ -262,7 +262,7 @@
     function clearCart() {
         if (!confirm("장바구니를 비우시겠습니까?")) return;
 
-        fetch('/api/cart/items', {method: 'DELETE'})
+        fetch('/cart/items', {method: 'DELETE'})
             .then(res => {
                 if (res.ok) {
                     // 리스트 내부를 싹 비우고 메시지 띄우기
@@ -289,7 +289,7 @@
         if (!confirm(`${checkboxes.length}개 상품을 삭제하시겠습니까?`)) return;
 
         const promises = Array.from(checkboxes).map(chk =>
-            fetch(`/api/cart/items/${chk.value}`, {method: 'DELETE'})
+            fetch(`/cart/items/${chk.value}`, {method: 'DELETE'})
                 .then(res => {
                     if(res.ok) {
                         // 성공한 항목은 화면에서 바로 지움

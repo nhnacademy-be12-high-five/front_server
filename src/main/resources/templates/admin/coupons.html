@@ -26,7 +26,7 @@
         <div class="coupon-detail2">
             <div class="card">
                 <h3>쿠폰 정책 생성</h3>
-                <form action="/api/coupons/admin/policy/create" method="post">
+                <form action="/api/coupons/admin/policies/create" method="post">
                     <div class="form-row">
                         <label>정책 이름</label>
                         <input type="text" name="name" placeholder="예: 겨울 정기 세일 정책" required>
@@ -114,7 +114,7 @@
                         <tr th:each="policy : ${policies}">
                             <td th:text="${policy.id}">1</td>
                             <td>
-                                <a th:href="@{/api/coupons/admin/policy/{id}(id=${policy.id})}"
+                                <a th:href="@{/api/coupons/admin/policies/{id}(id=${policy.id})}"
                                    th:text="${policy.name}"
                                    style="color: #007bff; text-decoration: underline; cursor: pointer;">
                                     정책 이름
@@ -134,7 +134,7 @@
                             </td>
                             <td>
                                 <form th:if="${policy.status == 'ACTIVE'}"
-                                      th:action="@{/api/coupons/admin/policy/{id}(id=${policy.id})}"
+                                      th:action="@{/api/coupons/admin/policies/{id}(id=${policy.id})}"
                                       method="post"
                                       onsubmit="return confirm('정말 이 정책을 비활성화하시겠습니까?\n\n[주의] 해당 정책으로 발급된 모든 미사용 쿠폰이 \'만료(EXPIRED)\' 처리되며, 더 이상 복구할 수 없습니다.');">
                                     <button type="submit"

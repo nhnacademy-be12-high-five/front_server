@@ -1,8 +1,8 @@
 package com.example.high_five.controller.search;
 
-import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.book.PagedResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -17,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class SearchController {
@@ -27,60 +28,111 @@ public class SearchController {
     private String bookApiBaseUrl;
 
     /**
-     * 일반 검색
-     * 예: /search?keyword=유아&sort=POPULAR&page=0
+     * 일반 검색 + 카테고리 검색 (searchType 으로 구분)
      */
     @GetMapping("/search")
-    public String search(@RequestParam String keyword,
+    public String search(@RequestParam(required = false) String keyword,
+                         @RequestParam(required = false) Long categoryId,
+                         @RequestParam(required = false) String categoryName,
+                         @RequestParam(defaultValue = "NORMAL") String searchType,
                          @RequestParam(defaultValue = "POPULAR") String sort,
                          @RequestParam(defaultValue = "0") int page,
                          Model model) {
 
-        int size = 10; // 한 페이지에 10권
+        int size = 10;
+        PagedResponse body = new PagedResponse();
 
-        URI uri = UriComponentsBuilder
-                .fromHttpUrl(bookApiBaseUrl + "/api/search")
-                .queryParam("keyword", keyword)
-                .queryParam("sort", sort)
-                .queryParam("page", page)
-                .queryParam("size", size)
-                .encode(StandardCharsets.UTF_8)
-                .build()
-                .toUri();
+        // ===== 1) CATEGORY 모드 =====
+        if ("CATEGORY".equalsIgnoreCase(searchType) && categoryId != null) {
+            try {
+                //  북서버 카테고리별 도서 조회 API 사용
+                URI uri = UriComponentsBuilder
+                        .fromHttpUrl(bookApiBaseUrl + "/api/categories/" + categoryId + "/books")
+                        .queryParam("sort", sort)
+                        .queryParam("page", page)
+                        .queryParam("size", size)
+                        .encode(StandardCharsets.UTF_8)
+                        .build()
+                        .toUri();
 
-        ResponseEntity<PagedResponse> response =
-                restTemplate.exchange(
-                        uri,
-                        HttpMethod.GET,
-                        null,
-                        new ParameterizedTypeReference<PagedResponse>() {}
-                );
+                ResponseEntity<PagedResponse> response =
+                        restTemplate.exchange(
+                                uri,
+                                HttpMethod.GET,
+                                null,
+                                new ParameterizedTypeReference<PagedResponse>() {}
+                        );
 
-        PagedResponse body = response.getBody();
-        if (body == null) {
-            body = new PagedResponse();
+                if (response.getBody() != null) {
+                    body = response.getBody();
+                }
+            } catch (Exception e) {
+                // 에러 나더라도 화면은 살리고 로그만 찍기
+                log.error("카테고리 검색 API 호출 실패 categoryId={}, sort={}, page={}",
+                        categoryId, sort, page, e);
+            }
+
+            model.addAttribute("keyword", null);  // 카테고리 모드라 키워드는 없음
+            model.addAttribute("categoryId", categoryId);
+            model.addAttribute("categoryName", categoryName);
+            model.addAttribute("books", body.getContent());
+            model.addAttribute("pageInfo", body);
+            model.addAttribute("page", page);
+            model.addAttribute("sort", sort);
+            model.addAttribute("searchType", "CATEGORY");
+            model.addAttribute("aiSummary", null);
+
+            return "Book/booklist";
         }
 
-        // ★ 서버에서 내려준 현재 페이지 번호(number)를 page 필드와 모델에 같이 넣기
-        int currentPage = body.getNumber(); // 0부터 시작
-        body.setPage(currentPage);
+        // ===== 2) NORMAL 모드 (기존 검색) =====
+        if (keyword == null || keyword.isBlank()) {
+            return "redirect:/";
+        }
+
+        try {
+            URI uri = UriComponentsBuilder
+                    .fromHttpUrl(bookApiBaseUrl + "/api/search")
+                    .queryParam("keyword", keyword)
+                    .queryParam("sort", sort)
+                    .queryParam("page", page)
+                    .queryParam("size", size)
+                    .encode(StandardCharsets.UTF_8)
+                    .build()
+                    .toUri();
+
+            ResponseEntity<PagedResponse> response =
+                    restTemplate.exchange(
+                            uri,
+                            HttpMethod.GET,
+                            null,
+                            new ParameterizedTypeReference<PagedResponse>() {}
+                    );
+
+            if (response.getBody() != null) {
+                body = response.getBody();
+            }
+        } catch (Exception e) {
+            log.error("일반 검색 API 호출 실패 keyword={}, sort={}, page={}",
+                    keyword, sort, page, e);
+        }
 
         model.addAttribute("keyword", keyword);
+        model.addAttribute("categoryId", null);
+        model.addAttribute("categoryName", null);
         model.addAttribute("books", body.getContent());
-        model.addAttribute("pageInfo", body);     // totalPages, totalElements 등
-        model.addAttribute("page", currentPage);  // 템플릿에서 편하게 쓰라고 별도 제공
+        model.addAttribute("pageInfo", body);
+        model.addAttribute("page", page);
         model.addAttribute("sort", sort);
-
-        // 탭/AI 박스 표시용
         model.addAttribute("searchType", "NORMAL");
         model.addAttribute("aiSummary", null);
 
         return "Book/booklist";
     }
 
+
     /**
-     * AI 검색 (RAG 기반)
-     * 예: /rag-search?keyword=유아&sort=REVIEW&page=0
+     * AI 검색 (RAG 기반) – 기존 그대로
      */
     @GetMapping("/rag-search")
     public String ragSearch(@RequestParam String keyword,
@@ -91,31 +143,34 @@ public class SearchController {
         int size = 10;
 
         // 1) 도서 목록 (RAG 하이브리드 검색)
-        URI searchUri = UriComponentsBuilder
-                .fromHttpUrl(bookApiBaseUrl + "/api/search/rag-search")
-                .queryParam("keyword", keyword)
-                .queryParam("sort", sort)
-                .queryParam("page", page)
-                .queryParam("size", size)
-                .encode(StandardCharsets.UTF_8)
-                .build()
-                .toUri();
+        PagedResponse body;
+        try {
+            URI searchUri = UriComponentsBuilder
+                    .fromHttpUrl(bookApiBaseUrl + "/api/search/rag-search")
+                    .queryParam("keyword", keyword)
+                    .queryParam("sort", sort)
+                    .queryParam("page", page)
+                    .queryParam("size", size)
+                    .encode(StandardCharsets.UTF_8)
+                    .build()
+                    .toUri();
 
-        ResponseEntity<PagedResponse> response =
-                restTemplate.exchange(
-                        searchUri,
-                        HttpMethod.GET,
-                        null,
-                        new ParameterizedTypeReference<PagedResponse>() {}
-                );
+            ResponseEntity<PagedResponse> response =
+                    restTemplate.exchange(
+                            searchUri,
+                            HttpMethod.GET,
+                            null,
+                            new ParameterizedTypeReference<PagedResponse>() {}
+                    );
 
-        PagedResponse body = response.getBody();
-        if (body == null) {
+            body = response.getBody();
+            if (body == null) {
+                body = new PagedResponse();
+            }
+        } catch (Exception e) {
+            log.error("RAG 검색 API 호출 실패", e);
             body = new PagedResponse();
         }
-
-        int currentPage = body.getNumber();
-        body.setPage(currentPage);
 
         // 2) AI 요약/추천 문장
         String aiMessage;
@@ -135,13 +190,13 @@ public class SearchController {
             aiMessage = "현재 AI 추천 설명을 불러오지 못했습니다. 나중에 다시 시도해 주세요.";
         }
 
-        // 3) 모델에 담기
         model.addAttribute("keyword", keyword);
+        model.addAttribute("categoryId", null);
+        model.addAttribute("categoryName", null);
         model.addAttribute("books", body.getContent());
         model.addAttribute("pageInfo", body);
-        model.addAttribute("page", currentPage);
+        model.addAttribute("page", page);
         model.addAttribute("sort", sort);
-
         model.addAttribute("searchType", "AI");
         model.addAttribute("aiSummary", aiMessage);
 

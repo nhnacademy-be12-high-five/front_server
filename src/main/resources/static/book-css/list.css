@@ -514,3 +514,203 @@ a {
         flex-direction: row;
     }
 }
+
+/* ==== 서점 스타일 네비게이션 바 (홈/검색 공통) ==== */
+#category-nav {
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    position: relative;
+    z-index: 100;
+}
+
+.nav-container {
+    display: flex;
+    align-items: center;
+    height: 50px;
+}
+
+/* 전체 분야 버튼 영역 */
+.all-menu-wrapper {
+    position: relative;
+    height: 100%;
+    width: 140px;
+}
+
+.all-menu-btn {
+    width: 100%;
+    height: 100%;
+    background: var(--color-primary);
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+/* 퀵 메뉴 (베스트셀러 / 신간도서) */
+.quick-menu {
+    display: flex;
+    list-style: none;
+    margin-left: 20px;
+    gap: 24px;
+}
+
+.quick-menu a {
+    color: #333;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.quick-menu a:hover {
+    color: var(--color-primary);
+}
+
+/* ==== 메가 메뉴 (대분류 + 소분류) ==== */
+.mega-menu {
+    display: none;
+    position: absolute;
+    top: 50px;            /* 네비게이션 바로 아래 */
+    left: 0;
+    height: 400px;        /* 히어로 배너 높이 정도 */
+    width: 220px;
+    background: #fff;
+    border: 1px solid #333;
+    border-top: none;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    z-index: 1000;
+}
+
+/* 전체 분야 호버 시 메가 메뉴 표시 */
+.all-menu-wrapper:hover .mega-menu {
+    display: block;
+}
+/* 대분류에 마우스를 올렸을 때 소분류 표시 */
+.depth1 > li:hover .depth2 {
+    display: grid;
+}
+
+/* 대분류(depth1) 영역 */
+.depth1 {
+    list-style: none;
+    height: 100%;
+    overflow-y: auto;
+    background: #fff;
+    border-right: 1px solid #ddd;
+}
+
+/* 스크롤바 꾸미기 (옵션) */
+.depth1::-webkit-scrollbar {
+    width: 6px;
+}
+.depth1::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 3px;
+}
+.depth1::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+.depth1 > li > a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 11px 16px;
+    font-size: 14px;
+    color: #333;
+    text-decoration: none;
+    border-bottom: 1px solid #f5f5f5;
+    transition: all 0.2s;
+}
+
+.depth1 > li > a:hover {
+    background: #f9f9f9;
+    color: var(--color-primary);
+    font-weight: 700;
+    padding-left: 20px;
+}
+
+.arrow {
+    font-size: 10px;
+    color: #bbb;
+    transition: transform 0.2s, color 0.2s;
+}
+
+.depth1 > li:hover .arrow {
+    color: var(--color-primary);
+}
+
+/* 소분류(depth2) 영역 */
+.depth2 {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 219px;          /* depth1 너비 맞춰서 옆으로 */
+    height: 400px;
+    width: 600px;
+    background: #fff;
+    border: 1px solid #333;
+    border-left: 1px solid #eee;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
+    padding: 24px 30px;
+    overflow-y: auto;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px 20px;
+    align-content: start;
+}
+
+/* 대분류에 마우스 올리면 소분류 보이기 */
+.depth1 > li:hover .depth2 {
+    display: grid;
+}
+
+/* 소분류 타이틀 */
+.depth2 h4 {
+    grid-column: 1 / -1;
+    font-size: 17px;
+    font-weight: 800;
+    color: #000;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #333;
+}
+
+/* 소분류 개별 링크 스타일 */
+.depth2 a {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #555;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.15s ease-in-out;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 링크 앞 점(·) 추가 */
+.depth2 a::before {
+    content: '·';
+    margin-right: 6px;
+    font-weight: bold;
+    color: #ddd;
+    transition: color 0.15s;
+}
+
+/* 호버 시 버튼처럼 보이도록 */
+.depth2 a:hover {
+    background-color: #f2f8ff;
+    color: var(--color-primary);
+    font-weight: 700;
+    transform: translateX(3px);
+}
+
+.depth2 a:hover::before {
+    color: var(--color-primary);
+}
+
