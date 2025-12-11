@@ -106,7 +106,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 30px;">
-        <a href="/api/cart" class="btn btn-link">🛒 장바구니 확인하러 가기</a>
+        <a href="/cart" class="btn btn-link">🛒 장바구니 확인하러 가기</a>
     </div>
 </div>
 
@@ -126,7 +126,7 @@
         };
 
         // [중요] API 주소 확인: /api/cart/items
-        fetch('/api/cart/items', {
+        fetch('/cart/items', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -137,7 +137,7 @@
                 if (response.ok) {
                     // 성공 시 메시지 확인 및 이동
                     if(confirm("✅ 장바구니에 담았습니다!\n바로 확인하러 갈까요?")) {
-                        location.href = "/api/cart"; // 장바구니 페이지로 이동
+                        location.href = "/cart"; // 장바구니 페이지로 이동
                     }
                 } else {
                     alert("❌ 담기 실패!\n\n1. Book ID가 DB에 있는지 확인하세요.\n2. 서버 로그를 확인하세요.");

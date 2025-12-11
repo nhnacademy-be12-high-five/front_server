@@ -102,7 +102,7 @@ public class CartController {
         response.addCookie(cookie);
     }
 
-    @GetMapping("/test")
+    @GetMapping("/bookTest")
     public String viewTestPage() {
         return "order/test-products";
     }
