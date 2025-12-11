@@ -35,7 +35,7 @@ public class AdminController {
         return "admin/coupons";
     }
 
-    @PostMapping("/api/coupons/admin/policy/create")
+    @PostMapping("/api/coupons/admin/policies/create")
     public String createPolicy(@ModelAttribute CouponPolicyRequestDto dto) {
         couponService.createCouponPolicy(dto);
 
@@ -53,7 +53,7 @@ public class AdminController {
         return "redirect:/api/coupons/admin/coupons";
     }
 
-    @PostMapping("/api/coupons/admin/policy/{id}")
+    @PostMapping("/api/coupons/admin/policies/{id}")
     public String disablePolicy(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         try {
             couponService.disableCouponPolicy(id);
@@ -93,7 +93,7 @@ public class AdminController {
         return "redirect:/api/coupons/admin/coupons";
     }
 
-    @GetMapping("/api/coupons/admin/policy/{id}")
+    @GetMapping("/api/coupons/admin/policies/{id}")
     public String policyDetail(@PathVariable("id") Long id, Model model) {
         // 1. Feign Client로 백엔드 데이터 조회
         CouponPolicyResponseDto policy = couponService.getCouponPolicy(id);
