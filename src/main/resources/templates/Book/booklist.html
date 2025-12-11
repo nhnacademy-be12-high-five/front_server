@@ -74,21 +74,70 @@
             <!-- 브레드크럼 -->
             <div class="breadcrumb">
                 <span>홈</span>
-                <span th:text="'검색: ' + ${keyword}">검색 키워드</span>
+
+                <!-- NORMAL 검색 -->
+                <span th:if="${searchType == null or searchType == 'NORMAL'}"
+                      th:text="'검색: ' + ${keyword}">
+                    검색: 키워드
+                </span>
+
+                <!-- CATEGORY 검색 -->
+                <span th:if="${searchType == 'CATEGORY'}"
+                      th:text="'카테고리: ' + ${categoryName}">
+                    카테고리: 이름
+                </span>
+
+                <!-- AI 검색 -->
+                <span th:if="${searchType == 'AI'}"
+                      th:text="'AI 검색: ' + ${keyword}">
+                    AI 검색: 키워드
+                </span>
             </div>
 
             <!-- 상단 타이틀 + 전체 건수 -->
             <div class="category-header">
                 <div>
-                    <div class="category-title"
-                         th:text="${keyword}">
-                        검색 결과
+                    <!-- 타이틀 -->
+                    <div class="category-title">
+                        <!-- NORMAL 검색 -->
+                        <span th:if="${searchType == null or searchType == 'NORMAL'}"
+                              th:text="${keyword}">
+                            검색 결과
+                        </span>
+
+                        <!-- CATEGORY 검색 -->
+                        <span th:if="${searchType == 'CATEGORY'}"
+                              th:text="${categoryName}">
+                            카테고리명
+                        </span>
+
+                        <!-- AI 검색 -->
+                        <span th:if="${searchType == 'AI'}"
+                              th:text="${keyword}">
+                            검색 결과(AI)
+                        </span>
                     </div>
+
+                    <!-- 설명 문구 -->
                     <p class="category-desc">
-                        <span th:text="${keyword}">키워드</span>
-                        에 대한 도서 검색 결과입니다.
+                        <span th:if="${searchType == null or searchType == 'NORMAL'}"
+                              th:text="${keyword} + ' 에 대한 도서 검색 결과입니다.'">
+                            키워드에 대한 도서 검색 결과입니다.
+                        </span>
+
+                        <span th:if="${searchType == 'CATEGORY'}"
+                              th:text="${categoryName} + ' 카테고리에 대한 도서 목록입니다.'">
+                            카테고리에 대한 도서 목록입니다.
+                        </span>
+
+                        <span th:if="${searchType == 'AI'}"
+                              th:text="${keyword} + ' 에 대한 AI 검색 결과입니다.'">
+                            키워드에 대한 AI 검색 결과입니다.
+                        </span>
                     </p>
                 </div>
+
+                <!-- 총 건수 -->
                 <div class="result-count">
                     총
                     <strong th:text="${pageInfo != null ? pageInfo.totalElements
@@ -150,6 +199,59 @@
                     </a>
                 </div>
 
+                <!-- CATEGORY 검색일 때 -->
+                <div class="sort-options"
+                     th:if="${searchType == 'CATEGORY'}">
+                    <a th:href="@{/search(searchType='CATEGORY',
+                              categoryId=${categoryId},
+                              categoryName=${categoryName},
+                              sort='POPULAR',
+                              page=0)}"
+                       th:classappend="${sort} == 'POPULAR' ? ' active' : ''">
+                        인기순
+                    </a>
+                    <a th:href="@{/search(searchType='CATEGORY',
+                              categoryId=${categoryId},
+                              categoryName=${categoryName},
+                              sort='NEW',
+                              page=0)}"
+                       th:classappend="${sort} == 'NEW' ? ' active' : ''">
+                        신간순
+                    </a>
+                    <a th:href="@{/search(searchType='CATEGORY',
+                              categoryId=${categoryId},
+                              categoryName=${categoryName},
+                              sort='LOW_PRICE',
+                              page=0)}"
+                       th:classappend="${sort} == 'LOW_PRICE' ? ' active' : ''">
+                        가격 낮은순
+                    </a>
+                    <a th:href="@{/search(searchType='CATEGORY',
+                              categoryId=${categoryId},
+                              categoryName=${categoryName},
+                              sort='HIGH_PRICE',
+                              page=0)}"
+                       th:classappend="${sort} == 'HIGH_PRICE' ? ' active' : ''">
+                        가격 높은순
+                    </a>
+                    <a th:href="@{/search(searchType='CATEGORY',
+                              categoryId=${categoryId},
+                              categoryName=${categoryName},
+                              sort='RATING',
+                              page=0)}"
+                       th:classappend="${sort} == 'RATING' ? ' active' : ''">
+                        평점순
+                    </a>
+                    <a th:href="@{/search(searchType='CATEGORY',
+                              categoryId=${categoryId},
+                              categoryName=${categoryName},
+                              sort='REVIEW',
+                              page=0)}"
+                       th:classappend="${sort} == 'REVIEW' ? ' active' : ''">
+                        리뷰순
+                    </a>
+                </div>
+
                 <!-- AI 검색일 때 -->
                 <div class="sort-options"
                      th:if="${searchType == 'AI'}">
@@ -179,8 +281,9 @@
                     </a>
                 </div>
 
-                <!-- 일반 검색 / AI 검색 결과 탭 -->
-                <div class="view-options">
+                <!-- 일반/AI 결과 탭: 카테고리 모드일 때는 숨김 -->
+                <div class="view-options"
+                     th:if="${keyword != null}">
                     <a th:classappend="${searchType == null or searchType == 'NORMAL'} ? ' active' : ''"
                        th:href="@{/search(keyword=${keyword}, sort=${sort}, page=0, searchType='NORMAL')}">
                         일반 검색
@@ -294,6 +397,9 @@
                    th:if="${page > 0}"
                    th:href="@{${searchType == 'AI' ? '/rag-search' : '/search'}(
                         keyword=${keyword},
+                        searchType=${searchType},
+                        categoryId=${categoryId},
+                        categoryName=${categoryName},
                         sort=${sort},
                         page=${page - 1}
                    )}">
@@ -306,6 +412,9 @@
                        class="page-link"
                        th:href="@{${searchType == 'AI' ? '/rag-search' : '/search'}(
                             keyword=${keyword},
+                            searchType=${searchType},
+                            categoryId=${categoryId},
+                            categoryName=${categoryName},
                             sort=${sort},
                             page=${p}
                        )}"
@@ -321,6 +430,9 @@
                    th:if="${page < pageInfo.totalPages - 1}"
                    th:href="@{${searchType == 'AI' ? '/rag-search' : '/search'}(
                         keyword=${keyword},
+                        searchType=${searchType},
+                        categoryId=${categoryId},
+                        categoryName=${categoryName},
                         sort=${sort},
                         page=${page + 1}
                    )}">
