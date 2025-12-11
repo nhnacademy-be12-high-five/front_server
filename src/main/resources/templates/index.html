@@ -1293,8 +1293,13 @@
                     <p>준비된 신간 도서가 없습니다.</p>
                 </div>
 
-                <article class="card" th:unless="${newBooks == null}" th:each="book : ${newBooks}">
-                    <a th:href="@{/book/{id}(id=${book.id})}" class="book-link" style="display:block; color:inherit;">
+                <article class="card"
+                         th:unless="${newBooks == null}"
+                         th:each="book : ${newBooks}">
+
+                    <a th:href="@{/books/{book-id}(book-id=${book.bookId})}"
+                       class="book-link"
+                       style="display:block; color:inherit;">
                         <div class="thumb">
                             <img th:src="${book.image}"
                                  th:alt="${book.image}"
@@ -1306,10 +1311,13 @@
                             <div class="title" th:text="${book.title}">책 제목</div>
                             <div class="meta">
                                 <span th:text="${book.publisher}">출판사</span> ·
-                                <span th:text="${#strings.replace(#strings.substring(book.publishedDate, 0, 7), '-', '.')}">2024.03</span>
+                                <span th:text="${#strings.replace(#strings.substring(book.publishedDate, 0, 7), '-', '.')}">
+                            2024.03
+                        </span>
                             </div>
                             <div class="price-row">
-                                <span class="price" th:text="|${#numbers.formatInteger(book.price, 0, 'COMMA')}|">₩15,000</span>
+                        <span class="price"
+                              th:text="|${#numbers.formatInteger(book.price, 0, 'COMMA')}|">₩15,000</span>
                                 <span class="badge" style="background-color: #e9c46a; color: #333;">NEW</span>
                             </div>
                         </div>
