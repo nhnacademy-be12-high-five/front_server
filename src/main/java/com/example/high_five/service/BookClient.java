@@ -1,7 +1,7 @@
 package com.example.high_five.service;
 
-import com.example.high_five.dto.book.PagedResponse;
 import com.example.high_five.dto.book.response.BookResponse;
+import com.example.high_five.dto.book.PagedResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +37,7 @@ public interface BookClient {
     @GetMapping("/api/search/rag-answer")
     String ragAnswer(@RequestParam("keyword") String keyword);
 
+    // 5. 신간 추천 책 리스트
     @GetMapping("/api/books/new")
     List<BookResponse> getNewBooks();
 }

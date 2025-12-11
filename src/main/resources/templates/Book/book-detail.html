@@ -161,11 +161,11 @@
                             &#9829;
                         </button>
                         <a class="btn-primary"
-                           th:href="@{/cart/add(bookId=${book['bookId']})}">
+                           th:href="@{/cart/add(bookId=${book.bookId})}">
                             장바구니 담기
                         </a>
                         <a class="btn-secondary"
-                           th:href="@{/order/now(bookId=${book['bookId']})}">
+                           th:href="@{/order/now(bookId=${book.bookId})}">
                             바로 구매
                         </a>
                     </div>
@@ -205,12 +205,6 @@
                 <p th:text="${book.content}">
                     도서 소개 내용이 표시됩니다.
                 </p>
-            </div>
-
-            <!-- 목차 탭 (더미 문구) -->
-            <div id="tab-contents" class="detail-tab-content">
-                <h2>목차</h2>
-                <p>목차 정보는 추후 연동 예정입니다.</p>
             </div>
 
             <!-- 리뷰 탭 (평점 정보 활용 가능) -->
