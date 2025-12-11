@@ -49,7 +49,6 @@ img {
     padding: 10px 20px;
 }
 
-
 /* 헤더 */
 #header {
     background: #fff;
@@ -364,6 +363,7 @@ main {
 }
 .section .head .more {
     font-size: 14px;
+    color: black;
 }
 
 /* 카드 그리드 */

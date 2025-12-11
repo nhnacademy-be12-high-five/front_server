@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "book-service", contextId = "bookClient", url = "${book.api.base-url}")
+@FeignClient(name = "gateway-server", contextId = "bookClient", url = "${book.api.base-url}")
 public interface BookClient {
 
     // 1. 도서 상세 조회
-    @GetMapping("/api/books/{id}")
-    BookResponse getBookDetail(@PathVariable("id") Long id);
+    @GetMapping("/api/books/{book-id}")
+    BookResponse getBookDetail(@PathVariable("book-id") Long id);
 
     // 2. 일반 검색
     @GetMapping("/api/search")
