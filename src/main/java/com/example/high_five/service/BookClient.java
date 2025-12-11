@@ -1,11 +1,13 @@
 package com.example.high_five.service;
 
-import com.example.high_five.dto.book.BookResponse;
 import com.example.high_five.dto.book.PagedResponse;
+import com.example.high_five.dto.book.response.BookResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @FeignClient(name = "gateway-server", contextId = "bookClient", url = "${book.api.base-url}")
 public interface BookClient {
@@ -34,4 +36,7 @@ public interface BookClient {
     // 4. AI 답변 (RAG 요약)
     @GetMapping("/api/search/rag-answer")
     String ragAnswer(@RequestParam("keyword") String keyword);
+
+    @GetMapping("/api/books/new")
+    List<BookResponse> getNewBooks();
 }
