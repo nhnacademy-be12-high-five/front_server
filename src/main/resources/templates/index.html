@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -59,7 +57,6 @@
         margin: 0 auto;
         padding: 10px 20px;
     }
-
 
     /* 헤더 */
     #header {
@@ -172,23 +169,18 @@
         position: absolute;
         top: -4px;
         right: -6px;
-
         background-color: #ff4d4f;
         color: white;
-
         font-size: 10px;
         font-weight: 800;
         line-height: 14px;
         min-width: 16px;
         height: 16px;
-
         border-radius: 10px;
         text-align: center;
         padding: 0 4px;
-
         border: 2px solid #fff;
         box-shadow: 0 1px 2px rgba(0,0,0,0.15);
-
         transition: transform 0.2s;
         z-index: 10;
     }
@@ -277,22 +269,20 @@
         box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
     }
 
-    /* 카테고리 탭 */
+    /* 카테고리 탭 (기존 탭용 – 구조만 유지) */
     .tabs {
         margin-top: 30px;
-        background: transparent; /* 배경 투명하게 */
-        border: none; /* 외곽선 제거 */
-        overflow: visible; /* 드롭다운 잘림 방지 */
+        background: transparent;
+        border: none;
+        overflow: visible;
     }
-
     .tabs .tab-bar {
         display: flex;
-        gap: 0; /* 간격 제거 (border 연결을 위해) */
+        gap: 0;
         padding: 0;
-        border-bottom: 2px solid #eee; /* 전체 밑줄 */
+        border-bottom: 2px solid #eee;
         position: relative;
     }
-
     .tab-btn {
         padding: 8px 12px;
         border-radius: 20px;
@@ -328,13 +318,10 @@
         color: #333;
         border-radius: 6px;
     }
-
     .sub-menu a:hover {
         background: #f2f6ff;
         color: #0b5ed7;
     }
-
-
     .tab-panels {
         padding: 14px;
     }
@@ -498,8 +485,8 @@
 
     .copy {
         display: flex;
-        flex-direction: column; /* 자식 요소들을 세로로 쌓음 */
-        align-items: center;    /* 수평(가로) 방향으로 중앙 정렬 */
+        flex-direction: column;
+        align-items: center;
         justify-content: center;
     }
 
@@ -534,15 +521,13 @@
         color: black;
     }
 
-    /* ==== 공통 우측 사용자 메뉴 (텍스트 2 + 노란 pill 1) ==== */
+    /* ==== 우측 사용자 메뉴 (텍스트+pill) ==== */
     .user-menu {
         display: flex;
         align-items: center;
         gap: 14px;
         margin-left: auto;
     }
-
-    /* 기본 텍스트 링크(마이페이지/장바구니) */
     .user-menu .user-link {
         display: inline-block;
         font-weight: 700;
@@ -553,10 +538,8 @@
     .user-menu .user-link:hover {
         color: var(--color-primary);
     }
-
-    /* 로그인만 노란 pill 버튼 */
     .user-menu .user-link.pill {
-        border: 2px solid var(--color-accent); /* 노란 테두리 */
+        border: 2px solid var(--color-accent);
         color: var(--color-accent);
         background: #fff;
         padding: 6px 14px;
@@ -567,31 +550,29 @@
         color: #fff;
     }
 
-    /* ==== 서점 스타일 네비게이션 바 ==== */
+    /* ============================
+       카테고리 네비게이션 (전체 분야)
+       ============================ */
     #category-nav {
         background: #fff;
         border-bottom: 1px solid #ddd;
         position: relative;
-        z-index: 100; /* 배너보다 위에 오도록 */
+        z-index: 100;
     }
-
     .nav-container {
         display: flex;
         align-items: center;
         height: 50px;
     }
-
-    /* 전체 분야 버튼 영역 */
     .all-menu-wrapper {
         position: relative;
         height: 100%;
-        width: 140px; /* 버튼 너비 */
+        width: 140px;
     }
-
     .all-menu-btn {
         width: 100%;
         height: 100%;
-        background: var(--color-primary); /* 브랜드 컬러 */
+        background: var(--color-primary);
         color: #fff;
         font-weight: 700;
         font-size: 16px;
@@ -600,34 +581,25 @@
         justify-content: center;
         gap: 8px;
         cursor: pointer;
-        display: flex;
-        flex-direction: row;
     }
-
-    /* 퀵 메뉴 (베스트셀러 등) */
     .quick-menu {
         display: flex;
         list-style: none;
         margin-left: 20px;
         gap: 24px;
     }
-
     .quick-menu a {
         color: #333;
         font-weight: 600;
         font-size: 15px;
     }
-
     .quick-menu a:hover {
         color: var(--color-primary);
     }
 
-    /* ==== 메가 메뉴 (드롭다운) ==== */
+    /* 메가 메뉴 컨테이너 */
     .mega-menu {
-        display: block; /* 공간을 차지하도록 변경 (visibility와 함께 사용 시 필수) */
-        visibility: hidden; /* 기본: 안 보임 */
-        opacity: 0;         /* 기본: 투명 */
-
+        display: none;
         position: absolute;
         top: 50px;
         left: 0;
@@ -638,174 +610,20 @@
         border-top: none;
         box-shadow: 0 10px 20px rgba(0,0,0,0.15);
         z-index: 1000;
-
-        /* [핵심] 마우스 뗐을 때 효과 */
-        /* opacity: 0.3초 동안 서서히 투명해짐 (단, 5초 뒤에 시작) */
-        /* visibility: 0초 만에 사라짐 (단, 5초 뒤에 시작) */
-        transition: visibility 0s linear 5s, opacity 0.3s ease 5s;
     }
-
-    .mega-menu.active {
-        visibility: visible;
-        opacity: 1;
-    }
-
-
-    .depth1 {
-        list-style: none;
-        height: 100%;
-        overflow-y: auto; /* 대분류가 많으면 스크롤 */
-        background: #fff;
-        border-right: 1px solid #ddd; /* 소분류와의 경계선 */
-    }
-
-    .depth1 > li {
-        width: 100%;
-    }
-
-    .depth1 > li > a {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 15px;
-        font-size: 14px;
-        color: #333;
-        text-decoration: none;
-        transition: background 0.1s;
-        border-bottom: 1px solid #f1f1f1; /* 항목 간 구분선 연하게 */
-    }
-
-    .depth1 > li > a:hover {
-        background: #f5f5f5;
-        color: var(--color-primary);
-        font-weight: 700;
-    }
-
-    .depth1 > li:hover > a {
-        background: #fff; /* 배경 흰색 유지 */
-        color: var(--color-primary); /* 글자색 변경 */
-        font-weight: 700;
-        /* 우측 테두리를 지워서 오른쪽 박스와 연결된 느낌 주기 */
-        position: relative;
-        z-index: 1001;
-        border-right: none;
-        box-shadow: -2px 0 0 inset var(--color-primary); /* 왼쪽 강조선 */
-    }
-
-    .depth1 > li:hover > a::after {
-        content: '';
-        position: absolute;
-        right: -2px;
-        top: 0;
-        bottom: 0;
-        width: 3px;
-        background: #fff; /* 소분류 배경과 같은 색 */
-    }
-
-    .arrow {
-        color: #ccc;
-        font-size: 12px;
-    }
-
-    /* ==== Depth 2 (우측으로 펼쳐짐) ==== */
-    .depth2 {
-        display: none;
-        position: absolute;
-        top: -1px; /* 테두리 두께만큼 보정 */
-        left: 199px; /* depth1 너비 - 1px (겹치게) */
-        width: 500px; /* 너비를 넓게 잡음 (2열 배치 위해) */
-        height: 520px; /* 부모 높이와 동일하게 */
-        background: #fff;
-        border: 1px solid #333; /* 외곽선 */
-        border-left: 1px solid #ddd; /* 평소에는 경계선 있음 */
-        padding: 25px 30px;
-        z-index: 1000;
-
-        /* 그리드 시스템 적용 */
-        grid-template-columns: repeat(2, 1fr); /* 2열 배치 */
-        grid-auto-rows: min-content; /* 내용물만큼만 높이 차지 */
-        gap: 15px 40px; /* 세로간격 15px, 가로간격 40px */
-    }
-
-    /* Depth 1 항목에 호버 시 Depth 2 등장 */
-    .depth1 > li:hover .depth2 {
-        display: flex;
-    }
-
-    .depth2 a {
-        color: #666;
-        font-size: 13px;
-        text-decoration: none;
-    }
-
-    .depth2 a:hover {
-        color: var(--color-primary);
-        text-decoration: underline;
-    }
-
-    .depth1 > li:hover .depth2 {
-        display: grid; /* flex 대신 grid 사용 */
-    }
-
-    /* 소분류 링크 스타일 */
-    .depth2 a {
-        color: #666;
-        font-size: 14px;
-        text-decoration: none;
-        padding: 2px 0;
-    }
-
-    .depth2 a:hover {
-        color: var(--color-primary);
-        text-decoration: underline;
-    }
-
-    /* (옵션) 소분류 내 제목 스타일 - HTML에 h4 등을 추가할 경우 */
-    .depth2 h4 {
-        grid-column: 1 / -1; /* 전체 너비 차지 */
-        font-size: 16px;
-        border-bottom: 2px solid #333;
-        padding-bottom: 10px;
-        margin-bottom: 15px;
-        color: #000;
-    }
-
-    /* =================================================================
-   [수정됨] UX 친화적 메가 메뉴 (배너 높이 제한 & 스크롤)
-   ================================================================= */
-
-    /* 1. 메가 메뉴 컨테이너 */
-    .mega-menu {
-        display: none;
-        position: absolute;
-        top: 50px; /* 네비게이션 바 바로 아래 */
-        left: 0;
-
-        /* [핵심 UX] 높이를 히어로 배너(슬라이드) 높이 정도로 고정 */
-        height: 400px;
-
-        width: 220px; /* 너비 */
-        background: #fff;
-        border: 1px solid #333;
-        border-top: none; /* 위쪽은 네비게이션과 연결된 느낌 */
-        box-shadow: 0 10px 20px rgba(0,0,0,0.15); /* 부드러운 그림자 */
-        z-index: 1000;
-    }
-
-    /* 호버 시 등장 */
+    /* 전체 분야에 마우스 올렸을 때 표시 */
     .all-menu-wrapper:hover .mega-menu {
         display: block;
     }
 
-    /* 2. 대분류 (Depth 1) - 스크롤 적용 */
+    /* 대분류(depth1) */
     .depth1 {
         list-style: none;
-        height: 100%; /* 부모 높이(400px) 꽉 채움 */
-        overflow-y: auto; /* 내용 넘치면 스크롤 발생 */
+        height: 100%;
+        overflow-y: auto;
         background: #fff;
+        border-right: 1px solid #ddd;
     }
-
-    /* 스크롤바 예쁘게 꾸미기 (Chrome, Safari, Edge) */
     .depth1::-webkit-scrollbar {
         width: 6px;
     }
@@ -816,128 +634,93 @@
     .depth1::-webkit-scrollbar-track {
         background-color: transparent;
     }
-
-
-    /* 대분류 아이템 스타일 */
     .depth1 > li > a {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 11px 16px; /* 간격 조정 */
+        padding: 11px 16px;
         font-size: 14px;
         color: #333;
         text-decoration: none;
         border-bottom: 1px solid #f5f5f5;
         transition: all 0.2s;
     }
-
-    /* 대분류 호버 효과 (서점 느낌: 진한 강조) */
     .depth1 > li:hover > a {
-        background: #f9f9f9; /* 배경 살짝 회색 */
-        color: var(--color-primary); /* 브랜드 컬러 */
+        background: #f9f9f9;
+        color: var(--color-primary);
         font-weight: 700;
-        padding-left: 20px; /* 살짝 오른쪽으로 이동하는 애니메이션 */
+        padding-left: 20px;
     }
-
-    /* 화살표 아이콘 */
     .arrow {
         font-size: 10px;
         color: #bbb;
-        transition: transform 0.2s;
+        transition: transform 0.2s, color 0.2s;
     }
     .depth1 > li:hover .arrow {
         color: var(--color-primary);
     }
 
-
-    /* 3. 소분류 (Depth 2) - 우측 팝업 */
+    /* 소분류(depth2) */
     .depth2 {
-        display: none; /* 기본 숨김 */
+        display: none;
         position: absolute;
-
-        /* [핵심] 대분류 박스 바로 옆에 붙임 */
         top: 0;
-        left: 219px; /* depth1 너비 - 1px */
-
-        /* [핵심] 높이도 대분류와 동일하게 400px 고정 */
+        left: 219px;
         height: 400px;
-        width: 600px; /* 가로로 넓게 (베스트셀러 안 가리고 배너 위만 덮음) */
-
+        width: 600px;
         background: #fff;
         border: 1px solid #333;
         border-left: 1px solid #eee;
         box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
-
         padding: 24px 30px;
-        overflow-y: auto; /* 소분류도 많으면 스크롤 */
-
-        /* 그리드 레이아웃: 3단 구성으로 변경하여 한눈에 들어오게 */
+        overflow-y: auto;
         grid-template-columns: repeat(3, 1fr);
         gap: 12px 20px;
-        align-content: start; /* 위에서부터 채움 */
+        align-content: start;
     }
-
-    /* 대분류 호버 시 소분류 등장 */
     .depth1 > li:hover .depth2 {
         display: grid;
     }
-
-    /* 소분류 타이틀 (h4) 스타일 */
     .depth2 h4 {
-        grid-column: 1 / -1; /* 전체 너비 */
+        grid-column: 1 / -1;
         font-size: 17px;
         font-weight: 800;
         color: #000;
         margin-bottom: 16px;
         padding-bottom: 12px;
-        border-bottom: 2px solid #333; /* 제목 밑줄 진하게 */
+        border-bottom: 2px solid #333;
     }
-
-    /* 소분류 링크 스타일 */
     .depth2 a {
-        display: block; /* [중요] 글자만 클릭되는게 아니라 박스 전체가 클릭되도록 */
-        width: 100%;    /* 셀 전체 너비 차지 */
-        padding: 8px 12px; /* [중요] 클릭 영역(Hit Area) 확장 */
-
+        display: block;
+        width: 100%;
+        padding: 8px 12px;
         font-size: 14px;
         color: #555;
         text-decoration: none;
-        border-radius: 6px; /* 모서리 둥글게 */
-        transition: all 0.15s ease-in-out; /* 부드러운 애니메이션 */
-
-        /* 텍스트 줄바꿈 방지 */
+        border-radius: 6px;
+        transition: all 0.15s ease-in-out;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
-
-    /* 링크 앞에 작은 점(Bullet) 추가하여 리스트 느낌 */
     .depth2 a::before {
         content: '·';
         margin-right: 6px;
         font-weight: bold;
-        color: #ddd; /* 평소에는 흐리게 */
+        color: #ddd;
         transition: color 0.15s;
     }
-
-    /* [UX 개선] 호버 시 '버튼'처럼 확실한 피드백 제공 */
     .depth2 a:hover {
-        background-color: #f2f8ff; /* 연한 파란색 배경 */
-        color: var(--color-primary); /* 글자색 진한 파랑 */
+        background-color: #f2f8ff;
+        color: var(--color-primary);
         font-weight: 700;
-        transform: translateX(3px); /* 오른쪽으로 살짝 이동하는 느낌 */
+        transform: translateX(3px);
     }
-
     .depth2 a:hover::before {
         color: var(--color-primary);
     }
-
-    /*.icon{*/
-    /*    cursor: pointer;*/
-    /*    transition-delay: ;*/
-    /*}*/
-
 </style>
+
 <body>
 <!-- 헤더 -->
 <header id="header" role="banner">
@@ -963,7 +746,6 @@
         </nav>
 
         <div class="user-menu">
-            <!-- 쿠폰 -->
             <a class="user-link" href="/coupon">
                 <img th:src="@{/img/icon-coupon.png}" alt="쿠폰" class="user-icon" />
             </a>
@@ -980,98 +762,344 @@
     </div>
 </header>
 
+<!-- 카테고리 네비게이션 -->
 <nav id="category-nav">
     <div class="container nav-container">
+        <!-- 왼쪽: 전체 분야 + 메가메뉴 -->
         <div class="all-menu-wrapper">
-            <button class="all-menu-btn" id="menuBtn">
+            <button class="all-menu-btn" type="button">
                 <span class="icon">☰</span> 전체 분야
             </button>
 
-            <div class="mega-menu" id="megaMenu"> </div>
-
+            <!-- 메가메뉴 (hover 시 표시) -->
             <div class="mega-menu">
                 <ul class="depth1">
+                    <!-- 1. 소설/시/희곡 (categoryId = 1) -->
                     <li>
-                        <a href="#">소설/시/희곡 <span class="arrow">›</span></a>
+                        <a th:href="@{/search(
+                            searchType='CATEGORY',
+                            categoryId=1,
+                            categoryName='소설/시/희곡',
+                            sort='POPULAR',
+                            page=0
+                        )}">
+                            소설/시/희곡 <span class="arrow">›</span>
+                        </a>
                         <div class="depth2">
-                            <h4 style="grid-column: 1/-1; padding-bottom:10px; border-bottom:2px solid #333; margin-bottom:10px;">소설/시/희곡</h4>
+                            <h4>소설/시/희곡</h4>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=101,
+                                categoryName='한국소설',
+                                sort='POPULAR',
+                                page=0
+                            )}">한국소설</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=102,
+                                categoryName='영미소설',
+                                sort='POPULAR',
+                                page=0
+                            )}">영미소설</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=103,
+                                categoryName='일본소설',
+                                sort='POPULAR',
+                                page=0
+                            )}">일본소설</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=104,
+                                categoryName='추리/미스터리',
+                                sort='POPULAR',
+                                page=0
+                            )}">추리/미스터리</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=105,
+                                categoryName='공포/스릴러',
+                                sort='POPULAR',
+                                page=0
+                            )}">공포/스릴러</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=106,
+                                categoryName='SF소설',
+                                sort='POPULAR',
+                                page=0
+                            )}">SF소설</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=107,
+                                categoryName='판타지소설',
+                                sort='POPULAR',
+                                page=0
+                            )}">판타지소설</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=108,
+                                categoryName='로맨스소설',
+                                sort='POPULAR',
+                                page=0
+                            )}">로맨스소설</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=109,
+                                categoryName='시/에세이',
+                                sort='POPULAR',
+                                page=0
+                            )}">시/에세이</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=110,
+                                categoryName='희곡/연극',
+                                sort='POPULAR',
+                                page=0
+                            )}">희곡/연극</a>
+                        </div>
+                    </li>
 
-                            <a href="#">한국소설</a>
-                            <a href="#">영미소설</a>
-                            <a href="#">일본소설</a>
-                            <a href="#">추리/미스터리</a>
-                            <a href="#">공포/스릴러</a>
-                            <a href="#">SF소설</a>
-                            <a href="#">판타지소설</a>
-                            <a href="#">로맨스소설</a>
-                            <a href="#">시/에세이</a>
-                            <a href="#">희곡/연극</a>
-                        </div>
-                    </li>
+                    <!-- 2. 경제/경영 (categoryId = 2) -->
                     <li>
-                        <a href="#">경제/경영 <span class="arrow">›</span></a>
+                        <a th:href="@{/search(
+                            searchType='CATEGORY',
+                            categoryId=2,
+                            categoryName='경제/경영',
+                            sort='POPULAR',
+                            page=0
+                        )}">
+                            경제/경영 <span class="arrow">›</span>
+                        </a>
                         <div class="depth2">
-                            <a href="#">경제이론</a>
-                            <a href="#">경영일반</a>
-                            <a href="#">투자/재테크</a>
-                            <a href="#">마케팅</a>
-                        </div>
-                    </li>
-                    <li>
-                        <a href="#">IT/모바일 <span class="arrow">›</span></a>
-                        <div class="depth2">
-                            <a href="#">프로그래밍</a>
-                            <a href="#">OS/데이터베이스</a>
-                            <a href="#">웹디자인</a>
-                        </div>
-                    </li>
-                    <li>
-                        <a href="#">인문/사회</a>
-                        <div class="depth2">
-                            <a href="#">여행</a>
-                            <a href="#">심리</a>
-                            <a href="#">철학</a>
-                            <a href="#">역사</a>
-                            <a href="#">정치</a>
-                            <a href="#">요리</a>
-                            <a href="#">종교</a>
-                        </div>
-                    </li>
-
-                    <li>
-                        <a href="#">유아/아동</a>
-                        <div class="depth2">
-                            <a href="#">그림책</a>
-                            <a href="#">만화</a>
-                        </div>
-                    </li>
-                    <li>
-                        <a href="#">수험서/자격증</a>
-                        <div class="depth2">
-                            <a href="#">토익</a>
-                            <a href="#">토플</a>
+                            <h4>경제/경영</h4>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=201,
+                                categoryName='경제이론',
+                                sort='POPULAR',
+                                page=0
+                            )}">경제이론</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=202,
+                                categoryName='경영일반',
+                                sort='POPULAR',
+                                page=0
+                            )}">경영일반</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=203,
+                                categoryName='투자/재테크',
+                                sort='POPULAR',
+                                page=0
+                            )}">투자/재테크</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=204,
+                                categoryName='마케팅',
+                                sort='POPULAR',
+                                page=0
+                            )}">마케팅</a>
                         </div>
                     </li>
 
+                    <!-- 3. IT/모바일 (categoryId = 3) -->
                     <li>
-                        <a href="#">자연/과학</a>
+                        <a th:href="@{/search(
+                            searchType='CATEGORY',
+                            categoryId=3,
+                            categoryName='IT/모바일',
+                            sort='POPULAR',
+                            page=0
+                        )}">
+                            IT/모바일 <span class="arrow">›</span>
+                        </a>
                         <div class="depth2">
-                            <a href="#">공학</a>
-                            <a href="#">수학</a>
+                            <h4>IT/모바일</h4>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=301,
+                                categoryName='프로그래밍',
+                                sort='POPULAR',
+                                page=0
+                            )}">프로그래밍</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=302,
+                                categoryName='OS/데이터베이스',
+                                sort='POPULAR',
+                                page=0
+                            )}">OS/데이터베이스</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=303,
+                                categoryName='웹디자인',
+                                sort='POPULAR',
+                                page=0
+                            )}">웹디자인</a>
                         </div>
                     </li>
 
+                    <!-- 4. 인문/사회 (categoryId = 4) -->
                     <li>
-                        <a href="#">건강/취미</a>
+                        <a th:href="@{/search(
+                            searchType='CATEGORY',
+                            categoryId=4,
+                            categoryName='인문/사회',
+                            sort='POPULAR',
+                            page=0
+                        )}">
+                            인문/사회 <span class="arrow">›</span>
+                        </a>
                         <div class="depth2">
-                            <a href="#">운동/피트니스</a>
-                            <a href="#">등산</a>
+                            <h4>인문/사회</h4>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=401,
+                                categoryName='여행',
+                                sort='POPULAR',
+                                page=0
+                            )}">여행</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=402,
+                                categoryName='심리',
+                                sort='POPULAR',
+                                page=0
+                            )}">심리</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=403,
+                                categoryName='철학',
+                                sort='POPULAR',
+                                page=0
+                            )}">철학</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=404,
+                                categoryName='역사',
+                                sort='POPULAR',
+                                page=0
+                            )}">역사</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=405,
+                                categoryName='정치',
+                                sort='POPULAR',
+                                page=0
+                            )}">정치</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=406,
+                                categoryName='요리',
+                                sort='POPULAR',
+                                page=0
+                            )}">요리</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=407,
+                                categoryName='종교',
+                                sort='POPULAR',
+                                page=0
+                            )}">종교</a>
+                        </div>
+                    </li>
+
+                    <!-- 5. 유아/아동 (categoryId = 5) -->
+                    <li>
+                        <a th:href="@{/search(
+                            searchType='CATEGORY',
+                            categoryId=5,
+                            categoryName='유아/아동',
+                            sort='POPULAR',
+                            page=0
+                        )}">
+                            유아/아동 <span class="arrow">›</span>
+                        </a>
+                        <div class="depth2">
+                            <h4>유아/아동</h4>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=501,
+                                categoryName='그림책',
+                                sort='POPULAR',
+                                page=0
+                            )}">그림책</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=502,
+                                categoryName='만화',
+                                sort='POPULAR',
+                                page=0
+                            )}">만화</a>
+                        </div>
+                    </li>
+
+                    <!-- 6. 수험서/자격증 (categoryId = 6) -->
+                    <li>
+                        <a th:href="@{/search(
+                            searchType='CATEGORY',
+                            categoryId=6,
+                            categoryName='수험서/자격증',
+                            sort='POPULAR',
+                            page=0
+                        )}">
+                            수험서/자격증 <span class="arrow">›</span>
+                        </a>
+                        <div class="depth2">
+                            <h4>수험서/자격증</h4>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=601,
+                                categoryName='토익',
+                                sort='POPULAR',
+                                page=0
+                            )}">토익</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=602,
+                                categoryName='토플',
+                                sort='POPULAR',
+                                page=0
+                            )}">토플</a>
+                        </div>
+                    </li>
+
+                    <!-- 7. 자연/과학 (categoryId = 7) -->
+                    <li>
+                        <a th:href="@{/search(
+                            searchType='CATEGORY',
+                            categoryId=7,
+                            categoryName='자연/과학',
+                            sort='POPULAR',
+                            page=0
+                        )}">
+                            자연/과학 <span class="arrow">›</span>
+                        </a>
+                        <div class="depth2">
+                            <h4>자연/과학</h4>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=701,
+                                categoryName='공학',
+                                sort='POPULAR',
+                                page=0
+                            )}">공학</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=702,
+                                categoryName='수학',
+                                sort='POPULAR',
+                                page=0
+                            )}">수학</a>
                         </div>
                     </li>
                 </ul>
             </div>
         </div>
 
+        <!-- 오른쪽: 퀵 메뉴 -->
         <ul class="quick-menu">
             <li><a href="#">베스트셀러</a></li>
             <li><a href="#">신간도서</a></li>
@@ -1084,33 +1112,16 @@
         <!-- 히어로 배너 -->
         <section class="hero" aria-label="프로모션 배너">
             <div class="slides" id="slides">
-                <!-- slide 1 -->
                 <article class="slide" aria-roledescription="slide">
-                    <!--                    <div class="copy">-->
-                    <!--                       <div>이 책을 덮는 순간, '어제의 나'와 작별하게 될 겁니다</div>-->
-                    <!--                       <img src="/img/위로의 방식.jpg"-->
-                    <!--                            width="700" height="500">-->
-                    <!--                    </div>-->
-                    <div>
-
-                    </div>
+                    <div></div>
                 </article>
-                <!-- slide 2 -->
                 <article class="slide" aria-roledescription="slide">
-                    <div class="copy">
-
-                    </div>
-                    <div>
-
-                    </div>
+                    <div class="copy"></div>
+                    <div></div>
                 </article>
-                <!-- slide 3 -->
                 <article class="slide" aria-roledescription="slide">
-                    <div class="copy">
-                    </div>
-                    <div>
-
-                    </div>
+                    <div class="copy"></div>
+                    <div></div>
                 </article>
             </div>
             <div class="nav" aria-label="슬라이드 위치 표시">
@@ -1120,184 +1131,156 @@
             </div>
         </section>
 
-
         <!-- 베스트셀러 -->
-
         <section class="section" aria-labelledby="best-title">
             <div class="head">
                 <h3 id="best-title">베스트셀러 👍</h3>
-                <a class="more" href="#"></a>
                 <a class="more" href="/books/new">더보기</a>
             </div>
             <div class="card-grid" id="best-grid">
-                <!-- 샘플 카드 5개 -->
                 <article class="card">
                     <div class="thumb">
-                        <!-- [수정됨] th:src="@{/img/...}" -->
                         <img th:src="@{/img/book2.jpeg}" alt="트랜드 코리아 2026 표지" />
                     </div>
                     <div class="info">
                         <div class="title">트랜드 코리아 2026</div>
                         <div class="meta">김난도 외 · 2025</div>
                         <div class="price-row">
-                  <span class="price">₩20,000</span
-                  ><span class="badge">10%↓</span>
+                            <span class="price">₩20,000</span>
+                            <span class="badge">10%↓</span>
                         </div>
                     </div>
                 </article>
                 <article class="card">
                     <div class="thumb">
-                        <!-- [수정됨] th:src="@{/img/...}" -->
-                        <img
-                                th:src="@{/img/book3.jpeg}"
-                                alt="처음 만나는 양자의 세계 표지"
-                        />
+                        <img th:src="@{/img/book3.jpeg}" alt="처음 만나는 양자의 세계 표지" />
                     </div>
                     <div class="info">
                         <div class="title">처음 만나는 양자의 세계</div>
                         <div class="meta">채은미 · 2025</div>
                         <div class="price-row">
-                  <span class="price">₩19,000</span
-                  ><span class="badge">베스트</span>
+                            <span class="price">₩19,000</span>
+                            <span class="badge">베스트</span>
                         </div>
                     </div>
                 </article>
                 <article class="card">
                     <div class="thumb">
-                        <!-- [수정됨] th:src="@{/img/...}" -->
-                        <img
-                                th:src="@{/img/book4.jpeg}"
-                                alt="대형주 추세추종 투자법칙 표지"
-                        />
+                        <img th:src="@{/img/book4.jpeg}" alt="대형주 추세추종 투자법칙 표지" />
                     </div>
                     <div class="info">
                         <div class="title">대형주 추세추종 투자법칙</div>
                         <div class="meta">이종호(전황) · 2025</div>
                         <div class="price-row">
-                  <span class="price">₩22,000</span
-                  ><span class="badge">키즈</span>
+                            <span class="price">₩22,000</span>
+                            <span class="badge">키즈</span>
                         </div>
                     </div>
                 </article>
                 <article class="card">
                     <div class="thumb">
-                        <!-- [수정됨] th:src="@{/img/...}" -->
                         <img th:src="@{/img/book5.jpeg}" alt="위버맨쉬 표지" />
                     </div>
                     <div class="info">
                         <div class="title">위버맨쉬</div>
                         <div class="meta">프리드리히 니체 · 2025</div>
                         <div class="price-row">
-                  <span class="price">₩17,800</span
-                  ><span class="badge">IT</span>
+                            <span class="price">₩17,800</span>
+                            <span class="badge">IT</span>
                         </div>
                     </div>
                 </article>
                 <article class="card">
                     <div class="thumb">
-                        <!-- [수정됨] th:src="@{/img/...}" -->
                         <img th:src="@{/img/book6.jpeg}" alt="박곰희 연금 부자수업 표지" />
                     </div>
                     <div class="info">
                         <div class="title">박곰희 연금 부자수업</div>
                         <div class="meta">박곰희 · 2025</div>
                         <div class="price-row">
-                  <span class="price">₩21,000</span
-                  ><span class="badge">인기</span>
+                            <span class="price">₩21,000</span>
+                            <span class="badge">인기</span>
                         </div>
                     </div>
                 </article>
             </div>
         </section>
 
-
-        <section class="section" aria-labelledby="best-title">
+        <section class="section" aria-labelledby="best-title2">
             <div class="head">
                 <h3 id="best-title2">주간 인기 급상승 🔥</h3>
-                <a class="more" href="#"></a>
             </div>
             <div class="card-grid" id="best-grid2">
-                <!-- 샘플 카드 5개 -->
+                <!-- 샘플 동일 -->
                 <article class="card">
                     <div class="thumb">
-                        <!-- [수정됨] th:src="@{/img/...}" -->
                         <img th:src="@{/img/book2.jpeg}" alt="트랜드 코리아 2026 표지" />
                     </div>
                     <div class="info">
                         <div class="title">트랜드 코리아 2026</div>
                         <div class="meta">김난도 외 · 2025</div>
                         <div class="price-row">
-                  <span class="price">₩20,000</span
-                  ><span class="badge">10%↓</span>
+                            <span class="price">₩20,000</span>
+                            <span class="badge">10%↓</span>
                         </div>
                     </div>
                 </article>
                 <article class="card">
                     <div class="thumb">
-                        <!-- [수정됨] th:src="@{/img/...}" -->
-                        <img
-                                th:src="@{/img/book3.jpeg}"
-                                alt="처음 만나는 양자의 세계 표지"
-                        />
+                        <img th:src="@{/img/book3.jpeg}" alt="처음 만나는 양자의 세계 표지" />
                     </div>
                     <div class="info">
                         <div class="title">처음 만나는 양자의 세계</div>
                         <div class="meta">채은미 · 2025</div>
                         <div class="price-row">
-                  <span class="price">₩19,000</span
-                  ><span class="badge">베스트</span>
+                            <span class="price">₩19,000</span>
+                            <span class="badge">베스트</span>
                         </div>
                     </div>
                 </article>
                 <article class="card">
                     <div class="thumb">
-                        <!-- [수정됨] th:src="@{/img/...}" -->
-                        <img
-                                th:src="@{/img/book4.jpeg}"
-                                alt="대형주 추세추종 투자법칙 표지"
-                        />
+                        <img th:src="@{/img/book4.jpeg}" alt="대형주 추세추종 투자법칙 표지" />
                     </div>
                     <div class="info">
                         <div class="title">대형주 추세추종 투자법칙</div>
                         <div class="meta">이종호(전황) · 2025</div>
                         <div class="price-row">
-                  <span class="price">₩22,000</span
-                  ><span class="badge">키즈</span>
+                            <span class="price">₩22,000</span>
+                            <span class="badge">키즈</span>
                         </div>
                     </div>
                 </article>
                 <article class="card">
                     <div class="thumb">
-                        <!-- [수정됨] th:src="@{/img/...}" -->
                         <img th:src="@{/img/book5.jpeg}" alt="위버맨쉬 표지" />
                     </div>
                     <div class="info">
                         <div class="title">위버맨쉬</div>
                         <div class="meta">프리드리히 니체 · 2025</div>
                         <div class="price-row">
-                  <span class="price">₩17,800</span
-                  ><span class="badge">IT</span>
+                            <span class="price">₩17,800</span>
+                            <span class="badge">IT</span>
                         </div>
                     </div>
                 </article>
                 <article class="card">
                     <div class="thumb">
-                        <!-- [수정됨] th:src="@{/img/...}" -->
                         <img th:src="@{/img/book6.jpeg}" alt="박곰희 연금 부자수업 표지" />
                     </div>
                     <div class="info">
                         <div class="title">박곰희 연금 부자수업</div>
                         <div class="meta">박곰희 · 2025</div>
                         <div class="price-row">
-                  <span class="price">₩21,000</span
-                  ><span class="badge">인기</span>
+                            <span class="price">₩21,000</span>
+                            <span class="badge">인기</span>
                         </div>
                     </div>
                 </article>
             </div>
         </section>
 
-        <!-- 신간/추천 2열 -->
+        <!-- 이달의 신간 -->
         <section class="section" aria-label="신간 및 추천">
             <div class="head">
                 <h3>이달의 신간 📚</h3>
@@ -1305,14 +1288,13 @@
             </div>
 
             <div class="card-grid" style="grid-template-columns: repeat(5, 1fr)">
-
                 <div th:if="${newBooks == null or newBooks.isEmpty()}"
                      style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">
                     <p>준비된 신간 도서가 없습니다.</p>
                 </div>
 
                 <article class="card" th:unless="${newBooks == null}" th:each="book : ${newBooks}">
-                    <a th:href="@{/books/{id}(id=${book.id})}" class="book-link" style="display:block; color:inherit;">
+                    <a th:href="@{/book/{id}(id=${book.id})}" class="book-link" style="display:block; color:inherit;">
                         <div class="thumb">
                             <img th:src="${book.image}"
                                  th:alt="${book.image}"
@@ -1326,10 +1308,8 @@
                                 <span th:text="${book.publisher}">출판사</span> ·
                                 <span th:text="${#strings.replace(#strings.substring(book.publishedDate, 0, 7), '-', '.')}">2024.03</span>
                             </div>
-
                             <div class="price-row">
                                 <span class="price" th:text="|${#numbers.formatInteger(book.price, 0, 'COMMA')}|">₩15,000</span>
-
                                 <span class="badge" style="background-color: #e9c46a; color: #333;">NEW</span>
                             </div>
                         </div>
@@ -1377,7 +1357,7 @@
     );
     setInterval(() => go(idx + 1), 5000);
 
-    // 탭
+    // 탭 (현재는 탭 버튼이 없어도 에러 나지 않도록 방어)
     const tabBtns = document.querySelectorAll(".tab-btn");
     const panels = {
         domestic: document.getElementById("panel-domestic"),
@@ -1389,46 +1369,6 @@
         human: document.getElementById("panel-human"),
         self: document.getElementById("panel-self"),
     };
-    tabBtns.forEach((btn) => {
-        btn.addEventListener("click", () => {
-            tabBtns.forEach((b) => b.setAttribute("aria-selected", "false"));
-            btn.setAttribute("aria-selected", "true");
-            Object.values(panels).forEach((p) => (p.hidden = true));
-            const key = btn.dataset.tab;
-            const panel = panels[key];
-            if (panel) {
-                panel.hidden = false;
-                // 필요 시 비어있는 패널에 동적 항목 예시 주입
-                if (!panel.dataset.filled) {
-                    for (let i = 0; i < 8; i++) {
-                        const a = document.createElement("a");
-                        a.className = "cat";
-                        a.href = "#";
-                        a.innerHTML = `<div class="thumb">CAT</div><span>${
-                            btn.textContent
-                        } ${i + 1}</span>`;
-                        panel.appendChild(a);
-                    }
-                    panel.dataset.filled = "1";
-                }
-            }
-        });
-    });
-
-    // // 검색 버튼(데모용)
-    // document
-    //     .querySelector(".search-box button")
-    //     .addEventListener("click", () => {
-    //         const q = document.querySelector(".search-box input").value.trim();
-    //         if (!q) {
-    //             alert("검색어를 입력해 주세요.");
-    //             return;
-    //         }
-    //         // 실제 서비스에서는 /search?q= 로 라우팅
-    //         alert(`검색: ${q}`);
-    //     });
-
-
     const subCategories = {
         domestic: [
             { name: "소설", link: "#", thumb: "소설" },
@@ -1443,32 +1383,22 @@
         foreign: [
             { name: "영미소설", link: "#", thumb: "영미소설" },
             { name: "일본도서", link: "#", thumb: "일본도서" },
-            // ... 나머지 외국도서 항목
         ]
     };
 
-    // 탭 클릭 이벤트 수정
     tabBtns.forEach((btn) => {
         btn.addEventListener("click", () => {
-            // 탭 선택 표시 로직 (기존)
             tabBtns.forEach((b) => b.setAttribute("aria-selected", "false"));
             btn.setAttribute("aria-selected", "true");
-
-            // 패널 숨김 로직 (기존)
-            Object.values(panels).forEach((p) => (p.hidden = true));
+            Object.values(panels).forEach((p) => p && (p.hidden = true));
 
             const key = btn.dataset.tab;
             const panel = panels[key];
 
             if (panel) {
                 panel.hidden = false;
-
-                // ⚠️ 동적 주입 로직 (수정된 부분)
-                // 이미 패널에 항목이 있으면 DOM 조작을 최소화하기 위해 건너뛰고,
-                // '국내도서'는 HTML에 이미 채워져 있으므로 건너뜁니다.
                 if (key !== 'domestic' && subCategories[key] && !panel.dataset.filled) {
-                    panel.innerHTML = ''; // 기존 임시 내용 삭제
-
+                    panel.innerHTML = '';
                     subCategories[key].forEach(cat => {
                         const a = document.createElement("a");
                         a.className = "cat";
@@ -1476,28 +1406,23 @@
                         a.innerHTML = `<div class="thumb">${cat.thumb}</div><span>${cat.name}</span>`;
                         panel.appendChild(a);
                     });
-                    panel.dataset.filled = "1"; // 채웠음을 표시
+                    panel.dataset.filled = "1";
                 }
             }
         });
     });
 
-    // [추가됨] 페이지 로드 시 뱃지 업데이트 + 뒤로가기 대응
+    // 장바구니 뱃지
     document.addEventListener("DOMContentLoaded", () => {
         updateCartBadge();
     });
-
     window.addEventListener("pageshow", (event) => {
         if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
             updateCartBadge();
         }
     });
-
-    // ==========================================
-    // [추가됨] 뱃지 카운트 로직 (서버 API 호출)
-    // ==========================================
     function updateCartBadge() {
-        fetch('/cart/count', {
+        fetch('/api/cart/count', {
             method: 'GET',
             headers: {'Content-Type': 'application/json'}
         })
@@ -1509,7 +1434,7 @@
                 const badge = document.getElementById('cartBadge');
                 if (badge) {
                     badge.textContent = count || 0;
-                    badge.style.display = 'block'; // 0이어도 무조건 표시
+                    badge.style.display = 'block';
                 }
             })
             .catch(err => {
@@ -1521,76 +1446,6 @@
                 }
             });
     }
-
-    const menuBtn = document.getElementById('menuBtn');
-    const menu = document.getElementById('all-menu');
-    let closeTimer = null; // 5초 타이머 저장 변수
-
-    // 1. 버튼 클릭 시 메뉴 열기/닫기 (토글)
-    menuBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // 이벤트가 부모로 전파되는 것 방지
-
-        if (menuBtn.classList.contains('active')) {
-            // 이미 열려있으면 닫기
-            closeMenu();
-        } else {
-            // 닫혀있으면 열기
-            openMenu();
-        }
-    });
-
-    // 2. 메뉴 영역에 마우스가 들어오면? -> 닫히지 않게 타이머 취소
-    menuBtn.addEventListener('mouseenter', () => {
-        if (closeTimer) {
-            clearTimeout(closeTimer);
-            closeTimer = null;
-        }
-    });
-
-    // 3. 메뉴 영역에서 마우스가 나가면? -> 5초 뒤에 닫기 예약
-    menu.addEventListener('mouseleave', () => {
-        startCloseTimer();
-    });
-
-    // 4. 버튼에서 마우스가 나가도 -> 5초 뒤에 닫기 예약
-    menuBtn.addEventListener('mouseleave', () => {
-        startCloseTimer();
-    });
-
-    // 5. 버튼에 다시 마우스 올리면 -> 닫기 취소
-    menuBtn.addEventListener('mouseenter', () => {
-        if (closeTimer) {
-            clearTimeout(closeTimer);
-            closeTimer = null;
-        }
-    });
-
-
-    openMenu=()=>{
-        menuBtn.classList.add('active')
-        if (closeTimer) clearTimeout(closeTimer);
-    }
-
-    closeMenu=()=>{
-       menuBtn.classList.remove('active');
-        if (closeTimer) clearTimeout(closeTimer);
-    }
-
-    document.addEventListener('click', (e) => {
-        if (!menuBtn.contains(e.target) && e.target !== menuBtn) {
-            closeMenu();
-        }
-    });
-
-    function startCloseTimer() {
-        if (menuBtn.classList.contains('active')) {
-            closeTimer = setTimeout(() => {
-                closeMenu();
-            }, 1000); // 5000ms = 5초
-        }
-    }
-
-
 </script>
 </body>
 </html>
