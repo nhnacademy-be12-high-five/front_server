@@ -1,168 +1,243 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://js.tosspayments.com/v1"></script>
     <title>HIGH-FIVE 도서 | 결제하기</title>
-      <link rel="stylesheet" href="/order-css/payment.css">
-  </head>
-  <body>
-    <!-- ===== 헤더 ===== -->
-    <header id="header" role="banner">
-        <div class="container">
-            <a href="./payment.html" class="logo">
-                <img src="../img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100" />
-                <div class="brand">HIGH-FIVE BOOKS</div>
+    <script src="https://js.tosspayments.com/v1/payment"></script>
+    <link rel="stylesheet" href="/order-css/payment.css">
+    <style>
+        /* 로딩 스피너 스타일 */
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+<header id="header" role="banner">
+    <div class="container">
+        <a href="/main" class="logo">
+            <img src="../img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100" />
+            <div class="brand">HIGH-FIVE BOOKS</div>
+        </a>
+
+        <nav class="gnb" aria-label="주요 메뉴">
+            <div class="search-box" role="search">
+                <input
+                        type="search"
+                        placeholder="도서명, 저자, ISBN, 태그 검색"
+                        aria-label="통합 검색"
+                />
+                <button class="search-btn" aria-label="검색">검색</button>
+            </div>
+        </nav>
+
+        <div class="user-menu">
+            <!-- 쿠폰 -->
+            <a class="user-link" href="/coupon">
+                <img src="../img/icon-coupon.png" alt="쿠폰" class="user-icon" />
+            </a>
+            <!-- 마이페이지 -->
+            <a class="user-link" href="/mypage">
+                <img src="../img/icon-mypage.png" alt="마이페이지" class="user-icon" />
+            </a>
+            <!-- 장바구니 -->
+            <a class="user-link" href="/cart">
+                <img src="../img/icon-cart.png" alt="장바구니" class="user-icon" />
             </a>
 
-            <nav class="gnb" aria-label="주요 메뉴">
-                <div class="search-box" role="search">
-                    <input
-                            type="search"
-                            placeholder="도서명, 저자, ISBN, 태그 검색"
-                            aria-label="통합 검색"
-                    />
-                    <button class="search-btn" aria-label="검색">검색</button>
-                </div>
-            </nav>
-
-            <div class="user-menu">
-                <!-- 쿠폰 -->
-                <a class="user-link" href="/coupon">
-                    <img src="../img/icon-coupon.png" alt="쿠폰" class="user-icon" />
-                </a>
-
-                <!-- 마이페이지 -->
-                <a class="user-link" href="/mypage">
-                    <img src="../img/icon-mypage.png" alt="마이페이지" class="user-icon" />
-                </a>
-
-                <!-- 장바구니 -->
-                <a class="user-link" href="/cart">
-                    <img src="../img/icon-cart.png" alt="장바구니" class="user-icon" />
-                </a>
-
-                <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
-            </div>
-
+            <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
         </div>
-    </header>
+    </div>
+</header>
 
-    <!-- ===== 본문 ===== -->
-    <main>
-      <div class="container">
+<main>
+    <div class="container">
         <h1 style="font-size: 22px; margin-bottom: 12px">결제하기</h1>
 
         <div class="pay-wrap">
-          <!-- 좌: 결제수단 선택 -->
-          <section class="panel">
-            <div class="hd">결제 수단</div>
-            <div class="bd">
-              <div class="tabs" id="payTabs">
-                <button class="tab" data-key="account">계좌이체</button>
-                <button th:each="method : ${paymentMethods}"
-                        class="tab"
-                        th:classappend="${currentKey == method.key} ? 'active' : ''"
-                        th:data-key="${method.key}">
-                  <span th:text="${method.label}">토스결제</span>
-                </button>
-              </div>
+            <section class="panel">
+                <div class="hd">결제 수단 선택</div>
+                <div class="bd">
+                    <div class="tabs" id="payTabs">
+                        <p th:if="${#lists.isEmpty(paymentMethods)}" style="padding:10px; color:red;">
+                            사용 가능한 결제 수단이 없습니다.
+                        </p>
 
-              <div class="pay-content" id="payContent">
-                신용카드로 결제합니다. (예: 카드사/할부 선택 UI는 추후 연동)
-              </div>
+                        <button th:each="method, methodStat : ${paymentMethods}"
+                                class="tab"
+                                th:classappend="${methodStat.first} ? 'active'"
+                                th:attr="data-code=${method.name}, data-alias=${method.alias}"
+                                th:onclick="selectMethod(this)"
+                                th:text="${method.alias}">
+                        </button>
+                    </div>
 
-              <div class="amount">
-                <span class="label">최종 결제 금액</span>
-                <strong class="value" id="finalAmount">38,700원</strong>
-              </div>
+                    <div class="pay-content" id="payContent">
+                        <p id="method-desc">결제 수단을 선택해주세요.</p>
+                    </div>
 
-              <button class="button" style="margin-top: 30px" onclick="requestPayment()">결제하기</button>
+                    <div class="amount">
+                        <span class="label">최종 결제 금액</span>
+                        <strong class="value" th:text="${#numbers.formatInteger(amount, 0, 'COMMA') + '원'}">50,000원</strong>
+                    </div>
 
-            </div>
-          </section>
+                    <button class="pay-btn" onclick="requestPayment()">결제하기</button>
+                </div>
+            </section>
 
-          <!-- 우: 주문 요약(간단) -->
-          <aside class="panel summary">
-            <div class="hd">주문 요약</div>
-            <div class="bd">
-              <div class="row">
-                <span>상품금액</span><span id="sumProducts">35,700원</span>
-              </div>
-              <div class="row">
-                <span>배송비</span><span id="sumShipping">3,000원</span>
-              </div>
-              <div class="row">
-                <span>할인</span><span id="sumDiscount">0원</span>
-              </div>
-              <div class="row">
-                <span class="big">결제예정금액</span
-                ><span class="big" id="sumTotal">38,700원</span>
-              </div>
-              <p
-                style="
-                  margin-top: 10px;
-                  color: var(--color-text-light);
-                  font-size: 13px;
-                "
-              >
-                2만 원 이상 무료배송 (기본 3,000원)
-              </p>
-            </div>
-          </aside>
+            <aside class="panel summary">
+                <div class="hd">주문 정보</div>
+                <div class="bd">
+                    <div class="row">
+                        <span>주문명</span>
+                        <span th:text="${orderName}" style="text-align:right;">책 제목 외</span>
+                    </div>
+                    <div class="row">
+                        <span>주문자</span>
+                        <span th:text="${customerName}">홍길동</span>
+                    </div>
+                    <div class="row">
+                        <span class="big">총 금액</span>
+                        <span class="big" th:text="${#numbers.formatInteger(amount, 0, 'COMMA') + '원'}">50,000원</span>
+                    </div>
+                </div>
+            </aside>
         </div>
-      </div>
-    </main>
+    </div>
+</main>
 
-    <!-- ===== 푸터 ===== -->
-    <footer id="footer">
-      <div class="container">
+<div id="loading-overlay">
+    <div class="spinner"></div>
+    <p style="margin-top: 15px; font-weight: bold;">결제 진행 중...</p>
+</div>
+
+<footer id="footer" role="contentinfo">
+    <div class="container">
         <div class="footer-links">
-          <a href="#">회사소개</a>
-          <a href="#">이용약관</a>
-          <a href="#"><strong>개인정보처리방침</strong></a>
-          <a href="#">고객센터</a>
+            <a href="#">회사소개</a>
+            <a href="#">이용약관</a>
+            <a href="#"><strong>개인정보처리방침</strong></a>
+            <a href="#">고객센터</a>
         </div>
         <div class="footer-info">
-          <div>
-            <strong>대표이사 마르코</strong> | 사업자등록번호 123-456-7890<br />
-            통신판매업신고 2024-광주동구-01211 | 이메일: help@highfive.com<br />
-            호스팅 제공자 NHN24 © HIGH-FIVE BOOKS. All Rights Reserved.
-          </div>
-          <div>
-            <strong>고객센터 1544-8282</strong> (발신자 부담)<br />
-            광주광역시 동구 서석동 조선대학교 1층 NHN아카데미<br />
-            Fax 062-1234-5678
-          </div>
+            <div>
+                <strong>대표이사 마르코</strong> | 사업자등록번호 123-456-7890<br />
+                통신판매업신고 2024-광주동구-01211 | 이메일: help@highfive.com<br />
+                호스팅 제공자 NHN24 © HIGH-FIVE BOOKS. All Rights Reserved.
+            </div>
+            <div>
+                <strong>고객센터 1544-8282</strong> (발신자 부담)<br />
+                광주광역시 동구 서석동 조선대학교 1층 NHN아카데미<br />
+                Fax 062-1234-5678
+            </div>
         </div>
-      </div>
-    </footer>
+    </div>
+</footer>
 
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        // 2. 클라이언트 키 초기화 (컨트롤러에서 주입)
-        const clientKey = [[${tossClientKey}]];
-        const tossPayments = TossPayments(clientKey);
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const clientKey = /*[[${tossClientKey}]]*/ "";
+    const tossPayments = TossPayments(clientKey);
 
-        // 3. 결제 데이터 가져오기 (컨트롤러에서 주입)
-        const orderId = [[${orderId}]];       // 주문 고유 번호 (UUID 등)
-        const orderName = [[${orderName}]];   // 주문명
-        const amount = [[${amount}]];         // 결제 금액
-        const customerName = [[${customerName}]]; // 주문자명
+    const orderId = /*[[${orderId}]]*/ "";
+    const amount = /*[[${amount}]]*/ 0;
+    const orderName = /*[[${orderName}]]*/ "";
+    const customerName = /*[[${customerName}]]*/ "";
+    const customerEmail = /*[[${customerEmail}]]*/ "";
 
-        function requestPayment() {
-            // 토스 결제창 호출
-            tossPayments.requestPayment('CARD', {
-                amount: amount,
-                orderId: orderId,
-                orderName: orderName,
-                customerName: customerName,
-                successUrl: window.location.origin + "/payment/success", // 성공 시 리다이렉트 (Front 컨트롤러)
-                failUrl: window.location.origin + "/payment/fail",       // 실패 시 리다이렉트
-            });
+    // 초기 선택값 (첫 번째 요소)
+    let selectedMethodCode = /*[[${currentKey}]]*/ null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        if(selectedMethodCode) {
+            updateDescription(selectedMethodCode);
         }
-        /*]]>*/
-    </script>
-  </body>
+    });
+
+    // [핵심 수정] 매개변수가 element(this)로 변경됨
+    function selectMethod(element) {
+        // data-code 속성 값을 가져옴
+        const code = element.getAttribute('data-code');
+        const alias = element.getAttribute('data-alias');
+
+        selectedMethodCode = code;
+
+        // 탭 스타일 활성화 처리
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(btn => {
+            // 현재 클릭된 버튼(element)과 비교하여 active 클래스 토글
+            if(btn === element) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+
+        updateDescription(code);
+    }
+
+    function updateDescription(code) {
+        const desc = document.getElementById('method-desc');
+        if (code === 'TOSS' || code === 'CARD') {
+            desc.innerText = "Toss 앱으로 빠르고 안전하게 결제하세요.";
+        } else if (code === 'TOSS_PAY') {
+            desc.innerText = "Toss 앱으로 빠르고 안전하게 결제하세요.";
+        } else if (code === 'POINT') {
+            desc.innerText = "보유하신 포인트로 결제합니다.";
+        } else {
+            desc.innerText = "선택한 결제 수단으로 진행합니다.";
+        }
+    }
+
+    function requestPayment() {
+        if (!amount || amount <= 0) {
+            alert("결제 금액 오류"); return;
+        }
+        if (!selectedMethodCode) {
+            alert("결제 수단을 선택해주세요."); return;
+        }
+
+        document.getElementById('loading-overlay').style.display = 'flex';
+
+        // DB에 저장된 Code('TOSS')를 Toss SDK용 메서드('카드')로 변환
+        let tossMethod = selectedMethodCode;
+
+        // SDK 메서드명 매핑 (필요시 추가)
+        if(selectedMethodCode === 'TOSS' || selectedMethodCode === 'CARD') {
+            tossMethod = '카드';
+        } else if(selectedMethodCode === 'TOSS_PAY') {
+            tossMethod = '토스페이';
+        }
+
+        tossPayments.requestPayment(tossMethod, {
+            amount: amount,
+            orderId: orderId,
+            orderName: orderName,
+            customerName: customerName,
+            successUrl: window.location.origin + "/payment/success",
+            failUrl: window.location.origin + "/payment/fail",
+        }).catch(error => {
+            document.getElementById('loading-overlay').style.display = 'none';
+            if (error.code !== 'USER_CANCEL') {
+                alert(error.message);
+            }
+        });
+    }
+    /*]]>*/
+</script>
+</body>
 </html>
