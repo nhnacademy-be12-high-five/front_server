@@ -139,81 +139,30 @@
       </div>
     </footer>
 
-    <script>
-      // 탭 전환(간단 안내 문구만 변경)
-      const tabEls = document.querySelectorAll(".tab");
-      const contentEl = document.getElementById("payContent");
-      const copy = {
-        tosspay: "토스페이 결제 화면으로 이동합니다. (SDK 연동 예정)",
-        payco: "PAYCO로 결제합니다. (SDK 연동 예정)",
-      };
-      tabEls.forEach((btn) => {
-        btn.addEventListener("click", () => {
-          tabEls.forEach((b) => b.classList.remove("active"));
-          btn.classList.add("active");
-          const key = btn.dataset.key;
-          contentEl.textContent = copy[key];
-        });
-      });
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // 2. 클라이언트 키 초기화 (컨트롤러에서 주입)
+        const clientKey = [[${tossClientKey}]];
+        const tossPayments = TossPayments(clientKey);
 
-      // // --- Toss Payments 연동 로직 --- -> 수정하기
-      const clientKey = "test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq";
-      const customerKey = "dbxQTZycUkwyTeddoWAfE";
-      const tossPayments = TossPayments(clientKey);
-      // 회원 결제
-      // @docs https://docs.tosspayments.com/sdk/v2/js#tosspaymentspayment
-      const payment = tossPayments.payment({ customerKey });
-      // 비회원 결제
-      // const payment = tossPayments.payment({customerKey: TossPayments.ANONYMOUS})
-      //
-      function getPaymentAmount() {
-        const amountText = document.getElementById("finalAmount").textContent;
-        // '38,700원' -> 38700
-        return parseInt(amountText.replace(/[^0-9]/g, ''), 10);
-      }
+        // 3. 결제 데이터 가져오기 (컨트롤러에서 주입)
+        const orderId = [[${orderId}]];       // 주문 고유 번호 (UUID 등)
+        const orderName = [[${orderName}]];   // 주문명
+        const amount = [[${amount}]];         // 결제 금액
+        const customerName = [[${customerName}]]; // 주문자명
 
-      // ------ '결제하기' 버튼 누르면 결제창 띄우기 ------
-      // @docs https://docs.tosspayments.com/sdk/v2/js#paymentrequestpayment
-      async function requestPayment() {
-        // 결제를 요청하기 전에 orderId, amount를 서버에 저장하세요.
-        // 결제 과정에서 악의적으로 결제 금액이 바뀌는 것을 확인하는 용도입니다.
-
-        const finalAmount = getPaymentAmount();
-        const activeTabKey = document.querySelector(".tab.active").dataset.key;
-
-        await payment.requestPayment({
-          method: "CARD", // 카드 결제
-          amount: {
-            currency: "KRW",
-            value: 50000,
-          },
-          orderId: "0z8sfuqSPNcpoai31o_U7", // 고유 주문번호
-          orderName: "토스 티셔츠 외 2건",
-          successUrl: window.location.origin + "/success", // 결제 요청이 성공하면 리다이렉트되는 URL
-          failUrl: window.location.origin + "/fail", // 결제 요청이 실패하면 리다이렉트되는 URL
-          customerEmail: "customer123@gmail.com",
-          customerName: "김토스",
-          customerMobilePhone: "01012341234",
-          card: {
-            useEscrow: false,
-            flowMode: "DEFAULT", // 통합결제창 여는 옵션
-            useCardPoint: false,
-            useAppCardOnly: false,
-          },
-        });
-      }
-
-      // 결제 버튼(더미)
-      // document.getElementById("payBtn").addEventListener("click", () => {
-      //   const active = document
-      //     .querySelector(".tab.active")
-      //     ?.textContent.trim();
-      //   const amount = document.getElementById("finalAmount").textContent;
-      //   alert(
-      //     `[데모] ${active}로 ${amount} 결제를 진행합니다.\n(실결제는 PG 연동 필요)`
-      //   );
-      //   // 실제 연동 시: 결제요청 API 호출 → PG SDK/결제창 호출 → 결과 처리
-      // });
+        function requestPayment() {
+            // 토스 결제창 호출
+            tossPayments.requestPayment('CARD', {
+                amount: amount,
+                orderId: orderId,
+                orderName: orderName,
+                customerName: customerName,
+                successUrl: window.location.origin + "/payment/success", // 성공 시 리다이렉트 (Front 컨트롤러)
+                failUrl: window.location.origin + "/payment/fail",       // 실패 시 리다이렉트
+            });
+        }
+        /*]]>*/
     </script>
   </body>
 </html>
