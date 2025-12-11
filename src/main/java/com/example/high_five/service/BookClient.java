@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(name = "book-service", contextId = "bookClient", url = "${gateway.uri}")
+@FeignClient(name = "TEAM5-GATEWAY-SERVER", contextId = "bookClient", url = "${gateway.uri}")
 public interface BookClient {
 
     // 1. 도서 상세 조회
