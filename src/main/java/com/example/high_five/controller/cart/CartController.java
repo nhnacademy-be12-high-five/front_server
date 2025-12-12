@@ -4,6 +4,7 @@ import com.example.high_five.dto.cart.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class CartController {
 
     private final FrontCartService cartService;
@@ -39,8 +41,9 @@ public class CartController {
     @ResponseBody
     public ResponseEntity<Void> updateQuantity(@RequestBody CartItemUpdateRequest request,
                                                @RequestHeader(value = "Cookie", required = false) String cookie) {
+        log.info(">>> cart update start");
         cartService.updateQuantity(cookie, request);
-        return ResponseEntity.ok().build();
+        log.info("<<< cart update end");
     }
 
     // 단건 삭제
