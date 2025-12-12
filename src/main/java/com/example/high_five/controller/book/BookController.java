@@ -22,11 +22,11 @@ public class BookController {
     /**
      * 도서 상세 화면
      */
+
     @GetMapping("/books/{book-id}")
     public String getBookDetail(@PathVariable("book-id") Long id, Model model) {
 
         BookResponse book = bookClient.getBookDetail(id);
-
         model.addAttribute("book", book);
 
         try {
@@ -47,4 +47,5 @@ public class BookController {
 
         return "Book/book-detail";
     }
+
 }
