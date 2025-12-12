@@ -236,9 +236,9 @@
 
         // Toss SDK 메서드 매핑
         const sdkMap = {
-            "TOSS": "CARD",
-            "BANK_TRANSFER": "TRANSFER",
-            "VIRTUAL_ACCOUNT": "VIRTUAL_ACCOUNT",
+            "TOSS": "카드",
+            "BANK_TRANSFER": "계좌이체",
+            "VIRTUAL_ACCOUNT": "가상계좌",
         };
 
         const tossMethod = sdkMap[selectedMethodCode];
@@ -248,6 +248,7 @@
             orderId: orderId,
             orderName: orderName,
             customerName: customerName,
+            customerEmail: customerEmail,
             successUrl: `${window.location.origin}/payment/success?orderId=${orderId}`,
             failUrl: `${window.location.origin}/payment/fail?orderId=${orderId}`,
         }).catch(error => {
