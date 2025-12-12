@@ -17,5 +17,5 @@ public interface PaymentService {
 
     // 활성화된 결제 수단 조회
     @GetMapping("/api/payments/methods")
-    List<PaymentMethodResponse> getActiveMethods();
+    List<PaymentMethodResponse> getAllMethods();
 }

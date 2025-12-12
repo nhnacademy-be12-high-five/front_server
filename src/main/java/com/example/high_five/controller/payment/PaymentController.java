@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/payment")
 public class PaymentController {
 
     private final PaymentService paymentService; // Feign Client
@@ -29,7 +31,7 @@ public class PaymentController {
     private String tossClientKey;
 
     // 결제 페이지 진입
-    @GetMapping("/payment")
+    @GetMapping
     public String checkoutPage(
             @RequestParam(required = false, defaultValue = "50000") Long amount,
             @RequestParam(required = false, defaultValue = "HIGH-FIVE 도서 외 1건") String orderName,
@@ -44,15 +46,15 @@ public class PaymentController {
             log.warn("테스트 모드: 임시 orderId 생성 = {}", orderId);
         }
 
-        // 백엔드에서 활성화된 결제 수단 가져오기
+        // 백엔드에서 결제 수단 가져오기
         List<PaymentMethodResponse> paymentMethods;
         try {
-            paymentMethods = paymentService.getActiveMethods();
+            paymentMethods = paymentService.getAllMethods();
         } catch (Exception e) {
             log.error("결제 수단 조회 실패", e);
             // 실패 시 보여줄 기본값 (DTO 구조와 맞춰야 HTML 에러 안 남)
             paymentMethods = List.of(
-                    PaymentMethodResponse.builder().name("TOSS").alias("통합결제").isActive(true).build()
+                    PaymentMethodResponse.builder().name("TOSS").alias("통합결제").active(true).build()
             );
         }
 
@@ -72,7 +74,7 @@ public class PaymentController {
     }
 
     // 토스 결제 성공 -> 백엔드 승인 요청
-    @GetMapping("/payment/success")
+    @GetMapping("/success")
     public String paymentSuccess(
             @RequestParam String paymentKey,
             @RequestParam String orderId,
@@ -101,24 +103,24 @@ public class PaymentController {
             // 주문 상세 페이지로 갈 링크를 위해 orderId도 전달
             model.addAttribute("orderId", orderId);
 
-            return "order/ordersuccess";
+            return "order/payment-success";
 
         } catch (FeignException e) {
             log.error("Payment Server 승인 실패: status={}, body={}", e.status(), e.contentUTF8());
             model.addAttribute("code", "PAYMENT_CONFIRM_ERROR");
             model.addAttribute("message", "결제 승인 중 오류가 발생했습니다. 다시 시도해주세요.");
-            return "order/fail";
+            return "order/payment-fail";
 
         } catch (Exception e) {
             log.error("결제 시스템 오류", e);
             model.addAttribute("code", "SYSTEM_ERROR");
             model.addAttribute("message", "시스템 오류가 발생했습니다.");
-            return "order/fail";
+            return "order/payment-fail";
         }
     }
 
     // [3] 토스 결제 실패 리다이렉트 처리
-    @GetMapping("/payment/fail")
+    @GetMapping("/fail")
     public String paymentFail(
             @RequestParam(required = false) String code,
             @RequestParam(required = false) String message,
@@ -127,6 +129,6 @@ public class PaymentController {
         model.addAttribute("code", code);
         model.addAttribute("message", message);
 
-        return "order/fail";
+        return "order/payment-fail";
     }
 }

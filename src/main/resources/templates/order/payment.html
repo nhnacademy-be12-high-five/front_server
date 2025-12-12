@@ -26,13 +26,20 @@
             height: 50px;
             animation: spin 1s linear infinite;
         }
+        .tab.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+            background: #f5f5f5;
+            border-color: #ddd;
+        }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 <header id="header" role="banner">
     <div class="container">
-        <a href="/main" class="logo">
+        <a href="/" class="logo">
             <img src="../img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100" />
             <div class="brand">HIGH-FIVE BOOKS</div>
         </a>
@@ -66,7 +73,6 @@
         </div>
     </div>
 </header>
-
 <main>
     <div class="container">
         <h1 style="font-size: 22px; margin-bottom: 12px">결제하기</h1>
@@ -76,16 +82,18 @@
                 <div class="hd">결제 수단 선택</div>
                 <div class="bd">
                     <div class="tabs" id="payTabs">
-                        <p th:if="${#lists.isEmpty(paymentMethods)}" style="padding:10px; color:red;">
+                        <p th:if="${#lists.isEmpty(paymentMethods)}" style="padding:10px; color:red; width:100%;">
                             사용 가능한 결제 수단이 없습니다.
                         </p>
 
-                        <button th:each="method, methodStat : ${paymentMethods}"
+                        <button th:each="method : ${paymentMethods}"
                                 class="tab"
-                                th:classappend="${methodStat.first} ? 'active'"
-                                th:attr="data-code=${method.name}, data-alias=${method.alias}"
-                                th:onclick="selectMethod(this)"
-                                th:text="${method.alias}">
+                                type="button"
+                                th:data-code="${method.name}"
+                                th:data-alias="${method.alias}"
+                                onclick="selectMethod(this)"
+                                th:classappend="${!method.active} ? 'disabled' : ''">
+                            <span th:text="${method.alias}">신용카드</span>
                         </button>
                     </div>
 
@@ -162,82 +170,95 @@
     const customerName = /*[[${customerName}]]*/ "";
     const customerEmail = /*[[${customerEmail}]]*/ "";
 
-    // 초기 선택값 (첫 번째 요소)
+    // 서버에 저장된 기본 선택값
     let selectedMethodCode = /*[[${currentKey}]]*/ null;
 
     document.addEventListener("DOMContentLoaded", () => {
-        if(selectedMethodCode) {
-            updateDescription(selectedMethodCode);
+        // 초기 로딩 시 기본 선택값이 있고, 비활성화 상태가 아니라면 설명 업데이트
+        if (selectedMethodCode) {
+            const defaultTab = document.querySelector(`.tab[data-code="${selectedMethodCode}"]`);
+            if (defaultTab && !defaultTab.classList.contains("disabled")) {
+                updateDescription(selectedMethodCode);
+            } else {
+                selectedMethodCode = null; // 비활성화된 경우 선택 해제
+            }
         }
     });
 
-    // [핵심 수정] 매개변수가 element(this)로 변경됨
+    // 결제수단 선택
     function selectMethod(element) {
-        // data-code 속성 값을 가져옴
-        const code = element.getAttribute('data-code');
-        const alias = element.getAttribute('data-alias');
+        if (element.classList.contains("disabled")) {
+            return;
+        }
+        const code = element.getAttribute("data-code");
 
         selectedMethodCode = code;
 
-        // 탭 스타일 활성화 처리
-        const tabs = document.querySelectorAll('.tab');
-        tabs.forEach(btn => {
-            // 현재 클릭된 버튼(element)과 비교하여 active 클래스 토글
-            if(btn === element) btn.classList.add('active');
-            else btn.classList.remove('active');
+        document.querySelectorAll(".tab").forEach(btn => {
+            btn.classList.toggle("active", btn === element);
         });
 
         updateDescription(code);
     }
 
+    // 결제수단 설명
     function updateDescription(code) {
-        const desc = document.getElementById('method-desc');
-        if (code === 'TOSS' || code === 'CARD') {
-            desc.innerText = "Toss 앱으로 빠르고 안전하게 결제하세요.";
-        } else if (code === 'TOSS_PAY') {
-            desc.innerText = "Toss 앱으로 빠르고 안전하게 결제하세요.";
-        } else if (code === 'POINT') {
-            desc.innerText = "보유하신 포인트로 결제합니다.";
-        } else {
-            desc.innerText = "선택한 결제 수단으로 진행합니다.";
+        const desc = document.getElementById("method-desc");
+
+        switch (code) {
+            case "TOSS":
+                desc.innerText = "Toss 위젯을 통해 빠르게 결제 해보세요.";
+                break;
+            case "BANK_TRANSFER":
+                desc.innerText = "실시간 계좌이체로 결제합니다.";
+                break;
+            case "VIRTUAL_ACCOUNT":
+                desc.innerText = "가상계좌를 발급받아 입금 후 결제 완료됩니다.";
+                break;
+            default:
+                desc.innerText = "선택한 결제 수단으로 진행합니다.";
         }
     }
 
+    // 결제 요청
     function requestPayment() {
         if (!amount || amount <= 0) {
-            alert("결제 금액 오류"); return;
+            alert("결제 금액 오류");
+            return;
         }
+
         if (!selectedMethodCode) {
-            alert("결제 수단을 선택해주세요."); return;
+            alert("결제 수단을 선택해주세요.");
+            return;
         }
 
-        document.getElementById('loading-overlay').style.display = 'flex';
+        document.getElementById("loading-overlay").style.display = "flex";
 
-        // DB에 저장된 Code('TOSS')를 Toss SDK용 메서드('카드')로 변환
-        let tossMethod = selectedMethodCode;
+        // Toss SDK 메서드 매핑
+        const sdkMap = {
+            "TOSS": "CARD",
+            "BANK_TRANSFER": "TRANSFER",
+            "VIRTUAL_ACCOUNT": "VIRTUAL_ACCOUNT",
+        };
 
-        // SDK 메서드명 매핑 (필요시 추가)
-        if(selectedMethodCode === 'TOSS' || selectedMethodCode === 'CARD') {
-            tossMethod = '카드';
-        } else if(selectedMethodCode === 'TOSS_PAY') {
-            tossMethod = '토스페이';
-        }
+        const tossMethod = sdkMap[selectedMethodCode];
 
         tossPayments.requestPayment(tossMethod, {
             amount: amount,
             orderId: orderId,
             orderName: orderName,
             customerName: customerName,
-            successUrl: window.location.origin + "/payment/success",
-            failUrl: window.location.origin + "/payment/fail",
+            successUrl: `${window.location.origin}/payment/success?orderId=${orderId}`,
+            failUrl: `${window.location.origin}/payment/fail?orderId=${orderId}`,
         }).catch(error => {
-            document.getElementById('loading-overlay').style.display = 'none';
-            if (error.code !== 'USER_CANCEL') {
+            document.getElementById("loading-overlay").style.display = "none";
+            if (error.code !== "USER_CANCEL") {
                 alert(error.message);
             }
         });
     }
     /*]]>*/
 </script>
+
 </body>
 </html>
