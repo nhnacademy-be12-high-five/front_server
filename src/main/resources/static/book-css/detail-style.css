@@ -747,3 +747,88 @@ input {
     padding: 5px;
     border-radius: 5px;
 }
+
+/* 탭 메뉴를 상단에 고정 (Sticky) */
+.book-detail-tabs {
+    position: sticky;
+    top: 0; /* 헤더 높이에 따라 조절 필요 (헤더가 fixed라면 헤더 높이만큼) */
+    z-index: 100;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+}
+
+.book-detail-tabs button {
+    flex: 1;
+    padding: 15px 0;
+    border: none;
+    background: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+}
+
+/* 활성화된 버튼 스타일 */
+.book-detail-tabs button.active {
+    font-weight: bold;
+    color: #00c73c; /* 포인트 컬러 */
+    border-bottom: 3px solid #00c73c;
+}
+
+/* 각 섹션 스타일 (숨기지 않고 모두 보여줌) */
+.detail-tab-content {
+    display: block !important; /* 기존 CSS의 display: none 무시 */
+    padding-top: 80px; /* 탭 메뉴에 가려지지 않게 여백 추가 */
+    margin-bottom: 60px; /* 섹션 간 간격 */
+    min-height: 300px; /* 내용이 적어도 스크롤 되도록 최소 높이 */
+    border-bottom: 1px solid #eee; /* 구분선 */
+}
+
+/* 마지막 섹션은 여백 좀 더 줌 */
+#tab-shipping {
+    padding-bottom: 100px;
+    border-bottom: none;
+}
+#tab-qna{
+    min-height: 600px;   /* 충분히 화면을 지나가게 */
+}
+#tab-shipping{
+    min-height: 1000px;
+}
+
+.user-menu .cart-link-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    overflow: visible;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -4px;
+    right: -6px;
+
+    background-color: #ff4d4f;
+    color: white;
+
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 14px;
+    min-width: 16px;
+    height: 16px;
+
+    border-radius: 10px;
+    text-align: center;
+    padding: 0 4px;
+
+    border: 2px solid #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+
+    transition: transform 0.2s;
+    z-index: 10;
+}
+
+.user-menu .cart-link-wrap:hover .cart-badge {
+    transform: scale(1.1);
+}
