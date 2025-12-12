@@ -10,5 +10,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MethodStatusRequest {
-    private boolean active;
+    private boolean isActive;
 }

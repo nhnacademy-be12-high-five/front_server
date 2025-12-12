@@ -34,14 +34,14 @@ public class PaymentAdminController {
 
     @PostMapping("/{methodId}/status")
     public String updateStatus(@PathVariable Long methodId,
-                               @RequestParam boolean active,
+                               @RequestParam boolean isActive,
                                RedirectAttributes redirectAttributes) {
         try {
-            paymentService.updateStatus(methodId, new MethodStatusRequest(active));
+            paymentService.updateStatus(methodId, new MethodStatusRequest(isActive));
             redirectAttributes.addFlashAttribute("message", "상태가 변경되었습니다.");
         } catch (Exception e) {
             log.error("상태 변경 실패", e);
-            redirectAttributes.addFlashAttribute("errorMessage", "상태 변경 실패");
+            redirectAttributes.addFlashAttribute("errorMessage", "상태 변경 실패에 실패했습니다.");
         }
         return "redirect:/admin/payments";
     }

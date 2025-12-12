@@ -60,8 +60,8 @@ public class PaymentController {
 
         model.addAttribute("paymentMethods", paymentMethods);
 
-        String defaultMethod = paymentMethods.isEmpty() ? "" : paymentMethods.getFirst().getName();
-        model.addAttribute("currentKey", defaultMethod);
+        //String defaultMethod = paymentMethods.isEmpty() ? "" : paymentMethods.getFirst().getName();
+        //model.addAttribute("currentKey", defaultMethod);
 
         model.addAttribute("tossClientKey", tossClientKey);
         model.addAttribute("orderId", orderId);

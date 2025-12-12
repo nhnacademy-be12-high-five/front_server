@@ -6,7 +6,8 @@
     const map = {
         'members.html': 'members',
         'points.html' : 'points',
-        'coupons.html': 'coupons'
+        'coupons.html': 'coupons',
+        'payments.html' : 'payments'
     };
     const currentKey = map[file];
 
