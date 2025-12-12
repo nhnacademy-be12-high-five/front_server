@@ -44,6 +44,7 @@ public class CartController {
         log.info(">>> cart update start");
         cartService.updateQuantity(cookie, request);
         log.info("<<< cart update end");
+        return ResponseEntity.ok().build();
     }
 
     // 단건 삭제
