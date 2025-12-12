@@ -6,9 +6,7 @@ import com.example.high_five.dto.member.request.MemberCreateRequestDto;
 import com.example.high_five.dto.member.response.TokenDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.*;
 
 @FeignClient(name = "TEAM5-GATEWAY-SERVER", contextId = "authClient", url = "${gateway.uri}")
 public interface AuthService {
@@ -25,5 +23,11 @@ public interface AuthService {
 
     @PostMapping("/api/auth/logout")
     ResponseEntity<Void> logout();
+
+    @PostMapping("/api/auth/login/{provider}")
+    ResponseEntity<TokenDto> loginSocial(
+            @PathVariable("provider") String provider,
+            @RequestParam("code") String code
+    );
 
 }
