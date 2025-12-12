@@ -11,6 +11,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class BookResponse {
+
     @JsonProperty("id")
     private Long bookId;
     private String title;
@@ -27,4 +28,10 @@ public class BookResponse {
 
     // book-detail.html 에서 사용하는 태그 필드
     private List<String> tags;
+
+    // 포장 여부
+    private boolean Wrapper;
+
+    // 포장하면 추가 금액 발생 - 500원
+    private int WrapperCost;
 }

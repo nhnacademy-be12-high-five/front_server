@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(name = "TEAM5-GATEWAY-SERVER", contextId = "bookClient", url = "${gateway.uri}")
+@FeignClient(name = "book-service", contextId = "booClient", url = "${gateway.uri}")
 public interface BookClient {
 
     // 1. 도서 상세 조회
@@ -41,7 +41,11 @@ public interface BookClient {
     @GetMapping("/api/books/new")
     List<BookResponse> getNewBooks();
 
-//    // 주간 인기 급상승 로직
-//    @GetMapping("/api/books/popular")
-//    List<BookResponse> getPopularBooks();
+    // 6. 주간 인기 급상승 로직
+    @GetMapping("/api/books/popular")
+    List<BookResponse> getPopularBooks();
+
+    // 7. 포장 여부
+    @GetMapping("/api/books/Wrapper")
+    boolean getWrapper();
 }

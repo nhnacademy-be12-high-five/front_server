@@ -24,8 +24,8 @@ public class testController {
             // 2. 뷰(Thymeleaf)로 전달
             model.addAttribute("newBooks", newBooks);
 
-//            List<BookResponse> risingBooks = bookClient.getPopularBooks();
-//            model.addAttribute("risingBooks",risingBooks);
+            List<BookResponse> risingBooks = bookClient.getPopularBooks();
+            model.addAttribute("risingBooks", risingBooks);
 
         } catch (Exception e) {
             // 백엔드 서버가 죽어있거나 에러가 나도 메인 페이지는 떠야 함
