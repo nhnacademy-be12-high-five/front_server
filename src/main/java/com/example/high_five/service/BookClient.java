@@ -44,4 +44,8 @@ public interface BookClient {
     // 주간 인기 급상승 로직
     @GetMapping("/api/books/popular")
     List<BookResponse> getPopularBooks();
+
+    //7. 카테고리 검색
+    @GetMapping("/api/categories/{categoryId}/books")
+    List<BookResponse> getBooksByCategory(@RequestParam("categoryId") Long categoryId);
 }
