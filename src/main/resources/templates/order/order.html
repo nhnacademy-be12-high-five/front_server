@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+
 <head>
     <meta charset="UTF-8">
     <title>주문서 작성 - High Five</title>
@@ -8,36 +10,8 @@
 </head>
 <body>
 
-<header id="header" role="banner">
-    <div class="container">
-        <a th:href="@{/}" class="logo">
-            <img th:src="@{/img/logo.png}" alt="HIGH-FIVE 로고" width="100" height="100"/>
-            <div class="brand">HIGH-FIVE BOOKS</div>
-        </a>
-
-        <nav class="gnb" aria-label="주요 메뉴">
-            <form class="search-box" role="search" th:action="@{/search}" method="get">
-                <input type="search" name="keyword" placeholder="도서명, 저자, ISBN, 태그 검색" aria-label="통합 검색"/>
-                <button type="submit" class="search-btn" aria-label="검색">검색</button>
-            </form>
-        </nav>
-
-        <div class="user-menu">
-            <a class="user-link" href="/coupon">
-                <img th:src="@{/img/icon-coupon.png}" alt="쿠폰" class="user-icon"/>
-            </a>
-            <a class="user-link" href="/mypage">
-                <img th:src="@{/img/icon-mypage.png}" alt="마이페이지" class="user-icon"/>
-            </a>
-            <a th:href="@{/cart}" href="/cart" class="user-link cart-link-wrap">
-                <img th:src="@{/img/icon-cart.png}" alt="장바구니" class="user-icon"/>
-                <span id="cartBadge" class="cart-badge" style="display: none;">0</span>
-            </a>
-        </div>
-    </div>
-</header>
-
-<div class="container">
+<!-- ✅ 기존 container -> order-container 로 변경 -->
+<div class="order-container">
     <h2>주문서 작성</h2>
 
     <form th:action="@{/orders}" method="post" th:object="${checkoutRequest}" id="orderForm">
@@ -132,26 +106,42 @@
 
         <section class="payment-summary">
             <h3>최종 결제 금액</h3>
+
             <div class="summary-row">
                 <span>총 상품 금액</span>
-                <span th:text="${#numbers.formatInteger(orderSheet.totalProductPrice, 0, 'COMMA')}">0</span>원
+                <!-- ✅ 숫자+원 묶어서 오른쪽 정렬 가능 -->
+                <span class="amount">
+                    <span id="displayProductPrice"
+                          th:text="${#numbers.formatInteger(orderSheet.totalProductPrice, 0, 'COMMA')}">0</span>원
+                </span>
             </div>
+
             <div class="summary-row">
                 <span>배송비</span>
-                <span id="displayDeliveryFee" th:text="${orderSheet.deliveryFee}">0</span>원
+                <span class="amount">
+                    <span id="displayDeliveryFee" th:text="${orderSheet.deliveryFee}">0</span>원
+                </span>
             </div>
+
             <div class="summary-row">
                 <span>포장비</span>
-                <span id="displayWrappingFee">0</span>원
+                <span class="amount">
+                    <span id="displayWrappingFee">0</span>원
+                </span>
             </div>
+
             <div class="summary-row discount">
                 <span>할인 금액</span>
-                -<span id="displayDiscount">0</span>원
+                <span class="amount">-<span id="displayDiscount">0</span>원</span>
             </div>
+
             <hr>
+
             <div class="total-row">
                 <span>총 결제 금액</span>
-                <span id="displayFinalPrice" class="final-price">0</span>원
+                <span class="amount final-price">
+                    <span id="displayFinalPrice">0</span>원
+                </span>
             </div>
         </section>
 
@@ -161,7 +151,6 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    // 서버에서 전달받은 초기값
     const productPrice = [[${orderSheet.totalProductPrice}]];
     const initialDeliveryFee = [[${orderSheet.deliveryFee}]];
     const maxPoint = [[${orderSheet.myPoint != null ? orderSheet.myPoint : 0}]];
@@ -202,7 +191,6 @@
         $('#displayFinalPrice').text(finalPrice.toLocaleString());
     }
 
-    // 장바구니 뱃지 카운트
     function updateCartBadge() {
         fetch('/cart/count', {
             method: 'GET',
@@ -219,7 +207,6 @@
             .catch(err => console.error("장바구니 카운트 로드 실패:", err));
     }
 
-    // 페이지 로드 시 실행
     $(document).ready(function() {
         updateTotal();
         updateCartBadge();

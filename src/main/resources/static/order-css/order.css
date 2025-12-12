@@ -7,6 +7,14 @@
     --color-border: #ddd;
     --color-border-light: #eee;
     --color-danger: #dc3545;
+
+    /* ✅ 여유(스페이싱) 토큰 */
+    --space-page-top: 24px;
+    --space-page-bottom: 70px;
+    --space-section-gap: 32px;
+    --space-section-padding-y: 30px;
+    --space-section-padding-x: 30px;
+    --space-field-gap: 18px;
 }
 
 /* 1. 기본 설정 */
@@ -22,11 +30,21 @@ body {
     min-height: 100vh;
 }
 
+/* ✅ 기존 container는 header에서도 쓰이므로 유지.
+   주문서 본문은 .order-container를 사용해서 header 깨짐 방지 */
 .container {
     width: 100%;
     max-width: 1000px;
     margin: 0 auto;
     padding: 20px;
+}
+
+/* ✅ 주문서 페이지 본문 전용 컨테이너 (HTML에서 container → order-container로 변경) */
+.order-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: var(--space-page-top) 20px var(--space-page-bottom);
 }
 
 h2 {
@@ -39,18 +57,21 @@ h2 {
 /* 2. 섹션 박스 스타일 (공통) */
 .order-section, .payment-summary {
     background: white;
-    padding: 30px;
-    border-radius: 8px;
+    padding: var(--space-section-padding-y) var(--space-section-padding-x);
+    border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    margin-bottom: 25px;
     border: 1px solid var(--color-border-light);
 }
+
+/* ✅ 섹션(폼 덩어리)끼리 여유: margin-bottom 확대 */
+.order-section { margin-bottom: var(--space-section-gap); }
+.payment-summary { margin-bottom: var(--space-section-gap); }
 
 .order-section h3, .payment-summary h3 {
     font-size: 18px;
     border-bottom: 2px solid var(--color-primary);
     padding-bottom: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 22px; /* ✅ 제목 아래 여유 조금 증가 */
     color: var(--color-primary);
 }
 
@@ -90,31 +111,32 @@ h2 {
 }
 
 .wrapper-select {
-    padding: 6px;
+    padding: 10px;
     border: 1px solid var(--color-border);
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
 /* 4. 배송지 정보 폼 */
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: var(--space-field-gap); /* ✅ 폼 요소 간격 확대 */
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 10px; /* ✅ 라벨-인풋 간격 확대 */
     font-weight: 600;
     font-size: 14px;
 }
 
 .form-group input {
     width: 100%;
-    padding: 12px;
+    padding: 12px 12px;
     border: 1px solid var(--color-border);
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 15px;
     outline: none;
     transition: border-color 0.2s;
+    height: 44px; /* ✅ 입력 높이 통일 */
 }
 
 .form-group input:focus {
@@ -125,27 +147,29 @@ h2 {
 .discount-row {
     display: flex;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: var(--space-field-gap); /* ✅ 행 간격 확대 */
+    gap: 12px; /* ✅ 라벨/컨트롤 사이 여유 */
 }
 
 .discount-row label {
-    width: 120px;
+    width: 160px; /* ✅ 라벨이 너무 좁아 답답하면 넓힘 */
     font-weight: 600;
 }
 
 .discount-row select,
 .discount-row input {
     flex: 1;
-    padding: 10px;
+    padding: 10px 12px;
     border: 1px solid var(--color-border);
-    border-radius: 4px;
+    border-radius: 8px;
+    height: 44px; /* ✅ 높이 통일 */
 }
 
 /* 6. 최종 결제 금액 요약 */
 .summary-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: 14px; /* ✅ 줄 간격 확대 */
     font-size: 16px;
 }
 
@@ -157,7 +181,7 @@ h2 {
 hr {
     border: 0;
     border-top: 1px dashed var(--color-border);
-    margin: 20px 0;
+    margin: 22px 0; /* ✅ 구분선 위아래 여유 */
 }
 
 .total-row {
@@ -183,13 +207,83 @@ hr {
     font-size: 20px;
     font-weight: bold;
     padding: 18px;
-    border-radius: 8px;
-    margin-top: 20px;
+    border-radius: 10px;
+    margin-top: 28px; /* ✅ 버튼 위 여유 확대 */
     transition: background-color 0.3s;
+    border: none;
+    cursor: pointer;
 }
 
 .btn-submit:hover {
     background-color: #0056b3;
+}
+
+/* ✅ 금액 오른쪽 정렬 + 숫자와 '원' 붙이기 */
+.payment-summary .summary-row,
+.payment-summary .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.payment-summary .amount {
+    display: inline-flex;
+    justify-content: flex-end;
+    gap: 0;                 /* 숫자와 '원' 사이 붙이기 */
+    min-width: 160px;       /* ✅ 줄맞춤 조금 더 안정적으로 */
+    text-align: right;
+    white-space: nowrap;    /* 줄바꿈 방지 */
+    font-variant-numeric: tabular-nums; /* 숫자 폭 고정 */
+}
+
+/* ===============================
+   ✅ (선택) 주문서 페이지에서 header가 깨질 때 방어용
+   - 헤더 CSS가 별도 파일이면 이 블록은 없어도 됨
+   - order.css만 로드하는 페이지라면 이 블록이 도움됨
+   =============================== */
+#header .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 12px 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+#header .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+#header .gnb {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+#header .search-box {
+    width: min(560px, 100%);
+    display: flex;
+}
+
+#header .search-box input[type="search"] {
+    flex: 1;
+}
+
+#header .user-menu {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#header .user-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
 }
 
 /* --- 기존 헤더/푸터 스타일 유지 (필요 시 아래 추가) --- */
