@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Highfive 관리자 - 결제 수단 관리</title>
+    <link rel="stylesheet" href="/admin-css/point.css">
+    <style>
+        /* 스위치 토글 스타일 추가 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #007bff; }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        .method-table {
+            width: 100%; border-collapse: collapse; margin-top: 20px;
+        }
+        .method-table th, .method-table td {
+            padding: 12px; text-align: left; border-bottom: 1px solid #ddd;
+        }
+        .method-table th { background-color: #f1f1f1; }
+        .badge {
+            padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;
+        }
+        .badge-on { background-color: #d4edda; color: #155724; }
+        .badge-off { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+
+<body>
+<aside class="sidebar">
+    <h2>HIGHFIVE 관리자</h2>
+    <ul class="menu">
+        <li><a href="/admin/books" data-key="books">도서 관리</a></li>
+        <li><a href="/admin/points/policy" data-key="points">포인트 관리</a></li>
+        <li><a href="/api/coupons/admin/coupons" data-key="coupons">쿠폰 관리</a></li>
+        <li><a href="/admin/payments" data-key="payments" class="active">결제 수단 관리</a></li>
+    </ul>
+</aside>
+
+<div style="flex:1; display:flex; flex-direction:column;">
+    <header>결제 수단 관리</header>
+    <main>
+        <div class="card">
+            <h3>결제 수단 ON/OFF 설정</h3>
+
+            <div th:if="${message}" style="color: green; margin-bottom: 10px;" th:text="${message}"></div>
+            <div th:if="${errorMessage}" style="color: red; margin-bottom: 10px;" th:text="${errorMessage}"></div>
+
+            <table class="method-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>결제 수단 코드</th>
+                    <th>표시 이름 (Alias)</th>
+                    <th>현재 상태</th>
+                    <th>상태 변경</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="method : ${methods}">
+                    <td th:text="${method.id}">1</td>
+                    <td th:text="${method.name}">TOSS</td>
+                    <td th:text="${method.alias}">토스페이먼츠</td>
+                    <td>
+                        <span th:if="${method.active}" class="badge badge-on">활성 (ON)</span>
+                        <span th:unless="${method.active}" class="badge badge-off">비활성 (OFF)</span>
+                    </td>
+                    <td>
+                        <form th:action="@{/admin/payments/{id}/status(id=${method.id})}" method="post">
+                            <input type="hidden" name="isActive" th:value="${!method.active}" />
+
+                            <button type="submit" class="save-btn"
+                                    style="width: auto; margin: 0; padding: 6px 12px; font-size: 13px;"
+                                    th:styleappend="${method.active} ? 'background-color:#dc3545;' : 'background-color:#28a745;'">
+                                <span th:text="${method.active} ? '비활성화하기' : '활성화하기'">변경</span>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+<script src="/assets/admin.js"></script>
+</body>
+</html>
