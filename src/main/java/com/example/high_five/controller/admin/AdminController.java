@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,6 +37,14 @@ public class AdminController {
 
     @PostMapping("/api/coupons/admin/policies/create")
     public String createPolicy(@ModelAttribute CouponPolicyRequestDto dto) {
+
+        if (dto.getTargetBookIds() == null) {
+            dto.setTargetBookIds(new ArrayList<>());
+        }
+        if (dto.getTargetCategoryIds() == null) {
+            dto.setTargetCategoryIds(new ArrayList<>());
+        }
+
         couponService.createCouponPolicy(dto);
 
         return "redirect:/api/coupons/admin/coupons";
@@ -139,5 +148,12 @@ public class AdminController {
     @ResponseBody
     public ResponseEntity<List<CategoryResponse>> getChildCategories(@PathVariable int parentId) {
         return ResponseEntity.ok(categoryFeignClient.getChildCategories(parentId));
+    }
+
+    @GetMapping("/api/coupons/admin/specific-book-coupons")
+    public String specificBookCouponPage(Model model) {
+        List<CouponPolicyResponseDto> policies = couponService.getAllPolicies();
+        model.addAttribute("policies", policies);
+        return "admin/book-coupons";
     }
 }
