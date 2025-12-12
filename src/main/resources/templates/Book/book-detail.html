@@ -72,6 +72,32 @@
                         </div>
                     </div>
 
+                    <div class="option-block" th:if="${!#lists.isEmpty(coupons)}">
+                        <div class="option-block-title" style="margin-bottom: 10px;">🎁 사용 가능한 쿠폰</div>
+                        <div class="coupon-list" style="display: flex; flex-direction: column; gap: 8px;">
+                            <div th:each="coupon : ${coupons}" class="coupon-item"
+                                 style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 6px;">
+
+                                <div style="flex: 1;">
+                                    <strong th:text="${coupon.couponName}" style="color: #333; font-size: 14px;">쿠폰명</strong>
+                                    <span style="display: block; font-size: 12px; color: #666; margin-top: 2px;">
+                                        <span th:if="${coupon.couponType == 'FIXED'}"
+                                              th:text="${#numbers.formatInteger(coupon.discountValue, 0, 'COMMA') + '원 할인'}"></span>
+                                        <span th:if="${coupon.couponType == 'PERCENTAGE'}"
+                                              th:text="${coupon.discountValue + '% 할인'}"></span>
+                                    </span>
+                                </div>
+
+                                <form method="post" th:action="@{/coupon/issue}">
+                                    <input type="hidden" name="couponId" th:value="${coupon.id}">
+                                    <button type="submit"
+                                            style="background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; transition: background 0.2s;">
+                                        받기
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="purchase-actions">
                         <button type="button" class="btn-heart" aria-label="관심도서" id="heart">&#9829;</button>
@@ -351,7 +377,6 @@
         alert("리뷰가 수정되었습니다.");
         location.reload();
     }
-
 </script>
 
 </body>
