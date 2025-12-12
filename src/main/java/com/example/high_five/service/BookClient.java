@@ -41,7 +41,7 @@ public interface BookClient {
     @GetMapping("/api/books/new")
     List<BookResponse> getNewBooks();
 
-//    // 주간 인기 급상승 로직
-//    @GetMapping("/api/books/popular")
-//    List<BookResponse> getPopularBooks();
+    // 주간 인기 급상승 로직
+    @GetMapping("/api/books/popular")
+    List<BookResponse> getPopularBooks();
 }
