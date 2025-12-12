@@ -42,7 +42,7 @@ public interface CartService {
 
     @PostMapping("/api/cart/merge")
     ResponseEntity<Void> mergeGuestCart(
-            @RequestHeader(value = "Cookie", required = false) String cookieHeader
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @RequestHeader(value = "Cookie", required = false) String cookieHeader
     );
 
     // [추가] 비회원 장바구니 삭제 요청 (백엔드로)
