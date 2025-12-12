@@ -102,7 +102,10 @@
                     <div class="purchase-actions">
                         <button type="button" class="btn-heart" aria-label="관심도서" id="heart">&#9829;</button>
                         <button type="button" class="btn-primary" id="add-to-cart-btn" th:data-book-id="${book.bookId}">장바구니 담기</button>
-                        <a class="btn-secondary" th:href="@{/order/now(bookId=${book.bookId})}">바로 구매</a>
+                        <a class="btn-secondary"
+                           th:href="@{/orders/sheet(bookIds=${book.bookId}, quantities=1)}">
+                            바로 구매
+                        </a>
                     </div>
 
                     <table class="summary-table">
