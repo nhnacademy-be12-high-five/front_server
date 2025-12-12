@@ -612,10 +612,11 @@
         box-shadow: 0 10px 20px rgba(0,0,0,0.15);
         z-index: 1000;
     }
-    /* 전체 분야에 마우스 올렸을 때 표시 */
-    .all-menu-wrapper:hover .mega-menu {
+
+    .mega-menu.active {
         display: block;
     }
+
 
     /* 대분류(depth1) */
     .depth1 {
@@ -759,6 +760,10 @@
             </a>
 
             <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
+
+            <a th:if="${myInfo != null}"
+               class="user-link pill"
+               th:href="@{/member/login.html}">로그아웃</a>
         </div>
     </div>
 </header>
@@ -790,70 +795,70 @@
                             <h4>소설/시/희곡</h4>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=101,
+                                categoryId=8,
                                 categoryName='한국소설',
                                 sort='POPULAR',
                                 page=0
                             )}">한국소설</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=102,
+                                categoryId=9,
                                 categoryName='영미소설',
                                 sort='POPULAR',
                                 page=0
                             )}">영미소설</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=103,
+                                categoryId=10,
                                 categoryName='일본소설',
                                 sort='POPULAR',
                                 page=0
                             )}">일본소설</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=104,
+                                categoryId=11,
                                 categoryName='추리/미스터리',
                                 sort='POPULAR',
                                 page=0
                             )}">추리/미스터리</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=105,
+                                categoryId=12,
                                 categoryName='공포/스릴러',
                                 sort='POPULAR',
                                 page=0
                             )}">공포/스릴러</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=106,
+                                categoryId=13,
                                 categoryName='SF소설',
                                 sort='POPULAR',
                                 page=0
                             )}">SF소설</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=107,
+                                categoryId=14,
                                 categoryName='판타지소설',
                                 sort='POPULAR',
                                 page=0
                             )}">판타지소설</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=108,
+                                categoryId=15,
                                 categoryName='로맨스소설',
                                 sort='POPULAR',
                                 page=0
                             )}">로맨스소설</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=109,
+                                categoryId=16,
                                 categoryName='시/에세이',
                                 sort='POPULAR',
                                 page=0
                             )}">시/에세이</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=110,
+                                categoryId=17,
                                 categoryName='희곡/연극',
                                 sort='POPULAR',
                                 page=0
@@ -876,28 +881,28 @@
                             <h4>경제/경영</h4>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=201,
+                                categoryId=18,
                                 categoryName='경제이론',
                                 sort='POPULAR',
                                 page=0
                             )}">경제이론</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=202,
+                                categoryId=19,
                                 categoryName='경영일반',
                                 sort='POPULAR',
                                 page=0
                             )}">경영일반</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=203,
+                                categoryId=20,
                                 categoryName='투자/재테크',
                                 sort='POPULAR',
                                 page=0
                             )}">투자/재테크</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=204,
+                                categoryId=21,
                                 categoryName='마케팅',
                                 sort='POPULAR',
                                 page=0
@@ -920,21 +925,21 @@
                             <h4>IT/모바일</h4>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=301,
+                                categoryId=22,
                                 categoryName='프로그래밍',
                                 sort='POPULAR',
                                 page=0
                             )}">프로그래밍</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=302,
+                                categoryId=23,
                                 categoryName='OS/데이터베이스',
                                 sort='POPULAR',
                                 page=0
                             )}">OS/데이터베이스</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=303,
+                                categoryId=24,
                                 categoryName='웹디자인',
                                 sort='POPULAR',
                                 page=0
@@ -957,49 +962,49 @@
                             <h4>인문/사회</h4>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=401,
+                                categoryId=25,
                                 categoryName='여행',
                                 sort='POPULAR',
                                 page=0
                             )}">여행</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=402,
+                                categoryId=26,
                                 categoryName='심리',
                                 sort='POPULAR',
                                 page=0
                             )}">심리</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=403,
+                                categoryId=27,
                                 categoryName='철학',
                                 sort='POPULAR',
                                 page=0
                             )}">철학</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=404,
+                                categoryId=28,
                                 categoryName='역사',
                                 sort='POPULAR',
                                 page=0
                             )}">역사</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=405,
+                                categoryId=29,
                                 categoryName='정치',
                                 sort='POPULAR',
                                 page=0
                             )}">정치</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=406,
+                                categoryId=30,
                                 categoryName='요리',
                                 sort='POPULAR',
                                 page=0
                             )}">요리</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=407,
+                                categoryId=31,
                                 categoryName='종교',
                                 sort='POPULAR',
                                 page=0
@@ -1022,14 +1027,14 @@
                             <h4>유아/아동</h4>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=501,
+                                categoryId=32,
                                 categoryName='그림책',
                                 sort='POPULAR',
                                 page=0
                             )}">그림책</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=502,
+                                categoryId=33,
                                 categoryName='만화',
                                 sort='POPULAR',
                                 page=0
@@ -1052,14 +1057,14 @@
                             <h4>수험서/자격증</h4>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=601,
+                                categoryId=34,
                                 categoryName='토익',
                                 sort='POPULAR',
                                 page=0
                             )}">토익</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=602,
+                                categoryId=35,
                                 categoryName='토플',
                                 sort='POPULAR',
                                 page=0
@@ -1082,14 +1087,14 @@
                             <h4>자연/과학</h4>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=701,
+                                categoryId=36,
                                 categoryName='공학',
                                 sort='POPULAR',
                                 page=0
                             )}">공학</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
-                                categoryId=702,
+                                categoryId=37,
                                 categoryName='수학',
                                 sort='POPULAR',
                                 page=0
@@ -1173,12 +1178,12 @@
             </div>
             <div class="card-grid" style="grid-template-columns: repeat(5, 1fr)">
 
-                <div th:if="${newBooks == null or newBooks.isEmpty()}"
+                <div th:if="${risingBooks == null or risingBooks.isEmpty()}"
                      style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">
-                    <p>인기 도서가 없습니다.</p>
+                    <p>아직 집계된 인기 도서가 없습니다.<br>(내일 아침에 랭킹이 업데이트됩니다!)</p>
                 </div>
 
-                <article class="card" th:unless="${newBooks == null}" th:each="book : ${newBooks}">
+                <article class="card" th:unless="${risingBooks == null}" th:each="book : ${risingBooks}">
                     <a th:href="@{/books/{id}(id=${book.bookId})}" class="book-link" style="display:block; color:inherit;">
                         <div class="thumb">
                             <img th:src="${book.image}"
@@ -1375,6 +1380,60 @@
                 }
             });
     }
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const menuWrapper = document.querySelector('.all-menu-wrapper');
+        const megaMenu = document.querySelector('.mega-menu');
+        const menuBtn = document.querySelector('.all-menu-btn');
+        let closeTimer = null;
+
+        // 메뉴 열기 함수
+        function openMenu() {
+            // 기존에 닫으려는 타이머가 돌고 있다면 취소 (메뉴 유지)
+            if (closeTimer) {
+                clearTimeout(closeTimer);
+                closeTimer = null;
+            }
+            megaMenu.classList.add('active');
+        }
+
+        // 메뉴 닫기 예약 함수 (10초 뒤)
+        function scheduleCloseMenu() {
+            // 이미 타이머가 있다면 중복 설정 방지
+            if (closeTimer) return;
+
+            closeTimer = setTimeout(() => {
+                megaMenu.classList.remove('active');
+                closeTimer = null;
+            }, 2000); // 10000ms = 10초
+        }
+
+        // 1. 버튼 클릭 시 토글 (열려있으면 닫기 예약, 닫혀있으면 열기)
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // 이벤트 버블링 방지
+            if (megaMenu.classList.contains('active')) {
+                // 이미 열려있다면 바로 닫지 않고 10초 뒤 닫기 예약 시작 (또는 즉시 닫기를 원하면 바로 remove)
+                scheduleCloseMenu();
+            } else {
+                openMenu();
+            }
+        });
+
+        // 2. 마우스가 영역(버튼+메뉴)에 들어오면 -> 타이머 취소하고 계속 보여줌
+        menuWrapper.addEventListener('mouseenter', openMenu);
+
+        // 3. 마우스가 영역을 벗어나면 -> 10초 카운트다운 시작
+        menuWrapper.addEventListener('mouseleave', scheduleCloseMenu);
+
+        // (선택 사항) 메뉴 내부의 링크를 클릭하면 즉시 닫혀야 깔끔함
+        const menuLinks = megaMenu.querySelectorAll('a');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                megaMenu.classList.remove('active');
+            });
+        });
+    });
 </script>
 </body>
 </html>
