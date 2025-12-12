@@ -249,8 +249,8 @@
             orderName: orderName,
             customerName: customerName,
             customerEmail: customerEmail,
-            successUrl: `${window.location.origin}/payment/success?orderId=${orderId}`,
-            failUrl: `${window.location.origin}/payment/fail?orderId=${orderId}`,
+            successUrl: window.location.origin + "/payment/success",
+            failUrl: window.location.origin + "/payment/fail",
         }).catch(error => {
             document.getElementById("loading-overlay").style.display = "none";
             if (error.code !== "USER_CANCEL") {
