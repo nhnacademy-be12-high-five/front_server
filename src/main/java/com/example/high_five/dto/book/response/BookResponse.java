@@ -1,5 +1,6 @@
 package com.example.high_five.dto.book.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,7 +11,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class BookResponse {
-
+    @JsonProperty("id")
     private Long bookId;
     private String title;
     private String author;

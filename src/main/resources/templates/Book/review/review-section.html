@@ -1,0 +1,108 @@
+<div class="review-section" th:fragment="review-section">
+
+    <div class="review-write-area">
+
+        <!-- 내가 작성한 리뷰 있을 때 -->
+        <div th:if="${myReview != null}" class="my-review-card">
+            <h3>내가 작성한 리뷰</h3>
+            <div class="review-item highlight">
+                <div class="review-header">
+                    <span class="stars" th:text="${'★'.repeat(myReview.rating)}">★★★★★</span>
+                    <span class="date"
+                          th:text="${#temporals.format(myReview.createdAt.toLocalDateTime(), 'yyyy-MM-dd')}">
+                        2025-01-01
+                    </span>
+                </div>
+                <div class="review-content">
+                    <p th:text="${myReview.content}">리뷰 내용...</p>
+
+                    <div th:if="${myReview.imageUrls != null and !myReview.imageUrls.isEmpty()}" class="review-img">
+                        <img th:src="${myReview.imageUrls[0]}" alt="내 리뷰 이미지">
+                    </div>
+                </div>
+                <div class="review-actions">
+                    <a href="javascript:void(0)"
+                       class="btn-small"
+                       th:data-review-id="${myReview.reviewId}"
+                       th:data-book-id="${book.bookId}"
+                       th:data-content="${myReview.content}"
+                       th:data-rating="${myReview.rating}"
+                       onclick="startEditReview(this)">
+                        수정
+                    </a>
+
+                    <form th:action="@{/reviews/books/{bookId}/{reviewId}/delete(bookId=${book.bookId}, reviewId=${myReview.reviewId})}"
+                          method="post" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                        <button type="submit" class="btn-small btn-danger">삭제</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 내가 작성한 리뷰 없을 때 -->
+        <div th:unless="${myReview != null}" class="review-form-card">
+            <h3>리뷰 작성</h3>
+            <form th:action="@{/reviews/books/{bookId}(bookId=${book.bookId})}"
+                  method="post" enctype="multipart/form-data">
+
+                <div class="star-rating">
+                    <span class="rating-label">별점</span>
+                    <select name="rating" class="form-select">
+                        <option value="5">★★★★★ (5점)</option>
+                        <option value="4">★★★★☆ (4점)</option>
+                        <option value="3">★★★☆☆ (3점)</option>
+                        <option value="2">★★☆☆☆ (2점)</option>
+                        <option value="1">★☆☆☆☆ (1점)</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <textarea name="content" placeholder="이 책에 대한 솔직한 리뷰를 남겨주세요." required></textarea>
+                </div>
+
+                <div class="file-group">
+                    <input type="file" name="images" multiple accept="image/*">
+                </div>
+
+                <button type="submit" class="btn-primary full-width">리뷰 등록하기</button>
+            </form>
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 전체 리뷰 리스트 -->
+    <div class="review-list-area">
+        <h3>전체 리뷰 <span th:text="${reviewList.totalElements}">0</span>건</h3>
+
+        <div class="review-list">
+            <div th:each="review : ${reviewList}" class="review-item">
+                <div class="writer-info">
+                    <span class="name" th:text="${review.loginId}">작성자ID</span>
+                    <span class="stars" th:text="${'★'.repeat(review.rating)}">★★★★★</span>
+                </div>
+                <div class="review-content">
+                    <p th:text="${review.content}">리뷰 내용</p>
+
+                    <div th:if="${review.imageUrls != null and !review.imageUrls.isEmpty()}" class="review-thumb">
+                        <img th:src="${review.imageUrls[0]}" width="100">
+                    </div>
+                </div>
+
+                <!-- ❗ review.createdAt 으로 수정 + Timestamp → LocalDateTime 변환 -->
+                <span class="date"
+                      th:text="${#temporals.format(review.createdAt.toLocalDateTime(), 'yyyy-MM-dd')}">
+                </span>
+
+            </div>
+
+            <div th:if="${reviewList.isEmpty()}" class="no-reviews">
+                <p>아직 작성된 리뷰가 없습니다. 첫 번째 리뷰를 남겨보세요!</p>
+            </div>
+        </div>
+
+        <div class="pagination" th:if="${!reviewList.isEmpty()}">
+        </div>
+    </div>
+</div>
+
