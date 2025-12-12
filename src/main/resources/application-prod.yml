@@ -1,0 +1,57 @@
+# application-prod.yml
+
+server:
+  # docker-compose에서 넘겨준 SERVER_PORT 사용 (예: 10483)
+  # 만약 0으로 설정하면 Eureka가 랜덤 포트로 인식하지만,
+  # Docker 포트 매핑을 위해 고정 포트가 필요할 수 있음.
+  port: ${SERVER_PORT:0}
+  tomcat:
+    uri-encoding: UTF-8
+
+spring:
+  application:
+    name: frontend-server
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+# 운영 유레카 설정 (환경 변수 주입)
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+  instance:
+    prefer-ip-address: true
+
+# 운영 게이트웨이 주소 (환경 변수 주입)
+gateway:
+  uri: ${API_GATEWAY_INTERNAL_URI}
+
+# Book API 기본 URL (환경 변수로 받은 게이트웨이 주소 활용)
+book:
+  api:
+    base-url: ${gateway.uri}/api/books
+
+jwt:
+  secret: ${jwt.secret}
+  expiration_time: ${jwt.expiration_time}
+  refresh_expiration_time: ${jwt.refresh_expiration_time}
+
+# 운영 로깅 (파일 저장 및 롤링 정책)
+logging:
+  file:
+    name: logs/front-server.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  level:
+    root: INFO
+    com.example.high_five: INFO
