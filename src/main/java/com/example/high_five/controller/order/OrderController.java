@@ -114,7 +114,7 @@ public class OrderController {
                                  @RequestParam Long amount,
                                  Model model) {
 
-        log.info("결제 승인 요청 시작: orderId={}, amount={}", orderId, amount);
+        log.info("결제 승인 요청: orderId={}, amount={}", orderId, amount);
 
         try {
             // 3-1. Payment Server에 승인 요청
@@ -128,16 +128,14 @@ public class OrderController {
             PaymentConfirmResponse response = paymentService.confirmPayment(confirmRequest);
 
             // 3-2. 승인 성공 시 완료 페이지에 보여줄 데이터 세팅
-            model.addAttribute("orderNumber", orderId); // 주문번호 (Toss orderId와 동일하게 사용 중이라면)
+            model.addAttribute("orderNumber", response.getPaymentId());
             model.addAttribute("totalPrice", response.getAmount());
             model.addAttribute("payMethodName", "Toss Payments"); // 혹은 response에서 받은 method
             model.addAttribute("orderDateTime", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
 
-            // 주문 상세 바로가기를 위해 orderId(Long 타입 PK가 있다면 그것을, 없다면 문자열 키) 전달
-            // 여기서는 orderId 문자열을 그대로 넘김
-            model.addAttribute("orderId", orderId);
+            model.addAttribute("orderId", orderId); // 주문 상세보기 용도
 
-            return "order/ordersuccess";
+            return "order/payment-success";
 
         } catch (FeignException e) {
             log.error("결제 승인 실패 (Feign): status={}, body={}", e.status(), e.contentUTF8());
