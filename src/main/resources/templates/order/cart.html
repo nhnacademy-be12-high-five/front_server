@@ -208,9 +208,10 @@
         if (newQty < 1) return; // 1 미만 방지
 
         // 서버에 요청
-        fetch('/api/cart/items', {
+        fetch('/cart/items', {
             method: 'PUT',
             headers: {'Content-Type': 'application/json'},
+            credentials: 'include',
             body: JSON.stringify({bookId: bookId, quantity: newQty})
         }).then(res => {
             if (res.ok) {
@@ -242,7 +243,7 @@
         const itemRow = btn.closest(".item");
         const bookId = itemRow.getAttribute("data-book-id");
 
-        fetch(`/api/cart/items/${bookId}`, {method: 'DELETE'})
+        fetch(`/cart/items/${bookId}`, {method: 'DELETE'})
             .then(res => {
                 if (res.ok) {
                     // 성공 시 해당 줄(row)만 삭제
@@ -262,7 +263,7 @@
     function clearCart() {
         if (!confirm("장바구니를 비우시겠습니까?")) return;
 
-        fetch('/api/cart/items', {method: 'DELETE'})
+        fetch('/cart/items', {method: 'DELETE'})
             .then(res => {
                 if (res.ok) {
                     // 리스트 내부를 싹 비우고 메시지 띄우기
@@ -289,7 +290,7 @@
         if (!confirm(`${checkboxes.length}개 상품을 삭제하시겠습니까?`)) return;
 
         const promises = Array.from(checkboxes).map(chk =>
-            fetch(`/api/cart/items/${chk.value}`, {method: 'DELETE'})
+            fetch(`/cart/items/${chk.value}`, {method: 'DELETE'})
                 .then(res => {
                     if(res.ok) {
                         // 성공한 항목은 화면에서 바로 지움

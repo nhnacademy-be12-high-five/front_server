@@ -25,38 +25,38 @@ public class FrontCartService {
         }
     }
 
-    public CartListResponse getCartItems(String cookieHeader) {
+    public CartListResponse getCartItems(Long memberId, String guestId) {
         // null 대신 unpaged() 사용
-        return cartService.getCartItems(cookieHeader, Pageable.unpaged()).getBody();
+        return cartService.getCartItems(memberId, guestId, Pageable.unpaged()).getBody();
     }
 
-    public void addToCart(String cookieHeader, CartAddRequest request, HttpServletResponse servletResponse) {
-        ResponseEntity<CartAddResponse> response = cartService.addItemToCart(request, cookieHeader);
+    public void addToCart(Long memberId, String guestId, CartAddRequest request, HttpServletResponse servletResponse) {
+        ResponseEntity<CartAddResponse> response = cartService.addItemToCart(request, memberId, guestId);
         syncCookie(response, servletResponse);
     }
 
-    public void updateQuantity(String cookieHeader, CartItemUpdateRequest request) {
-        cartService.updateQuantity(request, cookieHeader);
+    public void updateQuantity(Long memberId, String guestId, CartItemUpdateRequest request) {
+        cartService.updateQuantity(request, memberId, guestId);
     }
 
-    public void deleteItem(String cookieHeader, Long bookId) {
-        cartService.deleteOneItem(bookId, cookieHeader);
+    public void deleteItem(Long memberId, String guestId, Long bookId) {
+        cartService.deleteOneItem(bookId, memberId, guestId);
     }
 
-    public void clearCart(String cookieHeader) {
-        cartService.deleteAllCartItem(cookieHeader);
+    public void clearCart(Long memberId, String guestId) {
+        cartService.deleteAllCartItem(memberId, guestId);
     }
 
-    public void mergeCart(String cookieHeader, HttpServletResponse servletResponse) {
+    public void mergeCart(Long memberId, String guestId, HttpServletResponse servletResponse) {
         // 1. 백엔드 호출
-        ResponseEntity<Void> response = cartService.mergeGuestCart(cookieHeader);
+        ResponseEntity<Void> response = cartService.mergeGuestCart(memberId, guestId);
         // 2. 백엔드에서 "쿠키 지워라"라는 헤더가 오면 브라우저로 전달
         syncCookie(response, servletResponse);
     }
 
-    public void deleteGuestCart(String cookieHeader, HttpServletResponse servletResponse) {
+    public void deleteGuestCart(Long memberId, String guestId, HttpServletResponse servletResponse) {
         // 1. 백엔드 호출
-        ResponseEntity<Void> response = cartService.deleteGuestCartOnly(cookieHeader);
+        ResponseEntity<Void> response = cartService.deleteGuestCartOnly(memberId, guestId);
         // 2. 쿠키 동기화
         syncCookie(response, servletResponse);
     }

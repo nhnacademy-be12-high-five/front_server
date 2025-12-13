@@ -14,40 +14,47 @@ public interface CartService {
     @PostMapping("/api/cart/items")
     ResponseEntity<CartAddResponse> addItemToCart(
             @RequestBody CartAddRequest request,
-            @RequestHeader(value = "Cookie", required = false) String cookieHeader
+            @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
+            @RequestHeader(name = "X-GUEST-ID", required = false) String guestId
     );
 
     @GetMapping("/api/cart")
     ResponseEntity<CartListResponse> getCartItems(
-            @RequestHeader(value = "Cookie", required = false) String cookieHeader,
+            @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
+            @RequestHeader(name = "X-GUEST-ID", required = false) String guestId,
             @SpringQueryMap Pageable pageable
     );
 
     @DeleteMapping("/api/cart/items")
     ResponseEntity<Void> deleteAllCartItem(
-            @RequestHeader(value = "Cookie", required = false) String cookieHeader
+            @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
+            @RequestHeader(name = "X-GUEST-ID", required = false) String guestId
     );
 
     @PutMapping("/api/cart/items")
     ResponseEntity<CartUpdateResponse> updateQuantity(
             @RequestBody CartItemUpdateRequest request,
-            @RequestHeader(value = "Cookie", required = false) String cookieHeader
+            @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
+            @RequestHeader(name = "X-GUEST-ID", required = false) String guestId
     );
 
     @DeleteMapping("/api/cart/items/{bookId}")
     ResponseEntity<Void> deleteOneItem(
             @PathVariable("bookId") Long bookId,
-            @RequestHeader(value = "Cookie", required = false) String cookieHeader
+            @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
+            @RequestHeader(name = "X-GUEST-ID", required = false) String guestId
     );
 
     @PostMapping("/api/cart/merge")
     ResponseEntity<Void> mergeGuestCart(
-            @RequestHeader(value = "Cookie", required = false) String cookieHeader
+            @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
+            @RequestHeader(name = "X-GUEST-ID", required = false) String guestId
     );
 
     // [추가] 비회원 장바구니 삭제 요청 (백엔드로)
     @DeleteMapping("/api/cart/guest")
     ResponseEntity<Void> deleteGuestCartOnly(
-            @RequestHeader(value = "Cookie", required = false) String cookieHeader
+            @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
+            @RequestHeader(name = "X-GUEST-ID", required = false) String guestId
     );
 }
