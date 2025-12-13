@@ -58,7 +58,9 @@ public class CartController {
     @DeleteMapping("/cart/items")
     @ResponseBody
     public ResponseEntity<Void> clearCart(@RequestHeader(name = "X-USER-ID", required = false) Long memberId) {
+        System.out.println("===== FRONT DELETE CONTROLLER HIT =====");
         cartService.clearCart(memberId);
+        System.out.println("===== FRONT DELETE CONTROLLER HIT AFTER =====");
         return ResponseEntity.noContent().build();
     }
 
