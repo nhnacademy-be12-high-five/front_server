@@ -20,8 +20,9 @@ public class CartController {
     // 장바구니 페이지 조회
     @GetMapping("/cart")
     public String viewCartItems(Model model,
-                                @RequestHeader(value = "Cookie", required = false) String cookie) {
-        CartListResponse cartList = cartService.getCartItems(cookie);
+                                @CookieValue(value = "guestCookie", required = false) String guestId,
+                                @RequestHeader(name = "X-USER-ID", required = false) Long memberId) {
+        CartListResponse cartList = cartService.getCartItems(memberId, guestId);
         model.addAttribute("cartList", cartList);
         return "order/cart";
     }
@@ -30,9 +31,10 @@ public class CartController {
     @PostMapping("/cart/items")
     @ResponseBody
     public ResponseEntity<String> addItem(@RequestBody CartAddRequest request,
-                                          @RequestHeader(value = "Cookie", required = false) String cookie,
+                                          @CookieValue(value = "guestCookie", required = false) String guestId,
+                                          @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
                                           HttpServletResponse response) {
-        cartService.addToCart(cookie, request, response);
+        cartService.addToCart(memberId, guestId, request, response);
         return ResponseEntity.ok("장바구니에 담겼습니다.");
     }
 
@@ -40,9 +42,10 @@ public class CartController {
     @PutMapping("/cart/items")
     @ResponseBody
     public ResponseEntity<Void> updateQuantity(@RequestBody CartItemUpdateRequest request,
-                                               @RequestHeader(value = "Cookie", required = false) String cookie) {
+                                               @CookieValue(value = "guestCookie", required = false) String guestId,
+                                               @RequestHeader(name = "X-USER-ID", required = false) Long memberId) {
         log.info(">>> cart update start");
-        cartService.updateQuantity(cookie, request);
+        cartService.updateQuantity(memberId, guestId, request);
         log.info("<<< cart update end");
         return ResponseEntity.ok().build();
     }
@@ -51,25 +54,28 @@ public class CartController {
     @DeleteMapping("/cart/items/{bookId}")
     @ResponseBody
     public ResponseEntity<Void> deleteItem(@PathVariable Long bookId,
-                                           @RequestHeader(value = "Cookie", required = false) String cookie) {
-        cartService.deleteItem(cookie, bookId);
+                                           @CookieValue(value = "guestCookie", required = false) String guestId,
+                                           @RequestHeader(name = "X-USER-ID", required = false) Long memberId) {
+        cartService.deleteItem(memberId, guestId, bookId);
         return ResponseEntity.noContent().build();
     }
 
     // 전체 삭제
     @DeleteMapping("/cart/items")
     @ResponseBody
-    public ResponseEntity<Void> clearCart(@RequestHeader(value = "Cookie", required = false) String cookie) {
-        cartService.clearCart(cookie);
+    public ResponseEntity<Void> clearCart(@CookieValue(value = "guestCookie", required = false) String guestId,
+                                          @RequestHeader(name = "X-USER-ID", required = false) Long memberId) {
+        cartService.clearCart(memberId, guestId);
         return ResponseEntity.noContent().build();
     }
 
     // 카운트 뱃지
     @GetMapping("/cart/count")
     @ResponseBody
-    public ResponseEntity<Integer> getCartCount(@RequestHeader(value = "Cookie", required = false) String cookie) {
+    public ResponseEntity<Integer> getCartCount(@CookieValue(value = "guestCookie", required = false) String guestId,
+                                                @RequestHeader(name = "X-USER-ID", required = false) Long memberId) {
         try {
-            CartListResponse response = cartService.getCartItems(cookie);
+            CartListResponse response = cartService.getCartItems(memberId, guestId);
             if(response == null || response.items() == null) return ResponseEntity.ok(0);
             return ResponseEntity.ok(response.items().size());
         } catch (Exception e) {
@@ -79,9 +85,10 @@ public class CartController {
 
     @PostMapping("/cart/merge")
     @ResponseBody
-    public ResponseEntity<Void> mergeCart(@RequestHeader(value = "Cookie", required = false) String cookie,
+    public ResponseEntity<Void> mergeCart(@CookieValue(value = "guestCookie", required = false) String guestId,
+                                          @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
                                           HttpServletResponse response) {
-        cartService.mergeCart(cookie, response);
+        cartService.mergeCart(memberId, guestId, response);
 
         expireCookie(response, "guestCookie");
 
@@ -90,9 +97,10 @@ public class CartController {
 
     @DeleteMapping("/cart/guest")
     @ResponseBody
-    public ResponseEntity<Void> deleteGuestCart(@RequestHeader(value = "Cookie", required = false) String cookie,
+    public ResponseEntity<Void> deleteGuestCart(@CookieValue(value = "guestCookie", required = false) String guestId,
+                                                @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
                                                 HttpServletResponse response) {
-        cartService.deleteGuestCart(cookie, response);
+        cartService.deleteGuestCart(memberId, guestId, response);
 
         expireCookie(response, "guestCookie");
 
