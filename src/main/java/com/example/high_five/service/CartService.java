@@ -25,20 +25,20 @@ public interface CartService {
             @SpringQueryMap Pageable pageable
     );
 
-    @PostMapping("/api/cart/items")
+    @DeleteMapping("/api/cart/items")
     ResponseEntity<Void> deleteAllCartItem(
             @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
             @RequestHeader(name = "X-GUEST-ID", required = false) String guestId
     );
 
-    @PostMapping("/api/cart/items")
+    @PutMapping("/api/cart/items")
     ResponseEntity<CartUpdateResponse> updateQuantity(
             @RequestBody CartItemUpdateRequest request,
             @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
             @RequestHeader(name = "X-GUEST-ID", required = false) String guestId
     );
 
-    @PostMapping("/api/cart/items/{bookId}")
+    @DeleteMapping("/api/cart/items/{bookId}")
     ResponseEntity<Void> deleteOneItem(
             @PathVariable("bookId") Long bookId,
             @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
@@ -52,7 +52,7 @@ public interface CartService {
     );
 
     // [추가] 비회원 장바구니 삭제 요청 (백엔드로)
-    @PostMapping("/api/cart/guest")
+    @DeleteMapping("/api/cart/guest")
     ResponseEntity<Void> deleteGuestCartOnly(
             @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
             @RequestHeader(name = "X-GUEST-ID", required = false) String guestId
