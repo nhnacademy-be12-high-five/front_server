@@ -39,7 +39,7 @@ public class CartController {
     }
 
     // 수량 변경
-    @PostMapping("/cart/items")
+    @PutMapping("/cart/items")
     @ResponseBody
     public ResponseEntity<Void> updateQuantity(@RequestBody CartItemUpdateRequest request,
                                                @CookieValue(value = "guestCookie", required = false) String guestId,
@@ -51,7 +51,7 @@ public class CartController {
     }
 
     // 단건 삭제
-    @PostMapping("/cart/items/{bookId}")
+    @DeleteMapping("/cart/items/{bookId}")
     @ResponseBody
     public ResponseEntity<Void> deleteItem(@PathVariable Long bookId,
                                            @CookieValue(value = "guestCookie", required = false) String guestId,
@@ -61,7 +61,7 @@ public class CartController {
     }
 
     // 전체 삭제
-    @PostMapping("/cart/items")
+    @DeleteMapping("/cart/items")
     @ResponseBody
     public ResponseEntity<Void> clearCart(@CookieValue(value = "guestCookie", required = false) String guestId,
                                           @RequestHeader(name = "X-USER-ID", required = false) Long memberId) {
@@ -95,7 +95,7 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/cart/guest")
+    @DeleteMapping("/cart/guest")
     @ResponseBody
     public ResponseEntity<Void> deleteGuestCart(@CookieValue(value = "guestCookie", required = false) String guestId,
                                                 @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
