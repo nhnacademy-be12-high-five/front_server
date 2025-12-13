@@ -14,47 +14,40 @@ public interface CartService {
     @PostMapping("/api/cart/items")
     ResponseEntity<CartAddResponse> addItemToCart(
             @RequestBody CartAddRequest request,
-            @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
-            @RequestHeader(name = "X-GUEST-ID", required = false) String guestId
+            @RequestHeader(name = "X-USER-ID", required = false) Long memberId
     );
 
     @GetMapping("/api/cart")
     ResponseEntity<CartListResponse> getCartItems(
             @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
-            @RequestHeader(name = "X-GUEST-ID", required = false) String guestId,
             @SpringQueryMap Pageable pageable
     );
 
     @DeleteMapping("/api/cart/items")
     ResponseEntity<Void> deleteAllCartItem(
-            @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
-            @RequestHeader(name = "X-GUEST-ID", required = false) String guestId
+            @RequestHeader(name = "X-USER-ID", required = false) Long memberId
     );
 
     @PutMapping("/api/cart/items")
     ResponseEntity<CartUpdateResponse> updateQuantity(
             @RequestBody CartItemUpdateRequest request,
-            @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
-            @RequestHeader(name = "X-GUEST-ID", required = false) String guestId
+            @RequestHeader(name = "X-USER-ID", required = false) Long memberId
     );
 
     @DeleteMapping("/api/cart/items/{bookId}")
     ResponseEntity<Void> deleteOneItem(
             @PathVariable("bookId") Long bookId,
-            @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
-            @RequestHeader(name = "X-GUEST-ID", required = false) String guestId
+            @RequestHeader(name = "X-USER-ID", required = false) Long memberId
     );
 
     @PostMapping("/api/cart/merge")
     ResponseEntity<Void> mergeGuestCart(
-            @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
-            @RequestHeader(name = "X-GUEST-ID", required = false) String guestId
+            @RequestHeader(name = "X-USER-ID", required = false) Long memberId
     );
 
     // [추가] 비회원 장바구니 삭제 요청 (백엔드로)
     @DeleteMapping("/api/cart/guest")
     ResponseEntity<Void> deleteGuestCartOnly(
-            @RequestHeader(name = "X-USER-ID", required = false) Long memberId,
-            @RequestHeader(name = "X-GUEST-ID", required = false) String guestId
+            @RequestHeader(name = "X-USER-ID", required = false) Long memberId
     );
 }
