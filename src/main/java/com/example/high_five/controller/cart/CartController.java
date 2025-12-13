@@ -53,11 +53,10 @@ public class CartController {
     // 단건 삭제
     @DeleteMapping("/cart/items/{bookId}")
     @ResponseBody
-    public ResponseEntity<Void> deleteItem(@PathVariable Long bookId,
+    public ResponseEntity<String> deleteItem(@PathVariable Long bookId,
                                            @CookieValue(value = "guestCookie", required = false) String guestId,
                                            @RequestHeader(name = "X-USER-ID", required = false) Long memberId) {
-        cartService.deleteItem(memberId, guestId, bookId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("front-ok");
     }
 
     // 전체 삭제
