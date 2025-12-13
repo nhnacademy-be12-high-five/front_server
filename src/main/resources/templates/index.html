@@ -1356,7 +1356,7 @@
         }
     });
     function updateCartBadge() {
-        fetch('/api/cart/count', {
+        fetch('/cart/count', {
             method: 'GET',
             headers: {'Content-Type': 'application/json'}
         })

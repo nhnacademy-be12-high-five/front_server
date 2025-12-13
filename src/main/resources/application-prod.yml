@@ -55,3 +55,10 @@ logging:
   level:
     root: INFO
     com.example.high_five: INFO
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 3000
+        readTimeout: 3000
