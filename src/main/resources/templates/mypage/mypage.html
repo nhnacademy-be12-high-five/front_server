@@ -48,7 +48,15 @@
                 <img src="../img/icon-cart.png" alt="장바구니" class="user-icon" />
             </a>
 
-            <a class="user-link pill" th:href="@{/templates/member/login.html}">로그인</a>
+<!--            <a class="user-link pill" th:href="@{/templates/member/login.html}">로그인</a>-->
+
+            <a th:if="${myInfo == null}"
+               class="user-link pill"
+               th:href="@{/login}">로그인</a>
+
+            <a th:if="${myInfo != null}"
+               class="user-link pill"
+               th:href="@{/logout}">로그아웃</a>
         </div>
 
     </div>

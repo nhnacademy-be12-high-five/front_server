@@ -13,9 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -29,7 +27,7 @@ public class AuthController {
 
     @Value("${jwt.refresh_expiration_time}")
     private Long refreshExpirationTime;
-
+    //로컬에선 false 처리
     private static final boolean IS_SECURE = true;
 
     @GetMapping("/member/login.html")
@@ -110,5 +108,24 @@ public class AuthController {
             }
         }
         return null;
+    }
+
+    @GetMapping("/login/oauth2/code/{provider}")
+    public String socialLoginCallback(
+            @PathVariable String provider,
+            @RequestParam("code") String code,
+            HttpServletResponse response
+    ) {
+
+        ResponseEntity<TokenDto> apiResponse = authService.loginSocial(provider, code);
+        TokenDto tokens = apiResponse.getBody();
+
+        if (tokens == null) {
+            throw new RuntimeException("소셜 로그인 실패: 토큰을 받아오지 못했습니다.");
+        }
+        setCookie(response, "access-token", tokens.getAccessToken(), accessExpirationTime);
+        setCookie(response, "refresh-token", tokens.getRefreshToken(), refreshExpirationTime);
+
+        return "redirect:/";
     }
 }
