@@ -9,6 +9,7 @@ import com.example.high_five.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,11 +29,10 @@ public class BookController {
     /**
      * 도서 상세 화면
      */
-    @GetMapping("/books/{book-id}")
-    public String getBookDetail(@PathVariable("book-id") Long id, Model model) {
+    @GetMapping("/books/{bookId}")
+    public String getBookDetail(@PathVariable("bookId") Long id, Model model) {
 
         BookResponse book = bookClient.getBookDetail(id);
-
         model.addAttribute("book", book);
 
         try {
@@ -59,8 +59,21 @@ public class BookController {
         Page<BookReviewResponse> reviewList = reviewService.getReviews(id, Pageable.ofSize(5));
         model.addAttribute("reviewList", reviewList);
 
+        Long memberId = 1L;
+        boolean isLiked = false;
+
+        if (memberId != null){
+            try {
+                ResponseEntity<Boolean> likeResponse = bookClient.getLikeStatus(id, memberId);
+            }
+            catch (Exception e) {
+                // 에러 나도 페이지는 떠야 하므로 로그만 찍고 false 유지
+                System.err.println("좋아요 상태 조회 실패: " + e.getMessage());
+            }
+        }
+
+        // 마이페이지- 찜목록으로 이동하도록 구현
+         model.addAttribute("isLiked", isLiked);
         return "Book/book-detail";
     }
-
-
 }
