@@ -11,7 +11,7 @@ import java.util.Map;
 public interface CouponService {
 
     @GetMapping("/api/coupons/members")
-    Map<String, Object> getMemberCoupons(@CookieValue("AccessToken") String accessToken,
+    Map<String, Object> getMemberCoupons(@CookieValue("access-token") String accessToken,
                                          @RequestParam(value = "page", defaultValue = "0") int page,
                                          @RequestParam(value = "size", defaultValue = "10") int size);
 
@@ -26,7 +26,7 @@ public interface CouponService {
     void createCouponPolicy(@RequestBody CouponPolicyRequestDto dto);
 
     @PostMapping("/api/coupons/issue")
-    void issueCoupon(@CookieValue("AccessToken") String accessToken,
+    void issueCoupon(@CookieValue("access-token") String accessToken,
                      @RequestBody UserCouponIssueRequestDto requestDto);
 
     @GetMapping("/api/coupons/admin/coupon-policies")
