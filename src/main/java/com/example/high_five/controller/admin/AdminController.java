@@ -27,8 +27,9 @@ public class AdminController {
     private final CategoryFeignClient categoryFeignClient;
 
     @GetMapping("/api/coupons/admin/coupons")
-    public String couponPage(Model model){
-        List<CouponTemplateDto> coupons = couponService.getAdminCoupons();
+    public String couponPage(@CookieValue(value = "access-token", required = false) String accessToken,
+                             Model model){
+        List<CouponTemplateDto> coupons = couponService.getAdminCoupons(accessToken);
         List<CouponPolicyResponseDto> policies = couponService.getAllPolicies();
         model.addAttribute("coupons",coupons);
         model.addAttribute("policies",policies);
