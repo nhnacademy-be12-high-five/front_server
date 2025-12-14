@@ -26,7 +26,7 @@ public class AdminController {
     private final BookFeignClient bookFeignClient;
     private final CategoryFeignClient categoryFeignClient;
 
-    @GetMapping("/api/coupons/admin/coupons")
+    @GetMapping("/admin/coupons/page")
     public String couponPage(@CookieValue(value = "access-token", required = false) String accessToken,
                              Model model){
 
@@ -53,7 +53,7 @@ public class AdminController {
         }
     }
 
-    @PostMapping("/api/coupons/admin/policies/create")
+    @PostMapping("/admin/coupons/policies/create")
     public String createPolicy(@ModelAttribute CouponPolicyRequestDto dto) {
 
         if (dto.getTargetBookIds() == null) {
@@ -65,10 +65,10 @@ public class AdminController {
 
         couponService.createCouponPolicy(dto);
 
-        return "redirect:/api/coupons/admin/coupons";
+        return "redirect:/admin/coupons/page";
     }
 
-    @PostMapping("/api/coupons/admin/coupons/create")
+    @PostMapping("/admin/coupons/create")
     public String createCouponTemplate(@ModelAttribute CouponCreateRequestDto dto, RedirectAttributes redirectAttributes) {
         try {
             couponService.createCouponTemplate(dto);
@@ -76,10 +76,10 @@ public class AdminController {
         } catch (FeignException e) {
             redirectAttributes.addFlashAttribute("errorMessage", "템플릿 생성 실패: 정책이 비활성화 상태이거나 잘못된 요청입니다.");
         }
-        return "redirect:/api/coupons/admin/coupons";
+        return "redirect:/admin/coupons/page";
     }
 
-    @PostMapping("/api/coupons/admin/policies/{id}")
+    @PostMapping("/admin/coupons/policies/{id}")
     public String disablePolicy(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         try {
             couponService.disableCouponPolicy(id);
@@ -87,10 +87,10 @@ public class AdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "정책 비활성화 중 오류가 발생했습니다.");
         }
-        return "redirect:/api/coupons/admin/coupons";
+        return "redirect:/admin/coupons/page";
     }
 
-    @PostMapping("/api/coupons/admin/member-coupons/issue")
+    @PostMapping("/admin/coupons/member-coupons/issue")
     public String issueCouponManually(@RequestParam Long userId,
                                       @RequestParam Long couponId,
                                       RedirectAttributes redirectAttributes) {
@@ -116,10 +116,10 @@ public class AdminController {
             e.printStackTrace();
         }
 
-        return "redirect:/api/coupons/admin/coupons";
+        return "redirect:/admin/coupons/page";
     }
 
-    @GetMapping("/api/coupons/admin/policies/{id}")
+    @GetMapping("/admin/coupons/policies/{id}")
     public String policyDetail(@PathVariable("id") Long id, Model model) {
         // 1. Feign Client로 백엔드 데이터 조회
         CouponPolicyResponseDto policy = couponService.getCouponPolicy(id);
@@ -131,7 +131,7 @@ public class AdminController {
         return "admin/policy-detail";
     }
 
-    @GetMapping("/api/coupons/admin/books/search")
+    @GetMapping("/admin/coupons/books/search")
     @ResponseBody // JSON 데이터를 반환하기 위해 사용
     public ResponseEntity<List<BookResponse>> searchBooksForCoupon(@RequestParam("keyword") String keyword) {
         try {
@@ -153,7 +153,7 @@ public class AdminController {
     /**
      * [추가] 1차 카테고리 목록 조회 (AJAX용)
      */
-    @GetMapping("/api/coupons/admin/categories/parent")
+    @GetMapping("/admin/coupons/categories/parent")
     @ResponseBody
     public ResponseEntity<List<CategoryResponse>> getParentCategories() {
         return ResponseEntity.ok(categoryFeignClient.getParentCategories());
@@ -162,13 +162,13 @@ public class AdminController {
     /**
      * [추가] 2차 카테고리 목록 조회 (AJAX용)
      */
-    @GetMapping("/api/coupons/admin/categories/{parentId}/child")
+    @GetMapping("/admin/coupons/categories/{parentId}/child")
     @ResponseBody
     public ResponseEntity<List<CategoryResponse>> getChildCategories(@PathVariable int parentId) {
         return ResponseEntity.ok(categoryFeignClient.getChildCategories(parentId));
     }
 
-    @GetMapping("/api/coupons/admin/specific-book-coupons")
+    @GetMapping("/admin/coupons/specific-book-coupons")
     public String specificBookCouponPage(Model model) {
         List<CouponPolicyResponseDto> policies = couponService.getAllPolicies();
         model.addAttribute("policies", policies);
