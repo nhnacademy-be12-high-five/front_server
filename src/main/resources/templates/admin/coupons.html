@@ -13,8 +13,8 @@
     <ul class="menu">
         <li><a href="/admin/books">도서 관리</a></li>
         <li><a href="/admin/points">포인트 관리</a></li>
-        <li><a href="/api/coupons/admin/coupons" class="active">쿠폰 관리</a></li>
-        <li><a href="/api/coupons/admin/specific-book-coupons">특정 도서 쿠폰 관리</a></li>
+        <li><a href="/admin/coupons/page" class="active">쿠폰 관리</a></li>
+        <li><a href="/admin/coupons/specific-book-coupons">특정 도서 쿠폰 관리</a></li>
     </ul>
 </aside>
 
@@ -27,7 +27,7 @@
         <div class="coupon-detail2">
             <div class="card">
                 <h3>쿠폰 정책 생성</h3>
-                <form action="/api/coupons/admin/policies/create" method="post">
+                <form action="/admin/coupons/policies/create" method="post">
                     <div class="form-row">
                         <label>정책 이름</label>
                         <input type="text" name="name" placeholder="예: 겨울 정기 세일 정책" required>
@@ -102,7 +102,7 @@
                         <tr th:each="policy : ${policies}">
                             <td th:text="${policy.id}">1</td>
                             <td>
-                                <a th:href="@{/api/coupons/admin/policies/{id}(id=${policy.id})}"
+                                <a th:href="@{/admin/coupons/policies/{id}(id=${policy.id})}"
                                    th:text="${policy.name}"
                                    style="color: #007bff; text-decoration: underline; cursor: pointer;">
                                     정책 이름
@@ -122,7 +122,7 @@
                             </td>
                             <td>
                                 <form th:if="${policy.status == 'ACTIVE'}"
-                                      th:action="@{/api/coupons/admin/policies/{id}(id=${policy.id})}"
+                                      th:action="@{/admin/coupons/policies/{id}(id=${policy.id})}"
                                       method="post"
                                       onsubmit="return confirm('정말 이 정책을 비활성화하시겠습니까?\n\n[주의] 해당 정책으로 발급된 모든 미사용 쿠폰이 \'만료(EXPIRED)\' 처리되며, 더 이상 복구할 수 없습니다.');">
                                     <button type="submit"
@@ -148,7 +148,7 @@
         <div class="coupon-detail">
             <div class="card">
                 <h3>쿠폰 템플릿 생성</h3>
-                <form action="/api/coupons/admin/coupons/create" method="post">
+                <form action="/admin/coupons/create" method="post">
                     <div class="form-row">
                         <label>적용 정책 선택</label>
                         <select name="id" required>
@@ -289,7 +289,7 @@
             </div>
             <div class="card">
                 <h3>회원 쿠폰 수동 지급</h3>
-                <form action="/api/coupons/admin/member-coupons/issue" method="post">
+                <form action="/admin/coupons/member-coupons/issue" method="post">
                     <div class="form-row">
                         <label>대상 회원 ID</label>
                         <input type="number" name="userId" placeholder="회원 ID (예: 1)" required>
@@ -334,7 +334,7 @@
     });
 
     function loadParentCategories() {
-        fetch('/api/coupons/admin/categories/parent')
+        fetch('/admin/coupons/categories/parent')
             .then(res => res.json())
             .then(data => {
                 const select = document.getElementById('parentCategory');
@@ -355,7 +355,7 @@
 
         if (!parentId) return;
 
-        fetch(`/api/coupons/admin/categories/${parentId}/child`)
+        fetch(`/admin/coupons/categories/${parentId}/child`)
             .then(res => res.json())
             .then(data => {
                 data.forEach(cat => {

@@ -58,8 +58,8 @@
     <ul class="menu">
         <li><a href="/admin/books">도서 관리</a></li>
         <li><a href="/admin/points/policy">포인트 관리</a></li>
-        <li><a href="/api/coupons/admin/coupons">쿠폰 관리</a></li>
-        <li><a href="/api/coupons/admin/specific-book-coupons" class="active">특정 도서 쿠폰 관리</a></li>
+        <li><a href="/admin/coupons/page">쿠폰 관리</a></li>
+        <li><a href="/admin/coupons/specific-book-coupons" class="active">특정 도서 쿠폰 관리</a></li>
     </ul>
 </aside>
 
@@ -72,7 +72,7 @@
         <div class="card" style="max-width: 800px; margin: 0 auto;">
             <h3>도서별 쿠폰 정책 만들기</h3>
 
-            <form action="/api/coupons/admin/policies/create" method="post" onsubmit="return prepareSubmit()">
+            <form action="/admin/coupons/policies/create" method="post" onsubmit="return prepareSubmit()">
                 <div class="form-row">
                     <label>정책 이름</label>
                     <input type="text" name="name" placeholder="예: 해리포터 시리즈 특별 할인" required>
@@ -151,7 +151,7 @@
 
         try {
             // AdminController에 있는 API 호출
-            const response = await fetch(`/api/coupons/admin/books/search?keyword=${encodeURIComponent(keyword)}`);
+            const response = await fetch(`/admin/coupons/books/search?keyword=${encodeURIComponent(keyword)}`);
             const books = await response.json();
 
             resultArea.innerHTML = '';
