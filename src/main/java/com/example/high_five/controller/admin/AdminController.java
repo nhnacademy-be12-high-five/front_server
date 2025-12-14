@@ -34,11 +34,23 @@ public class AdminController {
             return "redirect:/member/login.html";
         }
 
-        List<CouponTemplateDto> coupons = couponService.getAdminCoupons();
-        List<CouponPolicyResponseDto> policies = couponService.getAllPolicies();
-        model.addAttribute("coupons",coupons);
-        model.addAttribute("policies",policies);
-        return "admin/coupons";
+        try {
+            List<CouponTemplateDto> coupons = couponService.getAdminCoupons();
+            List<CouponPolicyResponseDto> policies = couponService.getAllPolicies();
+
+            model.addAttribute("coupons", coupons);
+            model.addAttribute("policies", policies);
+            return "admin/coupons";
+
+        } catch (FeignException.Unauthorized e) {
+            System.out.println("인증 실패(401): 토큰이 유효하지 않습니다. 로그인 페이지로 이동합니다.");
+            return "redirect:/member/login.html";
+        } catch (FeignException.Forbidden e) {
+            return "redirect:/";
+        } catch (FeignException e) {
+            e.printStackTrace();
+            return "redirect:/";
+        }
     }
 
     @PostMapping("/api/coupons/admin/policies/create")
