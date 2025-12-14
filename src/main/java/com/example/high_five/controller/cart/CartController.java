@@ -10,8 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-
 @Controller
 @RequiredArgsConstructor
 @Slf4j
@@ -39,7 +37,7 @@ public class CartController {
     }
 
     // 수량 변경
-    @PutMapping("/api/cart/items")
+    @PutMapping("/cart/items")
     @ResponseBody
     public ResponseEntity<Void> updateQuantity(@RequestBody CartItemUpdateRequest request,
                                                @RequestHeader(name = "X-USER-ID", required = false) Long memberId) {
@@ -49,7 +47,7 @@ public class CartController {
     }
 
     // 단건 삭제
-    @DeleteMapping("/api/cart/items/{bookId}")
+    @DeleteMapping("/cart/items/{bookId}")
     @ResponseBody
     public ResponseEntity<Void> deleteItem(@PathVariable Long bookId,
                                            @RequestHeader(name = "X-USER-ID", required = false) Long memberId) {
@@ -58,7 +56,7 @@ public class CartController {
     }
 
     // 전체 삭제
-    @DeleteMapping("/api/cart/items")
+    @DeleteMapping("/cart/items")
     @ResponseBody
     public ResponseEntity<Void> clearCart(@RequestHeader(name = "X-USER-ID", required = false) Long memberId) {
         System.out.println("삭제 요청 확인됨");
