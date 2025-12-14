@@ -27,13 +27,8 @@ public class AdminController {
     private final CategoryFeignClient categoryFeignClient;
 
     @GetMapping("/api/coupons/admin/coupons")
-    public String couponPage(@CookieValue(value = "access-token", required = false) String accessToken,
+    public String couponPage(@RequestHeader("Authorization") String accessToken,
                              Model model){
-
-        if (accessToken == null || accessToken.isBlank()) {
-            System.out.println("AdminController: access-token 쿠키가 없음 (배포 환경 도메인/경로 문제 가능성)");
-            return "redirect:/member/login.html"; // 로그인 페이지로 리다이렉트
-        }
 
         String token = "Bearer " + accessToken;
 
