@@ -1,11 +1,11 @@
 package com.example.high_five.service;
 
+import ch.qos.logback.core.model.Model;
 import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.book.PagedResponse;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -47,4 +47,18 @@ public interface BookClient {
 
     @GetMapping("/api/categories/{categoryId}/books")
     List<BookResponse> getBooksByCategory(@PathVariable("categoryId") long categoryId);
+
+    // 도서 좋아요 조회
+    @GetMapping("/members/me/likes")
+    Boolean getBookLike(@PathVariable("book-id") Long id);
+
+    // 좋아요를 눌렀는데 로그인이 안되어있다면 로그인창으로 리다이렉팅
+    @PostMapping("/api/books/{book-id}/likes")
+    void toggleLike(@PathVariable("book-id") Long bookId,
+                          @RequestHeader(value = "X-USER-ID", required = true) Long memberId);
+
+    @GetMapping("/books/{book-id}/likes/status")
+    ResponseEntity<Boolean> getLikeStatus(@PathVariable("book-id") Long bookId,
+                                          @RequestHeader(value = "X-USER-ID", required = true) Long memberId);
+
 }
