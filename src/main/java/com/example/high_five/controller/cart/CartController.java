@@ -39,7 +39,7 @@ public class CartController {
     }
 
     // 수량 변경
-    @PutMapping("/cart/items")
+    @PutMapping("/api/cart/items")
     @ResponseBody
     public ResponseEntity<Void> updateQuantity(@RequestBody CartItemUpdateRequest request,
                                                @RequestHeader(name = "X-USER-ID", required = false) Long memberId) {
@@ -49,7 +49,7 @@ public class CartController {
     }
 
     // 단건 삭제
-    @DeleteMapping("/cart/items/{bookId}")
+    @DeleteMapping("/api/cart/items/{bookId}")
     @ResponseBody
     public ResponseEntity<Void> deleteItem(@PathVariable Long bookId,
                                            @RequestHeader(name = "X-USER-ID", required = false) Long memberId) {
@@ -58,7 +58,7 @@ public class CartController {
     }
 
     // 전체 삭제
-    @DeleteMapping("/cart/items")
+    @DeleteMapping("/api/cart/items")
     @ResponseBody
     public ResponseEntity<Void> clearCart(@RequestHeader(name = "X-USER-ID", required = false) Long memberId) {
         System.out.println("삭제 요청 확인됨");
