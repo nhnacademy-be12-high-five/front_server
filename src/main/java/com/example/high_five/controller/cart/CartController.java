@@ -39,16 +39,17 @@ public class CartController {
     }
 
     // 수량 변경
-    @PutMapping("/api/cart/items")
+    @PutMapping("/cart/items")
     @ResponseBody
     public ResponseEntity<Void> updateQuantity(@RequestBody CartItemUpdateRequest request,
                                                @RequestHeader(name = "X-USER-ID", required = false) Long memberId) {
+        System.out.println("수량 변경 확인됨");
         cartService.updateQuantity(memberId, request);
         return ResponseEntity.ok().build();
     }
 
     // 단건 삭제
-    @DeleteMapping("/api/cart/items/{bookId}")
+    @DeleteMapping("/cart/items/{bookId}")
     @ResponseBody
     public ResponseEntity<Void> deleteItem(@PathVariable Long bookId,
                                            @RequestHeader(name = "X-USER-ID", required = false) Long memberId) {
@@ -57,12 +58,11 @@ public class CartController {
     }
 
     // 전체 삭제
-    @DeleteMapping("/api/cart/items")
+    @DeleteMapping("/cart/items")
     @ResponseBody
     public ResponseEntity<Void> clearCart(@RequestHeader(name = "X-USER-ID", required = false) Long memberId) {
-        System.out.println("===== FRONT DELETE CONTROLLER HIT =====");
+        System.out.println("삭제 요청 확인됨");
         cartService.clearCart(memberId);
-        System.out.println("===== FRONT DELETE CONTROLLER HIT AFTER =====");
         return ResponseEntity.noContent().build();
     }
 
