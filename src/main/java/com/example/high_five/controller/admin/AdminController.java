@@ -27,12 +27,14 @@ public class AdminController {
     private final CategoryFeignClient categoryFeignClient;
 
     @GetMapping("/api/coupons/admin/coupons")
-    public String couponPage(@RequestHeader("Authorization") String accessToken,
+    public String couponPage(@CookieValue(value = "access-token", required = false) String accessToken,
                              Model model){
 
-        String token = "Bearer " + accessToken;
+        if (accessToken == null || accessToken.isBlank()) {
+            return "redirect:/member/login.html";
+        }
 
-        List<CouponTemplateDto> coupons = couponService.getAdminCoupons(token);
+        List<CouponTemplateDto> coupons = couponService.getAdminCoupons();
         List<CouponPolicyResponseDto> policies = couponService.getAllPolicies();
         model.addAttribute("coupons",coupons);
         model.addAttribute("policies",policies);
