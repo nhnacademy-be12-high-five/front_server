@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,9 +30,7 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    // 1. 리뷰 등록
-    // HTML form: name="score", name="content" -> request 객체에 자동 매핑
-    // HTML form: name="images" -> images 리스트에 매핑
+    // 리뷰 등록
     @PostMapping("/books/{book-id}")
     public String addReview(
             @PathVariable("book-id") Long bookId,
@@ -40,11 +40,23 @@ public class ReviewController {
         if (images == null) {
             images = List.of();
         }
-        reviewService.createReview(bookId, request, images);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        byte[] jsonBytes;
+        try {
+            jsonBytes = objectMapper.writeValueAsBytes(request);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Review Create DTO 변환 실패", e);
+        }
+
+        MultipartFile requestFile = new DtoMultipartFile("request", "request.json", "application/json", jsonBytes);
+
+        reviewService.createReview(bookId, requestFile, images);
+
         return "redirect:/books/" + bookId;
     }
 
-    // 2. 리뷰 리스트 조회 (더보기/페이지네이션용 AJAX)
+    // 리뷰 리스트 조회
     @GetMapping("/books/{book-id}")
     @ResponseBody
     public ResponseEntity<Page<BookReviewResponse>> getBookReviewList(
@@ -55,7 +67,7 @@ public class ReviewController {
         return ResponseEntity.ok(reviews);
     }
 
-    // 3. 리뷰 수정 폼으로 이동 (HTML의 '수정' 버튼 링크와 매핑)
+    // 리뷰 수정 폼
     @GetMapping("/books/{book-id}/update")
     public String updateReviewForm(
             @PathVariable("book-id") Long bookId,
@@ -67,39 +79,33 @@ public class ReviewController {
         return "review/review-update-form";
     }
 
-    // 4. 리뷰 수정 처리
-    @PostMapping("/reviews/books/{book-id}/{review-id}")
+    // 리뷰 수정 처리
+    @PostMapping(value = "/books/{book-id}/{review-id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
     public ResponseEntity<Void> updateReviewPut(
             @PathVariable("book-id") Long bookId,
             @PathVariable("review-id") Long reviewId,
-            @RequestPart("request") String requestJson,
+            @RequestPart("request") ReviewUpdateRequest request,
             @RequestPart(value = "images", required = false) List<MultipartFile> images
-    ) throws JsonProcessingException {
+    ) {
         if (images == null) images = List.of();
 
-        // JSON → DTO 변환
-        ReviewUpdateRequest request =
-                new ObjectMapper().readValue(requestJson, ReviewUpdateRequest.class);
+        ObjectMapper objectMapper = new ObjectMapper();
+        byte[] jsonBytes;
+        try {
+            jsonBytes = objectMapper.writeValueAsBytes(request);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
-        reviewService.updateMyReview(bookId, reviewId, requestJson, images);
+        MultipartFile requestFile = new DtoMultipartFile("request", "request.json", "application/json", jsonBytes);
+
+        reviewService.updateMyReview(bookId, reviewId, requestFile, images);
+
         return ResponseEntity.ok().build();
     }
 
-
-
-    // ★ 5. 리뷰 삭제 처리 (이게 빠져있어서 추가했습니다!)
-    // HTML: th:action="@{.../delete}" method="post" 와 매핑됨
-//    @PostMapping("/books/{book-id}/{review-id}/delete")
-//    public String removeReview(
-//            @PathVariable("book-id") Long bookId,
-//            @PathVariable("review-id") Long reviewId
-//    ) {
-//        reviewService.deleteMyReview(bookId, reviewId);
-//        return "redirect:/books/" + bookId;
-//    }
-
-    // 6. 마이페이지 리뷰 관리
+    // 마이페이지 리뷰 관리
     @GetMapping("/me")
     public String myReviewList(
             @PageableDefault(size = 10) Pageable pageable,
@@ -109,4 +115,30 @@ public class ReviewController {
         model.addAttribute("reviews", myReviews);
         return "mypage/reviews";
     }
+
+    // 리뷰 좋아요 요청 처리
+    @PostMapping("/books/{book-id}/reviews/{review-id}/like")
+    @ResponseBody
+    public ResponseEntity<Boolean> toggleLike(
+            @PathVariable("book-id") Long bookId,
+            @PathVariable("review-id") Long reviewId
+    ) {
+        Boolean isLiked = reviewService.toggleReviewLike(bookId, reviewId);
+
+        return ResponseEntity.ok(isLiked);
+    }
 }
+
+
+
+
+// ★ 리뷰 삭제 처리
+// HTML: th:action="@{.../delete}" method="post" 와 매핑됨
+//    @PostMapping("/books/{book-id}/{review-id}/delete")
+//    public String removeReview(
+//            @PathVariable("book-id") Long bookId,
+//            @PathVariable("review-id") Long reviewId
+//    ) {
+//        reviewService.deleteMyReview(bookId, reviewId);
+//        return "redirect:/books/" + bookId;
+//    }

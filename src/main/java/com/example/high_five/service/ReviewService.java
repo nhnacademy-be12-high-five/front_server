@@ -18,9 +18,9 @@ public interface ReviewService {
     // 리뷰 등록
     @PostMapping(value = "/api/books/{book-id}/reviews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ReviewCreateResponse createReview(
-                                       @PathVariable("book-id") Long bookId,
-                                       @RequestPart(value = "request") ReviewCreateRequest request,
-                                       @RequestPart(value = "images", required = false) List<MultipartFile> images
+            @PathVariable("book-id") Long bookId,
+            @RequestPart("request") MultipartFile requestFile,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images
     );
 
     // 리뷰 리스트 조회
@@ -48,8 +48,14 @@ public interface ReviewService {
     void updateMyReview(
             @PathVariable("book-id") Long bookId,
             @PathVariable("review-id") Long reviewId,
-            @RequestPart("request") String requestJson,
+            @RequestPart("request") MultipartFile requestFile,
             @RequestPart(value = "images", required = false) List<MultipartFile> images
+    );
+
+    @PostMapping("/api/books/{book-id}/reviews/{review-id}/like")
+    Boolean toggleReviewLike(
+            @PathVariable("book-id") Long bookId,
+            @PathVariable("review-id") Long reviewId
     );
 }
 

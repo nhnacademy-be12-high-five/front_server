@@ -1,6 +1,8 @@
 package com.example.high_five.config;
 
 import feign.RequestInterceptor;
+import feign.codec.Encoder;
+import feign.form.spring.SpringFormEncoder;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;

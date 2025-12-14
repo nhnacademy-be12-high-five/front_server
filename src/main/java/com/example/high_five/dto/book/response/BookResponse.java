@@ -26,6 +26,8 @@ public class BookResponse {
     private Double avgRating;
     private Long reviewCount;
 
+    private String aiSummary;
+
     // book-detail.html 에서 사용하는 태그 필드
     private List<String> tags;
 

@@ -30,11 +30,6 @@
                        onclick="startEditReview(this)">
                         수정
                     </a>
-
-                    <form th:action="@{/reviews/books/{bookId}/{reviewId}/delete(bookId=${book.bookId}, reviewId=${myReview.reviewId})}"
-                          method="post" onsubmit="return confirm('정말 삭제하시겠습니까?');">
-                        <button type="submit" class="btn-small btn-danger">삭제</button>
-                    </form>
                 </div>
             </div>
         </div>
@@ -89,11 +84,21 @@
                     </div>
                 </div>
 
-                <!-- ❗ review.createdAt 으로 수정 + Timestamp → LocalDateTime 변환 -->
-                <span class="date"
-                      th:text="${#temporals.format(review.createdAt.toLocalDateTime(), 'yyyy-MM-dd')}">
-                </span>
+                <div class="review-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
 
+                    <span class="date"
+                        th:text="${#temporals.format(review.createdAt.toLocalDateTime(), 'yyyy-MM-dd')}">
+                    </span>
+
+                    <button type="button"
+                            class="btn-review-like"
+                            th:if="${loginMemberId != review.memberId}"
+                            th:classappend="${review.isLiked} ? 'active'"
+                            th:onclick="|toggleReviewLike(${book.bookId}, ${review.reviewId}, this)|">
+                    </button>
+
+                    <span class="my-review-badge" th:if="${loginMemberId == review.memberId}">내 글</span>
+                </div>
             </div>
 
             <div th:if="${reviewList.isEmpty()}" class="no-reviews">

@@ -183,6 +183,32 @@ textarea {
     color: #888;
 }
 
+/* 좋아요 버튼 기본 스타일 */
+.btn-review-like {
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 5px 12px;
+    cursor: pointer;
+    color: #888;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s;
+}
+
+/* 좋아요 활성화 상태 (active 클래스가 붙었을 때) */
+.btn-review-like.active {
+    color: #e74c3c; /* 빨간색 */
+    border-color: #e74c3c;
+    background-color: #fff5f5;
+}
+
+.btn-review-like:hover {
+    background-color: #f9f9f9;
+}
+
 /* ========== 반응형 ========== */
 @media screen and (max-width: 600px) {
     .review-item {

@@ -39,7 +39,7 @@
         <div class="breadcrumb">
             <span>홈</span>
             <span>도서 상세</span>
-            <span th:text="${book.title}">도서 제목</span>
+            <span th:utext="${book.title}">도서 제목</span>
         </div>
 
         <section class="book-detail">
@@ -143,6 +143,20 @@
 
             <div id="tab-review" class="detail-tab-content">
                 <h2>리뷰</h2>
+                <div class="ai-summary-card" th:if="${book.aiSummary != null and !book.aiSummary.isEmpty()}">
+                    <div class="ai-header">
+                        <span class="ai-icon">🤖</span>
+                        <h3>AI 독자 리뷰 요약</h3>
+                    </div>
+
+                    <div class="ai-content">
+                        <p th:text="${book.aiSummary}"></p>
+                    </div>
+
+                    <div class="ai-footer">
+                        <small>✨ 최근 독자들의 리뷰를 AI가 분석하여 요약한 내용입니다.</small>
+                    </div>
+                </div>
                 <div th:replace="~{Book/review/review-section :: review-section(book=${book})}"></div>
             </div>
 
@@ -363,9 +377,6 @@
 
         const response = await fetch(`/reviews/books/${bookId}/${reviewId}`, {
             method: "POST",
-            headers: {
-                "x-user-id": '6' // 실제 로그인한 회원 ID로 교체
-            },
             body: formData
         });
 
@@ -376,6 +387,50 @@
 
         alert("리뷰가 수정되었습니다.");
         location.reload();
+    }
+    // 리뷰 좋아요 토글 함수
+    async function toggleReviewLike(bookId, reviewId, btn) {
+        try {
+            const response = await fetch(`/reviews/books/${bookId}/reviews/${reviewId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.status === 401) {
+                if (confirm("로그인이 필요한 서비스입니다.\n로그인 하시겠습니까?")) {
+                    location.href = '/member/login.html';
+                }
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            // 서버에서 받은 최신 상태 (true/false)
+            const isLiked = await response.json();
+
+            // UI 업데이트
+            const countSpan = btn.querySelector('.like-count');
+            let currentCount = parseInt(countSpan.textContent);
+
+            if (isLiked) {
+                // 좋아요 됨: 클래스 추가 & 숫자 +1
+                btn.classList.add('active');
+                countSpan.textContent = currentCount + 1;
+            } else {
+                // 좋아요 취소: 클래스 제거 & 숫자 -1
+                btn.classList.remove('active');
+                // 숫자가 0 밑으로 내려가지 않도록 방어
+                countSpan.textContent = Math.max(0, currentCount - 1);
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert('좋아요 처리 중 오류가 발생했습니다.');
+        }
     }
 </script>
 <script th:inline="javascript">
