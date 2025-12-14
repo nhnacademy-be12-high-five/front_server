@@ -16,7 +16,7 @@ public interface CouponService {
                                          @RequestParam(value = "size", defaultValue = "10") int size);
 
     @GetMapping("/api/coupons/admin/coupons")
-    List<CouponTemplateDto> getAdminCoupons(@CookieValue("access-token") String acessToken);
+    List<CouponTemplateDto> getAdminCoupons(@CookieValue("access-token") String accessToken);
 
     @GetMapping("/api/coupons/templates")
     Map<String, Object> getIssuableCoupons(@RequestParam(value = "page", defaultValue = "0") int page,
