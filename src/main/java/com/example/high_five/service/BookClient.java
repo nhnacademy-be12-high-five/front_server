@@ -50,6 +50,10 @@ public interface BookClient {
     @GetMapping("/api/categories/{categoryId}/books")
     List<BookResponse> getBooksByCategory(@PathVariable("categoryId") long categoryId);
 
+    // 베스트셀러
+    @GetMapping("/api/books/best-seller")
+    List<BookResponse> getBestSellers();
+  
     // 도서 좋아요 조회
     @GetMapping("/members/me/likes")
     Boolean getBookLike(@PathVariable("book-id") Long id);
