@@ -19,6 +19,7 @@ public class CouponPolicyRequestDto {
     private Long discountValue;
     private Long minOrderValue;
     private Long maxDiscountValue;
+    private Integer validPeriodDate;
     private List<Long> targetCategoryIds = new ArrayList<>();
     private List<Long> targetBookIds = new ArrayList<>();
 }
