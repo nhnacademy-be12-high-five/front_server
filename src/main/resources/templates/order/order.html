@@ -67,6 +67,7 @@
 <div class="order-container"> <h2>주문서 작성</h2>
 
     <form id="orderForm" th:object="${checkoutRequest}" onsubmit="return false;">
+        <input type="hidden" name="userId" th:value="${userId}">
 
         <section class="order-section">
             <h3>주문 상품</h3>

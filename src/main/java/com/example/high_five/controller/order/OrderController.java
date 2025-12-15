@@ -57,12 +57,13 @@ public class OrderController {
         // 서비스에서 필요한 모든 데이터(상품, 회원, 쿠폰 등)를 조회하여 DTO로 반환
         OrderResponse orderSheet = frontOrderService.createOrderSheet(userId, token, bookIds, quantities);
         model.addAttribute("orderSheet", orderSheet);
-
-
         // 1. 포인트 조회
         try {
             PointBalanceResponse pointResponse = memberService.getMyBalance(token).getBody();
             model.addAttribute("point", pointResponse.getCurrentPoint());
+            if (userId == null) {
+                userId = pointResponse.getMemberId();
+            }
         } catch (Exception e) {
             model.addAttribute("point", 0);
         }
@@ -83,7 +84,7 @@ public class OrderController {
             log.warn("결제 수단 조회 실패", e);
             model.addAttribute("paymentMethods", List.of());
         }
-
+        model.addAttribute("userId", userId);
 
         // 폼 바인딩용 객체 초기화
         OrderCheckoutRequest checkoutRequest = new OrderCheckoutRequest();
@@ -107,7 +108,10 @@ public class OrderController {
     @ResponseBody
     public ResponseEntity<?> createOrderApi(@Valid @ModelAttribute OrderCheckoutRequest request,
                                             BindingResult bindingResult,
-                                            @RequestHeader(value = "X-USER-ID", required = false) Long userId) {
+                                            @RequestHeader(value = "X-USER-ID", required = false) Long headerUserId,
+                                            @RequestParam(value = "userId", required = false) Long paramUserId) {
+
+        Long userId = (headerUserId != null) ? headerUserId : paramUserId;
 
         if (bindingResult.hasErrors()) {
             log.warn("Order validation error: {}", bindingResult.getAllErrors());
@@ -116,6 +120,9 @@ public class OrderController {
 
         try {
             // 주문 생성 서비스 호출 -> OrderCreateResponse(orderId, orderKey, totalAmount) 반환
+            if (userId != null) {
+                request.setUserId(userId);
+            }
             OrderCreateResponse response = frontOrderService.placeOrder(request, userId);
             return ResponseEntity.ok(response);
 
