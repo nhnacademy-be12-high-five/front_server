@@ -54,7 +54,8 @@ public class AdminController {
     }
 
     @PostMapping("/admin/coupons/policies/create")
-    public String createPolicy(@ModelAttribute CouponPolicyRequestDto dto) {
+    public String createPolicy(@ModelAttribute CouponPolicyRequestDto dto,
+                               RedirectAttributes redirectAttributes) {
 
         if (dto.getTargetBookIds() == null) {
             dto.setTargetBookIds(new ArrayList<>());
@@ -63,7 +64,26 @@ public class AdminController {
             dto.setTargetCategoryIds(new ArrayList<>());
         }
 
-        couponService.createCouponPolicy(dto);
+        try {
+            couponService.createCouponPolicy(dto);
+            redirectAttributes.addFlashAttribute("message", "쿠폰 정책이 성공적으로 생성되었습니다.");
+        } catch (FeignException e) {
+            String serverMessage = e.getMessage();
+            String alertMsg = "정책 생성 실패: " + e.status();
+
+            if (serverMessage != null && serverMessage.contains("\"message\":\"")) {
+                int start = serverMessage.indexOf("\"message\":\"") + 11;
+                int end = serverMessage.indexOf("\"", start);
+                if (end > start) {
+                    alertMsg = serverMessage.substring(start, end);
+                }
+            }
+
+            redirectAttributes.addFlashAttribute("errorMessage", alertMsg);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "시스템 오류가 발생했습니다.");
+            e.printStackTrace();
+        }
 
         return "redirect:/admin/coupons/page";
     }
