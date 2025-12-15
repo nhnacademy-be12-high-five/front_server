@@ -33,10 +33,6 @@ public class MemberController {
         }
     }
 
-
-
-
-
     @LoginRequired
     @GetMapping("/mypage")
     public String myPage(

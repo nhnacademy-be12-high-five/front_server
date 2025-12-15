@@ -132,7 +132,6 @@
         <a th:href="@{/mypage/likes}"
            th:classappend="${currentTab == 'likes'} ? 'active'"
            class="tab-btn">찜 목록</a>
-
     </nav>
 
     <section id="tab-info" class="tab-content" th:classappend="${currentTab == 'info'} ? 'active'">
@@ -161,6 +160,48 @@
         </div>
         <br />
         <button type="button" class="btn-edit">정보 수정</button>
+        <div class="withdrawal-area" style="margin-top: 30px; text-align: right; border-top: 1px solid #eee; padding-top: 15px;">
+            <span style="font-size: 13px; color: #888;">더 이상 서비스를 이용하지 않으시나요?</span>
+            <a href="#" id="btn-withdraw" style="font-size: 13px; color: #999; text-decoration: underline; margin-left: 10px;">
+                회원 탈퇴
+            </a>
+        </div>
+
+        <form id="edit-form" method="post" action="/mypage/update" style="display: none;">
+            <div class="info-group">
+                <div class="info-item">
+                    <label for="edit-name">이름</label>
+                    <input type="text" id="edit-name" name="name"
+                           th:value="${myInfo.name}" class="input-field" required>
+                </div>
+                <div class="info-item">
+                    <label for="edit-email">이메일</label>
+                    <input type="email" id="edit-email" name="email"
+                           th:value="${myInfo.email}" class="input-field" required>
+                </div>
+                <div class="info-item">
+                    <label>생일</label>
+                    <div th:text="${#temporals.format(myInfo.birthDate, 'yyyy-MM-dd')}"
+                         style="padding: 10px 0; color: #777;"></div>
+                </div>
+                <div class="info-item">
+                    <label for="edit-phone">연락처</label>
+                    <input type="text" id="edit-phone" name="phone"
+                           th:value="${myInfo.phone}" class="input-field" placeholder="010-0000-0000" required>
+                </div>
+
+                <div class="info-item">
+                    <label>회원 등급</label>
+                    <div th:text="${myInfo.gradeName}" style="padding: 10px 0; color: #777;"></div>
+                </div>
+            </div>
+            <br />
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button type="submit" class="btn-edit" style="background-color: var(--color-primary); color: white;">저장</button>
+                <button type="button" class="btn-outline" onclick="toggleEditMode(false)">취소</button>
+            </div>
+        </form>
+
     </section>
 
     <section id="tab-address" class="tab-content"
@@ -388,7 +429,6 @@
 
 </div>
 
-
 <script>
     // 마이페이지 탭 버튼만 선택 (헤더 검색 버튼 제외)
     const tabNav = document.querySelector(".container2 nav");
@@ -435,7 +475,7 @@
 
     saveBtn.addEventListener("click", () => {
         modal.style.display = "none";
-        alert("배송지가 저장되었습니다. (백엔드 연동 필요)");
+        alert("배송지가 저장되었습니다. ");
     });
 </script>
 <script>
@@ -503,10 +543,60 @@
     } else if (message) {
         alert(message);
     }
-    /*]]>*/
+
+    const withdrawBtn = document.getElementById("btn-withdraw");
+    if (withdrawBtn) {
+        withdrawBtn.addEventListener("click", (e) => {
+            e.preventDefault(); // 링크 이동 막기
+
+            if (confirm("정말 탈퇴하시겠습니까?")) {
+                // 백엔드 탈퇴 처리 URL로 이동 (예시)
+
+                fetch('/api/members/me/withdraw', {
+                    method: 'DELETE', // 혹은 POST (서버 설정에 따라 다름)
+                    headers: {
+                        'Content-Type': 'application/json'
+                        // 스프링 시큐리티 사용 시 CSRF 토큰 헤더가 필요할 수 있음
+                    }
+                })
+
+                .then(response => {
+                    if (response.ok) {
+                        // 2. 성공 시 처리
+                        alert("탈퇴 처리가 완료되었습니다. 이용해 주셔서 감사합니다.");
+                        // 세션이 서버에서 끊겼으므로 메인으로 이동
+                        location.href = "/login";
+                    } else {
+                        // 3. 실패 시 처리
+                        alert("탈퇴 처리에 실패했습니다. 관리자에게 문의해주세요.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("서버 통신 중 오류가 발생했습니다.");
+                });
+            }
+        });
+    }
+
+    function toggleEditMode(isEdit) {
+        const viewMode = document.getElementById('view-mode');
+        const editForm = document.getElementById('edit-form');
+
+        if (isEdit) {
+            // 수정 모드로 전환
+            viewMode.style.display = 'none';
+            editForm.style.display = 'block';
+        } else {
+            // 조회 모드로 복귀 (취소)
+            viewMode.style.display = 'block';
+            editForm.style.display = 'none';
+            // 취소 시 입력값을 다시 원래대로 돌리고 싶다면 form.reset() 추가 가능
+            editForm.reset();
+        }
+    }
+
 </script>
-
-
-
 </body>
 </html>
+`

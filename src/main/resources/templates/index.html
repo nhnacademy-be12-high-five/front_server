@@ -1137,33 +1137,33 @@
         <section class="section" aria-labelledby="best-title">
             <div class="head">
                 <h3>베스트셀러 🔥</h3>
-                <a class="more" href="/books/new">더보기</a>
+                <a class="more" href="/books/best-seller">더보기</a>
             </div>
             <div class="card-grid" style="grid-template-columns: repeat(5, 1fr)">
 
-                <div th:if="${newBooks == null or newBooks.isEmpty()}"
+                <div th:if="${bestSellers == null or bestSellers.isEmpty()}"
                      style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">
-                    <p>인기 도서가 없습니다.</p>
+                    <p>베스트셀러가 없습니다.</p>
                 </div>
 
-                <article class="card" th:unless="${newBooks == null}" th:each="book : ${newBooks}">
+                <article class="card" th:unless="${bestSellers == null}" th:each="book : ${bestSellers}">
                     <a th:href="@{/books/{bookId}(bookId=${book.bookId})}" class="book-link" style="display:block; color:inherit;">
                         <div class="thumb">
-                            <img th:src="${book.image}"
-                                 th:alt="${book.image}"
+                            <img th:src="${book.image}" th:alt="${book.title}"
                                  style="width: 100%; height: 100%; object-fit: cover;" />
                         </div>
                         <div class="info">
                             <div class="title" th:text="${book.title}">책 제목</div>
                             <div class="meta">
                                 <span th:text="${book.publisher}">출판사</span> ·
-                                <span th:text="${#strings.replace(#strings.substring(book.publishedDate, 0, 7), '-', '.')}">2024.03</span>
+                                <span th:if="${book.publishedDate != null}"
+                                      th:text="${#strings.replace(#strings.substring(book.publishedDate, 0, 7), '-', '.')}">
+                        </span>
                             </div>
 
                             <div class="price-row">
                                 <span class="price" th:text="|${#numbers.formatInteger(book.price, 0, 'COMMA')}|">₩15,000</span>
-
-                                <span class="badge" style="background-color: #e9c46a; color: #333;">NEW</span>
+                                <span class="badge" style="background-color: #ff4d4f; color: #fff;">BEST</span>
                             </div>
                         </div>
                     </a>
@@ -1380,7 +1380,6 @@
                 }
             });
     }
-
 
     document.addEventListener("DOMContentLoaded", () => {
         const menuWrapper = document.querySelector('.all-menu-wrapper');

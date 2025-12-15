@@ -100,7 +100,14 @@
                     </div>
 
                     <div class="purchase-actions">
-                        <button type="button" class="btn-heart" aria-label="관심도서" id="heart">&#9829;</button>
+                        <button type="button"
+                                class="btn-heart"
+                                th:classappend="${isLiked} ? 'active' : ''"
+                                aria-label="관심도서"
+                                id="heart"
+                                th:data-book-id="${book.bookId}">
+                            &#9829;
+                        </button>
                         <button type="button" class="btn-primary" id="add-to-cart-btn" th:data-book-id="${book.bookId}">장바구니 담기</button>
                         <a class="btn-secondary" th:href="@{/order/now(bookId=${book.bookId})}">바로 구매</a>
                     </div>
@@ -337,7 +344,6 @@
     }
 </script>
 
-
 <script>
     async function submitUpdateReview(reviewId, bookId) {
         const form = document.getElementById("updateReviewForm");
@@ -377,22 +383,70 @@
         alert("리뷰가 수정되었습니다.");
         location.reload();
     }
-</script>
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    document.addEventListener('DOMContentLoaded', function() {
-        var message = [[${message}]];
-        var errorMessage = [[${errorMessage}]];
 
-        if (message) {
-            alert(message);
-        }
-        if (errorMessage) {
-            alert(errorMessage);
+    document.addEventListener('DOMContentLoaded', function () {
+        const heartBtn = document.getElementById('heart');
+
+        if (heartBtn) {
+            heartBtn.addEventListener('click', async function () {
+                // [수정 1] data-book-id 값을 올바르게 가져오는 방법 (dataset 권장)
+                const bookId = this.dataset.bookId;
+
+                const accessToken = localStorage.getItem('accessToken');
+
+                // 디버깅용 로그 (개발자 도구 콘솔에서 확인 가능)
+                console.log("Book ID:", bookId);
+                console.log("Access Token:", accessToken);
+
+                try {
+                    // [수정 2] 경로에 '/books' 추가 (/api/books/{id}/likes)
+
+                    const headers = {
+                        'Content-Type': 'application/json'
+                    };
+
+                    // 토큰이 있을 때만 Authorization 헤더 추가
+                    // (토큰이 없으면 게이트웨이가 401을 리턴 -> 아래 401 처리 로직으로 이동)
+
+                    if (accessToken) {
+                        headers['Authorization'] = `Bearer ${accessToken}`;
+                    }
+
+                    const response = await fetch(`/api/books/${bookId}/likes`, {
+                        method: 'POST',
+                        headers: headers // 위에서 만든 headers 객체 사용
+                    });
+
+                    if (response.ok) {
+                        // 3. 성공 시 하트 색상 토글
+                        this.classList.toggle('active');
+
+                        // 찜 목록 이동 제안 (사용자가 원했던 기능)
+                        if (this.classList.contains('active')) {
+                            if(confirm("관심 도서에 담았습니다!\n마이페이지 찜 목록으로 이동하시겠습니까?")) {
+                                window.location.href = "/books/my-page/likes"; // 마이페이지 경로
+                            }
+                        } else {
+                            alert("관심 도서가 해제되었습니다.");
+                        }
+
+                    } else if (response.status === 401) {
+                        // 4. 로그인 안 된 경우
+                        if (confirm("로그인이 필요한 서비스입니다.\n로그인 페이지로 이동하시겠습니까?")) {
+                            alert("로그인이 필요합니다.");
+                            window.location.href = "/member/login.html";
+                        }
+                    } else {
+                        throw new Error("요청 실패");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert("오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+                }
+            });
         }
     });
-    /*]]>*/
-</script>
 
+</script>
 </body>
 </html>

@@ -3,9 +3,7 @@ package com.example.high_five.service;
 import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.book.PagedResponse;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -47,4 +45,8 @@ public interface BookClient {
 
     @GetMapping("/api/categories/{categoryId}/books")
     List<BookResponse> getBooksByCategory(@PathVariable("categoryId") long categoryId);
+
+    // 베스트셀러
+    @GetMapping("/api/books/best-seller")
+    List<BookResponse> getBestSellers();
 }
