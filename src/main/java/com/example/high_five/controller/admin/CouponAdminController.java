@@ -21,7 +21,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-public class AdminController {
+public class CouponAdminController {
     private final CouponService couponService;
     private final BookFeignClient bookFeignClient;
     private final CategoryFeignClient categoryFeignClient;
