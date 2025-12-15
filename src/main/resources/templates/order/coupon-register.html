@@ -42,5 +42,21 @@
 
 </div>
 
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener('DOMContentLoaded', function() {
+        var message = [[${message}]];
+        var errorMessage = [[${errorMessage}]];
+
+        if (message) {
+            alert(message);
+        }
+        if (errorMessage) {
+            alert(errorMessage);
+        }
+    });
+    /*]]>*/
+</script>
+
 </body>
 </html>
