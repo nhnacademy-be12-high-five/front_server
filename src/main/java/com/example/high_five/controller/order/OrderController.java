@@ -1,16 +1,21 @@
 package com.example.high_five.controller.order;
 
+import com.example.high_five.dto.coupon.MemberCouponResponseDto;
 import com.example.high_five.dto.order.OrderCheckoutRequest;
 import com.example.high_five.dto.order.OrderResponse;
 import com.example.high_five.dto.payment.PaymentConfirmRequest;
 import com.example.high_five.dto.payment.PaymentConfirmResponse;
 import com.example.high_five.dto.payment.PaymentMethodResponse;
+import com.example.high_five.dto.point.PointBalanceResponse;
+import com.example.high_five.service.CouponService;
 import com.example.high_five.service.FrontOrderService;
+import com.example.high_five.service.MemberService;
 import com.example.high_five.service.OrderClient.OrderCreateResponse;
 import com.example.high_five.service.PaymentService;
 import feign.FeignException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +37,8 @@ public class OrderController {
 
     private final FrontOrderService frontOrderService;
     private final PaymentService paymentService;
+    private final MemberService memberService;
+    private final CouponService couponService;
 
     @Value("test_ck_d46qopOB8969zAlo4YJY3ZmM75y0")
     private String tossClientKey;
@@ -52,13 +59,28 @@ public class OrderController {
         model.addAttribute("orderSheet", orderSheet);
 
 
-        // 결제 수단 조회
+        // 1. 포인트 조회
+        try {
+            PointBalanceResponse pointResponse = memberService.getMyBalance(token).getBody();
+            model.addAttribute("point", pointResponse.getCurrentPoint());
+        } catch (Exception e) {
+            model.addAttribute("point", 0);
+        }
+
+        // 2. 사용 가능 쿠폰 조회
+        try {
+            List<MemberCouponResponseDto> coupons = couponService.getUsableCoupons(userId);
+            model.addAttribute("coupons", coupons);
+        } catch (Exception e) {
+            model.addAttribute("coupons", Collections.emptyList());
+        }
+
+        // 3. 결제 수단 조회
         try {
             List<PaymentMethodResponse> paymentMethods = paymentService.getAllMethods();
             model.addAttribute("paymentMethods", paymentMethods);
         } catch (Exception e) {
             log.warn("결제 수단 조회 실패", e);
-            // 실패 시 빈 리스트 혹은 기본값 처리
             model.addAttribute("paymentMethods", List.of());
         }
 

@@ -135,19 +135,20 @@
                 <label>쿠폰 사용</label>
                 <select th:field="*{couponId}" id="couponSelect" onchange="updateTotal()">
                     <option value="" data-discount="0">사용 안함</option>
-                    <option th:each="coupon : ${orderSheet.coupons}"
-                            th:value="${coupon.couponId}"
-                            th:data-discount="${coupon.discountAmount}"
-                            th:text="|${coupon.couponName} (${#numbers.formatInteger(coupon.discountAmount, 0, 'COMMA')}원 할인)|">
+                    <option th:each="coupon : ${coupons}"
+                            th:value="${coupon.id}"
+                            th:data-discount="${coupon.discountValue}"
+                            th:text="|${coupon.couponName} (${#numbers.formatInteger(coupon.discountValue, 0, 'COMMA')}원 할인)|">
                         쿠폰명
                     </option>
                 </select>
             </div>
             <div class="discount-row">
-                <label>포인트 사용 (보유: <span th:text="${orderSheet.myPoint}">0</span>P)</label>
+                <label>포인트 사용 (보유: <span th:text="${#numbers.formatInteger(point, 0, 'COMMA')}">0</span>P)</label>
                 <input type="number" th:field="*{usedPoint}" id="usedPoint" value="0" min="0"
-                       th:max="${orderSheet.myPoint != null ? orderSheet.myPoint : 0}"
+                       th:max="${point}"
                        onchange="updateTotal()"> P
+                <button type="button" onclick="useAllPoints()" style="margin-left: 10px; padding: 5px 10px; cursor: pointer;">전액 사용</button>
             </div>
 
             <div class="form-group" th:if="${orderSheet.myPoint == null || orderSheet.myPoint == 0}">
@@ -227,11 +228,11 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
     // 1. 서버 데이터
-    const productPrice = [[${orderSheet.totalProductPrice}]];
-    const initialDeliveryFee = [[${orderSheet.deliveryFee}]];
-    const maxPoint = [[${orderSheet.myPoint != null ? orderSheet.myPoint : 0}]];
-    const tossClientKey = [[${tossClientKey}]];
-    const customerEmail = [[${orderSheet.email}]] || "test@example.com";
+    const productPrice = /*[[${orderSheet.totalProductPrice}]]*/ 0;
+    const initialDeliveryFee = /*[[${orderSheet.deliveryFee}]]*/ 0;
+    const maxPoint = /*[[${point != null ? point : 0}]]*/ 0;
+    const tossClientKey = /*[[${tossClientKey}]]*/ "";
+    const customerEmail = /*[[${orderSheet.email}]]*/ "test@example.com";
 
     // 2. 토스 객체
     const tossPayments = TossPayments(tossClientKey);
@@ -282,6 +283,12 @@
         $('#displayWrappingFee').text(wrappingFee.toLocaleString());
         $('#displayDiscount').text(totalDiscount.toLocaleString());
         $('#displayFinalPrice').text(finalPrice.toLocaleString());
+    }
+
+    function useAllPoints() {
+        const input = document.getElementById('usedPoint');
+        input.value = maxPoint; // maxPoint는 이미 script 상단에 정의됨
+        updateTotal();
     }
 
     // 결제 수단 탭 선택 함수
