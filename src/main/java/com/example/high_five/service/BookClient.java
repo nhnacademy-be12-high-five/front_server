@@ -37,16 +37,16 @@ public interface BookClient {
 
     // 5. 신간 추천 책 리스트
     @GetMapping("/api/books/new")
-    List<BookResponse> getNewBooks();
+    List<BookResponse> getNewBooks(@RequestParam("size") int size);
 
     // 6. 주간 인기 급상승 로직
     @GetMapping("/api/books/popular")
-    List<BookResponse> getPopularBooks();
+    List<BookResponse> getPopularBooks(@RequestParam("size") int size);
 
     @GetMapping("/api/categories/{categoryId}/books")
     List<BookResponse> getBooksByCategory(@PathVariable("categoryId") long categoryId);
 
     // 베스트셀러
     @GetMapping("/api/books/best-seller")
-    List<BookResponse> getBestSellers();
+    List<BookResponse> getBestSellers(@RequestParam("size") int size);
 }
