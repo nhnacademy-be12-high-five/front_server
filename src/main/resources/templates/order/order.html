@@ -7,31 +7,18 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://js.tosspayments.com/v1/payment"></script>
     <style>
-        /* 비활성화 요소 스타일 */
+        /* 비회원 기능 제한용 스타일 */
         .disabled-overlay {
             background-color: #eee;
             opacity: 0.6;
-            pointer-events: none;
+            pointer-events: none; /* 클릭 방지 */
             cursor: not-allowed;
         }
         .login-guide {
             font-size: 12px;
-            color: #dc3545;
+            color: #dc3545; /* 붉은색 경고 */
             margin-left: 10px;
             font-weight: bold;
-        }
-        /* 배송 정책 스타일 추가 */
-        .delivery-policy-info p {
-            font-size: 14px;
-            color: #555;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-        .delivery-policy-info span {
-            font-weight: bold;
-            color: #007bff; /* 정책 금액 강조 */
         }
     </style>
 </head>
@@ -93,17 +80,6 @@
 
         <section class="order-section">
             <h3>배송지 정보</h3>
-
-            <div class="delivery-policy-info"
-                 th:with="minAmount=${orderSheet.deliveryPolicy?.minOrderAmount ?: 30000},
-                          standardFee=${orderSheet.deliveryPolicy?.standardShippingFee ?: 3000},
-                          remoteFee=${orderSheet.deliveryPolicy?.remoteAreaSurcharge ?: 5000}">
-                <p>
-                    🚚  <span th:text="${#numbers.formatInteger(minAmount, 0, 'COMMA')}">30,000</span>원 이상 구매 시 <span style="font-weight: bold; color: #28a745;">무료 배송</span>.
-                    기본 배송비는 <span th:text="${#numbers.formatInteger(standardFee, 0, 'COMMA')}">3,000</span>원입니다.
-                    도서산간 지역은 <span th:text="${#numbers.formatInteger(remoteFee, 0, 'COMMA')}">5,000</span>원의 추가 요금이 발생합니다.
-                </p>
-            </div>
             <div class="form-group">
                 <label>받는 사람</label>
                 <input type="text" id="receiverName" name="receiverName"
@@ -235,24 +211,24 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    // 1. 서버 데이터
+    // 1. 서버 데이터 주입
     const maxPoint = [[${point != null ? point : 0}]];
     const tossClientKey = [[${tossClientKey}]];
     const customerEmail = [[${orderSheet.email}]];
 
-    // [수정] 서버에서 가져온 배송 정책 값으로 JavaScript 상수를 동적 설정 (클라이언트 재계산 일관성 유지)
-    // orderSheet.deliveryPolicy 객체에서 값을 가져오고, null일 경우를 대비해 기본값 (?:)을 사용합니다.
-    const FREE_DELIVERY_THRESHOLD = [[${orderSheet.deliveryPolicy?.minOrderAmount ?: 30000}]];
-    const STANDARD_DELIVERY_FEE = [[${orderSheet.deliveryPolicy?.standardShippingFee ?: 3000}]];
+    // [핵심] 배송비 정책 설정 (서버에서 받아온 값 적용, 없으면 기본값)
+    const FREE_DELIVERY_THRESHOLD = [[${orderSheet.freeDeliveryThreshold}]] || 30000;
+    const STANDARD_DELIVERY_FEE = [[${orderSheet.standardDeliveryFee}]] || 3000;
 
-    // 2. 토스 객체
+    // 2. 토스 객체 초기화
     const tossPayments = TossPayments(tossClientKey);
     let selectedMethodCode = null;
 
-    // 초기화
+    // 초기화 함수
     $(document).ready(function() {
-        updateTotal();
+        updateTotal(); // 최초 진입 시 금액 계산
 
+        // 첫 번째 결제 수단 자동 선택
         const firstTab = $('.tab:not(.disabled)').first();
         if (firstTab.length > 0) {
             selectMethod(firstTab[0]);
@@ -260,38 +236,41 @@
     });
 
     // ===========================
-    // UI 로직 (금액 재계산)
+    // UI 로직 (실시간 금액 재계산)
     // ===========================
     function updateTotal() {
         let currentTotalProductPrice = 0;
         let currentWrappingFee = 0;
 
-        // 1. 각 행(Row)별 계산
+        // 1. 각 상품 행(Row)별 계산
         $('.order-item-row').each(function() {
             const price = parseInt($(this).find('.item-price').val()) || 0;
             let quantity = parseInt($(this).find('.item-qty-input').val());
 
+            // 수량 유효성 검사
             if (isNaN(quantity) || quantity < 1) {
                 quantity = 1;
             }
 
+            // 상품별 합계 업데이트
             const rowTotal = price * quantity;
             $(this).find('.item-total-price').text(rowTotal.toLocaleString());
             currentTotalProductPrice += rowTotal;
 
+            // 포장비 계산
             const wrapperOption = $(this).find('.wrapper-select option:selected');
             const wrapperPrice = parseInt(wrapperOption.data('price')) || 0;
             currentWrappingFee += (wrapperPrice * quantity);
         });
 
-        // 2. 배송비 정책 적용 (동적으로 설정된 JS 상수 사용)
+        // 2. 배송비 재계산 (정책 적용)
         let currentDeliveryFee = STANDARD_DELIVERY_FEE;
         if (currentTotalProductPrice >= FREE_DELIVERY_THRESHOLD) {
             currentDeliveryFee = 0;
         }
 
-        // 3. 할인 계산
-        // 비활성화된 input이라도 값은 0이어야 안전
+        // 3. 할인 계산 (쿠폰 + 포인트)
+        // 비활성화된 경우 값은 0으로 처리됨
         const couponDiscount = parseInt($('#couponSelect').find(':selected').data('discount')) || 0;
         let usedPoint = parseInt($('#usedPoint').val()) || 0;
 
@@ -311,7 +290,7 @@
         let finalPrice = currentTotalProductPrice + currentDeliveryFee + currentWrappingFee - totalDiscount;
         if (finalPrice < 0) finalPrice = 0;
 
-        // 5. 화면 갱신
+        // 5. 화면 갱신 (콤마 포맷 적용)
         $('#displayProductPrice').text(currentTotalProductPrice.toLocaleString());
         $('#displayDeliveryFee').text(currentDeliveryFee.toLocaleString());
         $('#displayWrappingFee').text(currentWrappingFee.toLocaleString());
@@ -319,6 +298,7 @@
         $('#displayFinalPrice').text(finalPrice.toLocaleString());
     }
 
+    // 포인트 전액 사용 버튼
     function useAllPoints() {
         $('#usedPoint').val(maxPoint);
         updateTotal();
@@ -346,7 +326,9 @@
         }
     }
 
-    // 결제 요청
+    // ===========================
+    // 결제 요청 (서버 통신)
+    // ===========================
     function requestPayment() {
         if (!selectedMethodCode) {
             alert("결제 수단을 선택해주세요.");
@@ -373,9 +355,7 @@
             processData: false,
             contentType: false,
             success: function(response) {
-                // 서버 응답에서 UUID(orderKey)와 DB ID(orderId)를 모두 가져옵니다.
-                const orderKey = response.orderKey; // 토스 결제용 UUID
-                const dbOrderId = response.orderId; // 주문 취소용 DB ID
+                const orderId = response.orderKey;
                 const amount = response.totalAmount;
                 const orderName = "HIGH-FIVE 도서 주문";
 
@@ -386,7 +366,7 @@
 
                 tossPayments.requestPayment(tossMethod, {
                     amount: amount,
-                    orderId: orderKey, // 토스에는 UUID 전달
+                    orderId: orderId,
                     orderName: orderName,
                     customerName: receiverName,
                     customerEmail: customerEmail,
@@ -394,12 +374,7 @@
                     failUrl: window.location.origin + "/orders/fail",
                 }).catch(function (error) {
                     $('#loading-overlay').hide();
-
-                    // 사용자가 결제창을 닫거나 취소한 경우 (USER_CANCEL)
-                    if (error.code === 'USER_CANCEL') {
-                        console.log("사용자 결제 취소 -> 재고 해제 요청");
-                        cancelPendingOrder(dbOrderId); // DB ID로 취소 요청
-                    } else {
+                    if (error.code !== 'USER_CANCEL') {
                         alert("결제 실패: " + error.message);
                     }
                 });
@@ -415,22 +390,6 @@
                     if (xhr.responseText) msg += ": " + xhr.responseText;
                 }
                 alert(msg);
-            }
-        });
-    }
-
-    // 주문 취소(재고 해제) 요청 함수
-    function cancelPendingOrder(orderId) {
-        if (!orderId) return;
-
-        $.ajax({
-            url: '/orders/api/' + orderId + '/cancel', // 백엔드에 이 API가 있어야 합니다.
-            type: 'POST',
-            success: function() {
-                console.log("주문 취소 및 재고 해제 완료");
-            },
-            error: function(e) {
-                console.error("주문 취소 실패 (서버 로그 확인 필요)", e);
             }
         });
     }

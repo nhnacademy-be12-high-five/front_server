@@ -152,7 +152,7 @@
                     .then(res => {
                         if(res.ok) {
                             alert("장바구니가 통합되었습니다.");
-                            location.reload();
+                            location.reload(); 
                         }
                     });
             } else {
@@ -379,7 +379,7 @@
         // 3. GET 파라미터로 전송 (/orders/sheet?bookIds=1,2&quantities=1,2)
         // Spring Controller는 콤마로 구분된 리스트를 자동으로 파싱합니다.
         const url = `/orders/sheet?bookIds=${bookIds.join(",")}&quantities=${quantities.join(",")}`;
-
+        
         // 4. 페이지 이동
         location.href = url;
     }
