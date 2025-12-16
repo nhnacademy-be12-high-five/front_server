@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -6,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Booktown - 마이페이지</title>
     <link rel="stylesheet" href="member-css/mypage.css">
+    <style>
+        /* 수정 버튼 커서 스타일 추가 */
+        .btn-edit { cursor: pointer; }
+        /* 읽기 전용 입력창 스타일 */
+        .input-readonly { background-color: #f0f0f0; color: #888; cursor: not-allowed; }
+        .error-msg { color: #e74c3c; font-size: 12px; margin-top: 5px; }
+        .info-msg { color: #007bff; font-size: 12px; margin-top: 5px; }
+    </style>
 </head>
 <body>
 <header id="header" role="banner">
@@ -17,177 +24,108 @@
 
         <nav class="gnb" aria-label="주요 메뉴">
             <div class="search-box" role="search">
-                <input
-                        type="search"
-                        placeholder="검색어를 입력하세요"
-                        aria-label="통합 검색"
-                />
+                <input type="search" placeholder="검색어를 입력하세요" aria-label="통합 검색" />
                 <form method="get" action="/search">
-                    <button class="search-btn"
-                            aria-label="검색"
-                            type="submit">
-                        검색
-                    </button>
+                    <button class="search-btn" aria-label="검색" type="submit">검색</button>
                 </form>
             </div>
         </nav>
 
         <div class="user-menu">
-            <!-- 쿠폰 -->
-            <a class="user-link" href="/coupon">
-                <img src="../img/icon-coupon.png" alt="쿠폰" class="user-icon" />
-            </a>
+            <a class="user-link" href="/coupon"><img src="../img/icon-coupon.png" alt="쿠폰" class="user-icon" /></a>
+            <a class="user-link" href="/mypage"><img src="../img/icon-mypage.png" alt="마이페이지" class="user-icon" /></a>
+            <a class="user-link" href="/cart"><img src="../img/icon-cart.png" alt="장바구니" class="user-icon" /></a>
 
-            <!-- 마이페이지 -->
-            <a class="user-link" href="/mypage">
-                <img src="../img/icon-mypage.png" alt="마이페이지" class="user-icon" />
-            </a>
-
-            <!-- 장바구니 -->
-            <a class="user-link" href="/cart">
-                <img src="../img/icon-cart.png" alt="장바구니" class="user-icon" />
-            </a>
-
-<!--            <a class="user-link pill" th:href="@{/templates/member/login.html}">로그인</a>-->
-
-            <a th:if="${myInfo == null}"
-               class="user-link pill"
-               th:href="@{/login}">로그인</a>
-
-            <a th:if="${myInfo != null}"
-               class="user-link pill"
-               th:href="@{/logout}">로그아웃</a>
+            <a th:if="${myInfo == null}" class="user-link pill" th:href="@{/login}">로그인</a>
+            <a th:if="${myInfo != null}" class="user-link pill" th:href="@{/logout}">로그아웃</a>
         </div>
-
     </div>
 </header>
 
 <div class="container2">
     <nav class="box">
-
-        <!--        // category controller에 추가하기-->
-
-        <!--        @GetMapping("/mypage/{tab}")-->
-        <!--        public String myPage(@PathVariable("tab") String activeTab, Model model) {-->
-        <!--        // 1. URL 경로 변수로 현재 탭의 값을 받습니다. (예: /mypage/info)-->
-
-        <!--        // 2. 모델에 현재 활성화된 탭의 값을 담아 HTML로 전달합니다.-->
-        <!--        model.addAttribute("currentTab", activeTab);-->
-
-        <!--        // 3. (선택) 해당 탭에 필요한 데이터를 모델에 추가로 담아 보냅니다.-->
-        <!--        // if ("info".equals(activeTab)) {-->
-        <!--        //     model.addAttribute("userInfo", userService.getUserInfo());-->
-        <!--        // }-->
-
-        <!--        return "mypage/myPageTemplate"; // Thymeleaf 템플릿 이름-->
-        <!--        }-->
-        <!--        -->
-
-        <!--        // 타임리프 추가 -->
-<!--        <a th:href="@{/mypage(tab='info')}"-->
-<!--           th:classappend="${currentTab == 'info'} ? 'active'" class="tab-btn">내 정보</a>-->
-
-<!--        <a th:href="@{/mypage(tab='address')}"-->
-<!--           th:classappend="${currentTab == 'address'} ? 'active'" class="tab-btn">배송지</a>-->
-
-<!--        <a th:href="@{/mypage(tab='coupons')}"-->
-<!--           th:classappend="${currentTab == 'coupons'} ? 'active'" class="tab-btn">쿠폰</a>-->
-
-<!--        <a th:href="@{/mypage(tab='points')}"-->
-<!--           th:classappend="${currentTab == 'points'} ? 'active'" class="tab-btn">포인트</a>-->
-
-<!--        <a th:href="@{/mypage(tab='orders')}"-->
-<!--           th:classappend="${currentTab == 'orders'} ? 'active'" class="tab-btn">주문내역</a>-->
-
-<!--        <a th:href="@{/mypage(tab='reviews')}"-->
-<!--           th:classappend="${currentTab == 'reviews'} ? 'active'" class="tab-btn">리뷰</a>-->
-
-<!--        <a th:href="@{/mypage(tab='likes')}"-->
-<!--           th:classappend="${currentTab == 'likes'} ? 'active'" class="tab-btn">찜 목록</a>-->
-
-        <a th:href="@{/templates/mypage}"
-           th:classappend="${currentTab == 'info'} ? 'active'"
-           class="tab-btn">내 정보</a>
-
-        <a th:href="@{/mypage/address}"
-           th:classappend="${currentTab == 'address'} ? 'active'"
-           class="tab-btn">배송지</a>
-
-        <a th:href="@{/mypage/coupons}"
-           th:classappend="${currentTab == 'coupons'} ? 'active'"
-           class="tab-btn">쿠폰</a>
-
-        <a th:href="@{/mypage/points}"
-           th:classappend="${currentTab == 'points'} ? 'active'"
-           class="tab-btn">포인트</a>
-
-        <a th:href="@{/mypage/orders}"
-           th:classappend="${currentTab == 'orders'} ? 'active'"
-           class="tab-btn">주문내역</a>
-
-        <a th:href="@{/mypage/reviews}"
-           th:classappend="${currentTab == 'reviews'} ? 'active'"
-           class="tab-btn">리뷰</a>
-
-        <a th:href="@{/mypage/likes}"
-           th:classappend="${currentTab == 'likes'} ? 'active'"
-           class="tab-btn">찜 목록</a>
+        <a th:href="@{/mypage(tab='info')}" th:classappend="${currentTab == 'info'} ? 'active'" class="tab-btn">내 정보</a>
+        <a th:href="@{/mypage(tab='address')}" th:classappend="${currentTab == 'address'} ? 'active'" class="tab-btn">배송지</a>
+        <a th:href="@{/mypage(tab='coupons')}" th:classappend="${currentTab == 'coupons'} ? 'active'" class="tab-btn">쿠폰</a>
+        <a th:href="@{/mypage(tab='points')}" th:classappend="${currentTab == 'points'} ? 'active'" class="tab-btn">포인트</a>
+        <a th:href="@{/mypage(tab='orders')}" th:classappend="${currentTab == 'orders'} ? 'active'" class="tab-btn">주문내역</a>
+        <a th:href="@{/mypage(tab='reviews')}" th:classappend="${currentTab == 'reviews'} ? 'active'" class="tab-btn">리뷰</a>
+        <a th:href="@{/mypage(tab='likes')}" th:classappend="${currentTab == 'likes'} ? 'active'" class="tab-btn">찜 목록</a>
     </nav>
 
     <section id="tab-info" class="tab-content" th:classappend="${currentTab == 'info'} ? 'active'">
         <h2 class="section-title">내 정보</h2>
-        <div class="info-group">
-            <div class="info-item">
-                <label>이름</label>
-                <div th:text="${myInfo.name}">홍길동</div>
-            </div>
-            <div class="info-item">
-                <label>이메일</label>
-                <div th:text="${myInfo.email}">sun.kim@example.com</div>
-            </div>
-            <div class="info-item">
-                <label>생일</label>
-                <div th:text="${#temporals.format(myInfo.birthDate, 'yyyy-MM-dd')}">1995-01-01</div>
-            </div>
-            <div class="info-item">
-                <label>연락처</label>
-                <div th:text="${myInfo.phone}">010-1234-5678</div>
-            </div>
-            <div class="info-item">
-                <label>회원 등급</label>
-                <div th:text="${myInfo.gradeName}">일반</div>
-            </div>
-        </div>
-        <br />
-        <button type="button" class="btn-edit">정보 수정</button>
-        <div class="withdrawal-area" style="margin-top: 30px; text-align: right; border-top: 1px solid #eee; padding-top: 15px;">
-            <span style="font-size: 13px; color: #888;">더 이상 서비스를 이용하지 않으시나요?</span>
-            <a href="#" id="btn-withdraw" style="font-size: 13px; color: #999; text-decoration: underline; margin-left: 10px;">
-                회원 탈퇴
-            </a>
-        </div>
 
-        <form id="edit-form" method="post" action="/mypage/update" style="display: none;">
+        <div id="view-mode">
             <div class="info-group">
                 <div class="info-item">
-                    <label for="edit-name">이름</label>
-                    <input type="text" id="edit-name" name="name"
-                           th:value="${myInfo.name}" class="input-field" required>
+                    <label>이름</label>
+                    <div th:text="${myInfo.name}">홍길동</div>
                 </div>
                 <div class="info-item">
-                    <label for="edit-email">이메일</label>
-                    <input type="email" id="edit-email" name="email"
-                           th:value="${myInfo.email}" class="input-field" required>
+                    <label>이메일</label>
+                    <div th:text="${myInfo.email}">sun.kim@example.com</div>
                 </div>
                 <div class="info-item">
                     <label>생일</label>
-                    <div th:text="${#temporals.format(myInfo.birthDate, 'yyyy-MM-dd')}"
-                         style="padding: 10px 0; color: #777;"></div>
+                    <div th:text="${#temporals.format(myInfo.birthDate, 'yyyy-MM-dd')}">1995-01-01</div>
                 </div>
                 <div class="info-item">
+                    <label>연락처</label>
+                    <div th:text="${myInfo.phone}">010-1234-5678</div>
+                </div>
+                <div class="info-item">
+                    <label>회원 등급</label>
+                    <div th:text="${myInfo.gradeName}">일반</div>
+                </div>
+            </div>
+            <br />
+            <button type="button" class="btn-edit" onclick="toggleEditMode(true)">정보 수정</button>
+
+            <div class="withdrawal-area" style="margin-top: 30px; text-align: right; border-top: 1px solid #eee; padding-top: 15px;">
+                <span style="font-size: 13px; color: #888;">더 이상 서비스를 이용하지 않으시나요?</span>
+                <a href="#" id="btn-withdraw" style="font-size: 13px; color: #999; text-decoration: underline; margin-left: 10px;">
+                    회원 탈퇴
+                </a>
+            </div>
+        </div>
+
+        <form id="edit-form" action="/mypage/update" method="post" style="display: none;">
+            <div class="info-group">
+                <div class="info-item">
+                    <label for="edit-name">이름</label>
+                    <input type="text" id="edit-name" name="name" th:value="${myInfo.name}" class="input-field" required>
+                </div>
+                <div class="info-item">
+                    <label for="edit-email">이메일</label>
+                    <input type="email" id="edit-email" name="email" th:value="${myInfo.email}" class="input-field" required>
+                </div>
+
+                <div class="info-item">
+                    <label>생일</label>
+
+                    <div th:if="${myInfo.birthDate.year == 1000}">
+                        <input type="date" id="edit-birth" name="birthDate" class="input-field">
+                        <p style="font-size: 12px; color: #007bff; margin-top: 5px;">
+                            * 생년월일을 설정해주세요. (설정 후에는 변경할 수 없습니다.)
+                        </p>
+                    </div>
+
+                    <div th:unless="${myInfo.birthDate.year == 1000}">
+                        <input type="date"
+                               th:value="${myInfo.birthDate}"
+                               class="input-field"
+                               style="background-color: #f0f0f0; color: #888; cursor: not-allowed;"
+                               readonly
+                               onfocus="this.blur();" onclick="return false;">
+
+                        <p class="error-msg">* 생년월일은 최초 설정 후 변경할 수 없습니다.</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
                     <label for="edit-phone">연락처</label>
-                    <input type="text" id="edit-phone" name="phone"
-                           th:value="${myInfo.phone}" class="input-field" placeholder="010-0000-0000" required>
+                    <input type="text" id="edit-phone" name="phone" th:value="${myInfo.phone}" class="input-field" placeholder="010-0000-0000" required>
                 </div>
 
                 <div class="info-item">
@@ -202,10 +140,10 @@
             </div>
         </form>
 
+        <form id="withdraw-form" action="/mypage/withdraw" method="post" style="display: none;"></form>
     </section>
 
-    <section id="tab-address" class="tab-content"
-             th:classappend="${currentTab == 'address'} ? 'active' : ''">
+    <section id="tab-address" class="tab-content" th:classappend="${currentTab == 'address'} ? 'active' : ''">
         <h2 class="section-title">배송지 관리</h2>
         <div style="margin-bottom: 15px; color: #777; font-size: 14px;">
             저장 가능한 배송지는 최대 <strong>10개</strong>입니다.
@@ -226,16 +164,12 @@
         <button id="add-address-btn" class="btn-edit" style="margin-top: 25px;">+ 배송지 추가하기</button>
     </section>
 
-
-    <section id="tab-coupons" class="tab-content"
-             th:classappend="${currentTab == 'coupons'} ? 'active' : ''">
+    <section id="tab-coupons" class="tab-content" th:classappend="${currentTab == 'coupons'} ? 'active' : ''">
         <h2 class="section-title">보유 쿠폰함 (<span th:text="${couponCount}">0</span>개)</h2>
-
         <div class="coupon-grid">
             <div class="coupon-card" th:each="coupon : ${myCoupons}">
                 <div class="coupon-header">
                     <div class="coupon-title" th:text="${coupon.couponName}">쿠폰 이름</div>
-
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span class="coupon-badge"
                               th:classappend="${coupon.status == 'ISSUED'} ? 'badge-available' :
@@ -250,15 +184,8 @@
                     <div class="info-item">
                         <span class="info-label">할인 혜택</span>
                         <span class="info-value">
-                            <span th:if="${coupon.discountType == 'FIXED'}"
-                                  th:text="${#numbers.formatInteger(coupon.discountValue, 0, 'COMMA') + '원'}">
-                                1,000원
-                            </span>
-
-                            <span th:if="${coupon.discountType == 'PERCENTAGE'}"
-                                  th:text="${coupon.discountValue + '%'}">
-                                10%
-                            </span>
+                            <span th:if="${coupon.discountType == 'FIXED'}" th:text="${#numbers.formatInteger(coupon.discountValue, 0, 'COMMA') + '원'}">1,000원</span>
+                            <span th:if="${coupon.discountType == 'PERCENTAGE'}" th:text="${coupon.discountValue + '%'}">10%</span>
                         </span>
                     </div>
                     <div class="info-item">
@@ -268,47 +195,34 @@
                 </div>
                 <div class="coupon-condition" th:text="${coupon.condition}">조건</div>
             </div>
-
-            <div th:if="${couponCount == 0}" class="empty-message">
-                보유한 쿠폰이 없습니다.
-            </div>
+            <div th:if="${couponCount == 0}" class="empty-message">보유한 쿠폰이 없습니다.</div>
         </div>
         <div style="text-align: center; margin-top: 20px;">
             <a href="/coupon" class="btn-outline" style="padding: 10px 20px;">쿠폰 존으로 이동 &gt;</a>
         </div>
     </section>
 
-    <section id="tab-points" class="tab-content"
-             th:classappend="${currentTab == 'points'} ? 'active' : ''">
+    <section id="tab-points" class="tab-content" th:classappend="${currentTab == 'points'} ? 'active' : ''">
         <h2 class="section-title">포인트 관리</h2>
         <div class="points-container">
             <div class="points-box">
                 <div class="points-label">보유 포인트</div>
-                <div class="points-value"
-                     th:text="${#numbers.formatInteger((balance?.currentPoint ?: 0), 0, 'COMMA')}">0</div>
+                <div class="points-value" th:text="${#numbers.formatInteger((balance?.currentPoint ?: 0), 0, 'COMMA')}">0</div>
                 <div class="points-unit">P</div>
             </div>
             <div class="points-box">
                 <div class="points-label">누적 적립 포인트</div>
-                <div class="points-value"
-                     th:text="${#numbers.formatInteger((balance?.totalEarnedPoint ?: 0), 0, 'COMMA')}">0</div>
-
+                <div class="points-value" th:text="${#numbers.formatInteger((balance?.totalEarnedPoint ?: 0), 0, 'COMMA')}">0</div>
                 <div class="points-unit">P</div>
             </div>
         </div>
         <div class="points-history">
             <h3>최근 포인트 내역</h3>
-
             <div class="history-item" th:each="history : ${histories}">
                 <div style="display: flex; flex-direction: column; gap: 5px;">
-                    <span class="history-desc"
-                          th:text="${history.description}"
-                          style="font-weight: 600; color: #333;">상품 구매 적립</span>
-
-                    <span style="font-size: 12px; color: #999;"
-                          th:text="${#temporals.format(history.transactionDate, 'yyyy.MM.dd HH:mm')}">2025.01.01</span>
+                    <span class="history-desc" th:text="${history.description}" style="font-weight: 600; color: #333;">상품 구매 적립</span>
+                    <span style="font-size: 12px; color: #999;" th:text="${#temporals.format(history.transactionDate, 'yyyy.MM.dd HH:mm')}">2025.01.01</span>
                 </div>
-
                 <div style="text-align: right;">
                     <span class="history-amount"
                           th:text="${(history.amount > 0 ? '+' : '') + #numbers.formatInteger(history.amount, 0, 'COMMA') + ' P'}"
@@ -320,49 +234,28 @@
                     </div>
                 </div>
             </div>
-
-            <div th:if="${#lists.isEmpty(histories)}" class="empty-message">
-                포인트 내역이 없습니다.
-            </div>
+            <div th:if="${#lists.isEmpty(histories)}" class="empty-message">포인트 내역이 없습니다.</div>
         </div>
-
         <div style="margin-top: 20px; text-align: center;" th:if="${!#lists.isEmpty(histories)}">
-            <a th:if="${currentPage > 0}"
-               th:href="@{/templates/mypage(tab='points', page=${currentPage - 1})}"
-               class="btn-outline" style="padding: 5px 10px;">&lt; 이전</a>
-
-            <span style="margin: 0 10px; font-weight: 600;"
-                  th:text="${currentPage + 1} + ' / ' + ${totalPages}">1 / 5</span>
-
-            <a th:if="${currentPage + 1 < totalPages}"
-               th:href="@{/templates/mypage(tab='points', page=${currentPage + 1})}"
-               class="btn-outline" style="padding: 5px 10px;">다음 &gt;</a>
+            <a th:if="${currentPage > 0}" th:href="@{/templates/mypage(tab='points', page=${currentPage - 1})}" class="btn-outline" style="padding: 5px 10px;">&lt; 이전</a>
+            <span style="margin: 0 10px; font-weight: 600;" th:text="${currentPage + 1} + ' / ' + ${totalPages}">1 / 5</span>
+            <a th:if="${currentPage + 1 < totalPages}" th:href="@{/templates/mypage(tab='points', page=${currentPage + 1})}" class="btn-outline" style="padding: 5px 10px;">다음 &gt;</a>
         </div>
     </section>
-    <section id="tab-orders" class="tab-content"
-             th:classappend="${currentTab == 'orders'} ? 'active' : ''">
-        <h2 class="section-title">주문 내역</h2>
 
-        <!-- 안내 문구 -->
+    <section id="tab-orders" class="tab-content" th:classappend="${currentTab == 'orders'} ? 'active' : ''">
+        <h2 class="section-title">주문 내역</h2>
         <div style="margin-bottom: 15px; color: #777; font-size: 14px;">
             상품 수령 후 <strong>10일 이내</strong>에 구매확정을 해 주세요.<br />
             10일 이내에 구매확정을 하지 않을 경우, 시스템에서 <strong>자동으로 구매확정</strong> 처리됩니다.
         </div>
-
-        <!-- 주문 리스트 -->
         <div class="order-list">
-
-            <!-- 주문 카드 1 : 아직 구매확정 가능 -->
-            <article class="order-card order-item"
-                     data-confirm-deadline="2025-12-05">
+            <article class="order-card order-item" data-confirm-deadline="2025-12-05">
                 <header class="order-header">
-                    <div class="order-id">
-                        주문번호 <strong>2025-11-000123</strong>
-                    </div>
+                    <div class="order-id">주문번호 <strong>2025-11-000123</strong></div>
                     <div class="order-date">주문일자 2025-11-25</div>
                     <span class="badge-status shipping">배송완료</span>
                 </header>
-
                 <div class="order-body">
                     <div class="order-product">
                         <div class="title">어린 왕자 (개정판)</div>
@@ -373,29 +266,18 @@
                         <div class="confirm-deadline"></div>
                     </div>
                 </div>
-
                 <footer class="order-footer">
-                    <a href="/orders/2025-11-000123" class="btn-outline small">
-                        주문상세
-                    </a>
-                    <button type="button"
-                            class="btn-primary small btn-confirm">
-                        구매확정
-                    </button>
+                    <a href="/orders/2025-11-000123" class="btn-outline small">주문상세</a>
+                    <button type="button" class="btn-primary small btn-confirm">구매확정</button>
                 </footer>
             </article>
 
-            <!-- 주문 카드 2 : 이미 10일 경과 → 자동 구매확정 상태 -->
-            <article class="order-card order-item"
-                     data-confirm-deadline="2025-11-10">
+            <article class="order-card order-item" data-confirm-deadline="2025-11-10">
                 <header class="order-header">
-                    <div class="order-id">
-                        주문번호 <strong>2025-10-000045</strong>
-                    </div>
-                    <div class="order-date">주문일자 2025-10-20</div>
+                    <div class="order-id">주문번호 <strong>2025-10-000045</strong></div>
+                    <div class="order-date">2025-10-20</div>
                     <span class="badge-status completed">구매확정(자동)</span>
                 </header>
-
                 <div class="order-body">
                     <div class="order-product">
                         <div class="title">하이파이브 개발자 노트</div>
@@ -406,31 +288,18 @@
                         <div class="confirm-deadline"></div>
                     </div>
                 </div>
-
                 <footer class="order-footer">
-                    <a href="/orders/2025-10-000045" class="btn-outline small">
-                        주문상세
-                    </a>
-                    <button type="button"
-                            class="btn-primary small btn-confirm"
-                            disabled>
-                        구매확정 완료
-                    </button>
+                    <a href="#" class="btn-outline small">주문상세</a>
+                    <button type="button" class="btn-primary small btn-confirm" disabled>구매확정 완료</button>
                 </footer>
             </article>
-
         </div>
-
-        <!-- 주문이 전혀 없을 때 사용하려면 아래만 남기고 위 order-list 제거 -->
-        <!--
-        <div class="empty-message">최근 3개월간 주문 내역이 없습니다.</div>
-        -->
     </section>
 
 </div>
 
 <script>
-    // 마이페이지 탭 버튼만 선택 (헤더 검색 버튼 제외)
+    // [기존 탭 로직]
     const tabNav = document.querySelector(".container2 nav");
     const buttons = tabNav ? tabNav.querySelectorAll("button") : [];
     const sections = document.querySelectorAll(".tab-content");
@@ -440,8 +309,8 @@
             buttons.forEach((b) => b.classList.remove("active"));
             btn.classList.add("active");
 
-            const tab = btn.dataset.tab;      // info, coupons, points, reading ...
-            const tabId = "tab-" + tab;       // tab-info, tab-reading ...
+            const tab = btn.dataset.tab;
+            const tabId = "tab-" + tab;
 
             sections.forEach((section) => {
                 section.classList.remove("active");
@@ -455,38 +324,35 @@
     });
 </script>
 <script>
+    // [기존 배송지/모달 로직]
     const modal = document.getElementById("address-modal");
     const addBtn = document.getElementById("add-address-btn");
     const cancelBtn = document.getElementById("modal-cancel");
     const saveBtn = document.getElementById("modal-save");
     const addressList = document.getElementById("address-list");
 
-    addBtn.addEventListener("click", () => {
-        if (addressList.children.length >= 10) {
-            alert("배송지는 최대 10개까지 저장할 수 있습니다.");
-            return;
-        }
-        modal.style.display = "flex";
-    });
+    if (addBtn) {
+        addBtn.addEventListener("click", () => {
+            if (addressList && addressList.children.length >= 10) {
+                alert("배송지는 최대 10개까지 저장할 수 있습니다.");
+                return;
+            }
+            if (modal) modal.style.display = "flex";
+            else alert("배송지 추가 기능 준비 중");
+        });
+    }
 
-    cancelBtn.addEventListener("click", () => {
-        modal.style.display = "none";
-    });
-
-    saveBtn.addEventListener("click", () => {
-        modal.style.display = "none";
-        alert("배송지가 저장되었습니다. ");
-    });
+    if (cancelBtn) cancelBtn.addEventListener("click", () => { modal.style.display = "none"; });
+    if (saveBtn) saveBtn.addEventListener("click", () => { modal.style.display = "none"; alert("배송지가 저장되었습니다."); });
 </script>
 <script>
-    // 구매확정 버튼 / 자동확정 표시 처리
+    // [기존 구매확정 로직]
     function updateConfirmButtons() {
         const items = document.querySelectorAll(".order-item");
-
         const today = new Date();
 
         items.forEach((item) => {
-            const deadlineStr = item.dataset.confirmDeadline; // "2025-12-05"
+            const deadlineStr = item.dataset.confirmDeadline;
             if (!deadlineStr) return;
 
             const deadline = new Date(deadlineStr + "T23:59:59");
@@ -497,106 +363,70 @@
             const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
             if (diffMs < 0) {
-                // 10일 지남 → 자동 구매확정 상태
                 item.classList.add("completed");
-                if (btn) {
-                    btn.disabled = true;
-                    btn.textContent = "구매확정 완료";
-                }
-                if (msg) {
-                    msg.textContent = "구매확정 기한이 지나 자동으로 구매확정되었습니다.";
-                }
+                if (btn) { btn.disabled = true; btn.textContent = "구매확정 완료"; }
+                if (msg) msg.textContent = "기한 경과 자동 확정";
             } else {
-                // 아직 구매확정 가능
-                if (msg) {
-                    msg.textContent = "구매확정 가능 기간 D-" + diffDays;
-                }
+                if (msg) msg.textContent = "구매확정 가능 D-" + diffDays;
             }
 
-            // 버튼 클릭 시 동작 (실제 API 연동 시 수정)
             if (btn && !btn.disabled) {
                 btn.addEventListener("click", () => {
                     const ok = confirm("이 주문을 구매확정 처리하시겠습니까?");
                     if (!ok) return;
-
-                    // TODO: 백엔드에 구매확정 API 호출
                     btn.disabled = true;
                     btn.textContent = "구매확정 완료";
                     item.classList.add("completed");
-                    if (msg) {
-                        msg.textContent = "구매확정이 완료되었습니다.";
-                    }
+                    if (msg) msg.textContent = "구매확정이 완료되었습니다.";
                 });
             }
         });
     }
-
     document.addEventListener("DOMContentLoaded", updateConfirmButtons);
 </script>
+
 <script th:inline="javascript">
     /*<![CDATA[*/
-    const errorMessage = /*[[${errorMessage}]];*/ false;
-    const message = /*[[${message}]];*/ false;
 
-    if (errorMessage) {
-        alert(errorMessage);
-    } else if (message) {
-        alert(message);
-    }
+    // [1] 서버 알림 메시지 처리
+    const alertMessage = /*[[${alertMessage}]]*/ null;
+    const errorMessage = /*[[${errorMessage}]]*/ null;
+    const message = /*[[${message}]]*/ null;
 
-    const withdrawBtn = document.getElementById("btn-withdraw");
-    if (withdrawBtn) {
-        withdrawBtn.addEventListener("click", (e) => {
-            e.preventDefault(); // 링크 이동 막기
+    if (alertMessage) alert(alertMessage);
+    else if (errorMessage) alert(errorMessage);
+    else if (message) alert(message);
 
-            if (confirm("정말 탈퇴하시겠습니까?")) {
-                // 백엔드 탈퇴 처리 URL로 이동 (예시)
-
-                fetch('/api/members/me/withdraw', {
-                    method: 'DELETE', // 혹은 POST (서버 설정에 따라 다름)
-                    headers: {
-                        'Content-Type': 'application/json'
-                        // 스프링 시큐리티 사용 시 CSRF 토큰 헤더가 필요할 수 있음
-                    }
-                })
-
-                .then(response => {
-                    if (response.ok) {
-                        // 2. 성공 시 처리
-                        alert("탈퇴 처리가 완료되었습니다. 이용해 주셔서 감사합니다.");
-                        // 세션이 서버에서 끊겼으므로 메인으로 이동
-                        location.href = "/login";
-                    } else {
-                        // 3. 실패 시 처리
-                        alert("탈퇴 처리에 실패했습니다. 관리자에게 문의해주세요.");
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert("서버 통신 중 오류가 발생했습니다.");
-                });
-            }
-        });
-    }
-
+    // [2] 정보 수정 모드 토글 (View <-> Edit)
     function toggleEditMode(isEdit) {
         const viewMode = document.getElementById('view-mode');
         const editForm = document.getElementById('edit-form');
 
         if (isEdit) {
-            // 수정 모드로 전환
             viewMode.style.display = 'none';
             editForm.style.display = 'block';
         } else {
-            // 조회 모드로 복귀 (취소)
             viewMode.style.display = 'block';
             editForm.style.display = 'none';
-            // 취소 시 입력값을 다시 원래대로 돌리고 싶다면 form.reset() 추가 가능
             editForm.reset();
         }
     }
 
+    // [3] 회원 탈퇴 (Hidden Form Submit 사용)
+    const withdrawBtn = document.getElementById("btn-withdraw");
+    const withdrawForm = document.getElementById("withdraw-form");
+
+    if (withdrawBtn && withdrawForm) {
+        withdrawBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (confirm("정말 탈퇴하시겠습니까? 탈퇴 시 포인트와 쿠폰이 소멸됩니다.")) {
+                // Fetch 대신 폼 제출 (CORS/Cloudflare 이슈 해결)
+                withdrawForm.submit();
+            }
+        });
+    }
+
+    /*]]>*/
 </script>
 </body>
 </html>
-`
