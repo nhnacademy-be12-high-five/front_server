@@ -50,4 +50,8 @@ public interface CouponService {
 
     @GetMapping("/api/coupons/books/{book-id}")
     List<CouponTemplateDto> getBookCoupons(@PathVariable("book-id") Long bookId);
+
+
+    @GetMapping("/api/coupons/members/order")
+    List<MemberCouponResponseDto> getUsableCoupons(@RequestHeader(name = "X-USER-ID", required = false) Long memberId);
 }

@@ -4,9 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HIGH-FIVE 도서 | 홈</title>
-    <link rel="stylesheet" href="/index-css/index-css.css">
+    <link rel="icon" href="/img/favicon.png">
 </head>
-
 <style>
     :root {
         --color-primary: #007bff;
@@ -17,6 +16,7 @@
         --color-text-dark: #333;
         --color-border-light: #eee;
         --color-border: #ddd;
+
     }
     * {
         margin: 0;
@@ -53,7 +53,7 @@
     }
     .container {
         width: 100%;
-        max-width: 1200px;
+        max-width: 1100px;
         margin: 0 auto;
         padding: 10px 20px;
     }
@@ -465,9 +465,11 @@
         flex-direction: column;
         gap: 18px;
     }
+
     .footer-links a {
         color: #c0c0c0;
         margin-right: 15px;
+        text-decoration: none;
     }
     .footer-links a:hover {
         color: white;
@@ -720,6 +722,12 @@
     .depth2 a:hover::before {
         color: var(--color-primary);
     }
+
+    .footer-links{
+        margin-left: 20px;
+        gap: 10rem;
+    }
+
 </style>
 
 <body>
@@ -1180,7 +1188,7 @@
 
                 <div th:if="${risingBooks == null or risingBooks.isEmpty()}"
                      style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">
-                    <p>아직 집계된 인기 도서가 없습니다.<br>(내일 아침에 랭킹이 업데이트됩니다!)</p>
+                    <p>아직 집계된 인기 도서가 없습니다.
                 </div>
 
                 <article class="card" th:unless="${risingBooks == null}" th:each="book : ${risingBooks}">
@@ -1262,6 +1270,7 @@
         <a href="#"><strong>개인정보처리방침</strong></a>
         <a href="#">고객센터</a>
     </div>
+
     <div class="footer-info">
         <div>
             <strong>대표이사 마르코</strong> | 사업자등록번호 123-456-7890<br />
@@ -1405,7 +1414,7 @@
             closeTimer = setTimeout(() => {
                 megaMenu.classList.remove('active');
                 closeTimer = null;
-            }, 2000); // 10000ms = 10초
+            }, 100); // 10000ms = 10초
         }
 
         // 1. 버튼 클릭 시 토글 (열려있으면 닫기 예약, 닫혀있으면 열기)
