@@ -27,13 +27,10 @@ public class MemberController {
 
     @LoginRequired
     @GetMapping("/mypage")
-    public String myPage(
-            @RequestParam(value = "tab", required = false, defaultValue = "info") String tab,
-            Model model) {
+    public String myPage(Model model) {
         try {
             var myInfo = memberService.getMyInfo().getBody();
             model.addAttribute("myInfo", myInfo);
-
         } catch (FeignException e) {
             log.error("내 정보 조회 실패 (Feign): {}", e.getMessage());
             return "redirect:/member/login.html";
@@ -42,7 +39,7 @@ public class MemberController {
             return "redirect:/";
         }
 
-        model.addAttribute("currentTab", tab);
+        model.addAttribute("currentTab", "info");
         return "mypage/mypage";
     }
 
@@ -50,7 +47,6 @@ public class MemberController {
     @PostMapping("/mypage/update")
     public String updateMember(@ModelAttribute MemberUpdateRequest request,
                                RedirectAttributes redirectAttributes) {
-        log.info("수정 요청 데이터 확인: 이름={}, 폰={}, 생일={}", request.getName(), request.getPhone(), request.getBirthDate());
         try {
             memberService.updateMember(request);
             redirectAttributes.addFlashAttribute("message", "회원 정보가 성공적으로 수정되었습니다.");
@@ -61,7 +57,7 @@ public class MemberController {
             }
             redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
         }
-        return "redirect:/mypage?tab=info";
+        return "redirect:/mypage";
     }
 
     @LoginRequired
@@ -69,25 +65,21 @@ public class MemberController {
     public String withdrawMember(HttpServletResponse response, RedirectAttributes redirectAttributes) {
         try {
             memberService.withdrawMember();
-
-            // 탈퇴 후엔 로그아웃 처리 (쿠키 삭제)
             deleteCookie(response, "access-token");
             deleteCookie(response, "refresh-token");
-
             redirectAttributes.addFlashAttribute("message", "탈퇴가 완료되었습니다.");
             return "redirect:/";
-
         } catch (Exception e) {
             log.error("탈퇴 실패", e);
             redirectAttributes.addFlashAttribute("errorMessage", "탈퇴 처리에 실패했습니다.");
-            return "redirect:/mypage?tab=info";
+            return "redirect:/mypage";
         }
     }
 
     // 쿠키 삭제 헬퍼
     private void deleteCookie(HttpServletResponse response, String cookieName) {
         Cookie cookie = new Cookie(cookieName, null);
-        cookie.setMaxAge(0); // 즉시 만료
+        cookie.setMaxAge(0);
         cookie.setPath("/");
         response.addCookie(cookie);
     }
