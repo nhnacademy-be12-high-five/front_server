@@ -1,386 +1,392 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>HIGH-FIVE 도서 | 장바구니</title>
-    <link rel="stylesheet" href="/order-css/cart.css">
+    <meta charset="UTF-8">
+    <title>주문서 작성 - High Five</title>
+    <link rel="stylesheet" href="/order-css/order.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://js.tosspayments.com/v1/payment"></script>
+    <style>
+        /* 비활성화 요소 스타일 */
+        .disabled-overlay {
+            background-color: #eee;
+            opacity: 0.6;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+        .login-guide {
+            font-size: 12px;
+            color: #dc3545;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-<header id="header" role="banner">
-    <div class="container">
-        <a th:href="@{/}" class="logo">
-            <img th:src="@{/img/logo.png}" alt="HIGH-FIVE 로고" width="100" height="100"/>
-            <div class="brand">HIGH-FIVE BOOKS</div>
-        </a>
 
-        <nav class="gnb" aria-label="주요 메뉴">
-            <form class="search-box"
-                  role="search"
-                  th:action="@{/search}"
-                  method="get">
-                <input
-                        type="search"
-                        name="keyword"
-                        placeholder="도서명, 저자, ISBN, 태그 검색"
-                        aria-label="통합 검색"
-                />
-                <button type="submit" class="search-btn" aria-label="검색">검색</button>
-            </form>
+<div class="order-container">
+    <h2>주문서 작성</h2>
 
-        </nav>
+    <form id="orderForm" th:object="${checkoutRequest}" onsubmit="return false;">
+        <input type="hidden" name="userId" th:value="${userId}">
 
-        <div class="user-menu">
-            <a class="user-link" href="/coupon">
-                <img th:src="@{/img/icon-coupon.png}" alt="쿠폰" class="user-icon" />
-            </a>
-            <a class="user-link" href="/mypage">
-                <img th:src="@{/img/icon-mypage.png}" alt="마이페이지" class="user-icon" />
-            </a>
-            <a th:href="@{/cart}" href="/cart" class="user-link cart-link-wrap">
-                <img th:src="@{/img/icon-cart.png}" alt="장바구니" class="user-icon"/>
-                <span id="cartBadge" class="cart-badge" style="display: none;">0</span>
-            </a>
-        </div>
-    </div>
-</header>
+        <section class="order-section">
+            <h3>주문 상품</h3>
+            <table class="order-table">
+                <thead>
+                <tr>
+                    <th>상품 정보</th>
+                    <th>수량</th>
+                    <th>금액</th>
+                    <th>포장 선택</th>
+                </tr>
+                </thead>
+                <tbody id="orderItemsBody">
+                <tr th:each="item, stat : ${orderSheet.orderItems}" class="order-item-row">
+                    <td>
+                        <input type="hidden" th:name="|orderItems[${stat.index}].bookId|" th:value="${item.bookId}">
+                        <input type="hidden" class="item-price" th:value="${item.price}">
 
-<main class="main_con">
-    <div class="container">
-        <h1 style="font-size: 22px; margin: 6px 0 14px">장바구니</h1>
+                        <img th:src="${item.imageUrl}" alt="책 이미지" width="50" style="vertical-align: middle; margin-right: 10px;">
+                        <span th:text="${item.title}">책 제목</span>
+                    </td>
+                    <td>
+                        <input type="number"
+                               th:name="|orderItems[${stat.index}].quantity|"
+                               th:value="${item.quantity}"
+                               class="item-qty-input"
+                               min="1"
+                               onchange="updateTotal()"
+                               onkeyup="updateTotal()"> 개
+                    </td>
+                    <td>
+                        <span class="item-total-price" th:text="${#numbers.formatInteger(item.totalPrice, 0, 'COMMA')}">10,000</span>원
+                    </td>
+                    <td>
+                        <select th:name="|orderItems[${stat.index}].wrapperId|" class="wrapper-select" onchange="updateTotal()">
+                            <option value="" data-price="0">선택 안함</option>
+                            <option th:each="wrapper : ${orderSheet.wrappers}"
+                                    th:value="${wrapper.id}"
+                                    th:data-price="${wrapper.price}"
+                                    th:text="|${wrapper.name} (+${wrapper.price}원)|">
+                                선물 포장 (+1000원)
+                            </option>
+                        </select>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
 
-        <div class="cart-wrap">
-            <section class="panel">
-                <div class="hd">
-                    <div><label><input type="checkbox" id="chkAll" checked/> 전체선택</label></div>
-                    <button class="btn" onclick="deleteSelectedItems()">선택삭제</button>
+        <section class="order-section">
+            <h3>배송지 정보</h3>
+            <div class="form-group">
+                <label>받는 사람</label>
+                <input type="text" id="receiverName" name="receiverName"
+                       th:value="${checkoutRequest.receiverName} ?: '홍길동'" required>
+            </div>
+            <div class="form-group">
+                <label>연락처</label>
+                <input type="text" id="receiverPhone" name="receiverPhone"
+                       th:value="${checkoutRequest.receiverPhone} ?: '010-1234-5678'"
+                       placeholder="010-0000-0000" required>
+            </div>
+            <div class="form-group">
+                <label>주소</label>
+                <input type="text" id="receiverAddress" name="receiverAddress"
+                       th:value="${checkoutRequest.receiverAddress} ?: '서울특별시 강남구 테헤란로 123'"
+                       placeholder="상세 주소를 입력하세요" required>
+            </div>
+            <div class="form-group">
+                <label>희망 배송일</label>
+                <input type="date" th:field="*{requestDeliveryDate}">
+            </div>
+        </section>
+
+        <section class="order-section">
+            <h3>할인 / 결제</h3>
+
+            <div class="discount-row">
+                <label>쿠폰 사용</label>
+                <select th:field="*{couponId}" id="couponSelect" onchange="updateTotal()"
+                        th:disabled="${userId == null}"
+                        th:classappend="${userId == null} ? 'disabled-overlay' : ''">
+                    <option value="" data-discount="0">사용 안함</option>
+                    <option th:each="coupon : ${coupons}"
+                            th:value="${coupon.id}"
+                            th:data-discount="${coupon.discountValue}"
+                            th:text="|${coupon.couponName} (${#numbers.formatInteger(coupon.discountValue, 0, 'COMMA')}원 할인)|">
+                        쿠폰명
+                    </option>
+                </select>
+                <span th:if="${userId == null}" class="login-guide">로그인 후 사용 가능</span>
+            </div>
+
+            <div class="discount-row">
+                <label>포인트 사용 (보유: <span th:text="${#numbers.formatInteger(point, 0, 'COMMA')}">0</span>P)</label>
+
+                <input type="number" th:field="*{usedPoint}" id="usedPoint" value="0" min="0"
+                       th:max="${point}"
+                       onchange="updateTotal()"
+                       th:disabled="${userId == null}"
+                       th:classappend="${userId == null} ? 'disabled-overlay' : ''"> P
+
+                <button type="button" onclick="useAllPoints()"
+                        style="margin-left: 10px; padding: 5px 10px; cursor: pointer;"
+                        th:disabled="${userId == null}"
+                        th:classappend="${userId == null} ? 'disabled-overlay' : ''">전액 사용</button>
+
+                <span th:if="${userId == null}" class="login-guide">로그인 후 사용 가능</span>
+            </div>
+
+            <div class="form-group" th:if="${userId == null}">
+                <label>주문 비밀번호 (비회원 필수)</label>
+                <input type="password" th:field="*{orderPassword}" placeholder="주문 조회용 비밀번호 입력" required>
+            </div>
+        </section>
+
+        <section class="order-section">
+            <h3>결제 수단 선택</h3>
+            <input type="hidden" name="paymentMethod" id="paymentMethodInput">
+            <div class="tabs">
+                <div th:if="${#lists.isEmpty(paymentMethods)}" style="width:100%; color:red; padding:10px;">
+                    사용 가능한 결제 수단이 없습니다. 관리자에게 문의하세요.
                 </div>
+                <button th:each="method : ${paymentMethods}"
+                        type="button"
+                        class="tab"
+                        th:data-code="${method.name}"
+                        onclick="selectMethod(this)"
+                        th:classappend="${!method.active} ? ' disabled' : ''"
+                        th:disabled="${!method.active}">
+                    <span th:text="${method.alias}">신용카드</span>
+                </button>
+            </div>
+            <div class="pay-content">
+                <p id="method-desc">결제 수단을 선택해주세요.</p>
+            </div>
+        </section>
 
-                <div class="cart-list" id="cartList">
-                    <div class="empty" th:if="${cartList.items.isEmpty()}">
-                        장바구니에 담긴 상품이 없습니다.
-                    </div>
+        <section class="payment-summary">
+            <h3>최종 결제 금액</h3>
+            <div class="summary-row">
+                <span>총 상품 금액</span>
+                <span class="amount">
+                    <span id="displayProductPrice" th:text="${#numbers.formatInteger(orderSheet.totalProductPrice, 0, 'COMMA')}">0</span>원
+                </span>
+            </div>
+            <div class="summary-row">
+                <span>배송비</span>
+                <span class="amount">
+                    <span id="displayDeliveryFee" th:text="${orderSheet.deliveryFee}">0</span>원
+                </span>
+            </div>
+            <div class="summary-row">
+                <span>포장비</span>
+                <span class="amount">
+                    <span id="displayWrappingFee">0</span>원
+                </span>
+            </div>
+            <div class="summary-row discount">
+                <span>할인 금액</span>
+                <span class="amount">-<span id="displayDiscount">0</span>원</span>
+            </div>
+            <hr>
+            <div class="total-row">
+                <span>총 결제 금액</span>
+                <span class="amount final-price">
+                    <span id="displayFinalPrice">0</span>원
+                </span>
+            </div>
+        </section>
 
-                    <article class="item"
-                             th:unless="${cartList.items.isEmpty()}"
-                             th:each="item : ${cartList.items}"
-                             th:data-book-id="${item.bookId}"
-                             th:data-price="${item.price}">
+        <button type="button" class="btn-submit" onclick="requestPayment()">결제하기</button>
+    </form>
+</div>
 
-                        <input type="checkbox" class="chk" th:value="${item.bookId}" checked/>
-
-                        <div class="thumb">
-                            <img th:src="${item.image}" th:alt="${item.title}"
-                                 onerror="this.parentNode.textContent='No Img'"/>
-                        </div>
-
-                        <div>
-                            <div class="item-title" th:text="${item.title}">책 제목</div>
-                            <div class="item-meta">
-                                <span th:text="${#numbers.formatInteger(item.price, 0, 'COMMA')}">10,000</span>원
-                            </div>
-                        </div>
-
-                        <div class="qty">
-                            <button class="dec" type="button" onclick="changeQuantity(this, -1)">-</button>
-                            <input type="number" class="num" th:value="${item.quantity}" readonly/>
-                            <button class="inc" type="button" onclick="changeQuantity(this, 1)">+</button>
-                        </div>
-
-                        <div class="price">
-                            <span class="p"
-                                  th:text="${#numbers.formatInteger(item.totalPrice, 0, 'COMMA')}">10,000</span>원
-                        </div>
-
-                        <button class="del" onclick="deleteItem(this)">×</button>
-                    </article>
-                </div>
-
-                <div class="cart-toolbar">
-                    <div><label><input type="checkbox" id="chkAllBottom" checked/> 전체선택</label></div>
-                    <button class="btn" onclick="clearCart()">전체비우기</button>
-                </div>
-            </section>
-
-            <aside class="panel">
-                <div class="hd"><h2>주문 요약</h2></div>
-                <div class="sum">
-                    <div class="sum-row">
-                        <span class="muted">상품금액</span>
-                        <span id="sumProducts">0원</span>
-                    </div>
-                    <div class="sum-row">
-                        <span class="muted">배송비</span>
-                        <span id="sumShipping">0원</span>
-                    </div>
-                    <div class="sum-row">
-                        <span class="big">결제예정금액</span>
-                        <span class="big" id="sumTotal">0원</span>
-                    </div>
-                </div>
-                <div class="action">
-                    <button class="order-btn" onclick="orderSelected()">주문하기</button>
-                </div>
-            </aside>
-        </div>
-    </div>
-</main>
-
-<footer id="footer">
-    <div class="container">
-        <div class="footer-info">...</div>
-    </div>
-</footer>
+<div id="loading-overlay">
+    <div class="spinner"></div>
+    <p style="margin-top: 15px; font-weight: bold;">결제 진행 중...</p>
+</div>
 
 <script th:inline="javascript">
-    const fmt = (n) => n.toLocaleString("ko-KR");
+    /*<![CDATA[*/
+    // 1. 서버 데이터
+    const maxPoint = [[${point != null ? point : 0}]];
+    const tossClientKey = [[${tossClientKey}]];
+    const customerEmail = [[${orderSheet.email}]];
+
+    const FREE_DELIVERY_THRESHOLD = 30000;
+    const STANDARD_DELIVERY_FEE = 3000;
+
+    // 2. 토스 객체
+    const tossPayments = TossPayments(tossClientKey);
+    let selectedMethodCode = null;
 
     // 초기화
-    document.addEventListener("DOMContentLoaded", () => {
-        updateTotals();
-        updateCartBadge();
-        checkAndMergeCart();
-    });
+    $(document).ready(function() {
+        updateTotal();
 
-
-    function checkAndMergeCart() {
-        // Thymeleaf 변수를 JS로 가져옴 (true/false)
-        /*[[${cartList.hasGuestCart}]]*/
-        const hasGuestCart = /*[[${cartList.hasGuestCart}]]*/ false;
-
-        if (hasGuestCart) {
-            if (confirm("로그인 전 담아둔 장바구니 내역이 있습니다.\n회원 장바구니와 합치시겠습니까?")) {
-                // Yes -> 합치기 요청
-                fetch('/cart/merge', { method: 'POST', credentials: 'include'})
-                    .then(res => {
-                        if(res.ok) {
-                            alert("장바구니가 통합되었습니다.");
-                            location.reload(); // 새로고침해서 합쳐진 목록 보여주기
-                        }
-                    });
-            } else {
-                if(confirm("그럼 이전 장바구니 내역을 삭제할까요?\n(취소 시 유지됩니다)")) {
-                    fetch('/cart/guest', { method: 'DELETE', credentials: 'include'})
-                        .then(res => {
-                            if(res.ok) location.reload();
-                        });
-                }
-            }
-        }
-    }
-
-    // 뒤로가기 대응
-    window.addEventListener("pageshow", (event) => {
-        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
-            updateCartBadge();
+        const firstTab = $('.tab:not(.disabled)').first();
+        if (firstTab.length > 0) {
+            selectMethod(firstTab[0]);
         }
     });
 
-    // 뱃지 업데이트
-    function updateCartBadge() {
-        fetch('/cart/count', {
-            method: 'GET',
-            headers: {'Content-Type': 'application/json'},
-            credentials: 'include'
-        })
-            .then(res => res.ok ? res.json() : 0)
-            .then(count => {
-                const badge = document.getElementById('cartBadge');
-                if (badge) {
-                    badge.textContent = count || 0;
-                    badge.style.display = 'block';
-                }
-            })
-            .catch(err => console.error(err));
-    }
+    // ===========================
+    // UI 로직 (금액 재계산)
+    // ===========================
+    function updateTotal() {
+        let currentTotalProductPrice = 0;
+        let currentWrappingFee = 0;
 
-    // ==========================================
-    // [수정됨] 1. 수량 변경 (새로고침 X)
-    // ==========================================
-    function changeQuantity(btn, change) {
-        const itemRow = btn.closest(".item");
-        const bookId = itemRow.getAttribute("data-book-id");
-        const price = parseInt(itemRow.getAttribute("data-price"));
+        // 1. 각 행(Row)별 계산
+        $('.order-item-row').each(function() {
+            const price = parseInt($(this).find('.item-price').val()) || 0;
+            let quantity = parseInt($(this).find('.item-qty-input').val());
 
-        const input = itemRow.querySelector(".num");
-        const currentQty = parseInt(input.value);
-        let newQty = currentQty + change;
-
-        if (newQty < 1) return; // 1 미만 방지
-
-        // 서버에 요청
-        fetch('/cart/items', {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            credentials: 'include',
-            body: JSON.stringify({bookId: bookId, quantity: newQty})
-        }).then(res => {
-            if (res.ok) {
-                // 성공 시 화면만 업데이트!
-                input.value = newQty; // 입력창 수량 변경
-
-                // 개별 상품 총액 업데이트 (단가 * 수량)
-                const itemTotalEl = itemRow.querySelector(".price .p");
-                itemTotalEl.textContent = fmt(price * newQty);
-
-                // 전체 합계 재계산
-                updateTotals();
-
-                // 뱃지 숫자 업데이트 (필요하다면)
-                updateCartBadge();
-            } else {
-                alert("수량 변경 실패");
-                input.value = currentQty; // 실패 시 원래 숫자로 복구
+            if (isNaN(quantity) || quantity < 1) {
+                quantity = 1;
             }
+
+            const rowTotal = price * quantity;
+            $(this).find('.item-total-price').text(rowTotal.toLocaleString());
+            currentTotalProductPrice += rowTotal;
+
+            const wrapperOption = $(this).find('.wrapper-select option:selected');
+            const wrapperPrice = parseInt(wrapperOption.data('price')) || 0;
+            currentWrappingFee += (wrapperPrice * quantity);
         });
+
+        // 2. 배송비 정책 적용
+        let currentDeliveryFee = STANDARD_DELIVERY_FEE;
+        if (currentTotalProductPrice >= FREE_DELIVERY_THRESHOLD) {
+            currentDeliveryFee = 0;
+        }
+
+        // 3. 할인 계산
+        // 비활성화된 input이라도 값은 0이어야 안전
+        const couponDiscount = parseInt($('#couponSelect').find(':selected').data('discount')) || 0;
+        let usedPoint = parseInt($('#usedPoint').val()) || 0;
+
+        // 포인트 초과 검사
+        if (usedPoint > maxPoint) {
+            alert('보유 포인트를 초과할 수 없습니다.');
+            usedPoint = maxPoint;
+            $('#usedPoint').val(maxPoint);
+        }
+        if (usedPoint < 0) {
+            usedPoint = 0;
+            $('#usedPoint').val(0);
+        }
+
+        // 4. 최종 금액 계산
+        const totalDiscount = couponDiscount + usedPoint;
+        let finalPrice = currentTotalProductPrice + currentDeliveryFee + currentWrappingFee - totalDiscount;
+        if (finalPrice < 0) finalPrice = 0;
+
+        // 5. 화면 갱신
+        $('#displayProductPrice').text(currentTotalProductPrice.toLocaleString());
+        $('#displayDeliveryFee').text(currentDeliveryFee.toLocaleString());
+        $('#displayWrappingFee').text(currentWrappingFee.toLocaleString());
+        $('#displayDiscount').text(totalDiscount.toLocaleString());
+        $('#displayFinalPrice').text(finalPrice.toLocaleString());
     }
 
-    // ==========================================
-    // [수정됨] 2. 단건 삭제 (새로고침 X)
-    // ==========================================
-    function deleteItem(btn) {
-        if (!confirm("삭제하시겠습니까?")) return;
-
-        const itemRow = btn.closest(".item");
-        const bookId = itemRow.getAttribute("data-book-id");
-
-        fetch(`/cart/items/${bookId}`, {method: 'DELETE', credentials: 'include'})
-            .then(res => {
-                if (res.ok) {
-                    // 성공 시 해당 줄(row)만 삭제
-                    itemRow.remove();
-                    checkEmptyCart(); // 다 지웠는지 확인
-                    updateTotals();   // 금액 재계산
-                    updateCartBadge(); // 뱃지 업데이트
-                } else {
-                    alert("삭제 실패");
-                }
-            });
+    function useAllPoints() {
+        $('#usedPoint').val(maxPoint);
+        updateTotal();
     }
 
-    // ==========================================
-    // [수정됨] 3. 전체 비우기 (새로고침 X)
-    // ==========================================
-    function clearCart() {
-        if (!confirm("장바구니를 비우시겠습니까?")) return;
+    // 결제 수단 탭 선택
+    function selectMethod(element) {
+        if ($(element).hasClass("disabled")) return;
 
-        fetch('/cart/items', {method: 'DELETE', credentials: 'include'})
-            .then(res => {
-                if (res.ok) {
-                    // 리스트 내부를 싹 비우고 메시지 띄우기
-                    const cartList = document.getElementById("cartList");
-                    cartList.innerHTML = '<div class="empty">장바구니에 담긴 상품이 없습니다.</div>';
+        $('.tab').removeClass('active');
+        $(element).addClass('active');
 
-                    updateTotals();
-                    updateCartBadge();
-                } else {
-                    alert("실패");
-                }
-            });
+        selectedMethodCode = $(element).data("code");
+        $('#paymentMethodInput').val(selectedMethodCode);
+
+        const desc = document.getElementById("method-desc");
+        if (selectedMethodCode === 'TOSS') {
+            desc.innerText = "Toss 위젯을 통해 빠르게 결제 해보세요.";
+        } else if (selectedMethodCode === 'BANK_TRANSFER') {
+            desc.innerText = "실시간 계좌이체를 진행합니다.";
+        } else if (selectedMethodCode === 'VIRTUAL_ACCOUNT') {
+            desc.innerText = "가상계좌를 발급받아 입금 후 결제 완료됩니다.";
+        } else {
+            desc.innerText = "선택한 결제 수단으로 진행합니다.";
+        }
     }
 
-    // ==========================================
-    // [수정됨] 4. 선택 삭제 (새로고침 X)
-    // ==========================================
-    async function deleteSelectedItems() {
-        const checkboxes = document.querySelectorAll('.item .chk:checked');
-        if (checkboxes.length === 0) {
-            alert("선택된 상품이 없습니다.");
+    // 결제 요청
+    function requestPayment() {
+        if (!selectedMethodCode) {
+            alert("결제 수단을 선택해주세요.");
             return;
         }
-        if (!confirm(`${checkboxes.length}개 상품을 삭제하시겠습니까?`)) return;
 
-        const promises = Array.from(checkboxes).map(chk =>
-            fetch(`/cart/items/${chk.value}`, {method: 'DELETE', credentials: 'include'})
-                .then(res => {
-                    if(res.ok) {
-                        // 성공한 항목은 화면에서 바로 지움
-                        chk.closest('.item').remove();
+        const receiverName = $('#receiverName').val();
+        const receiverPhone = $('#receiverPhone').val();
+        const receiverAddress = $('#receiverAddress').val();
+
+        if (!receiverName || !receiverPhone || !receiverAddress) {
+            alert("배송지 정보를 모두 입력해주세요.");
+            return;
+        }
+
+        $('#loading-overlay').css('display', 'flex');
+
+        const formData = new FormData(document.getElementById('orderForm'));
+
+        $.ajax({
+            url: '/orders/api/create',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                const orderId = response.orderKey;
+                const amount = response.totalAmount;
+                const orderName = "HIGH-FIVE 도서 주문";
+
+                const methodMap = {
+                    "TOSS": "카드", "BANK_TRANSFER": "계좌이체", "VIRTUAL_ACCOUNT": "가상계좌"
+                };
+                const tossMethod = methodMap[selectedMethodCode] || "카드";
+
+                tossPayments.requestPayment(tossMethod, {
+                    amount: amount,
+                    orderId: orderId,
+                    orderName: orderName,
+                    customerName: receiverName,
+                    customerEmail: customerEmail,
+                    successUrl: window.location.origin + "/orders/success",
+                    failUrl: window.location.origin + "/orders/fail",
+                }).catch(function (error) {
+                    $('#loading-overlay').hide();
+                    if (error.code !== 'USER_CANCEL') {
+                        alert("결제 실패: " + error.message);
                     }
-                    return res;
-                })
-        );
-
-        try {
-            await Promise.all(promises);
-            checkEmptyCart();
-            updateTotals();
-            updateCartBadge();
-        } catch (e) {
-            console.error(e);
-            alert("일부 삭제 실패. 다시 시도해주세요.");
-            location.reload(); // 에러 나면 안전하게 새로고침
-        }
-    }
-
-    // [헬퍼 함수] 장바구니가 비었는지 체크해서 UI 표시
-    function checkEmptyCart() {
-        const cartList = document.getElementById("cartList");
-        const items = cartList.querySelectorAll(".item");
-
-        if (items.length === 0) {
-            cartList.innerHTML = '<div class="empty">장바구니에 담긴 상품이 없습니다.</div>';
-        }
-    }
-
-    // 5. 합계 계산 (UI) - 기존 유지
-    function updateTotals() {
-        const listEl = document.getElementById("cartList");
-        if (!listEl) return;
-
-        const items = [...listEl.querySelectorAll(".item")];
-        // 아이템이 하나도 없으면 0원 처리
-        if (items.length === 0) {
-            document.getElementById("sumProducts").textContent = "0원";
-            document.getElementById("sumShipping").textContent = "0원";
-            document.getElementById("sumTotal").textContent = "0원";
-            return;
-        }
-
-        const selected = items.filter(it => it.querySelector(".chk").checked);
-
-        const sum = selected.reduce((acc, it) => {
-            const price = Number(it.getAttribute("data-price"));
-            const qtyInput = it.querySelector(".num");
-            // 삭제된 요소의 값이 남을 수 있으므로 방어 코드
-            const qty = qtyInput ? Number(qtyInput.value) : 0;
-            return acc + (price * qty);
-        }, 0);
-
-        let shipping = (sum > 0 && sum < 20000) ? 3000 : 0;
-
-        document.getElementById("sumProducts").textContent = fmt(sum) + "원";
-        document.getElementById("sumShipping").textContent = fmt(shipping) + "원";
-        document.getElementById("sumTotal").textContent = fmt(sum + shipping) + "원";
-    }
-
-    // 이벤트 리스너들
-    const listEl = document.getElementById("cartList");
-    if (listEl) {
-        listEl.addEventListener("change", (e) => {
-            if (e.target.classList.contains("chk")) updateTotals();
+                });
+            },
+            error: function(xhr) {
+                $('#loading-overlay').hide();
+                let msg = "주문 생성 실패";
+                try {
+                    const resp = JSON.parse(xhr.responseText);
+                    if(resp.message) msg = resp.message;
+                    else msg += ": " + xhr.responseText;
+                } catch(e) {
+                    if (xhr.responseText) msg += ": " + xhr.responseText;
+                }
+                alert(msg);
+            }
         });
     }
-
-    // 전체 선택 체크박스 로직 (상단/하단 연동)
-    function toggleAllCheckboxes(checked) {
-        document.querySelectorAll(".item .chk").forEach(chk => chk.checked = checked);
-        updateTotals();
-    }
-
-    const chkAll = document.getElementById("chkAll");
-    if (chkAll) {
-        chkAll.addEventListener("change", (e) => toggleAllCheckboxes(e.target.checked));
-    }
-
-    const chkAllBottom = document.getElementById("chkAllBottom");
-    if (chkAllBottom) {
-        chkAllBottom.addEventListener("change", (e) => toggleAllCheckboxes(e.target.checked));
-    }
-
-    function orderSelected() {
-        alert("주문 페이지 이동 구현 필요");
-    }
+    /*]]>*/
 </script>
+
 </body>
 </html>

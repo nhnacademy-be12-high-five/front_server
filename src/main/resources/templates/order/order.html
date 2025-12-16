@@ -1,270 +1,392 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>도서 주문 / 결제</title>
-      <link rel="stylesheet" href="/order-css/order-detail.css">
-  </head>
-  <body>
-  <header id="header" role="banner">
-      <div class="container">
-          <a href="./order.html" class="logo">
-              <img src="../img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100" />
-              <div class="brand">HIGH-FIVE BOOKS</div>
-          </a>
+<head>
+    <meta charset="UTF-8">
+    <title>주문서 작성 - High Five</title>
+    <link rel="stylesheet" href="/order-css/order.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://js.tosspayments.com/v1/payment"></script>
+    <style>
+        /* 비활성화 요소 스타일 */
+        .disabled-overlay {
+            background-color: #eee;
+            opacity: 0.6;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+        .login-guide {
+            font-size: 12px;
+            color: #dc3545;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
 
-          <nav class="gnb" aria-label="주요 메뉴">
-              <div class="search-box" role="search">
-                  <input
-                          type="search"
-                          placeholder="도서명, 저자, ISBN, 태그 검색"
-                          aria-label="통합 검색"
-                  />
-                  <button class="search-btn" aria-label="검색">검색</button>
-              </div>
-          </nav>
+<div class="order-container">
+    <h2>주문서 작성</h2>
 
-          <div class="user-menu">
-              <!-- 쿠폰 -->
-              <a class="user-link" href="/coupon">
-                  <img src="../img/icon-coupon.png" alt="쿠폰" class="user-icon" />
-              </a>
+    <form id="orderForm" th:object="${checkoutRequest}" onsubmit="return false;">
+        <input type="hidden" name="userId" th:value="${userId}">
 
-              <!-- 마이페이지 -->
-              <a class="user-link" href="/mypage">
-                  <img src="../img/icon-mypage.png" alt="마이페이지" class="user-icon" />
-              </a>
+        <section class="order-section">
+            <h3>주문 상품</h3>
+            <table class="order-table">
+                <thead>
+                <tr>
+                    <th>상품 정보</th>
+                    <th>수량</th>
+                    <th>금액</th>
+                    <th>포장 선택</th>
+                </tr>
+                </thead>
+                <tbody id="orderItemsBody">
+                <tr th:each="item, stat : ${orderSheet.orderItems}" class="order-item-row">
+                    <td>
+                        <input type="hidden" th:name="|orderItems[${stat.index}].bookId|" th:value="${item.bookId}">
+                        <input type="hidden" class="item-price" th:value="${item.price}">
 
-              <!-- 장바구니 -->
-              <a class="user-link" href="/cart">
-                  <img src="../img/icon-cart.png" alt="장바구니" class="user-icon" />
-              </a>
+                        <img th:src="${item.imageUrl}" alt="책 이미지" width="50" style="vertical-align: middle; margin-right: 10px;">
+                        <span th:text="${item.title}">책 제목</span>
+                    </td>
+                    <td>
+                        <input type="number"
+                               th:name="|orderItems[${stat.index}].quantity|"
+                               th:value="${item.quantity}"
+                               class="item-qty-input"
+                               min="1"
+                               onchange="updateTotal()"
+                               onkeyup="updateTotal()"> 개
+                    </td>
+                    <td>
+                        <span class="item-total-price" th:text="${#numbers.formatInteger(item.totalPrice, 0, 'COMMA')}">10,000</span>원
+                    </td>
+                    <td>
+                        <select th:name="|orderItems[${stat.index}].wrapperId|" class="wrapper-select" onchange="updateTotal()">
+                            <option value="" data-price="0">선택 안함</option>
+                            <option th:each="wrapper : ${orderSheet.wrappers}"
+                                    th:value="${wrapper.id}"
+                                    th:data-price="${wrapper.price}"
+                                    th:text="|${wrapper.name} (+${wrapper.price}원)|">
+                                선물 포장 (+1000원)
+                            </option>
+                        </select>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
 
-              <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
-          </div>
+        <section class="order-section">
+            <h3>배송지 정보</h3>
+            <div class="form-group">
+                <label>받는 사람</label>
+                <input type="text" id="receiverName" name="receiverName"
+                       th:value="${checkoutRequest.receiverName} ?: '홍길동'" required>
+            </div>
+            <div class="form-group">
+                <label>연락처</label>
+                <input type="text" id="receiverPhone" name="receiverPhone"
+                       th:value="${checkoutRequest.receiverPhone} ?: '010-1234-5678'"
+                       placeholder="010-0000-0000" required>
+            </div>
+            <div class="form-group">
+                <label>주소</label>
+                <input type="text" id="receiverAddress" name="receiverAddress"
+                       th:value="${checkoutRequest.receiverAddress} ?: '서울특별시 강남구 테헤란로 123'"
+                       placeholder="상세 주소를 입력하세요" required>
+            </div>
+            <div class="form-group">
+                <label>희망 배송일</label>
+                <input type="date" th:field="*{requestDeliveryDate}">
+            </div>
+        </section>
 
-      </div>
-  </header>
-    <main id="container">
-      <form class="order-form" onsubmit="return false;">
-        <div class="order-wrap">
-          <div class="order-content">
-            <h1>도서 주문 / 결제</h1>
-            <hr
-              style="
-                margin-top: 10px;
-                border-color: var(--color-primary);
-                margin-bottom: 30px;
-              "
-            />
+        <section class="order-section">
+            <h3>할인 / 결제</h3>
 
-            <div class="section-box">
-              <h2 class="section-title">주문 상품 정보</h2>
-              <ul class="product-list">
-                <li class="product-item">
-                  <img src="book_cover_example.jpg" alt="도서 표지" />
-                  <div class="product-details">
-                    <div class="name">클린 코드 (Clean Code)</div>
-                    <div class="price-qty">15,000원 x 1권</div>
-                  </div>
-                  <div class="total-price">15,000원</div>
-                </li>
-                <li class="product-item">
-                  <img src="book_cover_example2.jpg" alt="도서 표지" />
-                  <div class="product-details">
-                    <div class="name">객체지향의 사실과 오해</div>
-                    <div class="price-qty">22,000원 x 2권</div>
-                  </div>
-                  <div class="total-price">44,000원</div>
-                </li>
-              </ul>
+            <div class="discount-row">
+                <label>쿠폰 사용</label>
+                <select th:field="*{couponId}" id="couponSelect" onchange="updateTotal()"
+                        th:disabled="${userId == null}"
+                        th:classappend="${userId == null} ? 'disabled-overlay' : ''">
+                    <option value="" data-discount="0">사용 안함</option>
+                    <option th:each="coupon : ${coupons}"
+                            th:value="${coupon.id}"
+                            th:data-discount="${coupon.discountValue}"
+                            th:text="|${coupon.couponName} (${#numbers.formatInteger(coupon.discountValue, 0, 'COMMA')}원 할인)|">
+                        쿠폰명
+                    </option>
+                </select>
+                <span th:if="${userId == null}" class="login-guide">로그인 후 사용 가능</span>
             </div>
 
-            <div class="section-box">
-              <h2 class="section-title">주문자 정보</h2>
-              <div class="input-group">
-                <label for="ordererName">이름</label>
-                <input type="text" id="ordererName" value="홍길동" required />
-              </div>
-              <div class="input-group">
-                <label for="ordererEmail">이메일</label>
-                <input
-                  type="email"
-                  id="ordererEmail"
-                  value="user@example.com"
-                  required
-                />
-              </div>
-              <div class="input-group">
-                <label for="ordererPhone">연락처</label>
-                <input
-                  type="tel"
-                  id="ordererPhone"
-                  value="010-1234-5678"
-                  required
-                />
-              </div>
+            <div class="discount-row">
+                <label>포인트 사용 (보유: <span th:text="${#numbers.formatInteger(point, 0, 'COMMA')}">0</span>P)</label>
+
+                <input type="number" th:field="*{usedPoint}" id="usedPoint" value="0" min="0"
+                       th:max="${point}"
+                       onchange="updateTotal()"
+                       th:disabled="${userId == null}"
+                       th:classappend="${userId == null} ? 'disabled-overlay' : ''"> P
+
+                <button type="button" onclick="useAllPoints()"
+                        style="margin-left: 10px; padding: 5px 10px; cursor: pointer;"
+                        th:disabled="${userId == null}"
+                        th:classappend="${userId == null} ? 'disabled-overlay' : ''">전액 사용</button>
+
+                <span th:if="${userId == null}" class="login-guide">로그인 후 사용 가능</span>
             </div>
 
-            <div class="section-box">
-              <h2 class="section-title">배송지 정보</h2>
-              <div class="input-group">
-                <label for="recipientName">수령인</label>
-                <input type="text" id="recipientName" required />
-              </div>
-              <div class="input-group">
-                <label for="zipCode">우편번호</label>
-                <div class="address-group">
-                  <input
-                    type="text"
-                    id="zipCode"
-                    placeholder="우편번호"
-                    readonly
-                    required
-                  />
-                  <button type="button">주소 검색</button>
+            <div class="form-group" th:if="${userId == null}">
+                <label>주문 비밀번호 (비회원 필수)</label>
+                <input type="password" th:field="*{orderPassword}" placeholder="주문 조회용 비밀번호 입력" required>
+            </div>
+        </section>
+
+        <section class="order-section">
+            <h3>결제 수단 선택</h3>
+            <input type="hidden" name="paymentMethod" id="paymentMethodInput">
+            <div class="tabs">
+                <div th:if="${#lists.isEmpty(paymentMethods)}" style="width:100%; color:red; padding:10px;">
+                    사용 가능한 결제 수단이 없습니다. 관리자에게 문의하세요.
                 </div>
-              </div>
-              <div class="input-group">
-                <label for="addressMain">주소</label>
-                <input
-                  type="text"
-                  id="addressMain"
-                  placeholder="기본 주소"
-                  readonly
-                  required
-                />
-              </div>
-              <div class="input-group extra-address">
-                <label for="addressDetail">상세 주소</label>
-                <input
-                  type="text"
-                  id="addressDetail"
-                  placeholder="동/호수, 건물명 등 상세 주소"
-                  required
-                />
-              </div>
-              <div class="input-group">
-                <label for="shippingMemo">배송 요청 사항 (선택)</label>
-                <input
-                  type="text"
-                  id="shippingMemo"
-                  placeholder="예: 문 앞에 놓아주세요."
-                />
-              </div>
+                <button th:each="method : ${paymentMethods}"
+                        type="button"
+                        class="tab"
+                        th:data-code="${method.name}"
+                        onclick="selectMethod(this)"
+                        th:classappend="${!method.active} ? ' disabled' : ''"
+                        th:disabled="${!method.active}">
+                    <span th:text="${method.alias}">신용카드</span>
+                </button>
             </div>
-
-              <div class="section-box">
-                  <h2 class="section-title">결제 수단</h2>
-                  <div class="payment-methods">
-                      <!-- 신용/체크카드 -->
-                      <label>
-                          <input
-                                  type="radio"
-                                  name="paymentMethod"
-                                  value="card"
-                                  checked
-                          />
-                          <span>신용/체크카드</span>
-                      </label>
-
-
-                      <!-- 토스페이 -->
-                      <label>
-                          <input
-                                  type="radio"
-                                  name="paymentMethod"
-                                  value="tosspay"
-                          />
-                          <span class="toss-button">TossPay 토스페이</span>
-                      </label>
-                  </div>
-              </div>
+            <div class="pay-content">
+                <p id="method-desc">결제 수단을 선택해주세요.</p>
             </div>
+        </section>
 
-
-              <div class="order-summary">
-            <h2 style="margin-bottom: 25px; font-size: 22px">최종 결제 금액</h2>
-
-            <div class="summary-item">
-              <span>총 상품 금액</span>
-              <strong>59,000원</strong>
+        <section class="payment-summary">
+            <h3>최종 결제 금액</h3>
+            <div class="summary-row">
+                <span>총 상품 금액</span>
+                <span class="amount">
+                    <span id="displayProductPrice" th:text="${#numbers.formatInteger(orderSheet.totalProductPrice, 0, 'COMMA')}">0</span>원
+                </span>
             </div>
-
-            <div class="summary-item">
-              <span>배송비</span>
-              <strong>3,000원</strong>
+            <div class="summary-row">
+                <span>배송비</span>
+                <span class="amount">
+                    <span id="displayDeliveryFee" th:text="${orderSheet.deliveryFee}">0</span>원
+                </span>
             </div>
-
-            <div
-              class="summary-item"
-              style="color: var(--color-danger); font-weight: 600"
-            >
-              <span>할인 금액 (쿠폰/포인트)</span>
-              <strong>- 5,000원</strong>
+            <div class="summary-row">
+                <span>포장비</span>
+                <span class="amount">
+                    <span id="displayWrappingFee">0</span>원
+                </span>
             </div>
-
-            <div class="total-payment">
-              <span>총 결제 금액</span>
-              <span class="price">57,000원</span>
+            <div class="summary-row discount">
+                <span>할인 금액</span>
+                <span class="amount">-<span id="displayDiscount">0</span>원</span>
             </div>
-
-            <div class="order-agree">
-              <input type="checkbox" id="agreeTerms" required />
-              <label for="agreeTerms"
-                >주문할 상품/금액/약관을 모두 확인하였습니다.</label
-              >
+            <hr>
+            <div class="total-row">
+                <span>총 결제 금액</span>
+                <span class="amount final-price">
+                    <span id="displayFinalPrice">0</span>원
+                </span>
             </div>
+        </section>
 
-            <button type="submit" class="order-btn">57,000원 결제하기</button>
-          </div>
-        </div>
-      </form>
+        <button type="button" class="btn-submit" onclick="requestPayment()">결제하기</button>
+    </form>
+</div>
 
-    </main>
-    <footer id="footer">
-      <div class="container">
-        <div class="footer-links">
-          <a href="#">회사소개</a>
-          <a href="#">이용약관</a>
-          <a href="#"><strong>개인정보처리방침</strong></a>
-          <a href="#">관리자</a>
-        </div>
+<div id="loading-overlay">
+    <div class="spinner"></div>
+    <p style="margin-top: 15px; font-weight: bold;">결제 진행 중...</p>
+</div>
 
-        <div class="footer-info">
-          <div class="copyright">
-            <strong>대표이사 마르코</strong> | 사업자등록번호 123-456-7890<br />
-            통신판매업신고 2024-광주동구-01211 | 이메일: marco@nhn.com<br />
-            호스팅 제공자 NHN24 © NHN24. All Rights Reserved.
-          </div>
-          <div class="customer-center">
-            <strong>고객센터 1544-8282</strong> (발신자 부담)<br />
-            광주광역시 동구 서석동 조선대학교 1층 NHN아카데미<br />
-            Fax 062-1234-5678
-          </div>
-        </div>
-      </div>
-    </footer>
-    <script>
-      // 1. 헤더의 로그인 버튼 요소를 찾습니다.
-      const loginButton = document.querySelector(".login-btn-top");
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // 1. 서버 데이터
+    const maxPoint = [[${point != null ? point : 0}]];
+    const tossClientKey = [[${tossClientKey}]];
+    const customerEmail = [[${orderSheet.email}]];
 
-      // 2. 버튼이 존재하면 클릭 이벤트를 연결합니다.
-      if (loginButton) {
-        loginButton.addEventListener("click", function () {
-          // 3. 'login.html'로 페이지를 이동시킵니다.
-          window.location.href = "login.html";
+    const FREE_DELIVERY_THRESHOLD = 30000;
+    const STANDARD_DELIVERY_FEE = 3000;
+
+    // 2. 토스 객체
+    const tossPayments = TossPayments(tossClientKey);
+    let selectedMethodCode = null;
+
+    // 초기화
+    $(document).ready(function() {
+        updateTotal();
+
+        const firstTab = $('.tab:not(.disabled)').first();
+        if (firstTab.length > 0) {
+            selectMethod(firstTab[0]);
+        }
+    });
+
+    // ===========================
+    // UI 로직 (금액 재계산)
+    // ===========================
+    function updateTotal() {
+        let currentTotalProductPrice = 0;
+        let currentWrappingFee = 0;
+
+        // 1. 각 행(Row)별 계산
+        $('.order-item-row').each(function() {
+            const price = parseInt($(this).find('.item-price').val()) || 0;
+            let quantity = parseInt($(this).find('.item-qty-input').val());
+
+            if (isNaN(quantity) || quantity < 1) {
+                quantity = 1;
+            }
+
+            const rowTotal = price * quantity;
+            $(this).find('.item-total-price').text(rowTotal.toLocaleString());
+            currentTotalProductPrice += rowTotal;
+
+            const wrapperOption = $(this).find('.wrapper-select option:selected');
+            const wrapperPrice = parseInt(wrapperOption.data('price')) || 0;
+            currentWrappingFee += (wrapperPrice * quantity);
         });
-      }
 
-      // 주소 검색 버튼 클릭 시 동작 (실제 구현 필요)
-      const addressSearchBtn = document.querySelector(".address-group button");
-      if (addressSearchBtn) {
-        addressSearchBtn.addEventListener("click", () => {
-          alert("주소 검색 기능이 호출되었습니다. (실제 구현 필요)");
+        // 2. 배송비 정책 적용
+        let currentDeliveryFee = STANDARD_DELIVERY_FEE;
+        if (currentTotalProductPrice >= FREE_DELIVERY_THRESHOLD) {
+            currentDeliveryFee = 0;
+        }
+
+        // 3. 할인 계산
+        // 비활성화된 input이라도 값은 0이어야 안전
+        const couponDiscount = parseInt($('#couponSelect').find(':selected').data('discount')) || 0;
+        let usedPoint = parseInt($('#usedPoint').val()) || 0;
+
+        // 포인트 초과 검사
+        if (usedPoint > maxPoint) {
+            alert('보유 포인트를 초과할 수 없습니다.');
+            usedPoint = maxPoint;
+            $('#usedPoint').val(maxPoint);
+        }
+        if (usedPoint < 0) {
+            usedPoint = 0;
+            $('#usedPoint').val(0);
+        }
+
+        // 4. 최종 금액 계산
+        const totalDiscount = couponDiscount + usedPoint;
+        let finalPrice = currentTotalProductPrice + currentDeliveryFee + currentWrappingFee - totalDiscount;
+        if (finalPrice < 0) finalPrice = 0;
+
+        // 5. 화면 갱신
+        $('#displayProductPrice').text(currentTotalProductPrice.toLocaleString());
+        $('#displayDeliveryFee').text(currentDeliveryFee.toLocaleString());
+        $('#displayWrappingFee').text(currentWrappingFee.toLocaleString());
+        $('#displayDiscount').text(totalDiscount.toLocaleString());
+        $('#displayFinalPrice').text(finalPrice.toLocaleString());
+    }
+
+    function useAllPoints() {
+        $('#usedPoint').val(maxPoint);
+        updateTotal();
+    }
+
+    // 결제 수단 탭 선택
+    function selectMethod(element) {
+        if ($(element).hasClass("disabled")) return;
+
+        $('.tab').removeClass('active');
+        $(element).addClass('active');
+
+        selectedMethodCode = $(element).data("code");
+        $('#paymentMethodInput').val(selectedMethodCode);
+
+        const desc = document.getElementById("method-desc");
+        if (selectedMethodCode === 'TOSS') {
+            desc.innerText = "Toss 위젯을 통해 빠르게 결제 해보세요.";
+        } else if (selectedMethodCode === 'BANK_TRANSFER') {
+            desc.innerText = "실시간 계좌이체를 진행합니다.";
+        } else if (selectedMethodCode === 'VIRTUAL_ACCOUNT') {
+            desc.innerText = "가상계좌를 발급받아 입금 후 결제 완료됩니다.";
+        } else {
+            desc.innerText = "선택한 결제 수단으로 진행합니다.";
+        }
+    }
+
+    // 결제 요청
+    function requestPayment() {
+        if (!selectedMethodCode) {
+            alert("결제 수단을 선택해주세요.");
+            return;
+        }
+
+        const receiverName = $('#receiverName').val();
+        const receiverPhone = $('#receiverPhone').val();
+        const receiverAddress = $('#receiverAddress').val();
+
+        if (!receiverName || !receiverPhone || !receiverAddress) {
+            alert("배송지 정보를 모두 입력해주세요.");
+            return;
+        }
+
+        $('#loading-overlay').css('display', 'flex');
+
+        const formData = new FormData(document.getElementById('orderForm'));
+
+        $.ajax({
+            url: '/orders/api/create',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                const orderId = response.orderKey;
+                const amount = response.totalAmount;
+                const orderName = "HIGH-FIVE 도서 주문";
+
+                const methodMap = {
+                    "TOSS": "카드", "BANK_TRANSFER": "계좌이체", "VIRTUAL_ACCOUNT": "가상계좌"
+                };
+                const tossMethod = methodMap[selectedMethodCode] || "카드";
+
+                tossPayments.requestPayment(tossMethod, {
+                    amount: amount,
+                    orderId: orderId,
+                    orderName: orderName,
+                    customerName: receiverName,
+                    customerEmail: customerEmail,
+                    successUrl: window.location.origin + "/orders/success",
+                    failUrl: window.location.origin + "/orders/fail",
+                }).catch(function (error) {
+                    $('#loading-overlay').hide();
+                    if (error.code !== 'USER_CANCEL') {
+                        alert("결제 실패: " + error.message);
+                    }
+                });
+            },
+            error: function(xhr) {
+                $('#loading-overlay').hide();
+                let msg = "주문 생성 실패";
+                try {
+                    const resp = JSON.parse(xhr.responseText);
+                    if(resp.message) msg = resp.message;
+                    else msg += ": " + xhr.responseText;
+                } catch(e) {
+                    if (xhr.responseText) msg += ": " + xhr.responseText;
+                }
+                alert(msg);
+            }
         });
-      }
-    </script>
-  </body>
+    }
+    /*]]>*/
+</script>
+
+</body>
 </html>
