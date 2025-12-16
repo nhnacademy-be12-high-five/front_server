@@ -1,6 +1,6 @@
 :root {
-    --color-primary: #007bff; /* 메인 블루 */
-    --color-accent: #e9c46a; /* 포인트 컬러 */
+    --color-primary: #007bff;
+    --color-accent: #e9c46a;
     --color-background: #fcf8f5;
     --color-text-dark: #333;
     --color-text-light: #666;
@@ -8,7 +8,6 @@
     --color-border-light: #eee;
     --color-danger: #dc3545;
 
-    /* ✅ 여유(스페이싱) 토큰 */
     --space-page-top: 24px;
     --space-page-bottom: 70px;
     --space-section-gap: 32px;
@@ -30,16 +29,6 @@ body {
     min-height: 100vh;
 }
 
-/* ✅ 기존 container는 header에서도 쓰이므로 유지.
-   주문서 본문은 .order-container를 사용해서 header 깨짐 방지 */
-.container {
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-/* ✅ 주문서 페이지 본문 전용 컨테이너 (HTML에서 container → order-container로 변경) */
 .order-container {
     width: 100%;
     max-width: 1000px;
@@ -54,24 +43,21 @@ h2 {
     color: var(--color-text-dark);
 }
 
-/* 2. 섹션 박스 스타일 (공통) */
+/* 2. 섹션 박스 스타일 */
 .order-section, .payment-summary {
     background: white;
     padding: var(--space-section-padding-y) var(--space-section-padding-x);
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     border: 1px solid var(--color-border-light);
+    margin-bottom: var(--space-section-gap);
 }
-
-/* ✅ 섹션(폼 덩어리)끼리 여유: margin-bottom 확대 */
-.order-section { margin-bottom: var(--space-section-gap); }
-.payment-summary { margin-bottom: var(--space-section-gap); }
 
 .order-section h3, .payment-summary h3 {
     font-size: 18px;
     border-bottom: 2px solid var(--color-primary);
     padding-bottom: 10px;
-    margin-bottom: 22px; /* ✅ 제목 아래 여유 조금 증가 */
+    margin-bottom: 22px;
     color: var(--color-primary);
 }
 
@@ -97,7 +83,6 @@ h2 {
     text-align: center;
 }
 
-/* 상품 정보 열 (좌측 정렬) */
 .order-table td:first-child {
     text-align: left;
     display: flex;
@@ -116,175 +101,85 @@ h2 {
     border-radius: 6px;
 }
 
-/* 4. 배송지 정보 폼 */
-.form-group {
-    margin-bottom: var(--space-field-gap); /* ✅ 폼 요소 간격 확대 */
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 10px; /* ✅ 라벨-인풋 간격 확대 */
-    font-weight: 600;
+/* 수량 입력 필드 스타일 추가 */
+.item-qty-input {
+    width: 60px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    text-align: center;
     font-size: 14px;
 }
 
+/* 4. 폼 스타일 */
+.form-group { margin-bottom: var(--space-field-gap); }
+.form-group label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 14px; }
 .form-group input {
     width: 100%;
     padding: 12px 12px;
     border: 1px solid var(--color-border);
     border-radius: 8px;
     font-size: 15px;
-    outline: none;
-    transition: border-color 0.2s;
-    height: 44px; /* ✅ 입력 높이 통일 */
+    height: 44px;
 }
-
-.form-group input:focus {
-    border-color: var(--color-primary);
-}
+.form-group input:focus { border-color: var(--color-primary); outline: none; }
 
 /* 5. 할인/결제 영역 */
-.discount-row {
-    display: flex;
-    align-items: center;
-    margin-bottom: var(--space-field-gap); /* ✅ 행 간격 확대 */
-    gap: 12px; /* ✅ 라벨/컨트롤 사이 여유 */
+.discount-row { display: flex; align-items: center; margin-bottom: var(--space-field-gap); gap: 12px; }
+.discount-row label { width: 160px; font-weight: 600; }
+.discount-row select, .discount-row input {
+    flex: 1; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 8px; height: 44px;
 }
 
-.discount-row label {
-    width: 160px; /* ✅ 라벨이 너무 좁아 답답하면 넓힘 */
-    font-weight: 600;
-}
-
-.discount-row select,
-.discount-row input {
-    flex: 1;
-    padding: 10px 12px;
-    border: 1px solid var(--color-border);
+/* 6. 결제 수단 탭 */
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.tab {
+    flex: 1 1 120px;
+    text-align: center;
+    border: 1px solid #ddd;
+    background: #fafafa;
+    padding: 12px;
     border-radius: 8px;
-    height: 44px; /* ✅ 높이 통일 */
-}
-
-/* 6. 최종 결제 금액 요약 */
-.summary-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 14px; /* ✅ 줄 간격 확대 */
-    font-size: 16px;
-}
-
-.summary-row.discount span:last-child {
-    color: var(--color-danger);
-    font-weight: bold;
-}
-
-hr {
-    border: 0;
-    border-top: 1px dashed var(--color-border);
-    margin: 22px 0; /* ✅ 구분선 위아래 여유 */
-}
-
-.total-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--color-text-dark);
-}
-
-.final-price {
-    font-size: 28px;
-    color: var(--color-primary);
-}
-
-/* 7. 결제하기 버튼 */
-.btn-submit {
-    display: block;
-    width: 100%;
-    background-color: var(--color-primary);
-    color: white;
-    font-size: 20px;
-    font-weight: bold;
-    padding: 18px;
-    border-radius: 10px;
-    margin-top: 28px; /* ✅ 버튼 위 여유 확대 */
-    transition: background-color 0.3s;
-    border: none;
     cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.tab:hover { background: #f0f0f0; }
+.tab.active {
+    border-color: #007bff;
+    background: #eaf2ff;
+    color: #007bff;
+    font-weight: 700;
+}
+.tab.disabled { opacity: 0.5; cursor: not-allowed; background: #eee; }
+.pay-content {
+    border: 1px dashed #ddd; border-radius: 8px; padding: 15px; color: #666; font-size: 13px; background: #fff;
 }
 
-.btn-submit:hover {
-    background-color: #0056b3;
+/* 7. 최종 결제 요약 */
+.summary-row { display: flex; justify-content: space-between; margin-bottom: 14px; font-size: 16px; }
+.summary-row.discount span:last-child { color: var(--color-danger); font-weight: bold; }
+.total-row { display: flex; justify-content: space-between; align-items: center; font-size: 20px; font-weight: 700; }
+.final-price { font-size: 28px; color: var(--color-primary); }
+.amount { display: inline-flex; justify-content: flex-end; min-width: 100px; text-align: right; }
+
+hr { border: 0; border-top: 1px dashed var(--color-border); margin: 22px 0; }
+
+.btn-submit {
+    display: block; width: 100%; background-color: var(--color-primary); color: white;
+    font-size: 20px; font-weight: bold; padding: 18px; border-radius: 10px; margin-top: 28px;
+    border: none; cursor: pointer; transition: background-color 0.3s;
 }
+.btn-submit:hover { background-color: #0056b3; }
 
-/* ✅ 금액 오른쪽 정렬 + 숫자와 '원' 붙이기 */
-.payment-summary .summary-row,
-.payment-summary .total-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* 로딩 오버레이 */
+#loading-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.8); z-index: 9999;
+    flex-direction: column; align-items: center; justify-content: center;
 }
-
-.payment-summary .amount {
-    display: inline-flex;
-    justify-content: flex-end;
-    gap: 0;                 /* 숫자와 '원' 사이 붙이기 */
-    min-width: 160px;       /* ✅ 줄맞춤 조금 더 안정적으로 */
-    text-align: right;
-    white-space: nowrap;    /* 줄바꿈 방지 */
-    font-variant-numeric: tabular-nums; /* 숫자 폭 고정 */
+.spinner {
+    border: 4px solid #f3f3f3; border-top: 4px solid #007bff; border-radius: 50%;
+    width: 50px; height: 50px; animation: spin 1s linear infinite;
 }
-
-/* ===============================
-   ✅ (선택) 주문서 페이지에서 header가 깨질 때 방어용
-   - 헤더 CSS가 별도 파일이면 이 블록은 없어도 됨
-   - order.css만 로드하는 페이지라면 이 블록이 도움됨
-   =============================== */
-#header .container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 12px 20px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-}
-
-#header .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-}
-
-#header .gnb {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-}
-
-#header .search-box {
-    width: min(560px, 100%);
-    display: flex;
-}
-
-#header .search-box input[type="search"] {
-    flex: 1;
-}
-
-#header .user-menu {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-#header .user-icon {
-    width: 24px;
-    height: 24px;
-    object-fit: contain;
-}
-
-/* --- 기존 헤더/푸터 스타일 유지 (필요 시 아래 추가) --- */
-/* 아래에 기존 css 파일의 #header, #footer 관련 코드를 붙여넣으시면 됩니다 */
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }

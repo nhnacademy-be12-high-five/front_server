@@ -4,67 +4,41 @@
     <meta charset="UTF-8">
     <title>주문서 작성 - High Five</title>
     <link rel="stylesheet" href="/order-css/order.css">
-    <style>
-        /* 결제 수단 탭 스타일 통합 */
-        .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
-        .tab {
-            flex: 1 1 120px;
-            text-align: center;
-            border: 1px solid #ddd;
-            background: #fafafa;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-        .tab:hover { background: #f0f0f0; }
-        .tab.active {
-            border-color: #007bff;
-            background: #eaf2ff;
-            color: #007bff;
-            font-weight: 700;
-        }
-        .tab.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background: #eee;
-        }
-        .pay-content {
-            border: 1px dashed #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            color: #666;
-            font-size: 13px;
-            background: #fff;
-        }
-        /* 로딩 오버레이 */
-        #loading-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            z-index: 9999;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #007bff;
-            border-radius: 50%;
-            width: 50px; height: 50px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://js.tosspayments.com/v1/payment"></script>
+    <style>
+        /* 비활성화 요소 스타일 */
+        .disabled-overlay {
+            background-color: #eee;
+            opacity: 0.6;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+        .login-guide {
+            font-size: 12px;
+            color: #dc3545;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        /* 배송 정책 스타일 추가 */
+        .delivery-policy-info p {
+            font-size: 14px;
+            color: #555;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .delivery-policy-info span {
+            font-weight: bold;
+            color: #007bff; /* 정책 금액 강조 */
+        }
+    </style>
 </head>
 <body>
 
-<div class="order-container"> <h2>주문서 작성</h2>
+<div class="order-container">
+    <h2>주문서 작성</h2>
 
     <form id="orderForm" th:object="${checkoutRequest}" onsubmit="return false;">
         <input type="hidden" name="userId" th:value="${userId}">
@@ -80,19 +54,26 @@
                     <th>포장 선택</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr th:each="item, stat : ${orderSheet.orderItems}">
+                <tbody id="orderItemsBody">
+                <tr th:each="item, stat : ${orderSheet.orderItems}" class="order-item-row">
                     <td>
                         <input type="hidden" th:name="|orderItems[${stat.index}].bookId|" th:value="${item.bookId}">
+                        <input type="hidden" class="item-price" th:value="${item.price}">
+
                         <img th:src="${item.imageUrl}" alt="책 이미지" width="50" style="vertical-align: middle; margin-right: 10px;">
                         <span th:text="${item.title}">책 제목</span>
                     </td>
                     <td>
-                        <input type="hidden" th:name="|orderItems[${stat.index}].quantity|" th:value="${item.quantity}" class="item-qty">
-                        <span th:text="${item.quantity}">1</span>개
+                        <input type="number"
+                               th:name="|orderItems[${stat.index}].quantity|"
+                               th:value="${item.quantity}"
+                               class="item-qty-input"
+                               min="1"
+                               onchange="updateTotal()"
+                               onkeyup="updateTotal()"> 개
                     </td>
                     <td>
-                        <span th:text="${#numbers.formatInteger(item.totalPrice, 0, 'COMMA')}">10,000</span>원
+                        <span class="item-total-price" th:text="${#numbers.formatInteger(item.totalPrice, 0, 'COMMA')}">10,000</span>원
                     </td>
                     <td>
                         <select th:name="|orderItems[${stat.index}].wrapperId|" class="wrapper-select" onchange="updateTotal()">
@@ -112,17 +93,33 @@
 
         <section class="order-section">
             <h3>배송지 정보</h3>
+
+            <div class="delivery-policy-info"
+                 th:with="minAmount=${orderSheet.deliveryPolicy?.minOrderAmount ?: 30000},
+                          standardFee=${orderSheet.deliveryPolicy?.standardShippingFee ?: 3000},
+                          remoteFee=${orderSheet.deliveryPolicy?.remoteAreaSurcharge ?: 5000}">
+                <p>
+                    🚚  <span th:text="${#numbers.formatInteger(minAmount, 0, 'COMMA')}">30,000</span>원 이상 구매 시 <span style="font-weight: bold; color: #28a745;">무료 배송</span>.
+                    기본 배송비는 <span th:text="${#numbers.formatInteger(standardFee, 0, 'COMMA')}">3,000</span>원입니다.
+                    도서산간 지역은 <span th:text="${#numbers.formatInteger(remoteFee, 0, 'COMMA')}">5,000</span>원의 추가 요금이 발생합니다.
+                </p>
+            </div>
             <div class="form-group">
                 <label>받는 사람</label>
-                <input type="text" th:field="*{receiverName}" id="receiverName" required>
+                <input type="text" id="receiverName" name="receiverName"
+                       th:value="${checkoutRequest.receiverName} ?: '홍길동'" required>
             </div>
             <div class="form-group">
                 <label>연락처</label>
-                <input type="text" th:field="*{receiverPhone}" id="receiverPhone" placeholder="010-0000-0000" required>
+                <input type="text" id="receiverPhone" name="receiverPhone"
+                       th:value="${checkoutRequest.receiverPhone} ?: '010-1234-5678'"
+                       placeholder="010-0000-0000" required>
             </div>
             <div class="form-group">
                 <label>주소</label>
-                <input type="text" th:field="*{receiverAddress}" id="receiverAddress" placeholder="상세 주소를 입력하세요" required>
+                <input type="text" id="receiverAddress" name="receiverAddress"
+                       th:value="${checkoutRequest.receiverAddress} ?: '서울특별시 강남구 테헤란로 123'"
+                       placeholder="상세 주소를 입력하세요" required>
             </div>
             <div class="form-group">
                 <label>희망 배송일</label>
@@ -132,9 +129,12 @@
 
         <section class="order-section">
             <h3>할인 / 결제</h3>
+
             <div class="discount-row">
                 <label>쿠폰 사용</label>
-                <select th:field="*{couponId}" id="couponSelect" onchange="updateTotal()">
+                <select th:field="*{couponId}" id="couponSelect" onchange="updateTotal()"
+                        th:disabled="${userId == null}"
+                        th:classappend="${userId == null} ? 'disabled-overlay' : ''">
                     <option value="" data-discount="0">사용 안함</option>
                     <option th:each="coupon : ${coupons}"
                             th:value="${coupon.id}"
@@ -143,31 +143,39 @@
                         쿠폰명
                     </option>
                 </select>
-            </div>
-            <div class="discount-row">
-                <label>포인트 사용 (보유: <span th:text="${#numbers.formatInteger(point, 0, 'COMMA')}">0</span>P)</label>
-                <input type="number" th:field="*{usedPoint}" id="usedPoint" value="0" min="0"
-                       th:max="${point}"
-                       onchange="updateTotal()"> P
-                <button type="button" onclick="useAllPoints()" style="margin-left: 10px; padding: 5px 10px; cursor: pointer;">전액 사용</button>
+                <span th:if="${userId == null}" class="login-guide">로그인 후 사용 가능</span>
             </div>
 
-            <div class="form-group" th:if="${orderSheet.myPoint == null || orderSheet.myPoint == 0}">
-                <label>주문 비밀번호 (비회원)</label>
-                <input type="password" th:field="*{orderPassword}" placeholder="주문 조회용 비밀번호 입력">
+            <div class="discount-row">
+                <label>포인트 사용 (보유: <span th:text="${#numbers.formatInteger(point, 0, 'COMMA')}">0</span>P)</label>
+
+                <input type="number" th:field="*{usedPoint}" id="usedPoint" value="0" min="0"
+                       th:max="${point}"
+                       onchange="updateTotal()"
+                       th:disabled="${userId == null}"
+                       th:classappend="${userId == null} ? 'disabled-overlay' : ''"> P
+
+                <button type="button" onclick="useAllPoints()"
+                        style="margin-left: 10px; padding: 5px 10px; cursor: pointer;"
+                        th:disabled="${userId == null}"
+                        th:classappend="${userId == null} ? 'disabled-overlay' : ''">전액 사용</button>
+
+                <span th:if="${userId == null}" class="login-guide">로그인 후 사용 가능</span>
+            </div>
+
+            <div class="form-group" th:if="${userId == null}">
+                <label>주문 비밀번호 (비회원 필수)</label>
+                <input type="password" th:field="*{orderPassword}" placeholder="주문 조회용 비밀번호 입력" required>
             </div>
         </section>
 
         <section class="order-section">
             <h3>결제 수단 선택</h3>
-
             <input type="hidden" name="paymentMethod" id="paymentMethodInput">
-
             <div class="tabs">
                 <div th:if="${#lists.isEmpty(paymentMethods)}" style="width:100%; color:red; padding:10px;">
                     사용 가능한 결제 수단이 없습니다. 관리자에게 문의하세요.
                 </div>
-
                 <button th:each="method : ${paymentMethods}"
                         type="button"
                         class="tab"
@@ -178,7 +186,6 @@
                     <span th:text="${method.alias}">신용카드</span>
                 </button>
             </div>
-
             <div class="pay-content">
                 <p id="method-desc">결제 수단을 선택해주세요.</p>
             </div>
@@ -189,7 +196,7 @@
             <div class="summary-row">
                 <span>총 상품 금액</span>
                 <span class="amount">
-                    <span th:text="${#numbers.formatInteger(orderSheet.totalProductPrice, 0, 'COMMA')}">0</span>원
+                    <span id="displayProductPrice" th:text="${#numbers.formatInteger(orderSheet.totalProductPrice, 0, 'COMMA')}">0</span>원
                 </span>
             </div>
             <div class="summary-row">
@@ -229,21 +236,23 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
     // 1. 서버 데이터
-    const productPrice = /*[[${orderSheet.totalProductPrice}]]*/ 0;
-    const initialDeliveryFee = /*[[${orderSheet.deliveryFee}]]*/ 0;
-    const maxPoint = /*[[${point != null ? point : 0}]]*/ 0;
-    const tossClientKey = /*[[${tossClientKey}]]*/ "";
-    const customerEmail = /*[[${orderSheet.email}]]*/ "test@example.com";
+    const maxPoint = [[${point != null ? point : 0}]];
+    const tossClientKey = [[${tossClientKey}]];
+    const customerEmail = [[${orderSheet.email}]];
+
+    // [수정] 서버에서 가져온 배송 정책 값으로 JavaScript 상수를 동적 설정 (클라이언트 재계산 일관성 유지)
+    // orderSheet.deliveryPolicy 객체에서 값을 가져오고, null일 경우를 대비해 기본값 (?:)을 사용합니다.
+    const FREE_DELIVERY_THRESHOLD = [[${orderSheet.deliveryPolicy?.minOrderAmount ?: 30000}]];
+    const STANDARD_DELIVERY_FEE = [[${orderSheet.deliveryPolicy?.standardShippingFee ?: 3000}]];
 
     // 2. 토스 객체
     const tossPayments = TossPayments(tossClientKey);
-    let selectedMethodCode = null; // 선택된 결제 수단 코드
+    let selectedMethodCode = null;
 
     // 초기화
     $(document).ready(function() {
         updateTotal();
 
-        // 첫 번째 활성화된 결제 수단 자동 선택
         const firstTab = $('.tab:not(.disabled)').first();
         if (firstTab.length > 0) {
             selectMethod(firstTab[0]);
@@ -251,21 +260,42 @@
     });
 
     // ===========================
-    // UI 로직 (금액, 결제수단)
+    // UI 로직 (금액 재계산)
     // ===========================
     function updateTotal() {
-        // 포장비
-        let wrappingFee = 0;
-        $('.wrapper-select').each(function() {
-            const price = parseInt($(this).find(':selected').data('price')) || 0;
-            const qty = parseInt($(this).closest('tr').find('.item-qty').val()) || 1;
-            wrappingFee += (price * qty);
+        let currentTotalProductPrice = 0;
+        let currentWrappingFee = 0;
+
+        // 1. 각 행(Row)별 계산
+        $('.order-item-row').each(function() {
+            const price = parseInt($(this).find('.item-price').val()) || 0;
+            let quantity = parseInt($(this).find('.item-qty-input').val());
+
+            if (isNaN(quantity) || quantity < 1) {
+                quantity = 1;
+            }
+
+            const rowTotal = price * quantity;
+            $(this).find('.item-total-price').text(rowTotal.toLocaleString());
+            currentTotalProductPrice += rowTotal;
+
+            const wrapperOption = $(this).find('.wrapper-select option:selected');
+            const wrapperPrice = parseInt(wrapperOption.data('price')) || 0;
+            currentWrappingFee += (wrapperPrice * quantity);
         });
 
-        // 할인
+        // 2. 배송비 정책 적용 (동적으로 설정된 JS 상수 사용)
+        let currentDeliveryFee = STANDARD_DELIVERY_FEE;
+        if (currentTotalProductPrice >= FREE_DELIVERY_THRESHOLD) {
+            currentDeliveryFee = 0;
+        }
+
+        // 3. 할인 계산
+        // 비활성화된 input이라도 값은 0이어야 안전
         const couponDiscount = parseInt($('#couponSelect').find(':selected').data('discount')) || 0;
         let usedPoint = parseInt($('#usedPoint').val()) || 0;
 
+        // 포인트 초과 검사
         if (usedPoint > maxPoint) {
             alert('보유 포인트를 초과할 수 없습니다.');
             usedPoint = maxPoint;
@@ -276,35 +306,34 @@
             $('#usedPoint').val(0);
         }
 
+        // 4. 최종 금액 계산
         const totalDiscount = couponDiscount + usedPoint;
-        let finalPrice = productPrice + initialDeliveryFee + wrappingFee - totalDiscount;
+        let finalPrice = currentTotalProductPrice + currentDeliveryFee + currentWrappingFee - totalDiscount;
         if (finalPrice < 0) finalPrice = 0;
 
-        // 화면 갱신
-        $('#displayWrappingFee').text(wrappingFee.toLocaleString());
+        // 5. 화면 갱신
+        $('#displayProductPrice').text(currentTotalProductPrice.toLocaleString());
+        $('#displayDeliveryFee').text(currentDeliveryFee.toLocaleString());
+        $('#displayWrappingFee').text(currentWrappingFee.toLocaleString());
         $('#displayDiscount').text(totalDiscount.toLocaleString());
         $('#displayFinalPrice').text(finalPrice.toLocaleString());
     }
 
     function useAllPoints() {
-        const input = document.getElementById('usedPoint');
-        input.value = maxPoint; // maxPoint는 이미 script 상단에 정의됨
+        $('#usedPoint').val(maxPoint);
         updateTotal();
     }
 
-    // 결제 수단 탭 선택 함수
+    // 결제 수단 탭 선택
     function selectMethod(element) {
-        if (element.classList.contains("disabled")) return;
+        if ($(element).hasClass("disabled")) return;
 
-        // 스타일 변경
         $('.tab').removeClass('active');
         $(element).addClass('active');
 
-        // 값 설정
-        selectedMethodCode = element.getAttribute("data-code");
+        selectedMethodCode = $(element).data("code");
         $('#paymentMethodInput').val(selectedMethodCode);
 
-        // 설명 문구 업데이트
         const desc = document.getElementById("method-desc");
         if (selectedMethodCode === 'TOSS') {
             desc.innerText = "Toss 위젯을 통해 빠르게 결제 해보세요.";
@@ -317,11 +346,8 @@
         }
     }
 
-    // ===========================
-    // 핵심 결제 요청 로직
-    // ===========================
+    // 결제 요청
     function requestPayment() {
-        // 1. 유효성 검사
         if (!selectedMethodCode) {
             alert("결제 수단을 선택해주세요.");
             return;
@@ -336,13 +362,10 @@
             return;
         }
 
-        // 2. 로딩 시작
         $('#loading-overlay').css('display', 'flex');
 
-        // 3. 폼 데이터 준비
         const formData = new FormData(document.getElementById('orderForm'));
 
-        // 4. 주문 생성 (AJAX)
         $.ajax({
             url: '/orders/api/create',
             type: 'POST',
@@ -350,23 +373,20 @@
             processData: false,
             contentType: false,
             success: function(response) {
-                // 성공 시 서버로부터 받은 데이터
-                const orderId = response.orderKey;
+                // 서버 응답에서 UUID(orderKey)와 DB ID(orderId)를 모두 가져옵니다.
+                const orderKey = response.orderKey; // 토스 결제용 UUID
+                const dbOrderId = response.orderId; // 주문 취소용 DB ID
                 const amount = response.totalAmount;
-                const orderName = "HIGH-FIVE 도서 주문"; // 혹은 response.orderName
+                const orderName = "HIGH-FIVE 도서 주문";
 
-                // Toss 메서드 매핑
                 const methodMap = {
-                    "TOSS": "카드",
-                    "BANK_TRANSFER": "계좌이체",
-                    "VIRTUAL_ACCOUNT": "가상계좌"
+                    "TOSS": "카드", "BANK_TRANSFER": "계좌이체", "VIRTUAL_ACCOUNT": "가상계좌"
                 };
                 const tossMethod = methodMap[selectedMethodCode] || "카드";
 
-                // 5. 토스 결제창 호출
                 tossPayments.requestPayment(tossMethod, {
                     amount: amount,
-                    orderId: orderId,
+                    orderId: orderKey, // 토스에는 UUID 전달
                     orderName: orderName,
                     customerName: receiverName,
                     customerEmail: customerEmail,
@@ -374,7 +394,12 @@
                     failUrl: window.location.origin + "/orders/fail",
                 }).catch(function (error) {
                     $('#loading-overlay').hide();
-                    if (error.code !== 'USER_CANCEL') {
+
+                    // 사용자가 결제창을 닫거나 취소한 경우 (USER_CANCEL)
+                    if (error.code === 'USER_CANCEL') {
+                        console.log("사용자 결제 취소 -> 재고 해제 요청");
+                        cancelPendingOrder(dbOrderId); // DB ID로 취소 요청
+                    } else {
                         alert("결제 실패: " + error.message);
                     }
                 });
@@ -382,8 +407,30 @@
             error: function(xhr) {
                 $('#loading-overlay').hide();
                 let msg = "주문 생성 실패";
-                if (xhr.responseText) msg += ": " + xhr.responseText;
+                try {
+                    const resp = JSON.parse(xhr.responseText);
+                    if(resp.message) msg = resp.message;
+                    else msg += ": " + xhr.responseText;
+                } catch(e) {
+                    if (xhr.responseText) msg += ": " + xhr.responseText;
+                }
                 alert(msg);
+            }
+        });
+    }
+
+    // 주문 취소(재고 해제) 요청 함수
+    function cancelPendingOrder(orderId) {
+        if (!orderId) return;
+
+        $.ajax({
+            url: '/orders/api/' + orderId + '/cancel', // 백엔드에 이 API가 있어야 합니다.
+            type: 'POST',
+            success: function() {
+                console.log("주문 취소 및 재고 해제 완료");
+            },
+            error: function(e) {
+                console.error("주문 취소 실패 (서버 로그 확인 필요)", e);
             }
         });
     }

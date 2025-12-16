@@ -144,18 +144,15 @@
 
 
     function checkAndMergeCart() {
-        // Thymeleaf 변수를 JS로 가져옴 (true/false)
-        /*[[${cartList.hasGuestCart}]]*/
-        const hasGuestCart = /*[[${cartList.hasGuestCart}]]*/ false;
+        const hasGuestCart = [[${cartList.hasGuestCart}]] || false;
 
         if (hasGuestCart) {
             if (confirm("로그인 전 담아둔 장바구니 내역이 있습니다.\n회원 장바구니와 합치시겠습니까?")) {
-                // Yes -> 합치기 요청
                 fetch('/cart/merge', { method: 'POST', credentials: 'include'})
                     .then(res => {
                         if(res.ok) {
                             alert("장바구니가 통합되었습니다.");
-                            location.reload(); // 새로고침해서 합쳐진 목록 보여주기
+                            location.reload();
                         }
                     });
             } else {
@@ -194,9 +191,7 @@
             .catch(err => console.error(err));
     }
 
-    // ==========================================
-    // [수정됨] 1. 수량 변경 (새로고침 X)
-    // ==========================================
+    // 1. 수량 변경
     function changeQuantity(btn, change) {
         const itemRow = btn.closest(".item");
         const bookId = itemRow.getAttribute("data-book-id");
@@ -206,9 +201,8 @@
         const currentQty = parseInt(input.value);
         let newQty = currentQty + change;
 
-        if (newQty < 1) return; // 1 미만 방지
+        if (newQty < 1) return;
 
-        // 서버에 요청
         fetch('/cart/items', {
             method: 'PUT',
             headers: {'Content-Type': 'application/json'},
@@ -216,28 +210,19 @@
             body: JSON.stringify({bookId: bookId, quantity: newQty})
         }).then(res => {
             if (res.ok) {
-                // 성공 시 화면만 업데이트!
-                input.value = newQty; // 입력창 수량 변경
-
-                // 개별 상품 총액 업데이트 (단가 * 수량)
+                input.value = newQty;
                 const itemTotalEl = itemRow.querySelector(".price .p");
                 itemTotalEl.textContent = fmt(price * newQty);
-
-                // 전체 합계 재계산
                 updateTotals();
-
-                // 뱃지 숫자 업데이트 (필요하다면)
                 updateCartBadge();
             } else {
                 alert("수량 변경 실패");
-                input.value = currentQty; // 실패 시 원래 숫자로 복구
+                input.value = currentQty;
             }
         });
     }
 
-    // ==========================================
-    // [수정됨] 2. 단건 삭제 (새로고침 X)
-    // ==========================================
+    // 2. 단건 삭제
     function deleteItem(btn) {
         if (!confirm("삭제하시겠습니까?")) return;
 
@@ -247,30 +232,25 @@
         fetch(`/cart/items/${bookId}`, {method: 'DELETE', credentials: 'include'})
             .then(res => {
                 if (res.ok) {
-                    // 성공 시 해당 줄(row)만 삭제
                     itemRow.remove();
-                    checkEmptyCart(); // 다 지웠는지 확인
-                    updateTotals();   // 금액 재계산
-                    updateCartBadge(); // 뱃지 업데이트
+                    checkEmptyCart();
+                    updateTotals();
+                    updateCartBadge();
                 } else {
                     alert("삭제 실패");
                 }
             });
     }
 
-    // ==========================================
-    // [수정됨] 3. 전체 비우기 (새로고침 X)
-    // ==========================================
+    // 3. 전체 비우기
     function clearCart() {
         if (!confirm("장바구니를 비우시겠습니까?")) return;
 
         fetch('/cart/items', {method: 'DELETE', credentials: 'include'})
             .then(res => {
                 if (res.ok) {
-                    // 리스트 내부를 싹 비우고 메시지 띄우기
                     const cartList = document.getElementById("cartList");
                     cartList.innerHTML = '<div class="empty">장바구니에 담긴 상품이 없습니다.</div>';
-
                     updateTotals();
                     updateCartBadge();
                 } else {
@@ -279,9 +259,7 @@
             });
     }
 
-    // ==========================================
-    // [수정됨] 4. 선택 삭제 (새로고침 X)
-    // ==========================================
+    // 4. 선택 삭제
     async function deleteSelectedItems() {
         const checkboxes = document.querySelectorAll('.item .chk:checked');
         if (checkboxes.length === 0) {
@@ -294,7 +272,6 @@
             fetch(`/cart/items/${chk.value}`, {method: 'DELETE', credentials: 'include'})
                 .then(res => {
                     if(res.ok) {
-                        // 성공한 항목은 화면에서 바로 지움
                         chk.closest('.item').remove();
                     }
                     return res;
@@ -309,11 +286,10 @@
         } catch (e) {
             console.error(e);
             alert("일부 삭제 실패. 다시 시도해주세요.");
-            location.reload(); // 에러 나면 안전하게 새로고침
+            location.reload();
         }
     }
 
-    // [헬퍼 함수] 장바구니가 비었는지 체크해서 UI 표시
     function checkEmptyCart() {
         const cartList = document.getElementById("cartList");
         const items = cartList.querySelectorAll(".item");
@@ -323,13 +299,12 @@
         }
     }
 
-    // 5. 합계 계산 (UI) - 기존 유지
+    // 5. 합계 계산
     function updateTotals() {
         const listEl = document.getElementById("cartList");
         if (!listEl) return;
 
         const items = [...listEl.querySelectorAll(".item")];
-        // 아이템이 하나도 없으면 0원 처리
         if (items.length === 0) {
             document.getElementById("sumProducts").textContent = "0원";
             document.getElementById("sumShipping").textContent = "0원";
@@ -342,7 +317,6 @@
         const sum = selected.reduce((acc, it) => {
             const price = Number(it.getAttribute("data-price"));
             const qtyInput = it.querySelector(".num");
-            // 삭제된 요소의 값이 남을 수 있으므로 방어 코드
             const qty = qtyInput ? Number(qtyInput.value) : 0;
             return acc + (price * qty);
         }, 0);
@@ -362,7 +336,6 @@
         });
     }
 
-    // 전체 선택 체크박스 로직 (상단/하단 연동)
     function toggleAllCheckboxes(checked) {
         document.querySelectorAll(".item .chk").forEach(chk => chk.checked = checked);
         updateTotals();
@@ -378,8 +351,37 @@
         chkAllBottom.addEventListener("change", (e) => toggleAllCheckboxes(e.target.checked));
     }
 
+    // ==========================================
+    // [수정됨] 주문 페이지 이동 로직
+    // ==========================================
     function orderSelected() {
-        alert("주문 페이지 이동 구현 필요");
+        // 1. 체크된 아이템만 선택
+        const selectedCheckboxes = document.querySelectorAll('.item .chk:checked');
+
+        if (selectedCheckboxes.length === 0) {
+            alert("주문할 상품을 선택해주세요.");
+            return;
+        }
+
+        // 2. bookIds와 quantities 배열 수집
+        let bookIds = [];
+        let quantities = [];
+
+        selectedCheckboxes.forEach(chk => {
+            const itemRow = chk.closest('.item');
+            const bookId = itemRow.getAttribute('data-book-id');
+            const qty = itemRow.querySelector('.num').value;
+
+            bookIds.push(bookId);
+            quantities.push(qty);
+        });
+
+        // 3. GET 파라미터로 전송 (/orders/sheet?bookIds=1,2&quantities=1,2)
+        // Spring Controller는 콤마로 구분된 리스트를 자동으로 파싱합니다.
+        const url = `/orders/sheet?bookIds=${bookIds.join(",")}&quantities=${quantities.join(",")}`;
+
+        // 4. 페이지 이동
+        location.href = url;
     }
 </script>
 </body>

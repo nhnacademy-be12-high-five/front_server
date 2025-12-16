@@ -21,6 +21,8 @@ public class OrderResponse {
 
     private int totalProductPrice;
     private int deliveryFee;
+    private DeliveryPolicyResponse deliveryPolicy;
+
 
     @Getter
     @Builder
