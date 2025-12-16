@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HIGH-FIVE 도서 | 베스트셀러 TOP 10</title>
+    <link rel="stylesheet" href="/index-css/index-css.css">
+    <style>
+        /* 베스트셀러 페이지 전용 추가 스타일 */
+        .page-header {
+            padding: 40px 0;
+            text-align: center;
+            background: #f8f9fa;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+        }
+        .page-header h2 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .page-header p {
+            color: #666;
+        }
+
+        /* 순위 뱃지 스타일 */
+        .rank-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #007bff;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%; /* 동그라미 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 2;
+        }
+
+        /* 1~3위는 특별한 색상 */
+        .rank-1 { background: #FFD700; color: #333; } /* 금 */
+        .rank-2 { background: #C0C0C0; color: #333; } /* 은 */
+        .rank-3 { background: #CD7F32; color: #fff; } /* 동 */
+
+
+        :root {
+            --color-primary: #007bff;
+            --color-accent: #e9c46a;
+            --color-background: #fcf8f5;
+            --color-dark-footer: #3e2723;
+            --color-text-light: #666;
+            --color-text-dark: #333;
+            --color-border-light: #eee;
+            --color-border: #ddd;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+            "Noto Sans KR", sans-serif;
+            color: var(--color-text-dark);
+            line-height: 1.6;
+            background: var(--color-background);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        a {
+            color: var(--color-primary);
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        a:hover {
+            color: #0056b3;
+        }
+        button {
+            font-family: inherit;
+            cursor: pointer;
+            border: 0;
+        }
+        img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px 20px;
+        }
+
+        /* 헤더 */
+        #header {
+            background: #fff;
+            border-bottom: 3px solid var(--color-primary);
+            padding: 12px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        #header .container {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo img {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+        }
+        .logo .brand {
+            font-size: 24px;
+            font-weight: 900;
+            color: black;
+        }
+        .gnb {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .search-box {
+            display: flex;
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
+            overflow: hidden;
+            width: 520px;
+            max-width: 100%;
+        }
+        .search-box input {
+            flex: 1;
+            border: 0;
+            padding: 10px 14px;
+            outline: none;
+            background: #fff;
+        }
+        .search-box button {
+            background: var(--color-primary);
+            color: #fff;
+            padding: 10px 16px;
+            white-space: nowrap;
+        }
+        .menu-row {
+            display: flex;
+            gap: 18px;
+            margin-top: 8px;
+            list-style: none;
+        }
+        .menu-row a {
+            color: var(--color-text-dark);
+            font-weight: 600;
+        }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+        }
+        .user-menu .pill {
+            border: 2px solid var(--color-accent);
+            color: var(--color-accent);
+            background: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+        .user-menu .pill:hover {
+            background: var(--color-accent);
+            color: #fff;
+        }
+
+        .user-menu .user-link {
+            display: flex;
+            align-items: center;
+            padding: 4px;
+        }
+
+        .user-menu .user-icon {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            transition: opacity 0.2s ease;
+        }
+
+        .user-menu .user-link:hover .user-icon {
+            opacity: 0.7;
+        }
+
+        .user-menu .cart-link-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            overflow: visible;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -4px;
+            right: -6px;
+            background-color: #ff4d4f;
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            line-height: 14px;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 10px;
+            text-align: center;
+            padding: 0 4px;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+            transition: transform 0.2s;
+            z-index: 10;
+        }
+
+        .user-menu .cart-link-wrap:hover .cart-badge {
+            transform: scale(1.1);
+        }
+
+    </style>
+</head>
+<body>
+
+<header id="header" role="banner">
+    <div class="container">
+        <a th:href="@{/}" class="logo">
+            <img th:src="@{/img/logo.png}" alt="HIGH-FIVE 로고" width="100" height="100" />
+            <div class="brand">HIGH-FIVE BOOKS</div>
+        </a>
+
+
+        <nav class="gnb" aria-label="주요 메뉴">
+            <form class="search-box"
+                  role="search"
+                  th:action="@{/search}"
+                  method="get">
+                <input
+                        type="search"
+                        name="keyword"
+                        placeholder="도서명, 저자, ISBN, 태그 검색"
+                        aria-label="통합 검색"
+                />
+                <button type="submit" class="search-btn" aria-label="검색">검색</button>
+            </form>
+        </nav>
+
+        <div class="user-menu">
+            <a class="user-link" href="/coupon">
+                <img th:src="@{/img/icon-coupon.png}" alt="쿠폰" class="user-icon" />
+            </a>
+            <a class="user-link" href="/mypage">
+                <img th:src="@{/img/icon-mypage.png}" alt="마이페이지" class="user-icon" />
+            </a>
+            <a th:href="@{/cart}" class="user-link cart-link-wrap">
+                <img th:src="@{/img/icon-cart.png}" alt="장바구니" class="user-icon" />
+                <span id="cartBadge" class="cart-badge" style="display: none;">0</span>
+            </a>
+
+            <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
+
+            <a th:if="${myInfo != null}"
+               class="user-link pill"
+               th:href="@{/member/login.html}">로그아웃</a>
+        </div>
+
+    </div>
+</header>
+
+<main>
+    <div class="page-header">
+        <div class="container">
+            <h2>🏆 주간 인기 차트 TOP 10</h2>
+            <p>가장 많은 사랑을 받고 있는 도서들을 만나보세요.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <section class="section">
+            <div class="card-grid" style="grid-template-columns: repeat(5, 1fr)">
+
+                <div th:if="${bestSellers == null or bestSellers.isEmpty()}"
+                     style="grid-column: 1/-1; text-align: center; padding: 60px;">
+                    <p>집계된 베스트셀러 데이터가 없습니다.</p>
+                </div>
+
+                <article class="card"
+                         th:unless="${bestSellers == null}"
+                         th:each="book, iterStat : ${bestSellers}">
+
+                    <a th:href="@{/books/{id}(id=${book.bookId})}" class="book-link" style="display:block; color:inherit; position: relative;">
+
+                        <div class="rank-badge"
+                             th:classappend="${iterStat.count <= 3} ? 'rank-' + ${iterStat.count}"
+                             th:text="${iterStat.count}">1</div>
+
+                        <div class="thumb">
+                            <img th:src="${book.image}" th:alt="${book.title}"
+                                 style="width: 100%; height: 100%; object-fit: cover;" />
+                        </div>
+                        <div class="info">
+                            <div class="title" th:text="${book.title}">책 제목</div>
+                            <div class="meta">
+                                <span th:text="${book.publisher}">출판사</span> ·
+                                <span th:text="${#strings.replace(#strings.substring(book.publishedDate, 0, 7), '-', '.')}">2024.03</span>
+                            </div>
+                            <div class="price-row">
+                                <span class="price" th:text="|${#numbers.formatInteger(book.price, 0, 'COMMA')}|">₩15,000</span>
+                                <span class="badge" style="background-color: #ff4d4f; color: #fff;" th:if="${iterStat.count <= 3}">BEST</span>
+                            </div>
+                        </div>
+                    </a>
+                </article>
+
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer id="footer">
+</footer>
+
+</body>
+</html>

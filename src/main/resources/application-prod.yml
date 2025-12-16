@@ -17,6 +17,7 @@ spring:
       enabled: true
       force: true
 
+
 # 운영 유레카 설정 (환경 변수 주입)
 eureka:
   client:
