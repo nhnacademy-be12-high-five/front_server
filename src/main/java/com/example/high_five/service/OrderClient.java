@@ -21,7 +21,7 @@ public interface OrderClient {
                                     @RequestBody OrderCheckoutRequest request);
 
     @GetMapping("/api/orders/policy/current")
-    DeliveryPolicyResponse getCurrentDeliveryPolicy();
+    DeliveryPolicyResponse getDeliveryPolicy();
 
     @PostMapping("/api/orders")
     OrderCreateResponse createOrder(
