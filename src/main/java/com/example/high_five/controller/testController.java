@@ -25,7 +25,11 @@ public class testController {
             model.addAttribute("newBooks", newBooks);
 
             List<BookResponse> risingBooks = bookClient.getPopularBooks();
+            System.out.println("메인 컨트롤러 - 주간 인기 도서 개수: " + risingBooks.size());
             model.addAttribute("risingBooks", risingBooks);
+
+            List<BookResponse> bestSellers = bookClient.getBestSellers();
+            model.addAttribute("bestSellers", bestSellers); // 모델에 담기
 
         } catch (Exception e) {
             // 백엔드 서버가 죽어있거나 에러가 나도 메인 페이지는 떠야 함

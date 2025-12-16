@@ -4,9 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HIGH-FIVE 도서 | 홈</title>
-    <link rel="stylesheet" href="/index-css/index-css.css">
+    <link rel="icon" href="/img/favicon.png">
 </head>
-
 <style>
     :root {
         --color-primary: #007bff;
@@ -17,6 +16,7 @@
         --color-text-dark: #333;
         --color-border-light: #eee;
         --color-border: #ddd;
+
     }
     * {
         margin: 0;
@@ -53,7 +53,7 @@
     }
     .container {
         width: 100%;
-        max-width: 1200px;
+        max-width: 1100px;
         margin: 0 auto;
         padding: 10px 20px;
     }
@@ -453,29 +453,24 @@
 
     /* 푸터 */
     #footer {
-        background: var(--color-dark-footer);
-        color: #a0a0a0;
-        padding: 34px 0;
+        background-color: var(--color-dark-footer);
+        color: #a0a0a0; /* 어두운 배경에 밝은 텍스트 */
+        padding: 40px 0;
         font-size: 13px;
-        margin-top: 32px;
     }
-    #footer .container {
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
-    }
+
     .footer-links a {
         color: #c0c0c0;
         margin-right: 15px;
+        text-decoration: none;
     }
-    .footer-links a:hover {
-        color: #fff;
-    }
+
     .footer-info {
         display: flex;
-        gap: 20px;
         justify-content: space-between;
+        gap: 20px;
     }
+
     .footer-info > div {
         flex: 1;
         line-height: 1.8;
@@ -721,6 +716,12 @@
     .depth2 a:hover::before {
         color: var(--color-primary);
     }
+
+    .footer-links{
+        margin-left: 20px;
+        gap: 10rem;
+    }
+
 </style>
 
 <body>
@@ -1137,33 +1138,33 @@
         <section class="section" aria-labelledby="best-title">
             <div class="head">
                 <h3>베스트셀러 🔥</h3>
-                <a class="more" href="/books/new">더보기</a>
+                <a class="more" href="/books/best-seller">더보기</a>
             </div>
             <div class="card-grid" style="grid-template-columns: repeat(5, 1fr)">
 
-                <div th:if="${newBooks == null or newBooks.isEmpty()}"
+                <div th:if="${bestSellers == null or bestSellers.isEmpty()}"
                      style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">
-                    <p>인기 도서가 없습니다.</p>
+                    <p>베스트셀러가 없습니다.</p>
                 </div>
 
-                <article class="card" th:unless="${newBooks == null}" th:each="book : ${newBooks}">
+                <article class="card" th:unless="${bestSellers == null}" th:each="book : ${bestSellers}">
                     <a th:href="@{/books/{bookId}(bookId=${book.bookId})}" class="book-link" style="display:block; color:inherit;">
                         <div class="thumb">
-                            <img th:src="${book.image}"
-                                 th:alt="${book.image}"
+                            <img th:src="${book.image}" th:alt="${book.title}"
                                  style="width: 100%; height: 100%; object-fit: cover;" />
                         </div>
                         <div class="info">
                             <div class="title" th:text="${book.title}">책 제목</div>
                             <div class="meta">
                                 <span th:text="${book.publisher}">출판사</span> ·
-                                <span th:text="${#strings.replace(#strings.substring(book.publishedDate, 0, 7), '-', '.')}">2024.03</span>
+                                <span th:if="${book.publishedDate != null}"
+                                      th:text="${#strings.replace(#strings.substring(book.publishedDate, 0, 7), '-', '.')}">
+                        </span>
                             </div>
 
                             <div class="price-row">
                                 <span class="price" th:text="|${#numbers.formatInteger(book.price, 0, 'COMMA')}|">₩15,000</span>
-
-                                <span class="badge" style="background-color: #e9c46a; color: #333;">NEW</span>
+                                <span class="badge" style="background-color: #ff4d4f; color: #fff;">BEST</span>
                             </div>
                         </div>
                     </a>
@@ -1180,7 +1181,7 @@
 
                 <div th:if="${risingBooks == null or risingBooks.isEmpty()}"
                      style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">
-                    <p>아직 집계된 인기 도서가 없습니다.<br>(내일 아침에 랭킹이 업데이트됩니다!)</p>
+                    <p>아직 집계된 인기 도서가 없습니다.
                 </div>
 
                 <article class="card" th:unless="${risingBooks == null}" th:each="book : ${risingBooks}">
@@ -1262,6 +1263,7 @@
         <a href="#"><strong>개인정보처리방침</strong></a>
         <a href="#">고객센터</a>
     </div>
+
     <div class="footer-info">
         <div>
             <strong>대표이사 마르코</strong> | 사업자등록번호 123-456-7890<br />
@@ -1381,7 +1383,6 @@
             });
     }
 
-
     document.addEventListener("DOMContentLoaded", () => {
         const menuWrapper = document.querySelector('.all-menu-wrapper');
         const megaMenu = document.querySelector('.mega-menu');
@@ -1406,7 +1407,7 @@
             closeTimer = setTimeout(() => {
                 megaMenu.classList.remove('active');
                 closeTimer = null;
-            }, 2000); // 10000ms = 10초
+            }, 100); // 10000ms = 10초
         }
 
         // 1. 버튼 클릭 시 토글 (열려있으면 닫기 예약, 닫혀있으면 열기)

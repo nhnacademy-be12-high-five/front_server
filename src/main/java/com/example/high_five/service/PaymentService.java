@@ -1,19 +1,24 @@
 package com.example.high_five.service;
 
-import com.example.high_five.dto.payment.MethodStatusRequest;
-import com.example.high_five.dto.payment.PaymentConfirmRequest;
-import com.example.high_five.dto.payment.PaymentConfirmResponse;
-import com.example.high_five.dto.payment.PaymentMethodResponse;
-import java.util.List;
+import com.example.high_five.dto.payment.*;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "gateway-server", contextId = "paymentClient", url = "${gateway.uri}")
+import java.time.LocalDate;
+import java.util.List;
+
+@FeignClient(name = "payment-server", url = "${gateway.uri}")
 public interface PaymentService {
+
+    @GetMapping("/api/payments/admin/stats/summary")
+    PaymentStatsResponse getTotalStats();
+
+    @GetMapping("/api/payments/admin/stats/daily")
+    List<DailySalesResponse> getDailyStats(
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    );
 
     @PostMapping("/api/payments/confirm")
     PaymentConfirmResponse confirmPayment(@RequestBody PaymentConfirmRequest request);

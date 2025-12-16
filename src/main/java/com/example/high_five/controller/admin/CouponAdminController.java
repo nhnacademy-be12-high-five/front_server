@@ -21,22 +21,41 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-public class AdminController {
+public class CouponAdminController {
     private final CouponService couponService;
     private final BookFeignClient bookFeignClient;
     private final CategoryFeignClient categoryFeignClient;
 
-    @GetMapping("/api/coupons/admin/coupons")
-    public String couponPage(Model model){
-        List<CouponTemplateDto> coupons = couponService.getAdminCoupons();
-        List<CouponPolicyResponseDto> policies = couponService.getAllPolicies();
-        model.addAttribute("coupons",coupons);
-        model.addAttribute("policies",policies);
-        return "admin/coupons";
+    @GetMapping("/admin/coupons/page")
+    public String couponPage(@CookieValue(value = "access-token", required = false) String accessToken,
+                             Model model){
+
+        if (accessToken == null || accessToken.isBlank()) {
+            return "redirect:/member/login.html";
+        }
+
+        try {
+            List<CouponTemplateDto> coupons = couponService.getAdminCoupons();
+            List<CouponPolicyResponseDto> policies = couponService.getAllPolicies();
+
+            model.addAttribute("coupons", coupons);
+            model.addAttribute("policies", policies);
+            return "admin/coupons";
+
+        } catch (FeignException.Unauthorized e) {
+            System.out.println("인증 실패(401): 토큰이 유효하지 않습니다. 로그인 페이지로 이동합니다.");
+            return "redirect:/member/login.html";
+        } catch (FeignException.Forbidden e) {
+            return "redirect:/";
+        } catch (FeignException e) {
+            e.printStackTrace();
+            return "redirect:/";
+        }
     }
 
-    @PostMapping("/api/coupons/admin/policies/create")
-    public String createPolicy(@ModelAttribute CouponPolicyRequestDto dto) {
+    @PostMapping("/admin/coupons/policies/create")
+    public String createPolicy(@ModelAttribute CouponPolicyRequestDto dto,
+                               RedirectAttributes redirectAttributes) {
 
         if (dto.getTargetBookIds() == null) {
             dto.setTargetBookIds(new ArrayList<>());
@@ -45,12 +64,31 @@ public class AdminController {
             dto.setTargetCategoryIds(new ArrayList<>());
         }
 
-        couponService.createCouponPolicy(dto);
+        try {
+            couponService.createCouponPolicy(dto);
+            redirectAttributes.addFlashAttribute("message", "쿠폰 정책이 성공적으로 생성되었습니다.");
+        } catch (FeignException e) {
+            String serverMessage = e.getMessage();
+            String alertMsg = "정책 생성 실패: " + e.status();
 
-        return "redirect:/api/coupons/admin/coupons";
+            if (serverMessage != null && serverMessage.contains("\"message\":\"")) {
+                int start = serverMessage.indexOf("\"message\":\"") + 11;
+                int end = serverMessage.indexOf("\"", start);
+                if (end > start) {
+                    alertMsg = serverMessage.substring(start, end);
+                }
+            }
+
+            redirectAttributes.addFlashAttribute("errorMessage", alertMsg);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "시스템 오류가 발생했습니다.");
+            e.printStackTrace();
+        }
+
+        return "redirect:/admin/coupons/page";
     }
 
-    @PostMapping("/api/coupons/admin/coupons/create")
+    @PostMapping("/admin/coupons/create")
     public String createCouponTemplate(@ModelAttribute CouponCreateRequestDto dto, RedirectAttributes redirectAttributes) {
         try {
             couponService.createCouponTemplate(dto);
@@ -58,10 +96,10 @@ public class AdminController {
         } catch (FeignException e) {
             redirectAttributes.addFlashAttribute("errorMessage", "템플릿 생성 실패: 정책이 비활성화 상태이거나 잘못된 요청입니다.");
         }
-        return "redirect:/api/coupons/admin/coupons";
+        return "redirect:/admin/coupons/page";
     }
 
-    @PostMapping("/api/coupons/admin/policies/{id}")
+    @PostMapping("/admin/coupons/policies/{id}")
     public String disablePolicy(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         try {
             couponService.disableCouponPolicy(id);
@@ -69,10 +107,10 @@ public class AdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "정책 비활성화 중 오류가 발생했습니다.");
         }
-        return "redirect:/api/coupons/admin/coupons";
+        return "redirect:/admin/coupons/page";
     }
 
-    @PostMapping("/api/coupons/admin/member-coupons/issue")
+    @PostMapping("/admin/coupons/member-coupons/issue")
     public String issueCouponManually(@RequestParam Long userId,
                                       @RequestParam Long couponId,
                                       RedirectAttributes redirectAttributes) {
@@ -98,10 +136,10 @@ public class AdminController {
             e.printStackTrace();
         }
 
-        return "redirect:/api/coupons/admin/coupons";
+        return "redirect:/admin/coupons/page";
     }
 
-    @GetMapping("/api/coupons/admin/policies/{id}")
+    @GetMapping("/admin/coupons/policies/{id}")
     public String policyDetail(@PathVariable("id") Long id, Model model) {
         // 1. Feign Client로 백엔드 데이터 조회
         CouponPolicyResponseDto policy = couponService.getCouponPolicy(id);
@@ -113,7 +151,7 @@ public class AdminController {
         return "admin/policy-detail";
     }
 
-    @GetMapping("/api/coupons/admin/books/search")
+    @GetMapping("/admin/coupons/books/search")
     @ResponseBody // JSON 데이터를 반환하기 위해 사용
     public ResponseEntity<List<BookResponse>> searchBooksForCoupon(@RequestParam("keyword") String keyword) {
         try {
@@ -135,7 +173,7 @@ public class AdminController {
     /**
      * [추가] 1차 카테고리 목록 조회 (AJAX용)
      */
-    @GetMapping("/api/coupons/admin/categories/parent")
+    @GetMapping("/admin/coupons/categories/parent")
     @ResponseBody
     public ResponseEntity<List<CategoryResponse>> getParentCategories() {
         return ResponseEntity.ok(categoryFeignClient.getParentCategories());
@@ -144,13 +182,13 @@ public class AdminController {
     /**
      * [추가] 2차 카테고리 목록 조회 (AJAX용)
      */
-    @GetMapping("/api/coupons/admin/categories/{parentId}/child")
+    @GetMapping("/admin/coupons/categories/{parentId}/child")
     @ResponseBody
     public ResponseEntity<List<CategoryResponse>> getChildCategories(@PathVariable int parentId) {
         return ResponseEntity.ok(categoryFeignClient.getChildCategories(parentId));
     }
 
-    @GetMapping("/api/coupons/admin/specific-book-coupons")
+    @GetMapping("/admin/coupons/specific-book-coupons")
     public String specificBookCouponPage(Model model) {
         List<CouponPolicyResponseDto> policies = couponService.getAllPolicies();
         model.addAttribute("policies", policies);

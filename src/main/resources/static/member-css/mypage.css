@@ -820,3 +820,18 @@ input {
     border-radius: 8px;
     background-color: #f9f9f9;
 }
+
+/* 입력창 스타일 */
+.input-field {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box; /* 패딩 포함 크기 계산 */
+}
+
+.input-field:focus {
+    border-color: #007bff; /* 포인트 컬러 */
+    outline: none;
+}

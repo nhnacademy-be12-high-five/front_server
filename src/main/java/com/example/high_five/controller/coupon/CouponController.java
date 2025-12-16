@@ -7,6 +7,7 @@ import com.example.high_five.dto.coupon.UserCouponIssueRequestDto;
 import com.example.high_five.service.CouponService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -56,7 +57,12 @@ public class CouponController {
     @PostMapping("/coupon/issue")
     public String issueCoupon(@RequestParam Long couponId,
                               @CookieValue(value = "access-token", required = false) String accessToken,
-                              RedirectAttributes redirectAttributes) {
+                              RedirectAttributes redirectAttributes,
+                              HttpServletRequest request) {
+
+        String referer = request.getHeader("Referer");
+        if (referer == null) referer = "/";
+
         // 1. 임시 사용자 ID (로그인 구현 전이므로 1번 사용자로 고정)
         if (accessToken == null || accessToken.isBlank()) {
             redirectAttributes.addFlashAttribute("errorMessage", "로그인이 필요한 서비스입니다.");
@@ -65,31 +71,24 @@ public class CouponController {
 
         try {
             UserCouponIssueRequestDto requestDto = new UserCouponIssueRequestDto(couponId);
-
             couponService.issueCoupon("Bearer " + accessToken, requestDto);
 
             redirectAttributes.addFlashAttribute("message", "쿠폰이 성공적으로 발급되었습니다.");
 
         } catch (FeignException e) {
-            String serverMessage = e.contentUTF8();
-
             if (e.status() == 409) {
-                redirectAttributes.addFlashAttribute("errorMessage", "이미 해당 쿠폰을 발급받으셨습니다.");
+                redirectAttributes.addFlashAttribute("errorMessage", "이미 발급받은 쿠폰입니다.");
             } else if (e.status() == 400) {
-                if (serverMessage != null && !serverMessage.isBlank()) {
-                    redirectAttributes.addFlashAttribute("errorMessage", serverMessage);
-                } else {
-                    redirectAttributes.addFlashAttribute("errorMessage", "잘못된 요청입니다.");
-                }
+                redirectAttributes.addFlashAttribute("errorMessage", "잘못된 요청입니다.");
             } else {
-                redirectAttributes.addFlashAttribute("errorMessage", "쿠폰 발급에 실패했습니다. (오류: " + e.status() + ")");
+                redirectAttributes.addFlashAttribute("errorMessage", "쿠폰 발급 실패 (오류: " + e.status() + ")");
             }
-            System.err.println("쿠폰 발급 실패: " + e.getMessage());
+            log.warn("쿠폰 발급 실패: {}", e.getMessage());
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "시스템 오류가 발생했습니다.");
-            System.err.println("쿠폰 발급 실패: " + e.getMessage());
+            log.error("시스템 오류: ", e);
         }
-        return "redirect:/mypage/coupons";
+        return "redirect:" + referer;
     }
 
     @LoginRequired // 인터셉터가 로그인 여부 체크 (설정되어 있다면)

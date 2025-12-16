@@ -46,6 +46,18 @@
                 <div class="coupon-header">
                     <div class="coupon-title" th:text="${coupon.couponName}">쿠폰 이름</div>
                     <div style="display: flex; align-items: center; gap: 8px;">
+                         <th:block th:if="${coupon.status.toString() == 'ISSUED' && coupon.daysRemained != null}">
+                            <span class="coupon-badge" style="background-color: #ff4d4f; color: white;"
+                                  th:if="${coupon.daysRemained == 0}">
+                                오늘 만료
+                            </span>
+
+                            <span class="coupon-badge" style="background-color: #ff4d4f; color: white;"
+                                  th:if="${coupon.daysRemained > 0}"
+                                  th:text="|D-${coupon.daysRemained}|">
+                                    D-Day
+                            </span>
+                         </th:block>
                          <span class="coupon-badge"
                                th:classappend="${coupon.status == 'ISSUED'} ? 'badge-available' :
                                               (${coupon.status == 'USED'} ? 'badge-used' : 'badge-expired')"
