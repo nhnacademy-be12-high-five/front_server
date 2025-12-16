@@ -1,6 +1,8 @@
 package com.example.high_five.service;
 
 import ch.qos.logback.core.model.Model;
+import com.example.high_five.dto.book.request.BookAdminUpdateRequest;
+import com.example.high_five.dto.book.request.BookRequest;
 import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.book.PagedResponse;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -9,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "book-service", contextId = "booClient", url = "${gateway.uri}")
+@FeignClient(name = "book-service", contextId = "bookClient", url = "${gateway.uri}")
 public interface BookClient {
 
     // 1. 도서 상세 조회
@@ -48,6 +50,10 @@ public interface BookClient {
     @GetMapping("/api/categories/{categoryId}/books")
     List<BookResponse> getBooksByCategory(@PathVariable("categoryId") long categoryId);
 
+    // 베스트셀러
+    @GetMapping("/api/books/best-seller")
+    List<BookResponse> getBestSellers();
+  
     // 도서 좋아요 조회
     @GetMapping("/members/me/likes")
     Boolean getBookLike(@PathVariable("book-id") Long id);
@@ -61,4 +67,24 @@ public interface BookClient {
     ResponseEntity<Boolean> getLikeStatus(@PathVariable("book-id") Long bookId,
                                           @RequestHeader(value = "X-USER-ID", required = true) Long memberId);
 
+    // [관리자] 도서 전체 조회
+    @GetMapping("/api/admin")
+    List<BookResponse> getAdminBooks(@RequestParam(value = "page", defaultValue = "0") int page,
+                                     @RequestParam(value = "size", defaultValue = "10") int size);
+
+    // [관리자] 도서 등록
+    @PostMapping("/api/admin")
+    BookResponse createBook(@RequestBody BookRequest bookRequest,
+                            @RequestHeader("X-User-Id") Long userId);
+
+    // [관리자] 도서 수정
+    @PutMapping("/api/admin/{id}")
+    BookResponse updateBook(@PathVariable("id") Long bookId,
+                            @RequestBody BookAdminUpdateRequest updateRequest,
+                            @RequestHeader("X-User-Id") Long userId);
+
+    // [관리자] 도서 삭제
+    @DeleteMapping("/api/admin/{id}")
+    void deleteBook(@PathVariable("id") Long bookId,
+                    @RequestHeader("X-User-Id") Long userId);
 }
