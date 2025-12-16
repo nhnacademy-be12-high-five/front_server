@@ -263,7 +263,7 @@
 
         .login-area {
             width: 100%;
-            max-width: 420px;
+            max-width: 700px;
             background-color: #ffffff;
             padding: 50px;
             border-radius: 10px;
@@ -285,7 +285,7 @@
         .register-form .input-group {
             margin-bottom: 20px;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
         }
 
         .register-form label {
@@ -298,19 +298,48 @@
         .register-form input[type="password"],
         .register-form input[type="email"],
         .register-form input[type="phone"],
-        .register-form input[type="gender"] {
-            width: 100%;
-            padding: 14px 15px;
-            border: 1px solid var(--color-border);
-            border-radius: 4px;
-            font-size: 15px;
-            transition: border-color 0.2s ease;
+        .register-form input[type="date"],
+        .register-form select {
+            flex-grow: 1;              /* 남은 공간 꽉 채우기 */
+            width: 100%;               /* 기본 너비 */
+            height: 48px;              /* 높이를 넉넉하게 */
+            padding: 0 15px;           /* 내부 여백 */
+            font-size: 15px;           /* 입력 글자 크기도 키움 */
+            color: #333;
+            background-color: #f9f9f9; /* 아주 연한 회색 배경 (눈이 편안함) */
+            border: 1px solid #ddd;    /* 연한 테두리 */
+            border-radius: 8px;        /* 모서리를 둥글게 */
+            transition: all 0.2s ease; /* 부드러운 애니메이션 */
         }
 
         .register-form input:focus {
             outline: none;
             border-color: var(--color-primary);
             box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+        }
+
+        .register-form .input-group {
+            display: flex;             /* 가로 배치 */
+            align-items: center;       /* 세로 중앙 정렬 */
+            margin-bottom: 20px;       /* 줄 간격 */
+        }
+
+        .register-form input:focus,
+        .register-form select:focus {
+            outline: none;
+            background-color: #ffffff; /* 배경이 하얗게 밝아짐 */
+            border-color: var(--color-primary); /* 브랜드 컬러로 테두리 변경 */
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15); /* 은은한 파란 번짐 효과 */
+        }
+
+        /* 2. 라벨(이름, 아이디 등) 디자인 - 글자 키우기 */
+        .register-form label {
+            width: 140px;              /* 너비 고정 (줄 맞춤용) */
+            font-size: 15px;           /* 글자 크기 확대 (기존 10px -> 15px) */
+            font-weight: 700;          /* 두껍게 강조 */
+            color: #333;               /* 진한 회색 */
+            flex-shrink: 0;            /* 너비 줄어들지 않게 고정 */
+            margin-right: 15px;        /* 입력창과의 간격 */
         }
 
         /* 가입하기 버튼 */
@@ -328,6 +357,40 @@
 
         .login-btn:hover {
             background-color: #0056b3;
+        }
+
+        /* 1. 입력창과 버튼을 가로로 배치 */
+        .id-check-box {
+            display: flex;
+            gap: 10px;        /* 입력창과 버튼 사이 간격 */
+            width: 100%;      /* 부모 너비 꽉 채우기 */
+        }
+
+        /* 2. 입력창이 남은 공간을 모두 차지하도록 설정 */
+        .id-check-box input {
+            flex-grow: 1;
+        }
+
+        .writer{
+            gap: 10px;
+        }
+
+        /* 3. 중복확인 버튼 꾸미기 */
+        .check-btn {
+            background-color: gray;
+            color: white;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;   /* 글자가 줄바꿈 되지 않게 고정 */
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        /* 마우스 올렸을 때 효과 */
+        .check-btn:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
         }
 
         #footer {
@@ -366,6 +429,34 @@
 
         .footer-info .copyright strong {
             color: #c0c0c0;
+        }
+
+        .input-box {
+            flex-grow: 1;              /* 라벨 옆 남은 공간을 이 박스가 차지 */
+            display: flex;             /* 내부의 인풋과 버튼을 가로로 배치 */
+            gap: 10px;                 /* 인풋과 버튼 사이 간격 */
+        }
+
+        /* 중복확인 버튼 디테일 수정 */
+        .check-btn {
+            height: 48px;              /* 입력창과 높이를 똑같이 맞춤 */
+            padding: 0 20px;
+            background-color: #6c757d; /* 기본 회색 */
+            color: white;
+            border-radius: 8px;        /* 입력창과 같은 둥글기 */
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: background-color 0.2s;
+        }
+
+        .check-btn:hover {
+            background-color: var(--color-primary); /* 호버 시 파란색으로 */
+        }
+
+        /* 성별 선택 박스(select)가 높이가 안 맞을 경우를 대비해 높이 강제 지정 */
+        #gender {
+            height: 48px;
         }
 
     </style>
@@ -417,18 +508,35 @@
             </div>
 
             <div class="input-group">
-                <label for="regId">아이디</label>
-                <input type="text" id="regId" name="loginId" placeholder="아이디를 입력하세요 (영문, 숫자 6~12자)" />
+                <label for="regId" class="writer">아이디</label>
+                <div class="input-box">
+                    <input
+                            type="text"
+                            id="regId"
+                            name="loginId"
+                            placeholder="아이디를 입력하세요 (영문, 숫자 6~12자)"
+                    />
+                    <button type="button" class="check-btn">중복확인</button>
+                </div>
             </div>
 
             <div class="input-group">
                 <label for="regPw">비밀번호</label>
-                <input type="password" id="regPw" name="password" placeholder="비밀번호를 입력하세요" />
+                <input
+                        type="password"
+                        id="regPw"
+                        name="password"
+                        placeholder="비밀번호를 입력하세요 (8-20자)"
+                />
             </div>
 
             <div class="input-group">
                 <label for="regPwConfirm">비밀번호 확인</label>
-                <input type="password" id="regPwConfirm" placeholder="비밀번호를 다시 입력하세요" />
+                <input
+                        type="password"
+                        id="regPwConfirm"
+                        placeholder="비밀번호를 입력하세요 (8-20자)"
+                />
             </div>
 
             <div class="input-group">

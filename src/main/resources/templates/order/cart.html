@@ -27,7 +27,6 @@
                 />
                 <button type="submit" class="search-btn" aria-label="검색">검색</button>
             </form>
-
         </nav>
 
         <div class="user-menu">
@@ -41,6 +40,8 @@
                 <img th:src="@{/img/icon-cart.png}" alt="장바구니" class="user-icon"/>
                 <span id="cartBadge" class="cart-badge" style="display: none;">0</span>
             </a>
+
+            <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
         </div>
     </div>
 </header>
@@ -128,7 +129,25 @@
 
 <footer id="footer">
     <div class="container">
-        <div class="footer-info">...</div>
+        <div class="footer-links">
+            <a href="#">회사소개</a>
+            <a href="#">이용약관</a>
+            <a href="#"><strong>개인정보처리방침</strong></a>
+            <a href="#">관리자</a>
+        </div>
+
+        <div class="footer-info">
+            <div class="copyright">
+                <strong>대표이사 마르코</strong> | 사업자등록번호 123-456-7890<br />
+                통신판매업신고 2024-광주동구-01211 | 이메일: marco@nhn.com<br />
+                호스팅 제공자 NHN24 © NHN24. All Rights Reserved.
+            </div>
+            <div class="customer-center">
+                <strong>고객센터 1544-8282</strong> (발신자 부담)<br />
+                광주광역시 동구 서석동 조선대학교 1층 NHN아카데미<br />
+                Fax 062-1234-5678
+            </div>
+        </div>
     </div>
 </footer>
 
