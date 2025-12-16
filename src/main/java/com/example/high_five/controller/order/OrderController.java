@@ -166,15 +166,15 @@ public class OrderController {
         return "order/payment-fail";
     }
 
-//    @PostMapping("/api/{orderId}/cancel")
-//    @ResponseBody
-//    public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId) {
-//        try {
-//            frontOrderService.cancelOrder(orderId);
-//            return ResponseEntity.ok().build();
-//        } catch (Exception e) {
-//            log.error("주문 취소 API 처리 실패 (orderId={})", orderId, e);
-//            return ResponseEntity.ok().build();
-//        }
-//    }
+    @PostMapping("/api/{orderId}/cancel")
+    @ResponseBody
+    public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId) {
+        try {
+            frontOrderService.cancelOrder(orderId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("주문 취소 API 처리 실패 (orderId={})", orderId, e);
+            return ResponseEntity.ok().build();
+        }
+    }
 }

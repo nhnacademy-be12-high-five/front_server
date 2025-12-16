@@ -193,6 +193,17 @@ public class FrontOrderService {
         return (totalProductPrice >= threshold) ? 0 : fee;
     }
 
+    public void cancelOrder(Long orderId) {
+
+        try {
+            orderClient.cancelOrder(orderId);
+            log.info("Order Cancel Success: OrderID={}", orderId);
+        } catch (Exception e) {
+            log.error("Order Cancel Failed: OrderID={}", orderId, e);
+            throw new RuntimeException("주문 취소 처리 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
     private record MemberInfoResult(MemberResponse member, Integer point, List<MemberCouponResponseDto> coupons) {}
     private record OrderItemsResult(List<OrderResponse.OrderItem> items, int totalProductPrice) {}
 }
