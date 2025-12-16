@@ -31,87 +31,88 @@ public class FrontOrderService {
     private final CouponService couponService;
     private final ObjectMapper objectMapper;
 
+    /**
+     * 주문서 작성 페이지 데이터 조회 (메인 메서드)
+     */
     public OrderResponse createOrderSheet(Long userId, String token, List<Long> bookIds, List<Integer> quantities) {
 
-        MemberDiscountInfo memberInfo = fetchMemberDiscountInfo(userId, token);
+        MemberInfoResult memberInfo = fetchMemberInfo(userId, token);
 
-        ItemsCalculationResult itemsResult = calculateProductPriceAndItems(bookIds, quantities);
+        OrderItemsResult itemsResult = createOrderItems(bookIds, quantities);
 
         List<OrderResponse.WrapperDto> wrappers = fetchWrappers();
 
-        DeliveryPolicyResult deliveryResult = fetchDeliveryPolicyAndCalculateFee(itemsResult.totalProductPrice());
+        DeliveryPolicyResponse policy = fetchDeliveryPolicy();
+
+        int deliveryFee = calculateDeliveryFee(itemsResult.totalProductPrice(), policy);
 
         return OrderResponse.builder()
                 .name(memberInfo.member() != null ? memberInfo.member().getName() : "")
                 .phoneNumber(memberInfo.member() != null ? memberInfo.member().getPhone() : "")
                 .email(memberInfo.member() != null ? memberInfo.member().getEmail() : "")
-                .myPoint(memberInfo.myPoint())
+                .myPoint(memberInfo.point())
                 .coupons(memberInfo.coupons())
                 .orderItems(itemsResult.items())
                 .wrappers(wrappers)
                 .totalProductPrice(itemsResult.totalProductPrice())
-                .deliveryFee(deliveryResult.deliveryFee())
-                .deliveryPolicy(deliveryResult.policy())
+                .deliveryFee(deliveryFee)
+                .deliveryPolicy(policy)
                 .build();
     }
 
+    /**
+     * 주문 생성 요청
+     */
     public OrderClient.OrderCreateResponse placeOrder(OrderCheckoutRequest request, Long userId, String guestId) {
         log.info("Order Request - UserID: {}, GuestID: {}, Items: {}", userId, guestId, request.getOrderItems().size());
         return orderClient.createOrder(userId, guestId, request);
     }
 
-    public void cancelOrder(Long orderId) {
-        try {
-            orderClient.cancelOrder(orderId);
-        } catch (Exception e) {
-            log.error("주문 취소 요청 실패 (orderId={})", orderId, e);
+    private MemberInfoResult fetchMemberInfo(Long userId, String token) {
+        if (userId == null) {
+            return new MemberInfoResult(null, 0, Collections.emptyList());
         }
-    }
 
-    private MemberDiscountInfo fetchMemberDiscountInfo(Long userId, String token) {
         MemberResponse member = null;
         Integer myPoint = 0;
         List<MemberCouponResponseDto> coupons = new ArrayList<>();
 
-        if (userId != null) {
-            try {
-                ResponseEntity<MemberResponse> memberResp = memberService.getMyInfo();
-                if (memberResp != null && memberResp.getBody() != null) {
-                    member = memberResp.getBody();
-                }
-
-                if (token != null) {
-                    try {
-                        ResponseEntity<PointBalanceResponse> pointResp = memberService.getMyBalance(token);
-                        if (pointResp != null && pointResp.getBody() != null) {
-                            Long currentPoint = pointResp.getBody().getCurrentPoint();
-                            myPoint = currentPoint != null ? currentPoint.intValue() : 0;
-                        }
-                    } catch (Exception e) {
-                        log.warn("포인트 조회 실패 (userId={}): {}", userId, e.getMessage());
-                    }
-                }
-
-                if (token != null) {
-                    try {
-                        Map<String, Object> couponPageMap = couponService.getMemberCoupons(token, 0, 100);
-                        if (couponPageMap != null && couponPageMap.containsKey("content")) {
-                            Object content = couponPageMap.get("content");
-                            coupons = objectMapper.convertValue(content, new TypeReference<List<MemberCouponResponseDto>>() {});
-                        }
-                    } catch (Exception e) {
-                        log.warn("쿠폰 조회 실패: {}", e.getMessage());
-                        coupons = Collections.emptyList();
-                    }
-                }
-            } catch (Exception e) {
-                log.error("회원 정보 로드 실패", e);
+        try {
+            // 기본 정보
+            ResponseEntity<MemberResponse> memberResp = memberService.getMyInfo();
+            if (memberResp != null && memberResp.getBody() != null) {
+                member = memberResp.getBody();
             }
+
+            if (token != null) {
+                try {
+                    ResponseEntity<PointBalanceResponse> pointResp = memberService.getMyBalance(token);
+                    if (pointResp != null && pointResp.getBody() != null) {
+                        Long currentPoint = pointResp.getBody().getCurrentPoint();
+                        myPoint = currentPoint != null ? currentPoint.intValue() : 0;
+                    }
+                } catch (Exception e) {
+                    log.warn("포인트 조회 실패 (userId={}): {}", userId, e.getMessage());
+                }
+
+                try {
+                    Map<String, Object> couponPageMap = couponService.getMemberCoupons(token, 0, 100);
+                    if (couponPageMap != null && couponPageMap.containsKey("content")) {
+                        Object content = couponPageMap.get("content");
+                        coupons = objectMapper.convertValue(content, new TypeReference<List<MemberCouponResponseDto>>() {});
+                    }
+                } catch (Exception e) {
+                    log.warn("쿠폰 조회 실패: {}", e.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            log.error("회원 정보 로드 실패", e);
         }
-        return new MemberDiscountInfo(member, myPoint, coupons);
+
+        return new MemberInfoResult(member, myPoint, coupons);
     }
 
-    private ItemsCalculationResult calculateProductPriceAndItems(List<Long> bookIds, List<Integer> quantities) {
+    private OrderItemsResult createOrderItems(List<Long> bookIds, List<Integer> quantities) {
         List<OrderResponse.OrderItem> items = new ArrayList<>();
         int totalProductPrice = 0;
 
@@ -119,31 +120,28 @@ public class FrontOrderService {
             Long bookId = bookIds.get(i);
             Integer qty = quantities.get(i);
 
-            BookResponse bookInfo = null;
             try {
-                bookInfo = bookClient.getBookDetail(bookId);
+                BookResponse bookInfo = bookClient.getBookDetail(bookId);
+                if (bookInfo != null) {
+                    int price = bookInfo.getPrice();
+                    int itemTotal = price * qty;
+
+                    items.add(OrderResponse.OrderItem.builder()
+                            .bookId(bookId)
+                            .title(bookInfo.getTitle())
+                            .imageUrl(bookInfo.getImage())
+                            .price(price)
+                            .quantity(qty)
+                            .totalPrice(itemTotal)
+                            .build());
+
+                    totalProductPrice += itemTotal;
+                }
             } catch (Exception e) {
                 log.error("책 정보 조회 실패 (bookId={}): {}", bookId, e.getMessage());
-                continue;
-            }
-
-            if (bookInfo != null) {
-                int price = bookInfo.getPrice();
-                int itemTotal = price * qty;
-
-                items.add(OrderResponse.OrderItem.builder()
-                        .bookId(bookId)
-                        .title(bookInfo.getTitle())
-                        .imageUrl(bookInfo.getImage())
-                        .price(price)
-                        .quantity(qty)
-                        .totalPrice(itemTotal)
-                        .build());
-
-                totalProductPrice += itemTotal;
             }
         }
-        return new ItemsCalculationResult(items, totalProductPrice);
+        return new OrderItemsResult(items, totalProductPrice);
     }
 
     private List<OrderResponse.WrapperDto> fetchWrappers() {
@@ -155,49 +153,46 @@ public class FrontOrderService {
         }
     }
 
-    private DeliveryPolicyResult fetchDeliveryPolicyAndCalculateFee(int totalProductPrice) {
-        int deliveryFee = 0;
-        DeliveryPolicyResponse policy;
+    private DeliveryPolicyResponse fetchDeliveryPolicy() {
+        int defaultFee = 3000;
+        int defaultThreshold = 30000;
 
         try {
-            policy = orderClient.getCurrentDeliveryPolicy();
-
-            long minOrderAmount = (policy.getMinOrderAmount() != null) ? policy.getMinOrderAmount() : 30000L;
-            int standardFee = (policy.getStandardShippingFee() != null) ? policy.getStandardShippingFee() : 3000;
-
-            if (totalProductPrice < minOrderAmount) {
-                deliveryFee = standardFee;
+            DeliveryPolicyResponse policy = orderClient.getDeliveryPolicy();
+            if (policy != null) {
+                if (policy.getStandardShippingFee() == null) {
+                    policy = DeliveryPolicyResponse.builder()
+                            .id(policy.getId())
+                            .standardShippingFee(defaultFee)
+                            .minOrderAmount(policy.getMinOrderAmount())
+                            .build();
+                }
+                if (policy.getMinOrderAmount() == null) {
+                    policy = DeliveryPolicyResponse.builder()
+                            .id(policy.getId())
+                            .standardShippingFee(policy.getStandardShippingFee())
+                            .minOrderAmount(defaultThreshold)
+                            .build();
+                }
+                return policy;
             }
-
         } catch (Exception e) {
-            log.warn("배송 정책 조회 실패, 기본값 적용: {}", e.getMessage());
-
-            policy = DeliveryPolicyResponse.builder()
-                    .minOrderAmount(30000)
-                    .standardShippingFee(3000)
-                    .remoteAreaSurcharge(5000)
-                    .build();
-
-            deliveryFee = (totalProductPrice >= 30000) ? 0 : 3000;
+            log.warn("배송 정책 조회 실패 (기본값 사용): {}", e.getMessage());
         }
-        return new DeliveryPolicyResult(deliveryFee, policy);
+
+        return DeliveryPolicyResponse.builder()
+                .standardShippingFee(defaultFee)
+                .minOrderAmount(defaultThreshold)
+                .build();
     }
 
+    private int calculateDeliveryFee(int totalProductPrice, DeliveryPolicyResponse policy) {
+        int threshold = policy.getMinOrderAmount() != null ? policy.getMinOrderAmount() : 30000;
+        int fee = policy.getStandardShippingFee() != null ? policy.getStandardShippingFee() : 3000;
 
-    @Builder
-    private record MemberDiscountInfo(
-            MemberResponse member,
-            Integer myPoint,
-            List<MemberCouponResponseDto> coupons
-    ) {}
+        return (totalProductPrice >= threshold) ? 0 : fee;
+    }
 
-    private record ItemsCalculationResult(
-            List<OrderResponse.OrderItem> items,
-            int totalProductPrice
-    ) {}
-
-    private record DeliveryPolicyResult(
-            int deliveryFee,
-            DeliveryPolicyResponse policy
-    ) {}
+    private record MemberInfoResult(MemberResponse member, Integer point, List<MemberCouponResponseDto> coupons) {}
+    private record OrderItemsResult(List<OrderResponse.OrderItem> items, int totalProductPrice) {}
 }
