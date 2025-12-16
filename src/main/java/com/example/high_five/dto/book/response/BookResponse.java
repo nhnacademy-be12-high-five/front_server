@@ -28,10 +28,4 @@ public class BookResponse {
 
     // book-detail.html 에서 사용하는 태그 필드
     private List<String> tags;
-
-    // 포장 여부
-    private boolean Wrapper;
-
-    // 포장하면 추가 금액 발생 - 500원
-    private int WrapperCost;
 }
