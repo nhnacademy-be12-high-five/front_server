@@ -1,6 +1,7 @@
 package com.example.high_five.controller.point;
 
 import com.example.high_five.common.CustomPage;
+import com.example.high_five.common.annotation.LoginRequired;
 import com.example.high_five.dto.point.PointBalanceResponse;
 import com.example.high_five.dto.point.PointHistoryResponse;
 import com.example.high_five.service.MemberService;
@@ -16,17 +17,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/mypage/points")
 public class PointController {
 
     private final MemberService memberService;
 
-    @GetMapping
+    @LoginRequired
+    @GetMapping("/mypage/points")
     public String pointPage(Model model,
                             @RequestParam(defaultValue = "0") int page,
                             @CookieValue(value = "access-token", required = false) String accessToken) {
 
-        if (accessToken == null) return "redirect:/member/login.html";
         String authHeader = "Bearer " + accessToken;
 
         try {

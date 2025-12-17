@@ -1,0 +1,105 @@
+.pagination { display: flex; justify-content: center; gap: 5px; margin-top: 20px; }
+.page-link { padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; color: #333; text-decoration: none; }
+.page-link.active { background-color: var(--color-primary); color: white; border-color: var(--color-primary); }
+
+.coupon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+.coupon-card {
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #fafafa;
+    transition: all 0.3s ease;
+}
+.coupon-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+.coupon-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+.coupon-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-dark);
+}
+.coupon-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.badge-available {
+    background-color: #d4edda;
+    color: #155724;
+}
+.badge-used {
+    background-color: #e2e3e5;
+    color: #383d41;
+}
+.badge-expired {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+.coupon-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+    font-size: 13px;
+}
+.info-label {
+    color: var(--color-text-light);
+    margin-bottom: 4px;
+    font-size: 12px;
+}
+.info-value {
+    color: var(--color-text-dark);
+    font-weight: 500;
+}
+.coupon-condition {
+    background-color: white;
+    border-left: 4px solid var(--color-primary);
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--color-text-dark);
+    line-height: 1.5;
+}
+.coupon-actions {
+    display: flex;
+    gap: 10px;
+}
+.btn {
+    flex: 1;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+.btn-secondary {
+    background-color: var(--color-border);
+    color: var(--color-text-dark);
+}
+.btn-secondary:hover {
+    background-color: #ccc;
+}

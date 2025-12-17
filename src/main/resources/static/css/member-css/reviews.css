@@ -1,0 +1,52 @@
+/* 페이지네이션 스타일 (포인트 페이지와 동일) */
+.pagination { display: flex; justify-content: center; gap: 5px; margin-top: 20px; }
+.page-link { padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; color: #333; text-decoration: none; }
+.page-link.active { background-color: var(--color-primary); color: white; border-color: var(--color-primary); }
+
+/* 리뷰 리스트 전용 스타일 (포인트 내역 스타일 기반 변형) */
+.review-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid #eee;
+}
+.review-item:last-child { border-bottom: none; }
+
+.review-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    text-decoration: none;
+    margin-bottom: 5px;
+    display: block;
+}
+.review-title:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+.review-date {
+    font-size: 13px;
+    color: #999;
+}
+
+.btn-view-detail {
+    font-size: 13px;
+    color: #666;
+    border: 1px solid #ddd;
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    background: #fff;
+}
+.btn-view-detail:hover {
+    background: #f8f9fa;
+    color: #333;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 50px 0;
+    color: #888;
+}

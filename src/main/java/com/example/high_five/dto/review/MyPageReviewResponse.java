@@ -1,9 +1,9 @@
 package com.example.high_five.dto.review;
 
-import java.sql.Timestamp;
+import java.time.ZonedDateTime;
 
 public record MyPageReviewResponse (Long reviewId,
                                     Long bookId,
                                     String bookTitle,
-                                    Timestamp createdAt){
+                                    ZonedDateTime createdAt){
 }

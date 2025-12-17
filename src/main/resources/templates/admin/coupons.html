@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Highfive 관리자 - 쿠폰 관리</title>
-    <link rel="stylesheet" href="/admin-css/coupons.css">
+    <link rel="stylesheet" href="/css/admin-css/admin-coupons.css">
 </head>
 
 <body>
@@ -16,6 +16,7 @@
         <li><a href="/admin/coupons/page" class="active">쿠폰 관리</a></li>
         <li><a href="/admin/coupons/specific-book-coupons">특정 도서 쿠폰 관리</a></li>
         <li><a href="/admin/payments/stats">매출 통계</a></li>
+        <li><a href="/admin/payments" data-key="payments">결제 수단 관리</a></li>
     </ul>
 </aside>
 
@@ -318,117 +319,6 @@
     </main>
 </div>
 
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    const message = [[${message}]];
-    const errorMessage = [[${errorMessage}]];
-
-    if (message) {
-        alert(message);
-    }
-    if (errorMessage) {
-        alert(errorMessage);
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        loadParentCategories();
-    });
-
-    function loadParentCategories() {
-        fetch('/admin/coupons/categories/parent')
-            .then(res => res.json())
-            .then(data => {
-                const select = document.getElementById('parentCategory');
-                data.forEach(cat => {
-                    const option = document.createElement('option');
-                    option.value = cat.categoryId;
-                    option.text = cat.categoryName;
-                    select.appendChild(option);
-                });
-            })
-            .catch(err => console.error("카테고리 로드 실패:", err));
-    }
-
-    // 2. 1차 선택 시 2차 카테고리 가져오기
-    function loadChildCategories(parentId) {
-        const childSelect = document.getElementById('childCategory');
-        childSelect.innerHTML = '<option value="">2차 선택</option>'; // 초기화
-
-        if (!parentId) return;
-
-        fetch(`/admin/coupons/categories/${parentId}/child`)
-            .then(res => res.json())
-            .then(data => {
-                data.forEach(cat => {
-                    const option = document.createElement('option');
-                    option.value = cat.categoryId;
-                    option.text = cat.categoryName;
-                    childSelect.appendChild(option);
-                });
-            });
-    }
-
-    // 3. '추가' 버튼 클릭 시 목록에 담기
-    function addCategory() {
-        const parentSelect = document.getElementById('parentCategory');
-        const childSelect = document.getElementById('childCategory');
-
-        // 2차를 선택했으면 2차 ID, 아니면 1차 ID 사용 (상황에 따라 정책 결정)
-        // 보통 책은 2차 카테고리에 속하므로 2차까지 선택을 권장하지만,
-        // 1차 전체 할인이라면 parentId를 넣을 수도 있습니다.
-
-        let selectedId = childSelect.value;
-        let selectedName = childSelect.options[childSelect.selectedIndex].text;
-
-        if (!selectedId) {
-            selectedId = parentSelect.value;
-            selectedName = parentSelect.options[parentSelect.selectedIndex].text;
-        }
-
-        if (!selectedId) {
-            alert("카테고리를 선택해주세요.");
-            return;
-        }
-
-        // 목록에 추가
-        const list = document.getElementById('selectedCategoryList');
-        const input = document.getElementById('targetCategoryIds');
-
-        // 중복 체크
-        let currentIds = input.value ? input.value.split(',').map(s=>s.trim()) : [];
-        if (currentIds.includes(selectedId)) {
-            alert("이미 추가된 카테고리입니다.");
-            return;
-        }
-
-        // UI 추가
-        const li = document.createElement('li');
-        li.textContent = `[${selectedId}] ${selectedName} `;
-        li.style.marginBottom = "5px";
-
-        const delBtn = document.createElement('button');
-        delBtn.textContent = "x";
-        delBtn.style.marginLeft = "10px";
-        delBtn.style.cursor = "pointer";
-        delBtn.style.border = "none";
-        delBtn.style.background = "transparent";
-        delBtn.style.color = "red";
-        delBtn.onclick = function() {
-            // 삭제 로직
-            list.removeChild(li);
-            currentIds = currentIds.filter(id => id !== selectedId);
-            input.value = currentIds.join(',');
-        };
-
-        li.appendChild(delBtn);
-        list.appendChild(li);
-
-        // 값 업데이트
-        currentIds.push(selectedId);
-        input.value = currentIds.join(',');
-    }
-    /*]]>*/
-</script>
 
 </body>
 </html>

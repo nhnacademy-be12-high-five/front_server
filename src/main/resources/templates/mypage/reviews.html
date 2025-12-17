@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>마이페이지 - 리뷰</title>
+    <link rel="stylesheet" href="/css/member-css/mypage.css">
+    <link rel="stylesheet" href="/css/common/footer.css">
+    <link rel="stylesheet" href="/css/common/header.css">
+    <link rel="stylesheet" href="/css/common/common.css">
+    <link rel="stylesheet" href="/css/member-css/reviews.css">
+</head>
+
+<script src="/js/common.js"></script>
+
+<body>
+
+<div th:replace="~{layout/header :: header}"></div>
+
+<div class="container2">
+    <nav class="box">
+        <a href="/mypage" class="tab-btn">내 정보</a>
+        <a href="/mypage/address" class="tab-btn">배송지</a>
+        <a href="/mypage/coupons" class="tab-btn">쿠폰</a>
+        <a href="/mypage/points" class="tab-btn">포인트</a>
+        <a href="/mypage/orders" class="tab-btn">주문내역</a>
+        <a href="/mypage/reviews" class="tab-btn active">리뷰</a>
+        <a href="/mypage/likes" class="tab-btn">찜 목록</a>
+    </nav>
+
+    <section class="tab-content active" style="display: block;">
+        <h2 class="section-title">나의 리뷰 관리</h2>
+
+        <div class="points-history" style="border-top: 2px solid #333; margin-top: 20px;">
+            <div th:if="${reviews.isEmpty()}" class="empty-message">
+                작성한 리뷰가 없습니다.
+            </div>
+
+            <div th:unless="${reviews.isEmpty()}">
+                <div class="review-item" th:each="review : ${reviews}">
+                    <div style="display: flex; flex-direction: column;">
+                        <a th:href="@{/books/{bookId}(bookId=${review.bookId})}"
+                           class="review-title"
+                           th:text="${review.bookTitle}">
+                            책 제목이 여기에 표시됩니다
+                        </a>
+
+                        <span class="review-date"
+                              th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd HH:mm')}">
+                            2024.12.16 14:00
+                        </span>
+                    </div>
+
+                    <div>
+                        <a th:href="@{/books/{bookId}(bookId=${review.bookId})}"
+                           class="btn-view-detail">
+                            리뷰 확인 &gt;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pagination" th:if="${page.totalPages > 0}">
+            <a th:if="${page.hasPrevious()}"
+               th:href="@{/members/me/reviews(page=${page.number - 1})}" class="page-link">&lt;</a>
+
+            <span th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}">
+        <a th:href="@{/members/me/reviews(page=${i})}"
+           th:text="${i + 1}"
+           th:classappend="${i == page.number} ? 'active' : ''"
+           class="page-link">1</a>
+    </span>
+
+            <a th:if="${page.hasNext()}"
+               th:href="@{/members/me/reviews(page=${page.number + 1})}" class="page-link">&gt;</a>
+        </div>
+    </section>
+</div>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+
+</body>
+</html>

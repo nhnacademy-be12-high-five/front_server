@@ -17,15 +17,12 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(authInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns(
-                        "/css/**",
-                        "/js/**",
-                        "/images/**",
-                        "/img/**",
-                        "/error",
-                        "/order-css/**",
-                        "/book-css/**",
-                        "/member-css/**",
-                        "/favicon.ico"
+                        "/css/**", "/js/**", "/img/**", "/favicon.ico", "/error",
+                        "/member/login.html",
+                        "/member/signup.html",
+                        "/auth/**",
+                        "/api/auth/**",
+                        "/"
                 );
     }
 }

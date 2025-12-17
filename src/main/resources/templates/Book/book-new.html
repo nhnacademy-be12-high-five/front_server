@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HIGH-FIVE 도서 | 베스트셀러 TOP 10</title>
+    <link rel="stylesheet" href="/css/common/footer.css">
+    <link rel="stylesheet" href="/css/common/header.css">
+    <link rel="stylesheet" href="/css/common/common.css">
+    <link rel="stylesheet" href="/css/book-css/book-new.css">
+</head>
+
+<script src="/js/common.js"></script>
+
+<body>
+
+<div th:replace="~{layout/header :: header}"></div>
+
+<header id="header" role="banner">
+    <div class="container">
+        <a th:href="@{/}" class="logo">
+            <img th:src="@{/img/logo.png}" alt="HIGH-FIVE 로고" width="100" height="100" />
+            <div class="brand">HIGH-FIVE BOOKS</div>
+        </a>
+
+
+        <nav class="gnb" aria-label="주요 메뉴">
+            <form class="search-box"
+                  role="search"
+                  th:action="@{/search}"
+                  method="get">
+                <input
+                        type="search"
+                        name="keyword"
+                        placeholder="도서명, 저자, ISBN, 태그 검색"
+                        aria-label="통합 검색"
+                />
+                <button type="submit" class="search-btn" aria-label="검색">검색</button>
+            </form>
+        </nav>
+
+        <div class="user-menu">
+            <a class="user-link" href="/coupon">
+                <img th:src="@{/img/icon-coupon.png}" alt="쿠폰" class="user-icon" />
+            </a>
+            <a class="user-link" href="/mypage">
+                <img th:src="@{/img/icon-mypage.png}" alt="마이페이지" class="user-icon" />
+            </a>
+            <a th:href="@{/cart}" class="user-link cart-link-wrap">
+                <img th:src="@{/img/icon-cart.png}" alt="장바구니" class="user-icon" />
+                <span id="cartBadge" class="cart-badge" style="display: none;">0</span>
+            </a>
+
+            <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
+
+            <a th:if="${myInfo != null}"
+               class="user-link pill"
+               th:href="@{/member/login.html}">로그아웃</a>
+        </div>
+
+    </div>
+</header>
+
+<main>
+    <div class="page-header">
+        <div class="container">
+            <h2>🏆 신간 TOP 10</h2>
+            <p>가장 많은 사랑을 받고 있는 도서들을 만나보세요.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <section class="section">
+            <div class="card-grid" style="grid-template-columns: repeat(5, 1fr)">
+
+                <div th:if="${bestSellers == null or bestSellers.isEmpty()}"
+                     style="grid-column: 1/-1; text-align: center; padding: 60px;">
+                    <p>집계된 베스트셀러 데이터가 없습니다.</p>
+                </div>
+
+                <article class="card"
+                         th:unless="${bestSellers == null}"
+                         th:each="book, iterStat : ${bestSellers}">
+
+                    <a th:href="@{/books/{id}(id=${book.bookId})}" class="book-link" style="display:block; color:inherit; position: relative;">
+
+                        <div class="rank-badge"
+                             th:classappend="${iterStat.count <= 3} ? 'rank-' + ${iterStat.count}"
+                             th:text="${iterStat.count}">1</div>
+
+                        <div class="thumb">
+                            <img th:src="${book.image}" th:alt="${book.title}"
+                                 style="width: 100%; height: 100%; object-fit: cover;" />
+                        </div>
+                        <div class="info">
+                            <div class="title" th:text="${book.title}">책 제목</div>
+                            <div class="meta">
+                                <span th:text="${book.publisher}">출판사</span> ·
+                                <span th:text="${#strings.replace(#strings.substring(book.publishedDate, 0, 7), '-', '.')}">2024.03</span>
+                            </div>
+                            <div class="price-row">
+                                <span class="price" th:text="|${#numbers.formatInteger(book.price, 0, 'COMMA')}|">₩15,000</span>
+                                <span class="badge" style="background-color: #ff4d4f; color: #fff;" th:if="${iterStat.count <= 3}">BEST</span>
+                            </div>
+                        </div>
+                    </a>
+                </article>
+
+            </div>
+        </section>
+    </div>
+</main>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+
+</body>
+</html>
