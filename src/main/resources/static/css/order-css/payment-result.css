@@ -48,60 +48,6 @@ img {
     padding: 10px 20px;
 }
 
-/* 헤더 */
-#header {
-    background: #fff;
-    border-bottom: 3px solid var(--color-primary);
-    padding: 12px 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-#header .container {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.logo img {
-    width: 64px;
-    height: 64px;
-    object-fit: contain;
-}
-.logo .brand {
-    font-size: 24px;
-    font-weight: 900;
-    color: black;
-}
-.gnb {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-.search-box {
-    display: flex;
-    border: 1px solid var(--color-border);
-    border-radius: 20px;
-    overflow: hidden;
-    width: 520px;
-    max-width: 100%;
-}
-.search-box input {
-    flex: 1;
-    border: 0;
-    padding: 10px 14px;
-    outline: none;
-    background: #fff;
-}
-.search-box button {
-    background: var(--color-primary);
-    color: #fff;
-    padding: 10px 16px;
-    white-space: nowrap;
-}
 
 /* 우측 사용자 메뉴 (아이콘 3개) */
 .user-menu {
@@ -241,37 +187,22 @@ main {
     flex-wrap: wrap;
 }
 
-/* 푸터 */
-#footer {
-    background: var(--color-dark-footer);
-    color: #a0a0a0;
-    padding: 34px 0;
-    font-size: 13px;
-    margin-top: 32px;
+.fail-container {
+    text-align: center;
+    padding: 60px 20px;
+    max-width: 600px;
+    margin: 0 auto;
 }
-#footer .container {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
+.icon-fail {
+    font-size: 50px; color: #dc3545; margin-bottom: 20px;
 }
-.footer-links a {
-    color: #c0c0c0;
-    margin-right: 15px;
-}
-.footer-links a:hover {
-    color: #fff;
-}
-.footer-info {
-    display: flex;
-    gap: 20px;
-    justify-content: space-between;
-}
-.footer-info > div {
-    flex: 1;
-    line-height: 1.8;
-}
-.footer-info strong {
-    color: #c0c0c0;
+.error-box {
+    background: #fff5f5;
+    border: 1px solid #ffcccc;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    color: #721c24;
 }
 
 /* 반응형 */

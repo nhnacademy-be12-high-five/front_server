@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<body>
+
+<header th:fragment="header">
+    <header id="header" role="banner">
+        <div class="container">
+            <a th:href="@{/}" class="logo">
+                <img th:src="@{/img/logo.png}" alt="HIGH-FIVE 로고" width="100" height="100"/>
+                <div class="brand">HIGH-FIVE BOOKS</div>
+            </a>
+
+            <nav class="gnb" aria-label="주요 메뉴">
+                <form class="search-box"
+                      role="search"
+                      th:action="@{/search}"
+                      method="get">
+                    <input type="search"
+                           name="keyword"
+                           placeholder="도서명, 저자, ISBN, 태그 검색"
+                           th:value="${keyword}"/>
+
+                    <input type="hidden" name="sort"
+                           th:value="${sort != null ? sort : 'POPULAR'}"/>
+
+                    <button type="submit" class="search-btn">검색</button>
+                    <button type="submit"
+                            class="search-btn ai"
+                            th:formaction="@{/rag-search}">
+                        AI 검색
+                    </button>
+                </form>
+            </nav>
+
+            <div class="user-menu">
+                <a class="user-link" href="/coupon">
+                    <img th:src="@{/img/icon-coupon.png}" class="user-icon"/>
+                </a>
+                <a class="user-link" href="/mypage">
+                    <img th:src="@{/img/icon-mypage.png}" class="user-icon"/>
+                </a>
+                <a th:href="@{/cart}" class="user-link cart-link-wrap">
+                    <img th:src="@{/img/icon-cart.png}" class="user-icon"/>
+                    <span id="cartBadge" class="cart-badge" style="display:none;">0</span>
+                </a>
+
+                <a th:if="${#request.getAttribute('user') == null}"
+                   class="user-link pill"
+                   th:href="@{/member/login.html}">로그인</a>
+
+                <a th:if="${#request.getAttribute('user') != null}"
+                   class="user-link pill"
+                   th:href="@{/logout}">로그아웃</a>
+            </div>
+        </div>
+    </header>
+
+</header>
+
+</body>
+</html>

@@ -4,11 +4,24 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Booktown - 쿠폰 발급</title>
-    <link rel="stylesheet" href="/order-css/coupon-register.css">
+    <link rel="stylesheet" href="/css/order-css/coupon-register.css">
+    <link rel="stylesheet" href="/css/common/footer.css">
+    <link rel="stylesheet" href="/css/common/header.css">
+    <link rel="stylesheet" href="/css/common/common.css">
 </head>
+
+<script src="/js/common.js"></script>
+
+<script th:inline="javascript">
+    window.PAGE_MESSAGE = [[${message != null ? "'" + message + "'" : "null"}]];
+    window.PAGE_ERROR_MESSAGE = [[${errorMessage != null ? "'" + errorMessage + "'" : "null"}]];
+</script>
+
+<script src="/js/coupon-register.js"></script>
+
 <body>
-<header id="header" role="banner">
-</header>
+
+<div th:replace="~{layout/header :: header}"></div>
 
 <div class="register-page-container">
     <h1 class="page-title">🎉 쿠폰 발급</h1>
@@ -42,21 +55,7 @@
 
 </div>
 
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    document.addEventListener('DOMContentLoaded', function() {
-        var message = [[${message}]];
-        var errorMessage = [[${errorMessage}]];
-
-        if (message) {
-            alert(message);
-        }
-        if (errorMessage) {
-            alert(errorMessage);
-        }
-    });
-    /*]]>*/
-</script>
+<div th:replace="~{layout/footer :: footer}"></div>
 
 </body>
 </html>

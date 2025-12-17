@@ -4,53 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Highfive 관리자 - 특정 도서 쿠폰 관리</title>
-    <link rel="stylesheet" href="/admin-css/coupons.css">
-    <style>
-        /* 검색 결과 리스트 스타일 */
-        .search-result-list {
-            margin-top: 10px;
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            background: #fff;
-        }
-        .search-result-item {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            gap: 10px;
-        }
-        .search-result-item:last-child { border-bottom: none; }
-        .search-result-item img { width: 40px; height: 60px; object-fit: cover; border-radius: 4px; }
-        .book-info { flex: 1; }
-        .book-title { font-weight: bold; font-size: 14px; }
-        .book-meta { font-size: 12px; color: #666; }
-
-        /* 선택된 도서 태그 스타일 */
-        .selected-book-tag {
-            display: inline-flex;
-            align-items: center;
-            background: #e3f2fd;
-            color: #007bff;
-            padding: 5px 10px;
-            border-radius: 20px;
-            margin-right: 5px;
-            margin-bottom: 5px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-        .selected-book-tag button {
-            background: none;
-            border: none;
-            color: #007bff;
-            margin-left: 8px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/admin-css/admin-coupons.css">
 </head>
+
+<script th:inline="javascript">
+    window.PAGE_ENV = {
+        message: [[${message != null ? "'" + message + "'" : "null"}]],
+    errorMessage: [[${errorMessage != null ? "'" + errorMessage + "'" : "null"}]]
+    };
+</script>
+
+<script src="/js/admin/admin-coupons.js"></script>
+
 
 <body>
 <aside class="sidebar">
@@ -134,111 +99,6 @@
         </div>
     </main>
 </div>
-
-<script>
-    // 선택된 도서 ID를 담을 Set (중복 방지)
-    const selectedBookIds = new Set();
-
-    // 1. 도서 검색 (AJAX)
-    async function searchBooks() {
-        const keyword = document.getElementById('bookKeyword').value;
-        if (!keyword.trim()) {
-            alert("검색어를 입력하세요.");
-            return;
-        }
-
-        const resultArea = document.getElementById('searchResultArea');
-        resultArea.style.display = 'block';
-        resultArea.innerHTML = '<div style="padding:10px;">검색 중...</div>';
-
-        try {
-            // AdminController에 있는 API 호출
-            const response = await fetch(`/admin/coupons/books/search?keyword=${encodeURIComponent(keyword)}`);
-            const books = await response.json();
-
-            resultArea.innerHTML = '';
-
-            if (books.length === 0) {
-                resultArea.innerHTML = '<div style="padding:10px;">검색 결과가 없습니다.</div>';
-                return;
-            }
-
-            books.forEach(book => {
-                const item = document.createElement('div');
-                item.className = 'search-result-item';
-                item.innerHTML = `
-                    <img src="${book.image || '/img/no-image.png'}" alt="표지">
-                    <div class="book-info">
-                        <div class="book-title">${book.title}</div>
-                        <div class="book-meta">${book.author} | ${book.price}원 | ISBN: ${book.isbn}</div>
-                    </div>
-                    <button type="button" onclick="addBook(${book.id}, '${book.title.replace(/'/g, "\\'")}')"
-                            style="padding: 5px 10px; border: 1px solid #ddd; background: #fff; cursor: pointer; border-radius: 4px;">
-                        추가
-                    </button>
-                `;
-                resultArea.appendChild(item);
-            });
-
-        } catch (error) {
-            console.error(error);
-            resultArea.innerHTML = '<div style="padding:10px; color:red;">검색 중 오류가 발생했습니다.</div>';
-        }
-    }
-
-    // 2. 도서 추가
-    function addBook(id, title) {
-        if (selectedBookIds.has(id)) {
-            alert("이미 추가된 도서입니다.");
-            return;
-        }
-
-        selectedBookIds.add(id);
-        renderSelectedBooks();
-    }
-
-    // 3. 도서 삭제
-    function removeBook(id) {
-        selectedBookIds.delete(id);
-        renderSelectedBooks();
-    }
-
-    // 4. 선택 목록 렌더링
-    function renderSelectedBooks() {
-        const container = document.getElementById('selectedBookList');
-        container.innerHTML = '';
-
-        if (selectedBookIds.size === 0) {
-            container.innerHTML = '<span style="color: #999; font-size: 13px;">검색 후 도서를 추가해주세요.</span>';
-            return;
-        }
-
-        selectedBookIds.forEach(id => {
-            // UI용 타이틀을 따로 저장하지 않았다면 ID만 보여주거나, Map을 사용해야 함.
-            // 여기서는 간단히 구현하기 위해 DOM 요소를 새로 생성
-            // (실제로는 id -> title 맵핑을 관리하는 것이 좋습니다)
-
-            const tag = document.createElement('span');
-            tag.className = 'selected-book-tag';
-            tag.innerHTML = `도서 ID: ${id} <button type="button" onclick="removeBook(${id})">x</button>`;
-            container.appendChild(tag);
-        });
-    }
-
-    // 원래 addBook 함수를 조금 수정해서 title도 활용하려면 selectedBooks Map을 쓰는게 좋습니다.
-    // 여기서는 간단하게 구현했습니다.
-
-    // 5. 폼 제출 전 처리
-    function prepareSubmit() {
-        if (selectedBookIds.size === 0) {
-            alert("최소 한 권 이상의 도서를 선택해야 합니다.");
-            return false;
-        }
-        // Set을 콤마로 구분된 문자열로 변환하여 hidden input에 저장
-        document.getElementById('targetBookIds').value = Array.from(selectedBookIds).join(',');
-        return true;
-    }
-</script>
 
 </body>
 </html>
