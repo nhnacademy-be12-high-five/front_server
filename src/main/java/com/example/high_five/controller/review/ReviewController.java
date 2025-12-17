@@ -1,6 +1,7 @@
 package com.example.high_five.controller.review;
 
 import com.example.high_five.common.annotation.LoginRequired;
+import com.example.high_five.dto.context.UserContext;
 import com.example.high_five.dto.review.*;
 import com.example.high_five.service.ReviewService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -61,11 +62,16 @@ public class ReviewController {
     // 리뷰 리스트 조회
     @GetMapping("/books/{book-id}/reviews")
     @ResponseBody
+    @LoginRequired
     public ResponseEntity<Page<BookReviewResponse>> getBookReviewList(
             @PathVariable("book-id") Long bookId,
-            @PageableDefault(size = 5) Pageable pageable
+            @PageableDefault(size = 5) Pageable pageable,
+            @RequestAttribute(value = "user", required = false) UserContext user,
+            Model model
     ) {
         Page<BookReviewResponse> reviews = reviewService.getReviews(bookId, pageable);
+        Long memberId = user.id();
+        model.addAttribute("loginMemberId", memberId);
         return ResponseEntity.ok(reviews);
     }
 
@@ -112,18 +118,17 @@ public class ReviewController {
     @GetMapping("/mypage/reviews")
     @LoginRequired
     public String myReviews(Model model,
+                            @RequestAttribute(value = "user", required = false) UserContext user,
                             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable)
     {
-//        if (user == null) {
-//            return "redirect:/member/login";
-//        }
+        if (user == null) {
+            return "redirect:/member/login";
+        }
 
-        // 1. FeignClient로 내 리뷰 조회
         Page<MyPageReviewResponse> reviewPage = reviewService.getMyReviews(pageable);
 
-        // 2. 모델에 담기
         model.addAttribute("reviews", reviewPage.getContent());
-        model.addAttribute("page", reviewPage); // 페이징 버튼용
+        model.addAttribute("page", reviewPage);
 
         return "mypage/reviews"; // HTML 파일 경로
     }
@@ -137,7 +142,6 @@ public class ReviewController {
             @PathVariable("review-id") Long reviewId
     ) {
         Boolean isLiked = reviewService.toggleReviewLike(bookId, reviewId);
-
         return ResponseEntity.ok(isLiked);
     }
 }
