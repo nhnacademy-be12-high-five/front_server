@@ -37,8 +37,8 @@
         <!-- 내가 작성한 리뷰 없을 때 -->
         <div th:unless="${myReview != null}" class="review-form-card">
             <h3>리뷰 작성</h3>
-            <form th:action="@{/books/{bookId}(bookId=${book.bookId})/reviews}"
-                  method="post" enctype="multipart/form-data">
+
+            <form id="reviewForm" enctype="multipart/form-data">
 
                 <div class="star-rating">
                     <span class="rating-label">별점</span>
@@ -59,7 +59,11 @@
                     <input type="file" name="images" multiple accept="image/*">
                 </div>
 
-                <button type="submit" class="btn-primary full-width">리뷰 등록하기</button>
+                <button type="button"
+                        class="btn-primary full-width"
+                        th:onclick="|submitReview(${book.bookId})|">
+                    리뷰 등록하기
+                </button>
             </form>
         </div>
     </div>
