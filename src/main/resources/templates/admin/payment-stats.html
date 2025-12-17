@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Highfive 관리자 - 결제/매출 통계</title>
+    <link rel="stylesheet" href="/admin-css/payment-stats.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<aside class="sidebar">
+    <h2>HIGHFIVE 관리자</h2>
+    <ul class="menu">
+        <li><a href="/admin/books">도서 관리</a></li>
+        <li><a href="/admin/points/policy">포인트 관리</a></li>
+        <li><a href="/admin/coupons/page">쿠폰 관리</a></li>
+        <li><a href="/admin/coupons/specific-book-coupons">특정 도서 쿠폰 관리</a></li>
+        <li><a href="/admin/payments/stats" class="active">매출 통계</a></li>
+        <li><a href="/admin/payments" data-key="payments">결제 수단 관리</a></li>
+    </ul>
+</aside>
+
+<div class="content-area">
+    <header>
+        <h1>결제 및 매출 통계</h1>
+    </header>
+
+    <main>
+        <div class="stats-summary-grid">
+            <div class="stat-card blue">
+                <h3>총 매출액</h3>
+                <p class="stat-value" th:text="${#numbers.formatInteger(summary.totalSalesAmount, 0, 'COMMA')} + '원'">0원</p>
+                <p class="stat-desc">누적 결제 금액</p>
+            </div>
+            <div class="stat-card green">
+                <h3>순 매출액</h3>
+                <p class="stat-value" th:text="${#numbers.formatInteger(summary.netSalesAmount, 0, 'COMMA')} + '원'">0원</p>
+                <p class="stat-desc">총 매출 - 환불 금액</p>
+            </div>
+            <div class="stat-card red">
+                <h3>환불 금액</h3>
+                <p class="stat-value" th:text="${#numbers.formatInteger(summary.totalCancelAmount, 0, 'COMMA')} + '원'">0원</p>
+                <div class="stat-sub">
+                    <span>취소 건수: </span><strong th:text="${summary.cancelCount}">0</strong>건
+                </div>
+            </div>
+            <div class="stat-card yellow">
+                <h3>결제 성공률</h3>
+                <p class="stat-value">
+                    <span th:if="${summary.totalTransactionCount > 0}"
+                          th:text="${#numbers.formatDecimal((summary.successCount * 100.0) / summary.totalTransactionCount, 1, 1)} + '%'">0.0%</span>
+                    <span th:unless="${summary.totalTransactionCount > 0}">0%</span>
+                </p>
+                <p class="stat-desc">총 <span th:text="${summary.totalTransactionCount}">0</span>건 중 성공</p>
+            </div>
+        </div>
+
+        <div class="chart-header-row">
+            <h3>기간별 통계 상세</h3>
+            <form method="get" action="/admin/payments/stats" class="date-filter">
+                <input type="date" name="startDate" th:value="${startDate}">
+                <span>~</span>
+                <input type="date" name="endDate" th:value="${endDate}">
+                <button type="submit">조회</button>
+            </form>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-box card">
+                <h4>일별 매출액 추이</h4>
+                <div class="canvas-wrapper">
+                    <canvas id="amountChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-box card">
+                <h4>일별 결제 건수</h4>
+                <div class="canvas-wrapper">
+                    <canvas id="countChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const dailyData = [[${dailyStats}]];
+
+    const labels = dailyData.map(d => d.date);
+    const dataAmount = dailyData.map(d => d.dailyTotalAmount);
+    const dataCount = dailyData.map(d => d.dailyCount);
+
+    // 1. 매출액 차트 (Line Chart) - 파란색
+    const ctxAmount = document.getElementById('amountChart').getContext('2d');
+    new Chart(ctxAmount, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '매출액 (원)',
+                data: dataAmount,
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                borderWidth: 2,
+                tension: 0.3, // 부드러운 곡선
+                fill: true,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y.toLocaleString() + '원';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString(); // Y축 콤마 표시
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // 2. 결제 건수 차트 (Bar Chart) - 노란색/주황색
+    const ctxCount = document.getElementById('countChart').getContext('2d');
+    new Chart(ctxCount, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '결제 건수 (건)',
+                data: dataCount,
+                backgroundColor: 'rgba(233, 196, 106, 0.8)', // 막대 색
+                borderColor: '#e9c46a',
+                borderWidth: 1,
+                borderRadius: 4 // 막대 둥글게
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1 // 건수는 소수점이 안 나오게 1단위
+                    }
+                }
+            }
+        }
+    });
+    /*]]>*/
+</script>
+
+</body>
+</html>

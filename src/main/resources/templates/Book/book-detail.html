@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title th:text="${book.title} + ' | HIGH-FIVE BOOKS'">도서 상세</title>
     <link rel="stylesheet" th:href="@{/book-css/review-section.css}">
     <link rel="stylesheet" href="/book-css/detail-style.css">
@@ -11,22 +11,23 @@
 <header id="header" role="banner">
     <div class="container">
         <a th:href="@{/}" class="logo">
-            <img th:src="@{/img/logo.png}" alt="HIGH-FIVE 로고" width="100" height="100" />
+            <img th:src="@{/img/logo.png}" alt="HIGH-FIVE 로고" width="100" height="100"/>
             <div class="brand">HIGH-FIVE BOOKS</div>
         </a>
         <nav class="gnb" aria-label="주요 메뉴">
             <form class="search-box" role="search" th:action="@{/search}" method="get">
-                <input type="search" name="keyword" placeholder="도서명, 저자, ISBN, 태그 검색" />
-                <input type="hidden" name="sort" value="POPULAR" />
+                <input type="search" name="keyword" placeholder="도서명, 저자, ISBN, 태그 검색"/>
+                <input type="hidden" name="sort" value="POPULAR"/>
                 <button type="submit" class="search-btn">검색</button>
                 <button type="submit" class="search-btn ai" th:formaction="@{/rag-search}">AI 검색</button>
             </form>
         </nav>
         <div class="user-menu">
-            <a class="user-link" th:href="@{/coupon}"><img th:src="@{/img/icon-coupon.png}" alt="쿠폰" class="user-icon" /></a>
-            <a class="user-link" th:href="@{/mypage}"><img th:src="@{/img/icon-mypage.png}" alt="마이페이지" class="user-icon" /></a>
+            <a class="user-link" th:href="@{/coupon}"><img th:src="@{/img/icon-coupon.png}" alt="쿠폰" class="user-icon"/></a>
+            <a class="user-link" th:href="@{/mypage}"><img th:src="@{/img/icon-mypage.png}" alt="마이페이지"
+                                                           class="user-icon"/></a>
             <a th:href="@{/cart}" class="user-link cart-link-wrap">
-                <img th:src="@{/img/icon-cart.png}" alt="장바구니" class="user-icon" />
+                <img th:src="@{/img/icon-cart.png}" alt="장바구니" class="user-icon"/>
                 <span id="cartBadge" class="cart-badge" style="display: none;">0</span>
             </a>
             <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
@@ -45,7 +46,7 @@
         <section class="book-detail">
             <div class="book-detail-main">
                 <div class="book-image">
-                    <img th:if="${book.image != null}" th:src="${book.image}" alt="도서 표지" />
+                    <img th:if="${book.image != null}" th:src="${book.image}" alt="도서 표지"/>
                     <div th:if="${book.image == null}" class="no-cover">도서 이미지</div>
                 </div>
 
@@ -64,7 +65,8 @@
                         </div>
                         <div class="discount-price">
                             <span class="discount-rate">10%</span>
-                            <span class="final-price" th:text="${#numbers.formatInteger(book.price, 3, 'COMMA')}">0</span>
+                            <span class="final-price"
+                                  th:text="${#numbers.formatInteger(book.price, 3, 'COMMA')}">0</span>
                             <span class="currency">원</span>
                         </div>
                         <div class="point-info">
@@ -79,7 +81,8 @@
                                  style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 6px;">
 
                                 <div style="flex: 1;">
-                                    <strong th:text="${coupon.couponName}" style="color: #333; font-size: 14px;">쿠폰명</strong>
+                                    <strong th:text="${coupon.couponName}"
+                                            style="color: #333; font-size: 14px;">쿠폰명</strong>
                                     <span style="display: block; font-size: 12px; color: #666; margin-top: 2px;">
                                         <span th:if="${coupon.couponType == 'FIXED'}"
                                               th:text="${#numbers.formatInteger(coupon.discountValue, 0, 'COMMA') + '원 할인'}"></span>
@@ -100,21 +103,36 @@
                     </div>
 
                     <div class="purchase-actions">
-                        <button type="button" class="btn-heart" aria-label="관심도서" id="heart">&#9829;</button>
-                        <button type="button" class="btn-primary" id="add-to-cart-btn" th:data-book-id="${book.bookId}">장바구니 담기</button>
-                        <a class="btn-secondary" th:href="@{/order/now(bookId=${book.bookId})}">바로 구매</a>
+                        <button type="button"
+                                class="btn-heart"
+                                th:classappend="${isLiked} ? 'active' : ''"
+                                aria-label="관심도서"
+                                id="heart"
+                                th:data-book-id="${book.bookId}">
+                            &#9829;
+                        </button>
+                        <button type="button" class="btn-primary" id="add-to-cart-btn" th:data-book-id="${book.bookId}">
+                            장바구니 담기
+                        </button>
+                        <a class="btn-secondary"
+                           th:href="@{/orders/sheet(bookIds=${book.bookId}, quantities=1)}">
+                            바로 구매
+                        </a>
                     </div>
 
                     <table class="summary-table">
                         <tbody>
                         <tr th:if="${book.publisher != null}">
-                            <th>출판사</th><td th:text="${book.publisher}"></td>
+                            <th>출판사</th>
+                            <td th:text="${book.publisher}"></td>
                         </tr>
                         <tr th:if="${book.publishedDate != null}">
-                            <th>발행일</th><td th:text="${book.publishedDate}"></td>
+                            <th>발행일</th>
+                            <td th:text="${book.publishedDate}"></td>
                         </tr>
                         <tr th:if="${book.isbn != null}">
-                            <th>ISBN</th><td th:text="${book.isbn}"></td>
+                            <th>ISBN</th>
+                            <td th:text="${book.isbn}"></td>
                         </tr>
                         </tbody>
                     </table>
@@ -124,7 +142,9 @@
             <div class="book-detail-tabs">
                 <button type="button" class="active" data-target="tab-intro">도서 소개</button>
                 <button type="button" data-target="tab-contents">목차</button>
-                <button type="button" data-target="tab-review">리뷰 (<span th:text="${reviewList != null ? reviewList.totalElements : 0}">0</span>)</button>
+                <button type="button" data-target="tab-review">리뷰 (<span
+                        th:text="${reviewList != null ? reviewList.totalElements : 0}">0</span>)
+                </button>
                 <button type="button" data-target="tab-qna">Q&amp;A</button>
                 <button type="button" data-target="tab-shipping">배송/반품</button>
             </div>
@@ -143,7 +163,8 @@
 
             <div id="tab-review" class="detail-tab-content">
                 <h2>리뷰</h2>
-                <div class="ai-summary-card" th:if="${book.aiReviewSummary != null and !book.aiReviewSummary.isEmpty()}">
+                <div class="ai-summary-card"
+                     th:if="${book.aiReviewSummary != null and !book.aiReviewSummary.isEmpty()}">
                     <div class="ai-header">
                         <span class="ai-icon">🤖</span>
                         <h3>AI 독자 리뷰 요약</h3>
@@ -351,7 +372,6 @@
     }
 </script>
 
-
 <script>
     async function submitUpdateReview(reviewId, bookId) {
         const form = document.getElementById("updateReviewForm");
@@ -360,13 +380,14 @@
         const content = form.querySelector("textarea[name='content']").value;
 
         const requestDto = {
-            content: content,
+            content,
             rating: Number(rating),
-            deleteImageIds: []   // 이미지 삭제 기능 미사용
+            deleteImageIds: []
         };
 
         const formData = new FormData();
-        formData.append("request",
+        formData.append(
+            "request",
             new Blob([JSON.stringify(requestDto)], { type: "application/json" })
         );
 
@@ -388,17 +409,59 @@
         alert("리뷰가 수정되었습니다.");
         location.reload();
     }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const heartBtn = document.getElementById('heart');
+        if (!heartBtn) return;
 
+        heartBtn.addEventListener('click', async function () {
+            const bookId = this.dataset.bookId;
+            const accessToken = localStorage.getItem('accessToken');
+
+            const headers = { 'Content-Type': 'application/json' };
+            if (accessToken) {
+                headers['Authorization'] = `Bearer ${accessToken}`;
+            }
+
+            try {
+                const response = await fetch(`/api/books/${bookId}/likes`, {
+                    method: 'POST',
+                    headers
+                });
+
+                if (response.ok) {
+                    this.classList.toggle('active');
+
+                    if (this.classList.contains('active')) {
+                        if (confirm("관심 도서에 담았습니다!\n마이페이지 찜 목록으로 이동하시겠습니까?")) {
+                            location.href = "/books/my-page/likes";
+                        }
+                    } else {
+                        alert("관심 도서가 해제되었습니다.");
+                    }
+
+                } else if (response.status === 401) {
+                    if (confirm("로그인이 필요한 서비스입니다.\n로그인 페이지로 이동하시겠습니까?")) {
+                        location.href = "/member/login.html";
+                    }
+                } else {
+                    throw new Error("요청 실패");
+                }
+            } catch (e) {
+                console.error(e);
+                alert("오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+            }
+        });
+    });
+</script>
+<script>
     const likeProcessingMap = {};
 
     function toggleReviewLike(bookId, reviewId, btn) {
-
-        if (likeProcessingMap[reviewId]) {
-            return;
-        }
+        if (likeProcessingMap[reviewId]) return;
 
         likeProcessingMap[reviewId] = true;
-
         btn.style.opacity = "0.5";
         btn.style.cursor = "not-allowed";
 
@@ -408,8 +471,8 @@
         })
             .then(response => {
                 if (response.status === 401) {
-                    if(confirm("로그인이 필요한 서비스입니다. 로그인 페이지로 이동하시겠습니까?")) {
-                        location.href = "/login";
+                    if (confirm("로그인이 필요한 서비스입니다. 로그인 페이지로 이동하시겠습니까?")) {
+                        location.href = "/member/login.html";
                     }
                     return null;
                 }
@@ -430,8 +493,8 @@
                     countSpan.innerText = Math.max(0, currentCount - 1);
                 }
             })
-            .catch(error => {
-                console.error(error);
+            .catch(err => {
+                console.error(err);
                 alert("일시적인 오류가 발생했습니다.");
             })
             .finally(() => {
@@ -443,22 +506,6 @@
             });
     }
 </script>
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    document.addEventListener('DOMContentLoaded', function() {
-        var message = [[${message}]];
-        var errorMessage = [[${errorMessage}]];
-
-        if (message) {
-            alert(message);
-        }
-        if (errorMessage) {
-            alert(errorMessage);
-        }
-    });
-    /*]]>*/
-</script>
-
 
 
 </body>

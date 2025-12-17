@@ -42,6 +42,7 @@ img {
     max-width: 100%;
     height: auto;
 }
+
 .container {
     width: 100%;
     max-width: 1200px;
@@ -55,8 +56,6 @@ img {
     border-bottom: 3px solid var(--color-primary);
     padding: 12px 0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-#header {
     display: flex;
     align-items: center;
     gap: 16px;
@@ -481,6 +480,7 @@ main {
     display: flex;
     gap: 20px;
     justify-content: space-between;
+    margin: 20px;
 }
 .footer-info > div {
     flex: 1;

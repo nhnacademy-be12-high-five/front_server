@@ -1,6 +1,7 @@
 package com.example.high_five.config;
 
 import feign.RequestInterceptor;
+import feign.Retryer;
 import feign.codec.Encoder;
 import feign.form.spring.SpringFormEncoder;
 import jakarta.servlet.http.Cookie;
@@ -14,6 +15,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Slf4j
 @Configuration
 public class FeignConfig {
+
+    @Bean
+    public Retryer retryer() {
+        return Retryer.NEVER_RETRY; // feign 호출 실패시 기본 5회 재시도에서 즉시 실패하게 바꿈
+    }
 
     @Bean
     public RequestInterceptor requestInterceptor() {

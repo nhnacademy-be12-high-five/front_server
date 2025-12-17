@@ -392,3 +392,40 @@ main {
         height: 110px;
     }
 }
+
+#footer {
+    background-color: var(--color-dark-footer);
+    color: #a0a0a0; /* 어두운 배경에 밝은 텍스트 */
+    padding: 40px 0;
+    font-size: 13px;
+}
+
+#footer .container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.footer-links a {
+    color: #c0c0c0;
+    margin-right: 15px;
+}
+.footer-links a:hover {
+    color: white;
+}
+
+.footer-info {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.footer-info .copyright,
+.footer-info .customer-center {
+    flex: 1;
+    line-height: 1.8;
+}
+
+.footer-info .copyright strong {
+    color: #c0c0c0;
+}

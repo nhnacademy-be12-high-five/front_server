@@ -870,3 +870,18 @@ input {
     color: #888;
     font-size: 12px;
 }
+
+
+.btn-heart {
+    font-size: 24px;
+    color: #ccc; /* 회색 */
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+/* 찜하기 완료 상태 (빨간 하트) - 클래스명 'active'가 붙으면 빨개짐 */
+.btn-heart.active {
+    color: #ff4d4d; /* 빨간색 */
+}
