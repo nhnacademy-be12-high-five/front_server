@@ -354,6 +354,11 @@ img {
     font-weight: 700;
 }
 
+.tab-btn.unactive {
+    color: gray;
+    font-weight: 700;
+}
+
 /* 탭 활성화 시 하단 라인 */
 .tab-btn.active::after {
     content: "";
@@ -449,15 +454,11 @@ img {
     background-color: #007bff;
     color: #191919;
 
-
     display: flex;
     justify-content: center;
     align-items: center;
-
     height: 50px;
     margin-right: 10px;
-
-
     padding: 0;
 }
 
@@ -465,6 +466,7 @@ img {
     background-color: #e60000; /* PAYCO 예시 */
     color: white;
     border: none;
+    padding: 0;
 }
 /* 💡 입력 필드와 아이콘을 묶는 컨테이너 */
 .input-wrapper {
@@ -585,4 +587,8 @@ img {
 .footer-links{
     margin-left: 20px;
     gap: 5rem;
+}
+
+.btn{
+    gap: 0;
 }

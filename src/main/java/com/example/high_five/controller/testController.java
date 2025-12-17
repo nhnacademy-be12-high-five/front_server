@@ -2,12 +2,11 @@ package com.example.high_five.controller;
 
 import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.service.BookClient;
+import com.example.high_five.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -16,6 +15,7 @@ import java.util.List;
 public class testController {
 
     private final BookClient bookClient; // FeignClient 주입
+    private final TagService tagService;
 
     @GetMapping("/")
     public String mainPage(Model model) {
@@ -36,7 +36,9 @@ public class testController {
         } catch (Exception e) {
             // 백엔드 서버가 죽어있거나 에러가 나도 메인 페이지는 떠야 함
             e.printStackTrace();
-            model.addAttribute("newBooks", List.of()); // 빈 리스트 전달
+            model.addAttribute("newBooks", List.of());
+            model.addAttribute("risingBooks", List.of());
+            model.addAttribute("bestSellers", List.of());
         }
         return "index";
     }
@@ -45,7 +47,9 @@ public class testController {
 //    public String getBookDetail(@PathVariable("bookId") Long bookId, Model model) {
 //        BookResponse book = bookClient.getBookDetail(bookId);
 //        model.addAttribute("book", book);
-//        return "detail";
+//
+////        List<TagResponse> tags = tagService.getTags();
+//        return "Book/book-detail";
 //    }
 
     // 이렇게 하면 이제 "best-seller.css"는 숫자가 아니므로 위 메서드를 무시하고
@@ -70,5 +74,4 @@ public class testController {
         model.addAttribute("recommendation:new_books_ids_1_5",popular);
         return "Book/book-new";
     }
-
 }
