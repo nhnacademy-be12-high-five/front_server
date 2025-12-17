@@ -31,5 +31,5 @@ public class BookResponse {
     private String aiReviewSummary;
 
     // book-detail.html 에서 사용하는 태그 필드
-//    private List<TagResponse> tagList;
+    private List<TagResponse> tags;
 }

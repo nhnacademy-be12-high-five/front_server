@@ -57,11 +57,16 @@
                         </div>
                     </div>
 
-<!--                    <div class="book-tags" th:if="${book.tagList != null and !book.tagList.empty}">-->
-<!--                        <span th:each="tag : ${book.tagList}" class="tag-badge">-->
-<!--                            <span th:text="'#' + ${tag.name}">#태그명</span>-->
-<!--                        </span>-->
-<!--                    </div>-->
+                    <div class="tag-section" th:if="${book.tags != null and !book.tags.isEmpty()}">
+                        <div class="tag-list">
+                            <a th:href="@{/search(keyword=${tag.name})}"
+                               class="book-tag"
+                               th:each="tag, stat : ${book.tags}"
+                               th:if="${stat.index < 5}">
+                                #<span th:text="${tag.name}">태그명</span>
+                            </a>
+                        </div>
+                    </div>
 
                     <div class="option-block" th:if="${!#lists.isEmpty(coupons)}">
                         <div class="option-block-title" style="margin-bottom: 10px;">🎁 사용 가능한 쿠폰</div>
