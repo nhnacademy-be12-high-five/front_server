@@ -30,7 +30,7 @@
     <ul class="menu">
         <li><a href="/admin/books" class="active">도서 관리</a></li>
         <li><a href="/admin/points" data-key="points">포인트 관리</a></li>
-        <li><a href="/admin/coupons" data-key="coupons">쿠폰 관리</a></li>
+        <li><a href="/admin/coupons/page" data-key="coupons">쿠폰 관리</a></li>
         <li><a href="/admin/coupons/specific-book-coupons">특정 도서 쿠폰 관리</a></li>
         <li><a href="/admin/payments/stats">매출 통계</a></li>
         <li><a href="/admin/payments" data-key="payments">결제 수단 관리</a></li>
@@ -222,6 +222,8 @@
 
         document.getElementById('bookId').value = '';
         document.getElementById('imgPreview').style.display = 'none';
+
+        setFormReadOnly(false);
     }
 
     // 5. 이미지 미리보기
@@ -235,7 +237,7 @@
         }
     }
 
-    // 6. 삭제 요청
+    // 6. 필드 잠금/해제 함수
     function setFormReadOnly(isReadOnly) {
         const fields = ['isbn', 'title', 'author', 'publisher', 'publishedDate', 'image', 'description'];
 
