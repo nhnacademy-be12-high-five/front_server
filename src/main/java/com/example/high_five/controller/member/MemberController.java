@@ -57,7 +57,7 @@ public class MemberController {
             }
             redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
         }
-        return "redirect:/myinfo";
+        return "redirect:/mypage";
     }
 
     @LoginRequired
@@ -72,7 +72,7 @@ public class MemberController {
         } catch (Exception e) {
             log.error("탈퇴 실패", e);
             redirectAttributes.addFlashAttribute("errorMessage", "탈퇴 처리에 실패했습니다.");
-            return "redirect:/myinfo";
+            return "redirect:/mypage";
         }
     }
 
