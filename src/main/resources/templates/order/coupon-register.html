@@ -47,9 +47,12 @@
                 </form>
             </div>
 
-            <div th:if="${#lists.isEmpty(templates)}">
+            <div class="empty-coupon"
+                 th:if="${availableCoupons == null || #lists.isEmpty(availableCoupons)}">
                 발급 가능한 쿠폰이 없습니다.
             </div>
+
+
         </div>
     </div>
 
