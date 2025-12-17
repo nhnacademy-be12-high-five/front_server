@@ -3,35 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <title>주문서 작성 - High Five</title>
-    <link rel="stylesheet" href="/order-css/order.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://js.tosspayments.com/v1/payment"></script>
-    <style>
-        /* 비회원 기능 제한용 스타일 */
-        .disabled-overlay {
-            background-color: #eee;
-            opacity: 0.6;
-            pointer-events: none; /* 클릭 방지 */
-            cursor: not-allowed;
-        }
-        .login-guide {
-            font-size: 12px;
-            color: #dc3545; /* 붉은색 경고 */
-            margin-left: 10px;
-            font-weight: bold;
-        }
-        /* 🚨 추가된 스타일: 배송 정책 설명 포맷팅 */
-        .summary-policy {
-            font-size: 12px;
-            color: #6c757d;
-            text-align: right;
-            margin-top: -5px;
-            margin-bottom: 5px;
-            padding-right: 15px;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/order-css/order.css">
+    <link rel="stylesheet" href="/css/common/footer.css">
+    <link rel="stylesheet" href="/css/common/header.css">
+    <link rel="stylesheet" href="/css/common/common.css">
 </head>
+
+<script src="/js/common.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://js.tosspayments.com/v1/payment"></script>
+<script th:inline="javascript">
+    window.ORDER_ENV = {
+        maxPoint: [[${point != null ? point : 0}]],
+    tossClientKey: [[${tossClientKey != null ? "'" + tossClientKey + "'" : "null"}]],
+    customerEmail: [[${orderSheet.email != null ? "'" + orderSheet.email + "'" : "null"}]],
+        freeDeliveryThreshold: [[${orderSheet.deliveryPolicy.minOrderAmount}]],
+        standardDeliveryFee: [[${orderSheet.deliveryPolicy.standardShippingFee}]]
+    };
+</script>
+<script src="/js/order.js"></script>
+
 <body>
+
+<div th:replace="~{layout/header :: header}"></div>
 
 <div class="order-container">
     <h2>주문서 작성</h2>
@@ -223,199 +217,7 @@
     <p style="margin-top: 15px; font-weight: bold;">결제 진행 중...</p>
 </div>
 
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    // 1. 서버 데이터 주입
-    const maxPoint = [[${point != null ? point : 0}]];
-    const tossClientKey = [[${tossClientKey}]];
-    const customerEmail = [[${orderSheet.email}]];
-
-    // [핵심] 배송비 정책 설정 (서버에서 받아온 값 적용, 없으면 기본값)
-    // 🚨 SPEL 오류 수정 완료: deliveryPolicy 객체를 통해 접근합니다.
-    const FREE_DELIVERY_THRESHOLD = [[${orderSheet.deliveryPolicy.minOrderAmount}]] || 30000;
-    const STANDARD_DELIVERY_FEE = [[${orderSheet.deliveryPolicy.standardShippingFee}]] || 3000;
-
-    // 2. 토스 객체 초기화
-    const tossPayments = TossPayments(tossClientKey);
-    let selectedMethodCode = null;
-
-    // 초기화 함수
-    $(document).ready(function() {
-        updateTotal(); // 최초 진입 시 금액 계산
-    });
-
-    // ===========================
-    // UI 로직 (실시간 금액 재계산)
-    // ===========================
-    function updateTotal() {
-        let currentTotalProductPrice = 0;
-        let currentWrappingFee = 0;
-
-        // 1. 각 상품 행(Row)별 계산
-        $('.order-item-row').each(function() {
-            const price = parseInt($(this).find('.item-price').val()) || 0;
-            let quantity = parseInt($(this).find('.item-qty-input').val());
-
-            // 수량 유효성 검사
-            if (isNaN(quantity) || quantity < 1) {
-                quantity = 1;
-            }
-
-            // 상품별 합계 업데이트
-            const rowTotal = price * quantity;
-            $(this).find('.item-total-price').text(rowTotal.toLocaleString());
-            currentTotalProductPrice += rowTotal;
-
-            // 포장비 계산
-            const wrapperOption = $(this).find('.wrapper-select option:selected');
-            const wrapperPrice = parseInt(wrapperOption.data('price')) || 0;
-            currentWrappingFee += (wrapperPrice * quantity);
-        });
-
-        // 2. 배송비 재계산 (정책 적용)
-        let currentDeliveryFee = STANDARD_DELIVERY_FEE;
-        if (currentTotalProductPrice >= FREE_DELIVERY_THRESHOLD) {
-            currentDeliveryFee = 0;
-        }
-
-        // 3. 할인 계산 (쿠폰 + 포인트)
-        // 비활성화된 경우 값은 0으로 처리됨
-        const couponDiscount = parseInt($('#couponSelect').find(':selected').data('discount')) || 0;
-        let usedPoint = parseInt($('#usedPoint').val()) || 0;
-
-        // 포인트 초과 검사
-        if (usedPoint > maxPoint) {
-            alert('보유 포인트를 초과할 수 없습니다.');
-            usedPoint = maxPoint;
-            $('#usedPoint').val(maxPoint);
-        }
-        if (usedPoint < 0) {
-            usedPoint = 0;
-            $('#usedPoint').val(0);
-        }
-
-        // 4. 최종 금액 계산
-        const totalDiscount = couponDiscount + usedPoint;
-        let finalPrice = currentTotalProductPrice + currentDeliveryFee + currentWrappingFee - totalDiscount;
-        if (finalPrice < 0) finalPrice = 0;
-
-        // 5. 화면 갱신 (콤마 포맷 적용)
-        $('#displayProductPrice').text(currentTotalProductPrice.toLocaleString());
-        $('#displayDeliveryFee').text(currentDeliveryFee.toLocaleString());
-        $('#displayWrappingFee').text(currentWrappingFee.toLocaleString());
-        $('#displayDiscount').text(totalDiscount.toLocaleString());
-        $('#displayFinalPrice').text(finalPrice.toLocaleString());
-    }
-
-    // 포인트 전액 사용 버튼
-    function useAllPoints() {
-        $('#usedPoint').val(maxPoint);
-        updateTotal();
-    }
-
-    // 결제 수단 탭 선택
-    function selectMethod(element) {
-        if ($(element).hasClass("disabled")) return;
-
-        // 이미 선택된 탭을 다시 클릭한 경우 → 해제
-        if ($(element).hasClass("active")) {
-            $(element).removeClass("active");
-            selectedMethodCode = null;
-            $('#paymentMethodInput').val("");
-
-            document.getElementById("method-desc").innerText =
-                "결제 수단을 선택해주세요.";
-            return;
-        }
-
-        // 새로 선택하는 경우
-        $('.tab').removeClass('active');
-        $(element).addClass('active');
-
-        selectedMethodCode = $(element).data("code");
-        $('#paymentMethodInput').val(selectedMethodCode);
-
-        const desc = document.getElementById("method-desc");
-        if (selectedMethodCode === 'TOSS') {
-            desc.innerText = "Toss 위젯을 통해 빠르게 결제 해보세요.";
-        } else if (selectedMethodCode === 'BANK_TRANSFER') {
-            desc.innerText = "실시간 계좌이체를 진행합니다.";
-        } else if (selectedMethodCode === 'VIRTUAL_ACCOUNT') {
-            desc.innerText = "가상계좌를 발급받아 입금 후 결제 완료됩니다.";
-        } else {
-            desc.innerText = "선택한 결제 수단으로 진행합니다.";
-        }
-    }
-
-    // ===========================
-    // 결제 요청 (서버 통신)
-    // ===========================
-    function requestPayment() {
-        if (!selectedMethodCode) {
-            alert("결제 수단을 선택해주세요.");
-            return;
-        }
-
-        const receiverName = $('#receiverName').val();
-        const receiverPhone = $('#receiverPhone').val();
-        const receiverAddress = $('#receiverAddress').val();
-
-        if (!receiverName || !receiverPhone || !receiverAddress) {
-            alert("배송지 정보를 모두 입력해주세요.");
-            return;
-        }
-
-        $('#loading-overlay').css('display', 'flex');
-
-        const formData = new FormData(document.getElementById('orderForm'));
-
-        $.ajax({
-            url: '/orders/api/create',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                const orderId = response.orderKey;
-                const amount = response.totalAmount;
-                const orderName = "HIGH-FIVE 도서 주문";
-
-                const methodMap = {
-                    "TOSS": "카드", "BANK_TRANSFER": "계좌이체", "VIRTUAL_ACCOUNT": "가상계좌"
-                };
-                const tossMethod = methodMap[selectedMethodCode] || "카드";
-
-                tossPayments.requestPayment(tossMethod, {
-                    amount: amount,
-                    orderId: orderId,
-                    orderName: orderName,
-                    customerName: receiverName,
-                    customerEmail: customerEmail,
-                    successUrl: window.location.origin + "/orders/success",
-                    failUrl: window.location.origin + "/orders/fail",
-                }).catch(function (error) {
-                    $('#loading-overlay').hide();
-                    if (error.code !== 'USER_CANCEL') {
-                        alert("결제 실패: " + error.message);
-                    }
-                });
-            },
-            error: function(xhr) {
-                $('#loading-overlay').hide();
-                let msg = "주문 생성 실패";
-                try {
-                    const resp = JSON.parse(xhr.responseText);
-                    if(resp.message) msg = resp.message;
-                    else msg += ": " + xhr.responseText;
-                } catch(e) {
-                    if (xhr.responseText) msg += ": " + xhr.responseText;
-                }
-                alert(msg);
-            }
-        });
-    }
-    /*]]>*/
-</script>
+<div th:replace="~{layout/footer :: footer}"></div>
 
 </body>
 </html>
