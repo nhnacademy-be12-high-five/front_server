@@ -1,5 +1,6 @@
 package com.example.high_five.controller.admin;
 
+import com.example.high_five.common.annotation.LoginRequired;
 import com.example.high_five.dto.book.BookPagedResponse;
 import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.book.CategoryResponse;
@@ -26,13 +27,9 @@ public class CouponAdminController {
     private final BookFeignClient bookFeignClient;
     private final CategoryFeignClient categoryFeignClient;
 
+    @LoginRequired(adminOnly=true)
     @GetMapping("/admin/coupons/page")
-    public String couponPage(@CookieValue(value = "access-token", required = false) String accessToken,
-                             Model model){
-
-        if (accessToken == null || accessToken.isBlank()) {
-            return "redirect:/member/login.html";
-        }
+    public String couponPage(Model model){
 
         try {
             List<CouponTemplateDto> coupons = couponService.getAdminCoupons();
@@ -53,6 +50,7 @@ public class CouponAdminController {
         }
     }
 
+    @LoginRequired(adminOnly=true)
     @PostMapping("/admin/coupons/policies/create")
     public String createPolicy(@ModelAttribute CouponPolicyRequestDto dto,
                                RedirectAttributes redirectAttributes) {
@@ -88,6 +86,7 @@ public class CouponAdminController {
         return "redirect:/admin/coupons/page";
     }
 
+    @LoginRequired(adminOnly=true)
     @PostMapping("/admin/coupons/create")
     public String createCouponTemplate(@ModelAttribute CouponCreateRequestDto dto, RedirectAttributes redirectAttributes) {
         try {
@@ -99,6 +98,7 @@ public class CouponAdminController {
         return "redirect:/admin/coupons/page";
     }
 
+    @LoginRequired(adminOnly=true)
     @PostMapping("/admin/coupons/policies/{id}")
     public String disablePolicy(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         try {
@@ -110,6 +110,7 @@ public class CouponAdminController {
         return "redirect:/admin/coupons/page";
     }
 
+    @LoginRequired(adminOnly=true)
     @PostMapping("/admin/coupons/member-coupons/issue")
     public String issueCouponManually(@RequestParam Long userId,
                                       @RequestParam Long couponId,
@@ -139,6 +140,7 @@ public class CouponAdminController {
         return "redirect:/admin/coupons/page";
     }
 
+    @LoginRequired(adminOnly=true)
     @GetMapping("/admin/coupons/policies/{id}")
     public String policyDetail(@PathVariable("id") Long id, Model model) {
         // 1. Feign Client로 백엔드 데이터 조회
@@ -151,6 +153,7 @@ public class CouponAdminController {
         return "admin/policy-detail";
     }
 
+    @LoginRequired(adminOnly=true)
     @GetMapping("/admin/coupons/books/search")
     @ResponseBody // JSON 데이터를 반환하기 위해 사용
     public ResponseEntity<List<BookResponse>> searchBooksForCoupon(@RequestParam("keyword") String keyword) {
@@ -173,6 +176,7 @@ public class CouponAdminController {
     /**
      * [추가] 1차 카테고리 목록 조회 (AJAX용)
      */
+    @LoginRequired(adminOnly=true)
     @GetMapping("/admin/coupons/categories/parent")
     @ResponseBody
     public ResponseEntity<List<CategoryResponse>> getParentCategories() {
@@ -182,12 +186,14 @@ public class CouponAdminController {
     /**
      * [추가] 2차 카테고리 목록 조회 (AJAX용)
      */
+    @LoginRequired(adminOnly=true)
     @GetMapping("/admin/coupons/categories/{parentId}/child")
     @ResponseBody
     public ResponseEntity<List<CategoryResponse>> getChildCategories(@PathVariable int parentId) {
         return ResponseEntity.ok(categoryFeignClient.getChildCategories(parentId));
     }
 
+    @LoginRequired(adminOnly=true)
     @GetMapping("/admin/coupons/specific-book-coupons")
     public String specificBookCouponPage(Model model) {
         List<CouponPolicyResponseDto> policies = couponService.getAllPolicies();
