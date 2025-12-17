@@ -44,17 +44,13 @@
                     <span id="cartBadge" class="cart-badge" style="display:none;">0</span>
                 </a>
 
-                <a th:if="${myInfo == null}"
+                <a th:if="${#request.getAttribute('user') == null}"
                    class="user-link pill"
-                   th:href="@{/member/login.html}">
-                    로그인
-                </a>
+                   th:href="@{/member/login.html}">로그인</a>
 
-                <a th:if="${myInfo != null}"
+                <a th:if="${#request.getAttribute('user') != null}"
                    class="user-link pill"
-                   th:href="@{/logout}">
-                    로그아웃
-                </a>
+                   th:href="@{/logout}">로그아웃</a>
             </div>
         </div>
     </header>
