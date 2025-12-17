@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>마이페이지 - 리뷰</title>
+    <link rel="stylesheet" href="/member-css/mypage.css">
+    <style>
+        /* 페이지네이션 스타일 (포인트 페이지와 동일) */
+        .pagination { display: flex; justify-content: center; gap: 5px; margin-top: 20px; }
+        .page-link { padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; color: #333; text-decoration: none; }
+        .page-link.active { background-color: var(--color-primary); color: white; border-color: var(--color-primary); }
+
+        /* 리뷰 리스트 전용 스타일 (포인트 내역 스타일 기반 변형) */
+        .review-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .review-item:last-child { border-bottom: none; }
+
+        .review-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            text-decoration: none;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .review-title:hover {
+            color: var(--color-primary);
+            text-decoration: underline;
+        }
+
+        .review-date {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .btn-view-detail {
+            font-size: 13px;
+            color: #666;
+            border: 1px solid #ddd;
+            padding: 5px 10px;
+            border-radius: 4px;
+            text-decoration: none;
+            background: #fff;
+        }
+        .btn-view-detail:hover {
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 50px 0;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+<header id="header" role="banner">
+    <div class="container">
+        <a href="/" class="logo">
+            <img src="/img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100" />
+            <div class="brand">HIGH-FIVE BOOKS</div>
+        </a>
+        <nav class="gnb" aria-label="주요 메뉴">
+            <div class="search-box" role="search">
+                <input type="search" placeholder="검색어를 입력하세요" aria-label="통합 검색" />
+                <form method="get" action="/search">
+                    <button class="search-btn" type="submit">검색</button>
+                </form>
+            </div>
+        </nav>
+        <div class="user-menu">
+            <a class="user-link" href="/coupon"><img src="/img/icon-coupon.png" alt="쿠폰" class="user-icon"/></a>
+            <a class="user-link" href="/mypage"><img src="/img/icon-mypage.png" alt="마이페이지" class="user-icon"/></a>
+            <a class="user-link" href="/api/cart"><img src="/img/icon-cart.png" alt="장바구니" class="user-icon"/></a>
+        </div>
+    </div>
+</header>
+
+<div class="container2">
+    <nav class="box">
+        <a href="/mypage" class="tab-btn">내 정보</a>
+        <a href="/mypage/address" class="tab-btn">배송지</a>
+        <a href="/mypage/coupons" class="tab-btn">쿠폰</a>
+        <a href="/mypage/points" class="tab-btn">포인트</a>
+        <a href="/mypage/orders" class="tab-btn">주문내역</a>
+        <a href="/mypage/reviews" class="tab-btn active">리뷰</a>
+        <a href="/mypage/likes" class="tab-btn">찜 목록</a>
+    </nav>
+
+    <section class="tab-content active" style="display: block;">
+        <h2 class="section-title">나의 리뷰 관리</h2>
+
+        <div class="points-history" style="border-top: 2px solid #333; margin-top: 20px;">
+            <div th:if="${reviews.isEmpty()}" class="empty-message">
+                작성한 리뷰가 없습니다.
+            </div>
+
+            <div th:unless="${reviews.isEmpty()}">
+                <div class="review-item" th:each="review : ${reviews}">
+                    <div style="display: flex; flex-direction: column;">
+                        <a th:href="@{/books/{bookId}(bookId=${review.bookId})}"
+                           class="review-title"
+                           th:text="${review.bookTitle}">
+                            책 제목이 여기에 표시됩니다
+                        </a>
+
+                        <span class="review-date"
+                              th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd HH:mm')}">
+                            2024.12.16 14:00
+                        </span>
+                    </div>
+
+                    <div>
+                        <a th:href="@{/books/{bookId}(bookId=${review.bookId})}"
+                           class="btn-view-detail">
+                            리뷰 확인 &gt;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pagination" th:if="${page.totalPages > 0}">
+            <a th:if="${page.hasPrevious()}"
+               th:href="@{/members/me/reviews(page=${page.number - 1})}" class="page-link">&lt;</a>
+
+            <span th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}">
+        <a th:href="@{/members/me/reviews(page=${i})}"
+           th:text="${i + 1}"
+           th:classappend="${i == page.number} ? 'active' : ''"
+           class="page-link">1</a>
+    </span>
+
+            <a th:if="${page.hasNext()}"
+               th:href="@{/members/me/reviews(page=${page.number + 1})}" class="page-link">&gt;</a>
+        </div>
+    </section>
+</div>
+
+<footer id="footer">
+    <div class="container">
+    </div>
+</footer>
+</body>
+</html>

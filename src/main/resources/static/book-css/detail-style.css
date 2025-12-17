@@ -833,6 +833,45 @@ input {
     transform: scale(1.1);
 }
 
+.ai-summary-card {
+    background-color: #f0f8ff; /* 연한 하늘색 배경 */
+    border: 1px solid #cceeff;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+.ai-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #e1f0ff;
+    padding-bottom: 10px;
+}
+.ai-icon {
+    font-size: 24px;
+}
+.ai-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #0066cc;
+    font-weight: 700;
+}
+.ai-content {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #333;
+    white-space: pre-line; /* 줄바꿈 문자(\n)를 실제 줄바꿈으로 표현 */
+}
+.ai-footer {
+    margin-top: 16px;
+    text-align: right;
+    color: #888;
+    font-size: 12px;
+}
+
+
 .btn-heart {
     font-size: 24px;
     color: #ccc; /* 회색 */
