@@ -22,7 +22,7 @@
     --r-md: 16px;
     --r-sm: 12px;
 
-    --container: 980px;
+    --container: 1200px;
 }
 
 *{ box-sizing: border-box; }
@@ -125,12 +125,12 @@ button{ font-family: inherit; }
 
 .available-coupon-grid{
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
+    grid-template-columns: 1fr;
+    gap: 20px;
     padding-bottom: 10px;
 }
 
-/* ✅ 빈 상태 스타일: HTML에 class="empty-coupon" 붙여야 적용됨 */
+/* 빈 상태 스타일: HTML에 class="empty-coupon" 붙여야 적용됨 */
 .available-coupon-grid .empty-coupon{
     grid-column: 1 / -1;
     padding: 18px 16px;
@@ -241,6 +241,21 @@ button{ font-family: inherit; }
     outline: none;
     box-shadow: 0 0 0 4px rgba(37,99,235,.18), 0 12px 22px rgba(37,99,235,.18);
 }
+/* 페이지 상단 헤더 영역 중앙 정렬 */
+.register-page-container {
+    text-align: center;
+}
+
+/* 제목 중앙 */
+.page-title {
+    justify-content: center;
+}
+
+/* 이미지 중앙 + 여백 조정 */
+.user-link {
+    margin: 12px auto 24px;
+}
+
 
 /* Responsive */
 @media (max-width: 900px){
