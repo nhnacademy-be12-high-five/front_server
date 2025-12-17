@@ -30,11 +30,6 @@
                        onclick="startEditReview(this)">
                         수정
                     </a>
-
-                    <form th:action="@{/reviews/books/{bookId}/{reviewId}/delete(bookId=${book.bookId}, reviewId=${myReview.reviewId})}"
-                          method="post" onsubmit="return confirm('정말 삭제하시겠습니까?');">
-                        <button type="submit" class="btn-small btn-danger">삭제</button>
-                    </form>
                 </div>
             </div>
         </div>
@@ -42,7 +37,7 @@
         <!-- 내가 작성한 리뷰 없을 때 -->
         <div th:unless="${myReview != null}" class="review-form-card">
             <h3>리뷰 작성</h3>
-            <form th:action="@{/reviews/books/{bookId}(bookId=${book.bookId})}"
+            <form th:action="@{/books/{bookId}(bookId=${book.bookId})/reviews}"
                   method="post" enctype="multipart/form-data">
 
                 <div class="star-rating">
@@ -89,11 +84,21 @@
                     </div>
                 </div>
 
-                <!-- ❗ review.createdAt 으로 수정 + Timestamp → LocalDateTime 변환 -->
-                <span class="date"
-                      th:text="${#temporals.format(review.createdAt.toLocalDateTime(), 'yyyy-MM-dd')}">
-                </span>
+                <div class="review-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
 
+                    <span class="date"
+                        th:text="${#temporals.format(review.createdAt.toLocalDateTime(), 'yyyy-MM-dd')}">
+                    </span>
+
+                    <button type="button"
+                            class="btn-review-like"
+                            th:classappend="${review.isLiked} ? 'active'"
+                            th:onclick="|toggleReviewLike(${book.bookId}, ${review.reviewId}, this)|">
+                        ♥ <span th:id="'like-count-' + ${review.reviewId}" th:text="${review.likeCount}">0</span>
+                    </button>
+
+                    <span class="my-review-badge" th:if="${loginMemberId == review.memberId}">내 글</span>
+                </div>
             </div>
 
             <div th:if="${reviewList.isEmpty()}" class="no-reviews">
@@ -101,7 +106,26 @@
             </div>
         </div>
 
-        <div class="pagination" th:if="${!reviewList.isEmpty()}">
+        <div class="pagination" th:if="${reviewList.totalPages > 0}"
+             style="display: flex; justify-content: center; gap: 5px; margin-top: 20px;">
+
+            <a th:if="${reviewList.hasPrevious()}"
+               th:href="@{/books/{id}(id=${book.bookId}, page=${reviewList.number - 1})#tab-review}"
+               class="page-link"
+               style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; color: #333; text-decoration: none;">&lt;</a>
+
+            <span th:each="i : ${#numbers.sequence(0, reviewList.totalPages - 1)}">
+                <a th:href="@{/books/{id}(id=${book.bookId}, page=${i})} + '#tab-review'"
+                   th:text="${i + 1}"
+                   th:classappend="${i == reviewList.number} ? 'active'"
+                   class="page-link"
+                   style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; color: #333; text-decoration: none;">1</a>
+            </span>
+
+            <a th:if="${reviewList.hasNext()}"
+               th:href="@{/books/{id}(id=${book.bookId}, page=${reviewList.number + 1})#tab-review}"
+               class="page-link"
+               style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; color: #333; text-decoration: none;">&gt;</a>
         </div>
     </div>
 </div>

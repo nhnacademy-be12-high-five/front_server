@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 @FeignClient(name = "gateway-server", contextId = "cartClient", url = "${gateway.uri}")
 //@FeignClient(name = "gateway-server", contextId = "memberClient", url = "http://gateway-server:8000")
-public interface CartService {
+public interface
+CartService {
 
     @PostMapping("/api/cart/items")
     ResponseEntity<CartAddResponse> addItemToCart(
