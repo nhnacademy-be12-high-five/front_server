@@ -1,6 +1,8 @@
 package com.example.high_five.service;
 
+import com.example.high_five.common.CustomPage;
 import com.example.high_five.dto.order.DeliveryPolicyResponse;
+import com.example.high_five.dto.order.MyOrderResponse;
 import com.example.high_five.dto.order.OrderCheckoutRequest;
 import com.example.high_five.dto.order.OrderResponse;
 import lombok.Getter;
@@ -40,4 +42,9 @@ public interface OrderClient {
 
     @PostMapping("/api/orders/{orderId}/cancel")
     void cancelOrder(@PathVariable("orderId") Long orderId);
+
+    @GetMapping("/api/orders")
+    CustomPage<MyOrderResponse> getMyOrders(@RequestHeader("X-USER-ID") Long userId,
+                                            @RequestParam("page") int page,
+                                            @RequestParam("size") int size);
 }
