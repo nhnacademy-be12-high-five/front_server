@@ -110,6 +110,7 @@ main {
 }
 .section .head .more {
     font-size: 14px;
+    color: black;
 }
 
 /* 카드 그리드 */
