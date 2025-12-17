@@ -1,6 +1,5 @@
 package com.example.high_five.service;
 
-import ch.qos.logback.core.model.Model;
 import com.example.high_five.dto.book.request.BookAdminUpdateRequest;
 import com.example.high_five.dto.book.request.BookRequest;
 import com.example.high_five.dto.book.response.BookResponse;

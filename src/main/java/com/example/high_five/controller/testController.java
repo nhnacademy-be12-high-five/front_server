@@ -22,15 +22,14 @@ public class testController {
 
         try {
             // 1. FeignClient를 통해 백엔드(Gateway -> Book Server) 호출
-            List<BookResponse> newBooks = bookClient.getNewBooks(10);
+            List<BookResponse> newBooks = bookClient.getNewBooks(5);
             // 2. 뷰(Thymeleaf)로 전달
             model.addAttribute("newBooks", newBooks);
 
-            List<BookResponse> risingBooks = bookClient.getPopularBooks(10);
-            System.out.println("메인 컨트롤러 - 주간 인기 도서 개수: " + risingBooks.size());
+            List<BookResponse> risingBooks = bookClient.getPopularBooks(5);
             model.addAttribute("risingBooks", risingBooks);
 
-            List<BookResponse> bestSellers = bookClient.getBestSellers(10);
+            List<BookResponse> bestSellers = bookClient.getBestSellers(5);
             model.addAttribute("bestSellers", bestSellers); // 모델에 담기
 
         } catch (Exception e) {
@@ -52,8 +51,9 @@ public class testController {
 //        return "Book/book-detail";
 //    }
 
-    // 이렇게 하면 이제 "best-seller.css"는 숫자가 아니므로 위 메서드를 무시하고
+    // 이렇게 하면 이제 "best-seller"는 숫자가 아니므로 위 메서드를 무시하고
     // 아래 메서드를 정확하게 찾아갑니다.
+
     @GetMapping("/books/best-seller")
     public String bestSellerPage(Model model) {
         List<BookResponse> bestSellers = bookClient.getBestSellers(10);
@@ -64,14 +64,14 @@ public class testController {
     @GetMapping("/books/popular")
     public String getPopularBooks(Model model){
         List<BookResponse> popular=bookClient.getPopularBooks(10);
-        model.addAttribute("weekly_books",popular);
-        return "Book/book-weekly";
+        model.addAttribute("risingBooks",popular);
+        return "Book/weeklyPopular";
     }
 
     @GetMapping("/books/new")
     public String getNewBooks(Model model){
-        List<BookResponse> popular=bookClient.getPopularBooks(10);
-        model.addAttribute("recommendation:new_books_ids_1_5",popular);
-        return "Book/book-new";
+        List<BookResponse> newBooks=bookClient.getNewBooks(10);
+        model.addAttribute("newBooks",newBooks);
+        return "Book/new";
     }
 }

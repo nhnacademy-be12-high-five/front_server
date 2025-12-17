@@ -950,3 +950,32 @@ input {
     border-color: #007bff;
     transform: translateY(-2px); /* 살짝 위로 뜸 */
 }
+
+/* 태그 컨테이너 */
+.book-tags {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px; /* 태그 사이 간격 */
+}
+
+/* 개별 태그 디자인 */
+.tag-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #f0f4f8; /* 연한 회색/하늘색 배경 */
+    color: #4a5568;            /* 짙은 글자색 */
+    border-radius: 20px;       /* 둥근 모서리 */
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: 1px solid #e2e8f0;
+}
+
+/* 태그 호버 효과 (선택 사항) */
+.tag-badge:hover {
+    background-color: #e2e8f0;
+    color: #2d3748;
+    transform: translateY(-1px);
+}
