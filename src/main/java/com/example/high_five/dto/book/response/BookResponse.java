@@ -1,5 +1,6 @@
 package com.example.high_five.dto.book.response;
 
+import com.example.high_five.dto.Tag.response.TagResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,5 +28,5 @@ public class BookResponse {
     private Long reviewCount;
 
     // book-detail.html 에서 사용하는 태그 필드
-    private List<String> tags;
+//    private List<TagResponse> tagList;
 }

@@ -359,6 +359,7 @@
         font-size: 20px;
     }
     .section .head .more {
+        color: black;
         font-size: 14px;
     }
 
@@ -728,6 +729,13 @@
         gap: 10rem;
     }
 
+    .marco{
+        margin:20px;
+    }
+
+    .call{
+        padding: 20px;
+    }
 </style>
 
 <body>
@@ -871,7 +879,7 @@
                                 categoryName='희곡/연극',
                                 sort='POPULAR',
                                 page=0
-                            )}">희곡/연극</a>
+                            )}">희곡</a>
                         </div>
                     </li>
 
@@ -942,10 +950,17 @@
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
                                 categoryId=23,
-                                categoryName='OS/데이터베이스',
+                                categoryName='OS',
                                 sort='POPULAR',
                                 page=0
-                            )}">OS/데이터베이스</a>
+                            )}">OS</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
+                                categoryId=23,
+                                categoryName='OS',
+                                sort='POPULAR',
+                                page=0
+                            )}">데이터베이스</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
                                 categoryId=24,
@@ -985,6 +1000,13 @@
                             )}">심리</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
+                                categoryId=30,
+                                categoryName='요리',
+                                sort='POPULAR',
+                                page=0
+                            )}">요리</a>
+                            <a th:href="@{/search(
+                                searchType='CATEGORY',
                                 categoryId=27,
                                 categoryName='철학',
                                 sort='POPULAR',
@@ -1004,13 +1026,6 @@
                                 sort='POPULAR',
                                 page=0
                             )}">정치</a>
-                            <a th:href="@{/search(
-                                searchType='CATEGORY',
-                                categoryId=30,
-                                categoryName='요리',
-                                sort='POPULAR',
-                                page=0
-                            )}">요리</a>
                             <a th:href="@{/search(
                                 searchType='CATEGORY',
                                 categoryId=31,
@@ -1145,7 +1160,7 @@
         <!-- 베스트셀러 -->
         <section class="section" aria-labelledby="best-title">
             <div class="head">
-                <h3>베스트셀러 🔥</h3>
+                <h3>베스트셀러 ☘️</h3>
                 <a class="more" href="/books/best-seller">더보기</a>
             </div>
             <div class="card-grid" style="grid-template-columns: repeat(5, 1fr)">
@@ -1264,21 +1279,22 @@
 </main>
 
 <!-- 푸터 -->
-<footer id="footer" role="contentinfo">
+<footer id="footer" role="contentinfo" class="footer">
     <div class="footer-links">
         <a href="#">회사소개</a>
         <a href="#">이용약관</a>
         <a href="#"><strong>개인정보처리방침</strong></a>
         <a href="#">고객센터</a>
+        <a href="#">관리자</a>
     </div>
 
     <div class="footer-info">
-        <div>
+        <div class="marco">
             <strong>대표이사 마르코</strong> | 사업자등록번호 123-456-7890<br />
             통신판매업신고 2024-광주동구-01211 | 이메일: help@highfive.com<br />
             호스팅 제공자 NHN24 © HIGH-FIVE BOOKS. All Rights Reserved.
         </div>
-        <div>
+        <div class="call">
             <strong>고객센터 1544-8282</strong> (발신자 부담)<br />
             광주광역시 동구 서석동 조선대학교 1층 NHN아카데미<br />
             Fax 062-1234-5678

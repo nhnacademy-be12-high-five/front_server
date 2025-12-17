@@ -1,17 +1,19 @@
 
+
+
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HIGH-FIVE 도서 | 베스트셀러 TOP 10</title>
+    <title>HIGH-FIVE 도서 | 신간 TOP 10</title>
     <link rel="stylesheet" href="/index-css/index-css.css">
     <style>
         /* 베스트셀러 페이지 전용 추가 스타일 */
         .page-header {
             padding: 40px 0;
             text-align: center;
-            background: #f8f9fa;
+            background:white;
             margin-bottom: 30px;
             border-bottom: 1px solid #eee;
         }
@@ -229,7 +231,6 @@
         .user-menu .cart-link-wrap:hover .cart-badge {
             transform: scale(1.1);
         }
-
     </style>
 </head>
 <body>
@@ -291,14 +292,13 @@
         <section class="section">
             <div class="card-grid" style="grid-template-columns: repeat(5, 1fr)">
 
-                <div th:if="${bestSellers == null or bestSellers.isEmpty()}"
-                     style="grid-column: 1/-1; text-align: center; padding: 60px;">
+                <div th:if="${newBooks == null or newBooks.isEmpty()}">
                     <p>집계된 베스트셀러 데이터가 없습니다.</p>
                 </div>
 
                 <article class="card"
-                         th:unless="${bestSellers == null}"
-                         th:each="book, iterStat : ${bestSellers}">
+                         th:unless="${newBooks == null}"
+                         th:each="book, iterStat : ${newBooks}">
 
                     <a th:href="@{/books/{id}(id=${book.bookId})}" class="book-link" style="display:block; color:inherit; position: relative;">
 
@@ -330,6 +330,27 @@
 </main>
 
 <footer id="footer">
+    <div class="container">
+        <div class="footer-links">
+            <a href="#">회사소개</a>
+            <a href="#">이용약관</a>
+            <a href="#"><strong>개인정보처리방침</strong></a>
+            <a href="#">관리자</a>
+        </div>
+
+        <div class="footer-info">
+            <div class="copyright">
+                <strong>대표이사 마르코</strong> | 사업자등록번호 123-456-7890<br />
+                통신판매업신고 2024-광주동구-01211 | 이메일: marco@nhn.com<br />
+                호스팅 제공자 NHN24 © NHN24. All Rights Reserved.
+            </div>
+            <div class="customer-center">
+                <strong>고객센터 1544-8282</strong> (발신자 부담)<br />
+                광주광역시 동구 서석동 조선대학교 1층 NHN아카데미<br />
+                Fax 062-1234-5678
+            </div>
+        </div>
+    </div>
 </footer>
 
 </body>

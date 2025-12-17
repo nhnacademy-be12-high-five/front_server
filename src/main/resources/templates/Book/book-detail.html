@@ -72,6 +72,12 @@
                         </div>
                     </div>
 
+<!--                    <div class="book-tags" th:if="${book.tagList != null and !book.tagList.empty}">-->
+<!--                        <span th:each="tag : ${book.tagList}" class="tag-badge">-->
+<!--                            <span th:text="'#' + ${tag.name}">#태그명</span>-->
+<!--                        </span>-->
+<!--                    </div>-->
+
                     <div class="option-block" th:if="${!#lists.isEmpty(coupons)}">
                         <div class="option-block-title" style="margin-bottom: 10px;">🎁 사용 가능한 쿠폰</div>
                         <div class="coupon-list" style="display: flex; flex-direction: column; gap: 8px;">
