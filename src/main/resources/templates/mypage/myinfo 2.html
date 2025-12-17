@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Booktown - 마이페이지</title>
+    <link rel="stylesheet" href="/css/member-css/mypage.css">
+    <link rel="stylesheet" href="/css/member-css/myinfo.css">
+    <link rel="stylesheet" href="/css/common/footer.css">
+    <link rel="stylesheet" href="/css/common/header.css">
+    <link rel="stylesheet" href="/css/common/common.css">
+</head>
+
+<script src="/js/common.js"></script>
+<script src="/js/myinfo.js"></script>
+
+<body>
+
+<div th:replace="~{layout/header :: header}"></div>
+
+<div class="container2">
+
+    <!-- 탭 네비게이션 (각각 컨트롤러로 이동) -->
+    <nav class="box">
+        <a href="/mypage" class="tab-btn active">내 정보</a>
+        <a href="/mypage/address" class="tab-btn">배송지</a>
+        <a href="/mypage/coupons" class="tab-btn">쿠폰</a>
+        <a href="/mypage/points" class="tab-btn">포인트</a>
+        <a href="/mypage/orders" class="tab-btn">주문내역</a>
+        <a href="/mypage/reviews" class="tab-btn">리뷰</a>
+        <a href="/mypage/likes" class="tab-btn">찜 목록</a>
+    </nav>
+
+    <!-- 내 정보 -->
+    <section class="tab-content active">
+        <h2 class="section-title">내 정보</h2>
+
+        <!-- 조회 모드 -->
+        <div id="view-mode">
+            <div class="info-group">
+                <div class="info-item">
+                    <label>이름</label>
+                    <div th:text="${myInfo.name}">홍길동</div>
+                </div>
+                <div class="info-item">
+                    <label>이메일</label>
+                    <div th:text="${myInfo.email}">test@test.com</div>
+                </div>
+                <div class="info-item">
+                    <label>생일</label>
+                    <div th:text="${#temporals.format(myInfo.birthDate, 'yyyy-MM-dd')}">1995-01-01</div>
+                </div>
+                <div class="info-item">
+                    <label>연락처</label>
+                    <div th:text="${myInfo.phone}">010-0000-0000</div>
+                </div>
+                <div class="info-item">
+                    <label>회원 등급</label>
+                    <div th:text="${myInfo.gradeName}">일반</div>
+                </div>
+            </div>
+
+            <br/>
+            <button type="button" class="btn-edit" onclick="toggleEditMode(true)">정보 수정</button>
+
+            <div class="withdrawal-area" style="margin-top:30px; text-align:right;">
+                <span style="font-size:13px; color:#888;">더 이상 서비스를 이용하지 않으시나요?</span>
+                <a href="#" id="btn-withdraw"
+                   style="font-size:13px; color:#999; text-decoration:underline; margin-left:10px;">
+                    회원 탈퇴
+                </a>
+            </div>
+        </div>
+
+        <!-- 수정 모드 -->
+        <form id="edit-form" action="/mypage/update" method="post" style="display:none;">
+            <div class="info-group">
+                <div class="info-item">
+                    <label>이름</label>
+                    <input type="text" name="name" th:value="${myInfo.name}" class="input-field" required>
+                </div>
+
+                <div class="info-item">
+                    <label>이메일</label>
+                    <input type="email" name="email" th:value="${myInfo.email}" class="input-field" required>
+                </div>
+
+                <div class="info-item">
+                    <label>생일</label>
+                    <input type="date"
+                           th:value="${myInfo.birthDate}"
+                           class="input-field input-readonly"
+                           readonly>
+                    <p class="error-msg">* 생년월일은 최초 설정 후 변경할 수 없습니다.</p>
+                </div>
+
+                <div class="info-item">
+                    <label>연락처</label>
+                    <input type="text" name="phone" th:value="${myInfo.phone}" class="input-field" required>
+                </div>
+            </div>
+
+            <br/>
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <button type="submit" class="btn-edit">저장</button>
+                <button type="button" class="btn-outline" onclick="toggleEditMode(false)">취소</button>
+            </div>
+        </form>
+
+        <form id="withdraw-form" action="/mypage/withdraw" method="post" style="display:none;"></form>
+    </section>
+</div>
+
+<script>
+
+</script>
+<div th:replace="~{layout/footer :: footer}"></div>
+
+</body>
+</html>
