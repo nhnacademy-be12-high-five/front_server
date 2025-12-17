@@ -68,23 +68,21 @@ public interface BookClient {
                                           @RequestHeader(value = "X-USER-ID", required = true) Long memberId);
 
     // [관리자] 도서 전체 조회
-    @GetMapping("/api/admin")
+    @GetMapping("/api/admin/books")
     List<BookResponse> getAdminBooks(@RequestParam(value = "page", defaultValue = "0") int page,
                                      @RequestParam(value = "size", defaultValue = "10") int size);
 
     // [관리자] 도서 등록
-    @PostMapping("/api/admin")
-    BookResponse createBook(@RequestBody BookRequest bookRequest,
-                            @RequestHeader("X-User-Id") Long userId);
+    @PostMapping("/api/admin/books")
+    BookResponse createBook(@RequestBody BookRequest bookRequest);
 
     // [관리자] 도서 수정
-    @PutMapping("/api/admin/{id}")
+    @PutMapping("/api/admin/books/{id}")
     BookResponse updateBook(@PathVariable("id") Long bookId,
-                            @RequestBody BookAdminUpdateRequest updateRequest,
-                            @RequestHeader("X-User-Id") Long userId);
+                            @RequestBody BookAdminUpdateRequest updateRequest);
 
     // [관리자] 도서 삭제
-    @DeleteMapping("/api/admin/{id}")
-    void deleteBook(@PathVariable("id") Long bookId,
-                    @RequestHeader("X-User-Id") Long userId);
+//    @DeleteMapping("/api/admin/{id}")
+//    void deleteBook(@PathVariable("id") Long bookId,
+//                    @RequestHeader("X-User-Id") Long userId);
 }

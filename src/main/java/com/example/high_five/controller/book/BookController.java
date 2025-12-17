@@ -6,6 +6,7 @@ import com.example.high_five.dto.review.BookReviewResponse;
 import com.example.high_five.service.BookClient;
 import com.example.high_five.service.CouponService;
 import com.example.high_five.service.ReviewService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,8 +30,10 @@ public class BookController {
     /**
      * 도서 상세 화면
      */
-    @GetMapping("/books/{bookId}")
-    public String getBookDetail(@PathVariable("bookId") Long id, Model model) {
+    @GetMapping("/books/{book-id}")
+    public String getBookDetail(@PathVariable("book-id") Long id, Model model, HttpServletRequest request) {
+
+        Long loginMemberId = (Long) request.getAttribute("memberId");
 
         BookResponse book = bookClient.getBookDetail(id);
         model.addAttribute("book", book);
@@ -58,7 +61,7 @@ public class BookController {
         // ---------------------------------------------------------
         Page<BookReviewResponse> reviewList = reviewService.getReviews(id, Pageable.ofSize(5));
         model.addAttribute("reviewList", reviewList);
-
+        model.addAttribute("loginMemberId", loginMemberId);
         Long memberId = 1L;
         boolean isLiked = false;
 

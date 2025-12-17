@@ -20,7 +20,6 @@ public class FeignMultipartConfig {
 
     @Bean
     public Encoder feignFormEncoder() {
-        // 이 인코더가 "파일 + JSON"을 동시에 보낼 수 있게 해줍니다.
         return new SpringFormEncoder(new SpringEncoder(messageConverters));
     }
 }

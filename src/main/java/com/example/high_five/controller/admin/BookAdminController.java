@@ -59,10 +59,9 @@ public class BookAdminController {
     @PostMapping
     @LoginRequired
     public String createBook(@ModelAttribute BookRequest bookRequest,
-                             @RequestAttribute("id") Long adminId,
                              RedirectAttributes redirectAttributes) {
         try {
-            bookClient.createBook(bookRequest, adminId);
+            bookClient.createBook(bookRequest);
             redirectAttributes.addFlashAttribute("message", "도서가 성공적으로 등록되었습니다.");
         } catch (Exception e) {
             log.error("도서 등록 실패", e);
@@ -75,17 +74,21 @@ public class BookAdminController {
     @LoginRequired
     public String updateBook(@PathVariable Long id,
                              @ModelAttribute BookAdminUpdateRequest updateRequest,
-                             @RequestAttribute("id") Long adminId,
                              RedirectAttributes redirectAttributes) {
         try {
-            bookClient.updateBook(id, updateRequest, adminId);
-            redirectAttributes.addFlashAttribute("message", "도서 정보가 수정되었습니다.");
+            log.info("도서 수정 요청 - ID: {}, 제목: {}", id, updateRequest.getTitle());
+
+            // 백엔드 API 호출
+            bookClient.updateBook(id, updateRequest);
+
+            redirectAttributes.addFlashAttribute("message", "도서 정보가 성공적으로 수정되었습니다.");
         } catch (Exception e) {
             log.error("도서 수정 실패", e);
             redirectAttributes.addFlashAttribute("errorMessage", "도서 수정 중 오류가 발생했습니다.");
         }
+
+        // 목록 페이지로 리다이렉트 (새로고침 시 재전송 방지)
         return "redirect:/admin/books";
     }
-
 
 }
