@@ -56,21 +56,21 @@ public class testController {
     // 아래 메서드를 정확하게 찾아갑니다.
     @GetMapping("/books/best-seller")
     public String bestSellerPage(Model model) {
-        List<BookResponse> bestSellers = bookClient.getBestSellers(10);
+        List<BookResponse> bestSellers = bookClient.getBestSellers(5);
         model.addAttribute("bestSellers", bestSellers);
         return "Book/bestseller";
     }
 
     @GetMapping("/books/popular")
     public String getPopularBooks(Model model){
-        List<BookResponse> popular=bookClient.getPopularBooks(10);
-        model.addAttribute("weekly_books",popular);
+        List<BookResponse> popular=bookClient.getPopularBooks(5);
+        model.addAttribute("risingBooks",popular);
         return "Book/weeklyPopular";
     }
 
     @GetMapping("/api/books/new")
     public String getNewBooks(Model model){
-        List<BookResponse> popular=bookClient.getPopularBooks(10);
+        List<BookResponse> popular=bookClient.getPopularBooks(5);
         model.addAttribute("recommendation:new_books_ids_1_5",popular);
         return "Book/new";
     }
