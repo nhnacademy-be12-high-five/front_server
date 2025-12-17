@@ -203,6 +203,8 @@
 
         previewImage(book.image);
 
+        setFormReadOnly(true);
+
         // 화면 스크롤을 폼으로 이동
         form.scrollIntoView({ behavior: 'smooth' });
     }
@@ -233,17 +235,17 @@
     }
 
     // 6. 삭제 요청
-    function deleteBook() {
-        const bookId = document.getElementById('bookId').value;
-        if (!bookId) return;
+    function setFormReadOnly(isReadOnly) {
+        const fields = ['isbn', 'title', 'author', 'publisher', 'publishedDate', 'image', 'description'];
 
-        if (confirm('정말로 이 도서를 삭제하시겠습니까? (복구 불가)')) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `/admin/books/${bookId}/delete`;
-            document.body.appendChild(form);
-            form.submit();
-        }
+        fields.forEach(fieldId => {
+            const el = document.getElementById(fieldId);
+            if (el) {
+                el.readOnly = isReadOnly;
+                el.style.backgroundColor = isReadOnly ? "#e9ecef" : "#fff";
+                el.style.cursor = isReadOnly ? "not-allowed" : "text";
+            }
+        });
     }
 </script>
 </body>
