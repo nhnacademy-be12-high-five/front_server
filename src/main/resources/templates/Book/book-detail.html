@@ -115,6 +115,17 @@
                         </a>
                     </div>
 
+                    <div class="tag-section" th:if="${book.tags != null and !book.tags.isEmpty()}">
+                        <div class="tag-list">
+                            <a th:href="@{/search(keyword=${tag})}"
+                               class="book-tag"
+                               th:each="tag, stat : ${book.tags}"
+                               th:if="${stat.index < 5}">
+                                #<span th:text="${tag}">태그명</span>
+                            </a>
+                        </div>
+                    </div>
+
                     <table class="summary-table">
                         <tbody>
                         <tr th:if="${book.publisher != null}">
