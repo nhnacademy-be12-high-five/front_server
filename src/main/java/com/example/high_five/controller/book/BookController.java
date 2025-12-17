@@ -63,7 +63,10 @@ public class BookController {
         model.addAttribute("reviewList", reviewList);
 
         model.addAttribute("loginMemberId", loginMemberId);
-
+        System.out.println("=====================================");
+        System.out.println("책 제목: " + book.getTitle());
+        System.out.println("AI 요약 데이터: " + book.getAiReviewSummary());
+        System.out.println("=====================================");
         return "Book/book-detail";
     }
 

@@ -198,15 +198,20 @@ textarea {
     transition: all 0.2s;
 }
 
-/* 좋아요 활성화 상태 (active 클래스가 붙었을 때) */
-.btn-review-like.active {
-    color: #e74c3c; /* 빨간색 */
-    border-color: #e74c3c;
-    background-color: #fff5f5;
+.btn-review-like {
+    border: 1px solid #ddd;
+    background: white;
+    color: #ccc;
+    border-radius: 20px;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.btn-review-like:hover {
-    background-color: #f9f9f9;
+.btn-review-like.active {
+    border-color: #ff4d4d;
+    background: #fff0f0;
+    color: #ff4d4d;
 }
 
 /* ========== 반응형 ========== */
@@ -225,3 +230,8 @@ textarea {
         padding: 5px 10px;
     }
 }
+ .page-link.active {
+     background-color: #007bff; /* 파란색 배경 */
+     color: white !important;
+     border-color: #007bff !important;
+ }

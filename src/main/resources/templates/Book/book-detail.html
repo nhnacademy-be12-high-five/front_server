@@ -143,14 +143,14 @@
 
             <div id="tab-review" class="detail-tab-content">
                 <h2>리뷰</h2>
-                <div class="ai-summary-card" th:if="${book.aiSummary != null and !book.aiSummary.isEmpty()}">
+                <div class="ai-summary-card" th:if="${book.aiReviewSummary != null and !book.aiReviewSummary.isEmpty()}">
                     <div class="ai-header">
                         <span class="ai-icon">🤖</span>
                         <h3>AI 독자 리뷰 요약</h3>
                     </div>
 
                     <div class="ai-content">
-                        <p th:text="${book.aiSummary}"></p>
+                        <p th:text="${book.aiReviewSummary}" style="white-space: pre-line;"></p>
                     </div>
 
                     <div class="ai-footer">
@@ -375,7 +375,7 @@
             formData.append("images", file);
         }
 
-        const response = await fetch(`/reviews/books/${bookId}/${reviewId}`, {
+        const response = await fetch(`/books/${bookId}/reviews/${reviewId}`, {
             method: "POST",
             body: formData
         });
@@ -388,49 +388,59 @@
         alert("리뷰가 수정되었습니다.");
         location.reload();
     }
-    // 리뷰 좋아요 토글 함수
-    async function toggleReviewLike(bookId, reviewId, btn) {
-        try {
-            const response = await fetch(`/reviews/books/${bookId}/reviews/${reviewId}/like`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
 
-            if (response.status === 401) {
-                if (confirm("로그인이 필요한 서비스입니다.\n로그인 하시겠습니까?")) {
-                    location.href = '/member/login.html';
-                }
-                return;
-            }
+    const likeProcessingMap = {};
 
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
+    function toggleReviewLike(bookId, reviewId, btn) {
 
-            // 서버에서 받은 최신 상태 (true/false)
-            const isLiked = await response.json();
-
-            // UI 업데이트
-            const countSpan = btn.querySelector('.like-count');
-            let currentCount = parseInt(countSpan.textContent);
-
-            if (isLiked) {
-                // 좋아요 됨: 클래스 추가 & 숫자 +1
-                btn.classList.add('active');
-                countSpan.textContent = currentCount + 1;
-            } else {
-                // 좋아요 취소: 클래스 제거 & 숫자 -1
-                btn.classList.remove('active');
-                // 숫자가 0 밑으로 내려가지 않도록 방어
-                countSpan.textContent = Math.max(0, currentCount - 1);
-            }
-
-        } catch (error) {
-            console.error('Error:', error);
-            alert('좋아요 처리 중 오류가 발생했습니다.');
+        if (likeProcessingMap[reviewId]) {
+            return;
         }
+
+        likeProcessingMap[reviewId] = true;
+
+        btn.style.opacity = "0.5";
+        btn.style.cursor = "not-allowed";
+
+        fetch(`/books/${bookId}/reviews/${reviewId}/like`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+            .then(response => {
+                if (response.status === 401) {
+                    if(confirm("로그인이 필요한 서비스입니다. 로그인 페이지로 이동하시겠습니까?")) {
+                        location.href = "/login";
+                    }
+                    return null;
+                }
+                if (!response.ok) throw new Error("좋아요 처리 실패");
+                return response.json();
+            })
+            .then(isLiked => {
+                if (isLiked === null) return;
+
+                const countSpan = document.getElementById(`like-count-${reviewId}`);
+                let currentCount = parseInt(countSpan.innerText);
+
+                if (isLiked) {
+                    btn.classList.add('active');
+                    countSpan.innerText = currentCount + 1;
+                } else {
+                    btn.classList.remove('active');
+                    countSpan.innerText = Math.max(0, currentCount - 1);
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                alert("일시적인 오류가 발생했습니다.");
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    likeProcessingMap[reviewId] = false;
+                    btn.style.opacity = "1";
+                    btn.style.cursor = "pointer";
+                }, 500);
+            });
     }
 </script>
 <script th:inline="javascript">
@@ -448,6 +458,8 @@
     });
     /*]]>*/
 </script>
+
+
 
 </body>
 </html>

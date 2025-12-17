@@ -38,9 +38,7 @@ public interface ReviewService {
 
     // 마이페이지 리뷰 리스트
     @GetMapping("/api/books/members/me/reviews")
-    Page<MyPageReviewResponse> getMyReviews(
-            @SpringQueryMap Pageable pageable
-    );
+    Page<MyPageReviewResponse> getMyReviews(Pageable pageable);
 
     // 리뷰 수정
     @PostMapping(value = "/api/books/{book-id}/reviews/{review-id}",
@@ -52,6 +50,7 @@ public interface ReviewService {
             @RequestPart(value = "images", required = false) List<MultipartFile> images
     );
 
+    // 리뷰 좋아요 기능
     @PostMapping("/api/books/{book-id}/reviews/{review-id}/like")
     Boolean toggleReviewLike(
             @PathVariable("book-id") Long bookId,

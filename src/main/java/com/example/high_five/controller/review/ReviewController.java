@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,13 +26,12 @@ import java.util.List;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/reviews")
 public class ReviewController {
 
     private final ReviewService reviewService;
 
     // 리뷰 등록
-    @PostMapping("/books/{book-id}")
+    @PostMapping("/books/{book-id}/reviews")
     public String addReview(
             @PathVariable("book-id") Long bookId,
             @ModelAttribute ReviewCreateRequest request,
@@ -57,7 +57,7 @@ public class ReviewController {
     }
 
     // 리뷰 리스트 조회
-    @GetMapping("/books/{book-id}")
+    @GetMapping("/books/{book-id}/reviews")
     @ResponseBody
     public ResponseEntity<Page<BookReviewResponse>> getBookReviewList(
             @PathVariable("book-id") Long bookId,
@@ -68,7 +68,7 @@ public class ReviewController {
     }
 
     // 리뷰 수정 폼
-    @GetMapping("/books/{book-id}/update")
+    @GetMapping("/books/{book-id}/reviews/update")
     public String updateReviewForm(
             @PathVariable("book-id") Long bookId,
             Model model
@@ -80,7 +80,7 @@ public class ReviewController {
     }
 
     // 리뷰 수정 처리
-    @PostMapping(value = "/books/{book-id}/{review-id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/books/{book-id}/reviews/{review-id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
     public ResponseEntity<Void> updateReviewPut(
             @PathVariable("book-id") Long bookId,
@@ -106,14 +106,22 @@ public class ReviewController {
     }
 
     // 마이페이지 리뷰 관리
-    @GetMapping("/me")
-    public String myReviewList(
-            @PageableDefault(size = 10) Pageable pageable,
-            Model model
-    ) {
-        Page<MyPageReviewResponse> myReviews = reviewService.getMyReviews(pageable);
-        model.addAttribute("reviews", myReviews);
-        return "mypage/reviews";
+    @GetMapping("/mypage/reviews")
+    public String myReviews(Model model,
+                            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable)
+    {
+//        if (user == null) {
+//            return "redirect:/member/login";
+//        }
+
+        // 1. FeignClient로 내 리뷰 조회
+        Page<MyPageReviewResponse> reviewPage = reviewService.getMyReviews(pageable);
+
+        // 2. 모델에 담기
+        model.addAttribute("reviews", reviewPage.getContent());
+        model.addAttribute("page", reviewPage); // 페이징 버튼용
+
+        return "mypage/reviews"; // HTML 파일 경로
     }
 
     // 리뷰 좋아요 요청 처리
