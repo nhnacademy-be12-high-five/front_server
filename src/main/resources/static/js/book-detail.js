@@ -267,3 +267,56 @@ function startEditReview(btn) {
         </form>
     `;
 }
+
+// ===================================================================================//
+
+async function submitReview(bookId) {
+    const form = document.getElementById("reviewForm");
+
+    const content = form.querySelector("textarea[name='content']").value;
+    const rating = form.querySelector("select[name='rating']").value;
+    const fileInput = form.querySelector("input[name='images']");
+
+    if (!content.trim()) {
+        alert("리뷰 내용을 입력해주세요.");
+        return;
+    }
+
+    const formData = new FormData();
+
+    // [핵심 수정 1] JSON Blob 대신 일반 폼 필드로 데이터 추가 (@ModelAttribute 대응)
+    formData.append("rating", rating);
+    formData.append("content", content);
+
+    // 이미지 파일 추가
+    if (fileInput && fileInput.files.length > 0) {
+        for (const file of fileInput.files) {
+            formData.append("images", file);
+        }
+    }
+
+    try {
+        // [핵심 수정 2] URL에서 '/api' 제거 (Front Server Controller 경로인 /books/... 로 요청)
+        const response = await fetch(`/books/${bookId}/reviews`, {
+            method: "POST",
+            body: formData
+        });
+
+        // 리다이렉트 응답(로그인 페이지 등) 체킹
+        if (response.redirected) {
+            window.location.href = response.url;
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error("리뷰 등록 실패");
+        }
+
+        alert("리뷰가 등록되었습니다!");
+        location.reload();
+
+    } catch (error) {
+        console.error(error);
+        alert("리뷰 등록 중 오류가 발생했습니다.");
+    }
+}
