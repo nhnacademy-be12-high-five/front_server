@@ -9,6 +9,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class MemberResponse {
+    private Long memberId;
+
     private String name;
 
     private String email;

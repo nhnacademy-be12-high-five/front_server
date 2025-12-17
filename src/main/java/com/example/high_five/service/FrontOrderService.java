@@ -1,9 +1,11 @@
 package com.example.high_five.service;
 
+import com.example.high_five.common.CustomPage;
 import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.coupon.MemberCouponResponseDto;
 import com.example.high_five.dto.member.response.MemberResponse;
 import com.example.high_five.dto.order.DeliveryPolicyResponse;
+import com.example.high_five.dto.order.MyOrderResponse;
 import com.example.high_five.dto.order.OrderCheckoutRequest;
 import com.example.high_five.dto.order.OrderResponse;
 import com.example.high_five.dto.point.PointBalanceResponse;
@@ -201,6 +203,16 @@ public class FrontOrderService {
         } catch (Exception e) {
             log.error("Order Cancel Failed: OrderID={}", orderId, e);
             throw new RuntimeException("주문 취소 처리 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    // 내 주문 내역 조회
+    public CustomPage<MyOrderResponse> getMyOrders(Long userId, int page, int size) {
+        try {
+            return orderClient.getMyOrders(userId, page, size);
+        } catch (Exception e) {
+            log.error("주문 내역 조회 실패 UserID={}: {}", userId, e.getMessage());
+            return new CustomPage<>(Collections.emptyList(), 0, 0, size, page);
         }
     }
 
