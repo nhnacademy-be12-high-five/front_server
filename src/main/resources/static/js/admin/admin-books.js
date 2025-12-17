@@ -72,8 +72,11 @@ function fillForm(book) {
     document.getElementById('bookId').value = book.id;
     document.getElementById('isbn').value = book.isbn || book.isbn13;
     document.getElementById('title').value = book.title;
-    // 저자는 List 형태일 수 있으므로 처리
-    document.getElementById('author').value = Array.isArray(book.author) ? book.author.join(', ') : book.author;
+    if (Array.isArray(book.author)) {
+        document.getElementById('author').value = book.author.join(',');
+    } else {
+        document.getElementById('author').value = book.author || ''; // author 필드명 확인 필요
+    }
     document.getElementById('publisher').value = book.publisher;
     document.getElementById('publishedDate').value = book.publishedDate;
     document.getElementById('price').value = book.price;
@@ -81,6 +84,8 @@ function fillForm(book) {
     document.getElementById('description').value = book.description || book.content; // 필드명 확인 필요
 
     previewImage(book.image);
+
+    setFormReadOnly(true);
 
     // 화면 스크롤을 폼으로 이동
     form.scrollIntoView({ behavior: 'smooth' });
@@ -98,6 +103,8 @@ function resetForm() {
 
     document.getElementById('bookId').value = '';
     document.getElementById('imgPreview').style.display = 'none';
+
+    setFormReadOnly(false);
 }
 
 // 5. 이미지 미리보기
@@ -111,16 +118,16 @@ function previewImage(url) {
     }
 }
 
-// 6. 삭제 요청
-function deleteBook() {
-    const bookId = document.getElementById('bookId').value;
-    if (!bookId) return;
+// 6. 필드 잠금/해제 함수
+function setFormReadOnly(isReadOnly) {
+    const fields = ['isbn', 'title', 'author', 'publisher', 'publishedDate', 'image', 'description'];
 
-    if (confirm('정말로 이 도서를 삭제하시겠습니까? (복구 불가)')) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/admin/books/${bookId}/delete`;
-        document.body.appendChild(form);
-        form.submit();
-    }
+    fields.forEach(fieldId => {
+        const el = document.getElementById(fieldId);
+        if (el) {
+            el.readOnly = isReadOnly;
+            el.style.backgroundColor = isReadOnly ? "#e9ecef" : "#fff";
+            el.style.cursor = isReadOnly ? "not-allowed" : "text";
+        }
+    });
 }
