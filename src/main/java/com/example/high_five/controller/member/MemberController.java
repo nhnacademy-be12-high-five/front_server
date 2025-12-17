@@ -40,7 +40,7 @@ public class MemberController {
         }
 
         model.addAttribute("currentTab", "info");
-        return "mypage/mypage";
+        return "mypage/myinfo";
     }
 
     @LoginRequired
@@ -57,7 +57,7 @@ public class MemberController {
             }
             redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
         }
-        return "redirect:/mypage";
+        return "redirect:/myinfo";
     }
 
     @LoginRequired
@@ -72,7 +72,7 @@ public class MemberController {
         } catch (Exception e) {
             log.error("탈퇴 실패", e);
             redirectAttributes.addFlashAttribute("errorMessage", "탈퇴 처리에 실패했습니다.");
-            return "redirect:/mypage";
+            return "redirect:/myinfo";
         }
     }
 

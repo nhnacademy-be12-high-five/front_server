@@ -5,67 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HIGH-FIVE BOOKS | 도서 검색 결과</title>
 
-    <!-- 도서 리스트 공통 CSS -->
-    <link rel="stylesheet" href="/book-css/list.css">
+    <link rel="stylesheet" href="/css/book-css/list.css">
+    <link rel="stylesheet" href="/css/common/footer.css">
+    <link rel="stylesheet" href="/css/common/header.css">
+    <link rel="stylesheet" href="/css/common/common.css">
 </head>
+
+<script src="/js/common.js"></script>
+<script src="/js/book-list.js"></script>
+
 <body>
-<!-- =================== 헤더 =================== -->
-<header id="header" role="banner">
-    <div class="container">
-        <!-- 로고 -->
-        <a th:href="@{/}" class="logo">
-            <img th:src="@{/img/logo.png}" alt="HIGH-FIVE 로고" width="100" height="100" />
-            <div class="brand">HIGH-FIVE BOOKS</div>
-        </a>
 
-        <!-- 검색 박스 -->
-        <nav class="gnb" aria-label="주요 메뉴">
-            <form class="search-box"
-                  role="search"
-                  th:action="@{/search}"
-                  method="get">
-                <input type="search"
-                       name="keyword"
-                       placeholder="도서명, 저자, ISBN, 태그 검색"
-                       aria-label="통합 검색"
-                       th:value="${keyword}" />
-
-                <!-- 정렬 기준 유지 -->
-                <input type="hidden" name="sort"
-                       th:value="${sort != null ? sort : 'POPULAR'}" />
-
-                <!-- 일반 검색 버튼 -->
-                <button type="submit"
-                        class="search-btn"
-                        aria-label="일반 검색">
-                    검색
-                </button>
-
-                <!-- AI 검색 버튼: rag-search로 통일 -->
-                <button type="submit"
-                        class="search-btn ai"
-                        aria-label="AI 검색"
-                        th:formaction="@{/rag-search}">
-                    AI 검색
-                </button>
-            </form>
-        </nav>
-
-        <!-- 우측 아이콘 메뉴 -->
-        <div class="user-menu">
-            <a class="user-link" th:href="@{/coupon}">
-                <img th:src="@{/img/icon-coupon.png}" alt="쿠폰" class="user-icon" />
-            </a>
-            <a class="user-link" th:href="@{/mypage}">
-                <img th:src="@{/img/icon-mypage.png}" alt="마이페이지" class="user-icon" />
-            </a>
-            <a class="user-link" th:href="@{/cart}">
-                <img th:src="@{/img/icon-cart.png}" alt="장바구니" class="user-icon" />
-            </a>
-            <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
-        </div>
-    </div>
-</header>
+<div th:replace="~{layout/header :: header}"></div>
 
 <!-- =================== 메인 =================== -->
 <main id="container">
@@ -443,46 +394,7 @@
     </div>
 </main>
 
-<!-- ===== JS: AI 말풍선 / 카드 토글 ===== -->
-<script>
-    // 상단 AI 요약 토글
-    function toggleMainAiSummary(btn) {
-        const wrapper = btn.closest('.ai-main-summary');
-        if (!wrapper) return;
-
-        const body = wrapper.querySelector('.ai-main-summary-body');
-        if (!body) return;
-
-        const isCollapsed = body.classList.contains('collapsed');
-
-        if (isCollapsed) {
-            body.classList.remove('collapsed');
-            body.classList.add('expanded');
-            btn.textContent = '간략히 보기 ▴';
-        } else {
-            body.classList.remove('expanded');
-            body.classList.add('collapsed');
-            btn.textContent = '자세히 보기 ▾';
-        }
-    }
-
-    // 카드 안 AI 설명 토글 (상세페이지로 이동하지 않도록 이벤트 막기)
-    function toggleAiDesc(btn, e) {
-        if (e) {
-            e.preventDefault();    // 링크 이동 막기
-            e.stopPropagation();   // <a> 클릭 이벤트 전파 막기
-        }
-
-        const targetId = btn.getAttribute('data-target');
-        const box = document.getElementById(targetId);
-        if (!box) return;
-
-        const isOpen = box.style.display === 'block';
-        box.style.display = isOpen ? 'none' : 'block';
-
-        btn.textContent = isOpen ? '자세히 보기 ▾' : '간략히 보기 ▴';
-    }
-</script>
+<div th:replace="~{layout/footer :: footer}"></div>
 
 </body>
 </html>

@@ -1,0 +1,140 @@
+#container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 80px 0;
+    background-color: white; /* 전체 배경색과 통일 */
+}
+
+.login-area {
+    width: 100%;
+    max-width: 700px;
+    background-color: #ffffff;
+    padding: 50px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--color-border-light);
+}
+
+/* .login-area 내의 h2 제목 */
+.login-area .register-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 30px;
+    background-color: #ffffff;
+}
+
+/* 폼 입력 필드 */
+.register-form .input-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+}
+
+.register-form label {
+    font-size: 14px;
+    color: var(--color-text-light);
+    margin-bottom: 8px;
+}
+
+.register-form input[type="text"],
+.register-form input[type="password"],
+.register-form input[type="email"],
+.register-form input[type="phone"],
+.register-form input[type="date"],
+.register-form select {
+    flex-grow: 1;              /* 남은 공간 꽉 채우기 */
+    width: 100%;               /* 기본 너비 */
+    height: 48px;              /* 높이를 넉넉하게 */
+    padding: 0 15px;           /* 내부 여백 */
+    font-size: 15px;           /* 입력 글자 크기도 키움 */
+    color: #333;
+    background-color: #f9f9f9; /* 아주 연한 회색 배경 (눈이 편안함) */
+    border: 1px solid #ddd;    /* 연한 테두리 */
+    border-radius: 8px;        /* 모서리를 둥글게 */
+    transition: all 0.2s ease; /* 부드러운 애니메이션 */
+}
+
+.register-form input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+}
+
+.register-form .input-group {
+    display: flex;             /* 가로 배치 */
+    align-items: center;       /* 세로 중앙 정렬 */
+    margin-bottom: 20px;       /* 줄 간격 */
+}
+
+.register-form input:focus,
+.register-form select:focus {
+    outline: none;
+    background-color: #ffffff; /* 배경이 하얗게 밝아짐 */
+    border-color: var(--color-primary); /* 브랜드 컬러로 테두리 변경 */
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15); /* 은은한 파란 번짐 효과 */
+}
+
+/* 2. 라벨(이름, 아이디 등) 디자인 - 글자 키우기 */
+.register-form label {
+    width: 140px;              /* 너비 고정 (줄 맞춤용) */
+    font-size: 15px;           /* 글자 크기 확대 (기존 10px -> 15px) */
+    font-weight: 700;          /* 두껍게 강조 */
+    color: #333;               /* 진한 회색 */
+    flex-shrink: 0;            /* 너비 줄어들지 않게 고정 */
+    margin-right: 15px;        /* 입력창과의 간격 */
+}
+
+/* 가입하기 버튼 */
+.login-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: var(--color-primary);
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 4px;
+    margin-top: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.login-btn:hover {
+    background-color: #0056b3;
+}
+
+/* 1. 입력창과 버튼을 가로로 배치 */
+.id-check-box {
+    display: flex;
+    gap: 10px;        /* 입력창과 버튼 사이 간격 */
+    width: 100%;      /* 부모 너비 꽉 채우기 */
+}
+
+/* 2. 입력창이 남은 공간을 모두 차지하도록 설정 */
+.id-check-box input {
+    flex-grow: 1;
+}
+
+.writer{
+    gap: 10px;
+}
+
+/* 3. 중복확인 버튼 꾸미기 */
+.check-btn {
+    background-color: gray;
+    color: white;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;   /* 글자가 줄바꿈 되지 않게 고정 */
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+/* 마우스 올렸을 때 효과 */
+.check-btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}

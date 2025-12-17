@@ -3,63 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>결제 실패</title>
-    <link rel="stylesheet" href="/order-css/order-success.css"> <style>
-    .fail-container {
-        text-align: center;
-        padding: 60px 20px;
-        max-width: 600px;
-        margin: 0 auto;
-    }
-    .icon-fail {
-        font-size: 50px; color: #dc3545; margin-bottom: 20px;
-    }
-    .error-box {
-        background: #fff5f5;
-        border: 1px solid #ffcccc;
-        padding: 20px;
-        border-radius: 8px;
-        margin: 20px 0;
-        color: #721c24;
-    }
-</style>
+    <link rel="stylesheet" href="/css/order-css/payment-result.css">
+    <link rel="stylesheet" href="/css/common/footer.css">
+    <link rel="stylesheet" href="/css/common/header.css">
+    <link rel="stylesheet" href="/css/common/common.css">
 </head>
+
+<script src="/js/common.js"></script>
+
 <body>
-<header id="header" role="banner">
-    <div class="container">
-        <a href="/" class="logo">
-            <img src="../img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100" />
-            <div class="brand">HIGH-FIVE BOOKS</div>
-        </a>
 
-        <nav class="gnb" aria-label="주요 메뉴">
-            <div class="search-box" role="search">
-                <input
-                        type="search"
-                        placeholder="도서명, 저자, ISBN, 태그 검색"
-                        aria-label="통합 검색"
-                />
-                <button class="search-btn" aria-label="검색">검색</button>
-            </div>
-        </nav>
-
-        <div class="user-menu">
-            <!-- 쿠폰 -->
-            <a class="user-link" href="/coupon">
-                <img src="../img/icon-coupon.png" alt="쿠폰" class="user-icon" />
-            </a>
-            <!-- 마이페이지 -->
-            <a class="user-link" href="/mypage">
-                <img src="../img/icon-mypage.png" alt="마이페이지" class="user-icon" />
-            </a>
-            <!-- 장바구니 -->
-            <a class="user-link" href="/cart">
-                <img src="../img/icon-cart.png" alt="장바구니" class="user-icon" />
-            </a>
-
-            <a class="user-link pill" th:href="@{/member/login.html}">로그인</a>
-        </div>
-    </div>
-</header>
+<div th:replace="~{layout/header :: header}"></div>
 
 <main>
     <div class="fail-container">
@@ -81,27 +35,7 @@
     </div>
 </main>
 
-<footer id="footer" role="contentinfo">
-    <div class="container">
-        <div class="footer-links">
-            <a href="#">회사소개</a>
-            <a href="#">이용약관</a>
-            <a href="#"><strong>개인정보처리방침</strong></a>
-            <a href="#">고객센터</a>
-        </div>
-        <div class="footer-info">
-            <div>
-                <strong>대표이사 마르코</strong> | 사업자등록번호 123-456-7890<br />
-                통신판매업신고 2024-광주동구-01211 | 이메일: help@highfive.com<br />
-                호스팅 제공자 NHN24 © HIGH-FIVE BOOKS. All Rights Reserved.
-            </div>
-            <div>
-                <strong>고객센터 1544-8282</strong> (발신자 부담)<br />
-                광주광역시 동구 서석동 조선대학교 1층 NHN아카데미<br />
-                Fax 062-1234-5678
-            </div>
-        </div>
-    </div>
-</footer>
+<div th:replace="~{layout/footer :: footer}"></div>
+
 </body>
 </html>

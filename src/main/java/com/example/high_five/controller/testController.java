@@ -48,7 +48,7 @@ public class testController {
 //        return "detail";
 //    }
 
-    // 이렇게 하면 이제 "best-seller"는 숫자가 아니므로 위 메서드를 무시하고
+    // 이렇게 하면 이제 "best-seller.css"는 숫자가 아니므로 위 메서드를 무시하고
     // 아래 메서드를 정확하게 찾아갑니다.
     @GetMapping("/books/best-seller")
     public String bestSellerPage(Model model) {
@@ -61,14 +61,14 @@ public class testController {
     public String getPopularBooks(Model model){
         List<BookResponse> popular=bookClient.getPopularBooks(10);
         model.addAttribute("weekly_books",popular);
-        return "Book/weeklyPopular";
+        return "Book/book-weekly";
     }
 
-    @GetMapping("/api/books/new")
+    @GetMapping("/books/new")
     public String getNewBooks(Model model){
         List<BookResponse> popular=bookClient.getPopularBooks(10);
         model.addAttribute("recommendation:new_books_ids_1_5",popular);
-        return "Book/new";
+        return "Book/book-new";
     }
 
 }

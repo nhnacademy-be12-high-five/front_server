@@ -1,5 +1,6 @@
 package com.example.high_five.controller.review;
 
+import com.example.high_five.common.annotation.LoginRequired;
 import com.example.high_five.dto.review.*;
 import com.example.high_five.service.ReviewService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -32,6 +33,7 @@ public class ReviewController {
 
     // 리뷰 등록
     @PostMapping("/books/{book-id}/reviews")
+    @LoginRequired
     public String addReview(
             @PathVariable("book-id") Long bookId,
             @ModelAttribute ReviewCreateRequest request,
@@ -82,6 +84,7 @@ public class ReviewController {
     // 리뷰 수정 처리
     @PostMapping(value = "/books/{book-id}/reviews/{review-id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
+    @LoginRequired
     public ResponseEntity<Void> updateReviewPut(
             @PathVariable("book-id") Long bookId,
             @PathVariable("review-id") Long reviewId,
@@ -107,6 +110,7 @@ public class ReviewController {
 
     // 마이페이지 리뷰 관리
     @GetMapping("/mypage/reviews")
+    @LoginRequired
     public String myReviews(Model model,
                             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable)
     {
@@ -127,6 +131,7 @@ public class ReviewController {
     // 리뷰 좋아요 요청 처리
     @PostMapping("/books/{book-id}/reviews/{review-id}/like")
     @ResponseBody
+    @LoginRequired
     public ResponseEntity<Boolean> toggleLike(
             @PathVariable("book-id") Long bookId,
             @PathVariable("review-id") Long reviewId

@@ -4,33 +4,19 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Booktown - 마이페이지</title>
-    <link rel="stylesheet" href="/member-css/mypage.css">
-    <style>
-        .btn-edit { cursor: pointer; }
-        .input-readonly { background-color: #f0f0f0; color: #888; cursor: not-allowed; }
-        .error-msg { color: #e74c3c; font-size: 12px; margin-top: 5px; }
-        .info-msg { color: #007bff; font-size: 12px; margin-top: 5px; }
-    </style>
+    <link rel="stylesheet" href="/css/member-css/mypage.css">
+    <link rel="stylesheet" href="/css/member-css/myinfo.css">
+    <link rel="stylesheet" href="/css/common/footer.css">
+    <link rel="stylesheet" href="/css/common/header.css">
+    <link rel="stylesheet" href="/css/common/common.css">
 </head>
+
+<script src="/js/common.js"></script>
+<script src="/js/myinfo.js"></script>
+
 <body>
 
-<header id="header">
-    <div class="container">
-        <a href="/" class="logo">
-            <img src="/img/logo.png" alt="HIGH-FIVE 로고" width="100" height="100"/>
-            <div class="brand">HIGH-FIVE BOOKS</div>
-        </a>
-
-        <div class="user-menu">
-            <a class="user-link" href="/coupon"><img src="/img/icon-coupon.png" alt="쿠폰" class="user-icon"/></a>
-            <a class="user-link" href="/mypage"><img src="/img/icon-mypage.png" alt="마이페이지" class="user-icon"/></a>
-            <a class="user-link" href="/cart"><img src="/img/icon-cart.png" alt="장바구니" class="user-icon"/></a>
-
-            <a th:if="${myInfo == null}" class="user-link pill" th:href="@{/login}">로그인</a>
-            <a th:if="${myInfo != null}" class="user-link pill" th:href="@{/logout}">로그아웃</a>
-        </div>
-    </div>
-</header>
+<div th:replace="~{layout/header :: header}"></div>
 
 <div class="container2">
 
@@ -126,24 +112,9 @@
 </div>
 
 <script>
-    function toggleEditMode(isEdit) {
-        document.getElementById('view-mode').style.display = isEdit ? 'none' : 'block';
-        document.getElementById('edit-form').style.display = isEdit ? 'block' : 'none';
-        if (!isEdit) document.getElementById('edit-form').reset();
-    }
 
-    const withdrawBtn = document.getElementById("btn-withdraw");
-    const withdrawForm = document.getElementById("withdraw-form");
-
-    if (withdrawBtn) {
-        withdrawBtn.addEventListener("click", e => {
-            e.preventDefault();
-            if (confirm("정말 탈퇴하시겠습니까?")) {
-                withdrawForm.submit();
-            }
-        });
-    }
 </script>
+<div th:replace="~{layout/footer :: footer}"></div>
 
 </body>
 </html>

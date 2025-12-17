@@ -183,3 +183,26 @@ hr { border: 0; border-top: 1px dashed var(--color-border); margin: 22px 0; }
     width: 50px; height: 50px; animation: spin 1s linear infinite;
 }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* 비회원 기능 제한용 스타일 */
+.disabled-overlay {
+    background-color: #eee;
+    opacity: 0.6;
+    pointer-events: none; /* 클릭 방지 */
+    cursor: not-allowed;
+}
+.login-guide {
+    font-size: 12px;
+    color: #dc3545; /* 붉은색 경고 */
+    margin-left: 10px;
+    font-weight: bold;
+}
+/* 🚨 추가된 스타일: 배송 정책 설명 포맷팅 */
+.summary-policy {
+    font-size: 12px;
+    color: #6c757d;
+    text-align: right;
+    margin-top: -5px;
+    margin-bottom: 5px;
+    padding-right: 15px;
+}
