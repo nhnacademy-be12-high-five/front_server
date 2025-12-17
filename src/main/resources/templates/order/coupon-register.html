@@ -14,13 +14,11 @@
 <body>
 <script src="/js/common.js"></script>
 
-<!-- message / errorMessage를 JS에 안전하게 주입 (문자열 자동 quoting/escaping) -->
+<!-- message / errorMessage를 JS로 안전하게 주입 -->
 <script th:inline="javascript">
     window.PAGE_MESSAGE = /*[[${message}]]*/ null;
     window.PAGE_ERROR_MESSAGE = /*[[${errorMessage}]]*/ null;
 </script>
-
-<!-- 알림 로직은 JS에서 "값이 있을 때만" -->
 <script src="/js/coupon-register.js"></script>
 
 <div th:replace="~{layout/header :: header}"></div>
@@ -28,7 +26,6 @@
 <div class="register-page-container">
     <h1 class="page-title">🎉 쿠폰 발급</h1>
 
-    <!-- 메인페이지로 이동 -->
     <a class="user-link" href="/">
         <img src="/img/logo.png" alt="메인페이지로 이동하기" class="user-icon" width="200" height="200"/>
     </a>
@@ -37,8 +34,11 @@
         <h3>다운로드 가능한 쿠폰 목록</h3>
 
         <div class="available-coupon-grid">
-            <!-- 쿠폰 카드 -->
-            <div class="download-coupon-card" th:each="template : ${templates}">
+            <!--  쿠폰이 있을 때만 카드 렌더 -->
+            <div class="download-coupon-card"
+                 th:each="template : ${templates}"
+                 th:if="${templates != null && !#lists.isEmpty(templates)}">
+
                 <div class="coupon-info-text">
                     <h4 th:text="${template.couponName}">쿠폰 이름</h4>
                     <p th:text="${template.description}">쿠폰 설명</p>
@@ -50,7 +50,7 @@
                 </form>
             </div>
 
-            <!-- 빈 문구 조건: availableCoupons가 아니라 templates로 판단 -->
+            <!--  빈 문구는 templates 기준으로만 -->
             <div class="empty-coupon"
                  th:if="${templates == null || #lists.isEmpty(templates)}">
                 발급 가능한 쿠폰이 없습니다.
