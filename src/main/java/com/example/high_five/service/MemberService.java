@@ -2,6 +2,7 @@ package com.example.high_five.service;
 
 import com.example.high_five.common.CustomPage;
 import com.example.high_five.dto.member.request.MemberCreateRequestDto;
+import com.example.high_five.dto.member.request.MemberUpdateRequest;
 import com.example.high_five.dto.member.response.MemberResponse;
 import com.example.high_five.dto.point.PointAdminAdjustmentRequest;
 import com.example.high_five.dto.point.PointAdminPolicyRequest;
@@ -11,11 +12,7 @@ import com.example.high_five.dto.point.PointHistoryResponse;
 import com.example.high_five.dto.point.PointTransactionResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @FeignClient(name = "gateway-server", contextId = "memberClient", url = "${gateway.uri}")
 public interface MemberService {
@@ -38,13 +35,14 @@ public interface MemberService {
     // 포인트 이력 조회
     @GetMapping("/api/points/history")
     ResponseEntity<CustomPage<PointHistoryResponse>> getMyHistory(@RequestHeader("Authorization") String token,
-                                                                  @RequestParam("page") int page,
-                                                                  @RequestParam("size") int size);
-    // 회원 가입
-    @PostMapping("/api/auth/signup")
-    void registerMember(@RequestBody MemberCreateRequestDto dto);
-
+                                                                  @RequestParam("page") int page,@RequestParam("size") int size);
 
     @GetMapping("/api/members/me")
     ResponseEntity<MemberResponse> getMyInfo();
+
+    @PutMapping("/api/members/me")
+    ResponseEntity<MemberResponse> updateMember(@RequestBody MemberUpdateRequest request);
+
+    @DeleteMapping("/api/members/me/withdraw")
+    ResponseEntity<Void> withdrawMember();
 }
