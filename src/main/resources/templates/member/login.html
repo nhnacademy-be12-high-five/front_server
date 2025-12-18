@@ -10,9 +10,6 @@
     <link rel="stylesheet" href="/css/common/common.css">
 </head>
 
-<script src="/js/common.js"></script>
-<script src="/js/login.js"></script>
-
 <body>
 
 <div th:replace="~{layout/header :: header}"></div>
@@ -20,11 +17,12 @@
 <main id="container">
     <div class="login-area">
         <div class="tab-menu">
-            <button type="button" class="tab-btn active">회원 로그인</button>
+            <button type="button" class="tab-btn active" id="tabMember">회원 로그인</button>
+            <button type="button" class="tab-btn unactive" id="tabGuest">비회원 주문조회</button>
         </div>
         <div th:if="${error}" class="error-message" th:text="${error}"></div>
 
-        <form class="login-form" action="/auth/login" method="post">
+        <form id="formMember" class="login-form" action="/auth/login" method="post">
             <div class="input-group">
                 <label for="loginId">아이디</label>
                 <div class="input-wrapper">
@@ -32,7 +30,7 @@
                 </div>
             </div>
             <div class="input-group">
-                <label for="pwd">비밀번호</label>
+                <label for="guestPwd">비밀번호</label>
                 <div class="input-wrapper">
                     <input
                             type="password"
@@ -46,28 +44,45 @@
                             alt="아이콘"
                             width="100"
                             height="100"
-                            onclick="togglePasswordVisibility()"
+                            onclick="togglePasswordVisibility('pwd', this)"
                     />
                 </div>
             </div>
 
-            <button type="submit" class="login-btn" >로그인</button>
-            <button type="submit" class="login2-btn" onclick="location.href='/member/signup.html'">회원가입</button>
+            <div class="btn">
+                <button type="submit" class="login-btn">로그인</button>
+                <button type="button" class="login2-btn" onclick="location.href='/member/signup.html'">회원가입</button>
+
+                <div class="sns-login">
+                    <a href="https://id.payco.com/oauth2.0/authorize?response_type=code&client_id=3RDwsbe24b34tbkpVdYgqZB&serviceProviderCode=FRIENDS&redirect_uri=https://nhnbook.shop/login/oauth2/code/payco&userLocale=ko_KR"
+                       class="sns-btn payco">
+                        PAYCO 로그인
+                    </a>
+                </div>
+            </div>
         </form>
 
-        <div class="sns-login">
-<!--로컬 페이코-->
-<!--            <a href="https://id.payco.com/oauth2.0/authorize?response_type=code&client_id=3RDJfC0EFpgMSp8pe7saxfn&serviceProviderCode=FRIENDS&redirect_uri=http://nhn.highfive:9000/login/oauth2/code/payco&userLocale=ko_KR"-->
-<!--배포 페이코-->
-
-            <a href="https://id.payco.com/oauth2.0/authorize?response_type=code&client_id=3RDwsbe24b34tbkpVdYgqZB&serviceProviderCode=FRIENDS&redirect_uri=https://nhnbook.shop/login/oauth2/code/payco&userLocale=ko_KR" class="sns-btn payco">
-                PAYCO 로그인
-            </a>
-        </div>
+        <form id="formGuest" class="login-form" action="/order/guest" method="post" style="display: none;">
+            <div class="input-group">
+                <label for="orderId">주문 번호</label>
+                <div class="input-wrapper">
+                    <input type="text" id="orderId" name="orderId" placeholder="주문 번호를 입력하세요" />
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="guestPwd">주문 비밀번호</label>
+                <div class="input-wrapper">
+                    <input type="password" id="guestPwd" name="guestPassword" placeholder="주문 시 설정한 비밀번호" required />
+                    <img class="input-icon" th:src="@{/img/free-icon-eye.png}" alt="보기"
+                         onclick="togglePasswordVisibility('guestPwd', this)" />
+                </div>
+            </div>
+        </form>
     </div>
 </main>
 
 <div th:replace="~{layout/footer :: footer}"></div>
-
+<script src="/js/common.js"></script>
+<script src="/js/login.js"></script>
 </body>
 </html>
