@@ -1,5 +1,6 @@
 package com.example.high_five.service;
 
+import com.example.high_five.common.CommonPageResponse;
 import com.example.high_five.common.CustomPage;
 import com.example.high_five.dto.order.DeliveryPolicyResponse;
 import com.example.high_five.dto.order.MyOrderResponse;
@@ -44,7 +45,9 @@ public interface OrderClient {
     void cancelOrder(@PathVariable("orderId") Long orderId);
 
     @GetMapping("/api/orders")
-    CustomPage<MyOrderResponse> getMyOrders(@RequestHeader("X-USER-ID") Long userId,
-                                            @RequestParam("page") int page,
-                                            @RequestParam("size") int size);
+    CommonPageResponse<MyOrderResponse> getMyOrders(
+            @RequestHeader("X-USER-ID") Long userId,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size
+    );
 }

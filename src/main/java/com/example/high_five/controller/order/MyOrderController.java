@@ -1,5 +1,6 @@
 package com.example.high_five.controller.order;
 
+import com.example.high_five.common.CommonPageResponse;
 import com.example.high_five.common.CustomPage;
 import com.example.high_five.common.annotation.LoginRequired;
 import com.example.high_five.dto.member.response.MemberResponse;
@@ -46,9 +47,9 @@ public class MyOrderController {
             return "redirect:/member/login.html";
         }
 
-        CustomPage<MyOrderResponse> orderPage = frontOrderService.getMyOrders(myInfo.getMemberId(), page, size);
+        CommonPageResponse<MyOrderResponse> orderPage = frontOrderService.getMyOrders(myInfo.getMemberId(), page, size);
 
-        model.addAttribute("orders", orderPage.getContent());
+        model.addAttribute("orders", orderPage.getData());
         model.addAttribute("page", orderPage);
         model.addAttribute("currentTab", "orders");
 

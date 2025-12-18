@@ -1,5 +1,6 @@
 package com.example.high_five.service;
 
+import com.example.high_five.common.CommonPageResponse;
 import com.example.high_five.common.CustomPage;
 import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.coupon.MemberCouponResponseDto;
@@ -207,12 +208,12 @@ public class FrontOrderService {
     }
 
     // 내 주문 내역 조회
-    public CustomPage<MyOrderResponse> getMyOrders(Long userId, int page, int size) {
+    public CommonPageResponse<MyOrderResponse> getMyOrders(Long userId, int page, int size) {
         try {
             return orderClient.getMyOrders(userId, page, size);
         } catch (Exception e) {
             log.error("주문 내역 조회 실패 UserID={}: {}", userId, e.getMessage());
-            return new CustomPage<>(Collections.emptyList(), 0, 0, size, page);
+            return new CommonPageResponse<>();
         }
     }
 

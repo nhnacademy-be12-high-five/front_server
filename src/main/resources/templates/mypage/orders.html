@@ -20,15 +20,15 @@
 
 <div class="container2">
     <aside class="mypage-tabs">
-    <nav class="box">
-        <a href="/mypage" class="tab-btn">내 정보</a>
-        <a href="/mypage/address" class="tab-btn">배송지</a>
-        <a href="/mypage/coupons" class="tab-btn">쿠폰</a>
-        <a href="/mypage/points" class="tab-btn">포인트</a>
-        <a href="/mypage/orders" class="tab-btn active">주문내역</a>
-        <a href="/mypage/reviews" class="tab-btn">리뷰</a>
-        <a href="/mypage/likes" class="tab-btn">찜 목록</a>
-    </nav>
+        <nav class="box">
+            <a href="/mypage" class="tab-btn">내 정보</a>
+            <a href="/mypage/address" class="tab-btn">배송지</a>
+            <a href="/mypage/coupons" class="tab-btn">쿠폰</a>
+            <a href="/mypage/points" class="tab-btn">포인트</a>
+            <a href="/mypage/orders" class="tab-btn active">주문내역</a>
+            <a href="/mypage/reviews" class="tab-btn">리뷰</a>
+            <a href="/mypage/likes" class="tab-btn">찜 목록</a>
+        </nav>
     </aside>
 
     <section class="tab-content active">
@@ -65,31 +65,42 @@
             <div class="order-footer">
                 총 결제금액: <span th:text="${#numbers.formatInteger(order.totalAmount, 0, 'COMMA')}">30,000</span>원
 
-                <div style="margin-top: 10px;">
+                <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: flex-end;">
+
                     <button th:if="${order.status == 'WAITING'}"
                             th:onclick="'cancelOrder(' + ${order.orderId} + ')'"
-                            style="padding: 5px 10px; font-size: 12px; cursor: pointer;">주문 취소
+                            class="btn-cancel" style="padding: 5px 10px; font-size: 12px; cursor: pointer; background-color: #f44336; color: white; border: none; border-radius: 4px;">
+                        주문 취소
                     </button>
+
+                    <button th:if="${order.status == 'DELIVERING'}"
+                            th:onclick="'confirmPurchase(' + ${order.orderId} + ')'"
+                            class="btn-confirm" style="padding: 5px 10px; font-size: 12px; cursor: pointer; background-color: #2196F3; color: white; border: none; border-radius: 4px;">
+                        구매 확정
+                    </button>
+
+                    <span th:if="${order.status == 'COMPLETED'}"
+                          style="font-size: 12px; color: #4CAF50; font-weight: bold;">
+                        구매 확정 (배송 완료)
+                    </span>
                 </div>
             </div>
-        </div>
+        </div> <div class="pagination" th:if="${page.totalPages > 1}">
+        <a th:if="${page.pageNumber > 0}"
+           th:href="@{/mypage/orders(page=${page.pageNumber - 1})}"
+           class="page-link">&lt;</a>
 
-        <div class="pagination" th:if="${page.totalPages > 1}">
-            <a th:if="${page.currentPage > 0}"
-               th:href="@{/mypage/orders(page=${page.currentPage - 1})}"
-               class="page-link">&lt;</a>
+        <span th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}">
+                <a th:href="@{/mypage/orders(page=${i})}"
+                   th:text="${i + 1}"
+                   th:classappend="${i == page.pageNumber} ? 'active' : ''"
+                   class="page-link">1</a>
+            </span>
 
-            <span th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}">
-        <a th:href="@{/mypage/orders(page=${i})}"
-           th:text="${i + 1}"
-           th:classappend="${i == page.currentPage} ? 'active' : ''"
-           class="page-link">1</a>
-    </span>
-
-            <a th:if="${page.currentPage < page.totalPages - 1}"
-               th:href="@{/mypage/orders(page=${page.currentPage + 1})}"
-               class="page-link">&gt;</a>
-        </div>
+        <a th:if="${page.pageNumber < page.totalPages - 1}"
+           th:href="@{/mypage/orders(page=${page.pageNumber + 1})}"
+           class="page-link">&gt;</a>
+    </div>
 
     </section>
 </div>
@@ -100,9 +111,7 @@
 
         fetch(`/orders/api/${orderId}/cancel`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            headers: { 'Content-Type': 'application/json' }
         })
             .then(response => {
                 if (response.ok) {
@@ -110,6 +119,24 @@
                     window.location.reload();
                 } else {
                     alert('주문 취소에 실패했습니다.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function confirmPurchase(orderId) {
+        if (!confirm('구매를 확정하시겠습니까? (구매 확정 후에는 반품이 불가합니다)')) return;
+
+        fetch(`/orders/api/${orderId}/confirm`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('구매가 확정되었습니다!');
+                    window.location.reload();
+                } else {
+                    alert('구매 확정에 실패했습니다.');
                 }
             })
             .catch(error => console.error('Error:', error));
