@@ -9,10 +9,12 @@
     <link rel="stylesheet" href="/css/common/footer.css">
     <link rel="stylesheet" href="/css/common/header.css">
     <link rel="stylesheet" href="/css/common/common.css">
+    <style>
+        .input-readonly { background-color: #f0f0f0; color: #888; cursor: not-allowed; }
+        .info-msg { color: #007bff; font-size: 12px; margin-top: 5px; }
+        .error-msg { color: #e74c3c; font-size: 12px; margin-top: 5px; }
+    </style>
 </head>
-
-<script src="/js/common.js"></script>
-<script src="/js/myinfo.js"></script>
 
 <body>
 
@@ -20,7 +22,6 @@
 
 <div class="container2">
 
-    <!-- 탭 네비게이션 (각각 컨트롤러로 이동) -->
     <nav class="box">
         <a href="/mypage" class="tab-btn active">내 정보</a>
         <a href="/mypage/address" class="tab-btn">배송지</a>
@@ -31,11 +32,9 @@
         <a href="/mypage/likes" class="tab-btn">찜 목록</a>
     </nav>
 
-    <!-- 내 정보 -->
     <section class="tab-content active">
         <h2 class="section-title">내 정보</h2>
 
-        <!-- 조회 모드 -->
         <div id="view-mode">
             <div class="info-group">
                 <div class="info-item">
@@ -48,7 +47,7 @@
                 </div>
                 <div class="info-item">
                     <label>생일</label>
-                    <div th:text="${#temporals.format(myInfo.birthDate, 'yyyy-MM-dd')}">1995-01-01</div>
+                    <div th:text="${myInfo.birthDate.year == 1000 ? '설정 필요 (정보 수정 버튼을 눌러주세요)' : #temporals.format(myInfo.birthDate, 'yyyy-MM-dd')}"></div>
                 </div>
                 <div class="info-item">
                     <label>연락처</label>
@@ -72,7 +71,6 @@
             </div>
         </div>
 
-        <!-- 수정 모드 -->
         <form id="edit-form" action="/mypage/update" method="post" style="display:none;">
             <div class="info-group">
                 <div class="info-item">
@@ -87,13 +85,21 @@
 
                 <div class="info-item">
                     <label>생일</label>
-                    <input type="date"
-                           th:value="${myInfo.birthDate}"
-                           class="input-field input-readonly"
-                           readonly>
-                    <p class="error-msg">* 생년월일은 최초 설정 후 변경할 수 없습니다.</p>
-                </div>
 
+                    <div th:if="${myInfo.birthDate.year == 1000}">
+                        <input type="date" name="birthDate" class="input-field" required>
+                        <p class="info-msg">* 원활한 서비스 이용을 위해 생년월일을 입력해주세요. (설정 후 변경 불가)</p>
+                    </div>
+
+                    <div th:unless="${myInfo.birthDate.year == 1000}">
+                        <input type="date"
+                               th:value="${myInfo.birthDate}"
+                               class="input-field input-readonly"
+                               readonly
+                               onfocus="this.blur();" onclick="return false;">
+                        <p class="error-msg">* 생년월일은 최초 설정 후 변경할 수 없습니다.</p>
+                    </div>
+                </div>
                 <div class="info-item">
                     <label>연락처</label>
                     <input type="text" name="phone" th:value="${myInfo.phone}" class="input-field" required>
@@ -107,13 +113,60 @@
             </div>
         </form>
 
-        <form id="withdraw-form" action="/mypage/withdraw" method="post" style="display:none;"></form>
+        <form id="withdraw-form" th:action="@{/mypage/withdraw}" method="post" style="display:none;">
+        </form>
     </section>
 </div>
 
-<script>
+<script src="/js/common.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
 
+    // 1. 서버에서 보낸 알림 메시지 확인
+    const alertMessage = /*[[${alertMessage}]]*/ null;
+
+    if (alertMessage) {
+        alert(alertMessage); // 알림창 띄우기
+
+        // "필수 정보"라는 단어가 포함된 메시지라면 자동으로 수정 모드로 전환
+        if (alertMessage.includes("필수 정보")) {
+            // 화면이 다 그려진 후 실행되도록 약간의 지연
+            setTimeout(() => toggleEditMode(true), 100);
+        }
+    }
+
+    // 2. 수정 모드 토글 함수
+    function toggleEditMode(isEdit) {
+        const viewMode = document.getElementById('view-mode');
+        const editForm = document.getElementById('edit-form');
+
+        if (isEdit) {
+            viewMode.style.display = 'none';
+            editForm.style.display = 'block';
+        } else {
+            viewMode.style.display = 'block';
+            editForm.style.display = 'none';
+            // 취소 시 입력값 초기화
+            editForm.reset();
+        }
+    }
+
+    // 3. 회원 탈퇴 버튼 이벤트
+    const withdrawBtn = document.getElementById("btn-withdraw");
+    const withdrawForm = document.getElementById("withdraw-form");
+
+    if (withdrawBtn) {
+        withdrawBtn.addEventListener("click", e => {
+            e.preventDefault();
+            if (confirm("정말 탈퇴하시겠습니까?")) {
+                withdrawForm.submit();
+            }
+        });
+    }
+
+    /*]]>*/
 </script>
+
 <div th:replace="~{layout/footer :: footer}"></div>
 
 </body>
