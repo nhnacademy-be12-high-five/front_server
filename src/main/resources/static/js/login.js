@@ -33,31 +33,64 @@ if (mypageLinkInHeader) {
 }
 
 // ==== 비밀번호 보이기/숨기기 함수 ====
-function togglePasswordVisibility() {
-    // 1. 비밀번호 필드와 아이콘 요소 가져오기
-    // HTML의 ID인 'loginPw'를 사용
-    const passwordField = document.getElementById("pwd");
-    const eyeIcon = document.getElementById("free-icon-eye");
+function togglePasswordVisibility(id, icon) {
+    // 1. 넘겨받은 ID로 해당 input 찾기
+    const inputField = document.getElementById(id);
 
-    if (!passwordField) {
-        console.error("Error: passwordField element not found.");
+    // 요소가 없으면 중단
+    if (!inputField) {
+        console.error("해당 ID의 input을 찾을 수 없습니다: " + id);
         return;
     }
 
-    // 2. 입력 필드의 타입 전환 및 아이콘 변경
-    if (passwordField.type === "password") {
-        passwordField.type = "text";
-        // 아이콘을 닫힌 눈 모양 이미지로 변경 (경로 확인 필요)
-        if (eyeIcon) {
-            // 브라우저가 인식할 수 있는 절대 경로 사용
-            // free-icon-closed-eyes.png 파일이 /static/img/에 있어야 함
-            eyeIcon.src = "/img/free-icon-closed-eyes.png";
-        }
+    // 2. 타입 토글 및 아이콘 변경
+    if (inputField.type === "password") {
+        inputField.type = "text"; // 비밀번호 보이기
+        // 클릭된 그 아이콘의 이미지를 변경
+        icon.src = "/img/free-icon-closed-eyes.png";
     } else {
-        passwordField.type = "password";
-        // 아이콘을 열린 눈 모양 이미지로 변경
-        if (eyeIcon) {
-            eyeIcon.src = "/img/free-icon-eye.png";
-        }
+        inputField.type = "password"; // 비밀번호 숨기기
+        icon.src = "/img/free-icon-eye.png";
     }
+}
+
+const tabMember = document.getElementById("tabMember");
+const tabGuest = document.getElementById("tabGuest");
+const formMember = document.getElementById("formMember");
+const formGuest = document.getElementById("formGuest");
+
+// 회원 로그인 탭 클릭 시
+if (tabMember) {
+    tabMember.addEventListener("click", function () {
+
+        // 탭 스타일 변경
+        tabMember.classList.add("active");
+        tabMember.classList.remove("unactive");
+        tabGuest.classList.add("unactive");
+        tabGuest.classList.remove("active");
+
+        console.log("회원 선택");
+
+        // 폼 표시/숨김
+        formMember.style.display = "block";
+        formGuest.style.display = "none";
+    });
+}
+
+// 비회원 주문조회 탭 클릭 시
+if (tabGuest) {
+    tabGuest.addEventListener("click", function () {
+
+        console.log("비회원 선택");
+
+        // 탭 스타일 변경
+        tabGuest.classList.add("active");
+        tabGuest.classList.remove("unactive");
+        tabMember.classList.add("unactive");
+        tabMember.classList.remove("active");
+
+        // 폼 표시/숨김
+        formMember.style.display = "none";
+        formGuest.style.display = "block";
+    });
 }
