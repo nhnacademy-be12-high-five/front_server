@@ -4,14 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>회원가입</title>
+
+    <meta name="_csrf" th:content="${_csrf?.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf?.headerName}"/>
+
     <link rel="stylesheet" href="/css/common/footer.css">
     <link rel="stylesheet" href="/css/common/header.css">
     <link rel="stylesheet" href="/css/common/common.css">
     <link rel="stylesheet" href="/css/member-css/signup.css">
-</head>
 
-<script src="/js/common.js"></script>
-<script src="/js/signup.js"></script>
+    <style>
+        .check-btn { cursor: pointer; white-space: nowrap; }
+        .verify-msg { font-size: 12px; margin-top: 5px; }
+        /* 인증/확인 완료 시 입력창 회색 처리 */
+        .input-readonly { background-color: #e8f0fe; cursor: not-allowed; }
+        .success-text { color: green; }
+        .error-text { color: red; }
+    </style>
+</head>
 
 <body>
 
@@ -20,52 +30,56 @@
 <main id="container">
     <div class="login-area">
         <h2 class="register-title">회원가입</h2>
-        <form class="register-form" action="/member/signup" method="post">
+        <form class="register-form" action="/member/signup" method="post" id="signup-form">
+
             <div class="input-group">
                 <label for="regName">이름</label>
-                <input type="text" id="regName" name="name" placeholder="이름을 입력하세요" />
+                <input type="text" id="regName" name="name" placeholder="이름을 입력하세요" required />
             </div>
 
             <div class="input-group">
                 <label for="regEmail">이메일</label>
-                <input type="email" id="regEmail" name="email" placeholder="이메일 주소를 입력하세요" />
+                <div class="input-box">
+                    <input type="email" id="regEmail" name="email" placeholder="이메일 주소를 입력하세요" required />
+                    <button type="button" id="btn-send-email" class="check-btn">인증번호 받기</button>
+                </div>
             </div>
+
+            <div class="input-group" id="email-verify-box" style="display: none;">
+                <label for="email-code">인증번호</label>
+                <div class="input-box">
+                    <input type="text" id="email-code" placeholder="인증번호 6자리" maxlength="6">
+                    <button type="button" id="btn-verify-code" class="check-btn">확인</button>
+                </div>
+                <p id="verify-message" class="verify-msg"></p>
+            </div>
+
+            <input type="hidden" id="emailVerified" value="false">
 
             <div class="input-group">
                 <label for="regId" class="writer">아이디</label>
                 <div class="input-box">
-                    <input
-                            type="text"
-                            id="regId"
-                            name="loginId"
-                            placeholder="아이디를 입력하세요 (영문, 숫자 6~12자)"
-                    />
-                    <button type="button" class="check-btn">중복확인</button>
+                    <input type="text" id="regId" name="loginId" placeholder="아이디를 입력하세요 (영문, 숫자 6~12자)" required />
+                    <button type="button" id="btn-check-id" class="check-btn">중복확인</button>
                 </div>
+                <p id="id-check-msg" class="verify-msg"></p>
             </div>
+
+            <input type="hidden" id="idChecked" value="false">
 
             <div class="input-group">
                 <label for="regPw">비밀번호</label>
-                <input
-                        type="password"
-                        id="regPw"
-                        name="password"
-                        placeholder="비밀번호를 입력하세요 (8-20자)"
-                />
+                <input type="password" id="regPw" name="password" placeholder="비밀번호를 입력하세요 (8-20자)" required />
             </div>
 
             <div class="input-group">
                 <label for="regPwConfirm">비밀번호 확인</label>
-                <input
-                        type="password"
-                        id="regPwConfirm"
-                        placeholder="비밀번호를 입력하세요 (8-20자)"
-                />
+                <input type="password" id="regPwConfirm" placeholder="비밀번호를 입력하세요 (8-20자)" required />
             </div>
 
             <div class="input-group">
                 <label for="phoneNumber">연락처</label>
-                <input type="text" id="phoneNumber" name="phone" placeholder="핸드폰 번호를 입력하세요" />
+                <input type="text" id="phoneNumber" name="phone" placeholder="핸드폰 번호를 입력하세요" required />
             </div>
 
             <div class="input-group">
@@ -87,6 +101,159 @@
 </main>
 
 <div th:replace="~{layout/footer :: footer}"></div>
+
+<script src="/js/common.js"></script>
+
+<script>
+    const sendBtn = document.getElementById('btn-send-email');
+    const verifyBtn = document.getElementById('btn-verify-code');
+    const verifyBox = document.getElementById('email-verify-box');
+    const emailInput = document.getElementById('regEmail');
+    const verifiedInput = document.getElementById('emailVerified');
+
+    // 아이디 관련
+    const idCheckBtn = document.getElementById('btn-check-id');
+    const idInput = document.getElementById('regId');
+    const idCheckMsg = document.getElementById('id-check-msg');
+    const idCheckedInput = document.getElementById('idChecked');
+
+    const signupForm = document.getElementById('signup-form');
+
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+
+    const getHeaders = (type = 'application/x-www-form-urlencoded') => {
+        const headers = { 'Content-Type': type };
+        if (csrfToken && csrfHeader) {
+            headers[csrfHeader] = csrfToken;
+        }
+        return headers;
+    };
+
+    sendBtn.addEventListener('click', () => {
+        const email = emailInput.value;
+        if (!email) { alert("이메일을 입력해주세요."); return; }
+
+        sendBtn.disabled = true;
+        sendBtn.innerText = "전송 중...";
+
+        fetch('/auth/api/email/send', {
+            method: 'POST',
+            headers: getHeaders(),
+            body: new URLSearchParams({ email: email })
+        })
+            .then(async res => {
+                if (res.ok) {
+                    alert("인증번호가 발송되었습니다. 메일함을 확인해주세요.");
+                    verifyBox.style.display = 'block';
+                    sendBtn.innerText = "재전송";
+                    sendBtn.disabled = false;
+                } else {
+                    const errorText = await res.text();
+                    alert("발송 실패: " + errorText);
+                    sendBtn.disabled = false;
+                    sendBtn.innerText = "인증번호 받기";
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("서버 통신 오류가 발생했습니다.");
+                sendBtn.disabled = false;
+                sendBtn.innerText = "인증번호 받기";
+            });
+    });
+
+    verifyBtn.addEventListener('click', () => {
+        const email = emailInput.value;
+        const code = document.getElementById('email-code').value;
+
+        if(!code) { alert("인증번호를 입력해주세요."); return; }
+
+        fetch('/auth/api/email/verify', {
+            method: 'POST',
+            headers: getHeaders('application/json'),
+            body: JSON.stringify({ email: email, code: code })
+        })
+            .then(async res => {
+                if (res.ok) {
+                    alert("인증 성공!");
+                    verifyBox.style.display = 'none';
+                    emailInput.readOnly = true;
+                    emailInput.classList.add('input-readonly');
+                    sendBtn.disabled = true;
+                    sendBtn.innerText = "인증 완료";
+
+                    // 상태 저장 (true)
+                    verifiedInput.value = "true";
+                } else {
+                    const errorText = await res.text();
+                    alert("인증 실패: " + errorText);
+                }
+            });
+    });
+
+
+
+    idCheckBtn.addEventListener('click', () => {
+        const loginId = idInput.value;
+        if (!loginId) { alert("아이디를 입력해주세요."); return; }
+        fetch('/auth/api/id/check', {
+            method: 'POST',
+            headers: getHeaders(),
+            body: new URLSearchParams({ loginId: loginId })
+        })
+            .then(async res => {
+                const text = await res.text();
+                if (res.ok) {
+                    // 사용 가능
+                    alert(text);
+                    idCheckMsg.innerText = "사용 가능한 아이디입니다.";
+                    idCheckMsg.className = "verify-msg success-text";
+
+
+                    idCheckedInput.value = "true";
+                } else {
+                    alert(text);
+                    idCheckMsg.innerText = text;
+                    idCheckMsg.className = "verify-msg error-text";
+                    idInput.value = "";
+                    idInput.focus();
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("서버 오류가 발생했습니다.");
+            });
+    });
+
+
+
+    signupForm.addEventListener('submit', (e) => {
+        if (verifiedInput.value !== "true") {
+            e.preventDefault();
+            alert("이메일 인증을 완료해주세요!");
+            emailInput.focus();
+            return;
+        }
+
+        if (idCheckedInput.value !== "true") {
+            e.preventDefault();
+            alert("아이디 중복 확인을 해주세요!");
+            idInput.focus();
+            return;
+        }
+
+        const pw = document.getElementById('regPw').value;
+        const pwConfirm = document.getElementById('regPwConfirm').value;
+        if (pw !== pwConfirm) {
+            e.preventDefault();
+            alert("비밀번호가 일치하지 않습니다.");
+            document.getElementById('regPwConfirm').focus();
+            return;
+        }
+    });
+
+</script>
 
 </body>
 </html>

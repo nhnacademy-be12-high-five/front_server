@@ -1,7 +1,6 @@
 package com.example.high_five.controller.auth;
 
 import com.example.high_five.dto.member.request.LoginRequest;
-import com.example.high_five.dto.member.request.MemberCreateRequestDto;
 import com.example.high_five.dto.member.response.TokenDto;
 import com.example.high_five.service.AuthService;
 import jakarta.servlet.http.Cookie;
@@ -29,17 +28,16 @@ public class AuthController {
 
     @Value("${jwt.refresh_expiration_time}")
     private Long refreshExpirationTime;
-    //로컬에선 false 처리
+
     private static final boolean IS_SECURE = true;
 
-    @GetMapping("/member/login.html")
+    @GetMapping("/member/login")
     public String loginForm() {
         return "member/login";
     }
 
     @PostMapping("/auth/login")
     public String login(@ModelAttribute LoginRequest loginRequest, HttpServletResponse response) {
-
         ResponseEntity<TokenDto> apiResponse = authService.login(loginRequest);
         TokenDto tokens = apiResponse.getBody();
 
@@ -55,7 +53,6 @@ public class AuthController {
     @PostMapping("/auth/reissue")
     public ResponseEntity<Void> reissue(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = resolveCookie(request, "refresh-token");
-
         if (refreshToken == null) {
             return ResponseEntity.status(401).build();
         }
@@ -71,6 +68,15 @@ public class AuthController {
 
     @GetMapping("/logout")
     public String logoutByGet(HttpServletResponse response) {
+        return processLogout(response);
+    }
+
+    @PostMapping("/auth/logout")
+    public String logout(HttpServletResponse response) {
+        return processLogout(response);
+    }
+
+    private String processLogout(HttpServletResponse response) {
         try {
             authService.logout();
         } catch (Exception e) {
@@ -81,45 +87,28 @@ public class AuthController {
         return "redirect:/";
     }
 
-    @PostMapping("/auth/logout")
-    public String logout(HttpServletResponse response) {
-        try {
-            authService.logout();
-        } catch (Exception e) {
-            log.warn("로그아웃 처리 중 오류 (무시): {}", e.getMessage());
+    @GetMapping("/login/oauth2/code/{provider}")
+    public String socialLoginCallback(@PathVariable String provider, @RequestParam("code") String code,
+                                      HttpServletResponse response, RedirectAttributes redirectAttributes) {
+        ResponseEntity<TokenDto> apiResponse = authService.loginSocial(provider, code);
+        TokenDto tokens = apiResponse.getBody();
+
+        if (tokens == null) throw new RuntimeException("소셜 로그인 실패");
+
+        setCookie(response, "access-token", tokens.getAccessToken(), accessExpirationTime);
+        setCookie(response, "refresh-token", tokens.getRefreshToken(), refreshExpirationTime);
+
+        if (!tokens.isProfileComplete()) {
+            redirectAttributes.addFlashAttribute("alertMessage", "필수 정보를 입력해주세요.");
+            return "redirect:/mypage?tab=info";
         }
-
-        setCookie(response, "access-token", "", 0);
-        setCookie(response, "refresh-token", "", 0);
-
         return "redirect:/";
     }
 
-    @GetMapping("/member/signup.html")
-    public String signupForm() {
-        return "member/signup";
-    }
-
-    @PostMapping("/member/signup")
-    public String signup(@ModelAttribute MemberCreateRequestDto requestDto) {
-        try {
-            authService.signup(requestDto);
-            return "redirect:/member/login.html";
-        } catch (Exception e) {
-            log.error("회원가입 실패: {}", e.getMessage());
-            return "redirect:/member/signup.html?error";
-        }
-    }
-
-    // 쿠키 설정 중복 제거를 위한 헬퍼 메서드
     private void setCookie(HttpServletResponse response, String name, String value, long maxAgeSeconds) {
         ResponseCookie cookie = ResponseCookie.from(name, value)
-                .path("/")
-                .httpOnly(true)
-                .secure(IS_SECURE) // ★ 모든 메서드에서 동일하게 적용
-                .sameSite("Lax")
-                .maxAge(maxAgeSeconds / 1000)
-                .build();
+                .path("/").httpOnly(true).secure(IS_SECURE).sameSite("Lax")
+                .maxAge(maxAgeSeconds / 1000).build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
@@ -127,38 +116,9 @@ public class AuthController {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie c : cookies) {
-                if (name.equals(c.getName())) {
-                    return c.getValue();
-                }
+                if (name.equals(c.getName())) return c.getValue();
             }
         }
         return null;
-    }
-
-    @GetMapping("/login/oauth2/code/{provider}")
-    public String socialLoginCallback(
-            @PathVariable String provider,
-            @RequestParam("code") String code,
-            HttpServletResponse response,
-            RedirectAttributes redirectAttributes
-    ) {
-
-        ResponseEntity<TokenDto> apiResponse = authService.loginSocial(provider, code);
-        TokenDto tokens = apiResponse.getBody();
-
-        if (tokens == null) {
-            throw new RuntimeException("소셜 로그인 실패: 토큰을 받아오지 못했습니다.");
-        }
-        setCookie(response, "access-token", tokens.getAccessToken(), accessExpirationTime);
-        setCookie(response, "refresh-token", tokens.getRefreshToken(), refreshExpirationTime);
-
-        if (!tokens.isProfileComplete()) {
-
-            redirectAttributes.addFlashAttribute("alertMessage", "원활한 서비스 이용을 위해 생년월일 등 필수 정보를 입력해주세요.");
-
-            return "redirect:/mypage?tab=info";
-        }
-
-        return "redirect:/";
     }
 }
