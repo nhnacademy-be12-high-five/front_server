@@ -12,7 +12,12 @@ const {
 // ===========================
 // 2. Toss 초기화
 // ===========================
-const tossPayments = TossPayments(tossClientKey);
+if (!TOSS_CLIENT_KEY || typeof TOSS_CLIENT_KEY !== "string") {
+    console.error("Toss Client Key 누락", TOSS_CLIENT_KEY);
+}
+
+const tossPayments = TossPayments(TOSS_CLIENT_KEY);
+
 let selectedMethodCode = null;
 
 // 초기화
@@ -71,6 +76,36 @@ function useAllPoints() {
     $('#usedPoint').val(maxPoint);
     updateTotal();
 }
+
+// ===========================
+// 결제 수단 선택
+// ===========================
+function selectMethod(element) {
+    if ($(element).hasClass("disabled")) return;
+
+    if ($(element).hasClass("active")) {
+        $(element).removeClass("active");
+        selectedMethodCode = null;
+        $('#paymentMethodInput').val("");
+        $('#method-desc').text("결제 수단을 선택해주세요.");
+        return;
+    }
+
+    $('.tab').removeClass('active');
+    $(element).addClass('active');
+
+    selectedMethodCode = $(element).data("code");
+    $('#paymentMethodInput').val(selectedMethodCode);
+
+    const descMap = {
+        TOSS: "Toss 위젯을 통해 빠르게 결제 해보세요.",
+        BANK_TRANSFER: "실시간 계좌이체를 진행합니다.",
+        VIRTUAL_ACCOUNT: "가상계좌를 발급받아 입금 후 결제 완료됩니다."
+    };
+
+    $('#method-desc').text(descMap[selectedMethodCode] ?? "선택한 결제 수단으로 진행합니다.");
+}
+
 
 // ===========================
 // 결제 요청

@@ -13,14 +13,15 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://js.tosspayments.com/v1/payment"></script>
 <script th:inline="javascript">
+    const TOSS_CLIENT_KEY = [[${tossClientKey}]];
     window.ORDER_ENV = {
         maxPoint: [[${point != null ? point : 0}]],
-    tossClientKey: [[${tossClientKey != null ? "'" + tossClientKey + "'" : "null"}]],
-    customerEmail: [[${orderSheet.email != null ? "'" + orderSheet.email + "'" : "null"}]],
+    customerEmail: [[${orderSheet.email != null ? '"' + orderSheet.email + '"' : 'null'}]],
         freeDeliveryThreshold: [[${orderSheet.deliveryPolicy.minOrderAmount}]],
         standardDeliveryFee: [[${orderSheet.deliveryPolicy.standardShippingFee}]]
     };
 </script>
+
 <script src="/js/order.js"></script>
 
 <body>
