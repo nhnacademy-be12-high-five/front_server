@@ -1,7 +1,6 @@
 package com.example.high_five.service;
 
 import com.example.high_five.common.CustomPage;
-import com.example.high_five.dto.member.request.MemberCreateRequestDto;
 import com.example.high_five.dto.member.request.MemberUpdateRequest;
 import com.example.high_five.dto.member.response.MemberResponse;
 import com.example.high_five.dto.point.PointAdminAdjustmentRequest;
