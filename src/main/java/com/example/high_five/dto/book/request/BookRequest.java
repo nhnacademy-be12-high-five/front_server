@@ -2,15 +2,16 @@ package com.example.high_five.dto.book.request;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class BookRequest {
-    private String seqNo;
     private String isbn;
     private String title;
-    private String author;
+    private Integer price;
     private String publisher;
-    private String pubDate;
-    private String price;
-    private String imageUrl;
+    private String publishedDate;
     private String description;
+    private String image;
+    private List<String> author;
 }

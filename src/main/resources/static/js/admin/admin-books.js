@@ -72,8 +72,8 @@ function fillForm(book) {
     document.getElementById('bookId').value = book.id;
     document.getElementById('isbn').value = book.isbn || book.isbn13;
     document.getElementById('title').value = book.title;
-    if (Array.isArray(book.author)) {
-        document.getElementById('author').value = book.author.join(',');
+    if (Array.isArray(book.authors)) {
+        document.getElementById('author').value = book.authors.join(',');
     } else {
         document.getElementById('author').value = book.author || ''; // author 필드명 확인 필요
     }
