@@ -3,74 +3,12 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>Booktown - 주문 내역</title>
-    <link rel="stylesheet" href="/member-css/mypage.css">
-    <link rel="stylesheet" href="/css/member-css/coupons.css">
+    <title>마이페이지 - 주문 내역</title>
+    <link rel="stylesheet" href="/css/member-css/mypage.css">
     <link rel="stylesheet" href="/css/common/footer.css">
     <link rel="stylesheet" href="/css/common/header.css">
     <link rel="stylesheet" href="/css/common/common.css">
-    <style>
-        .order-card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            background-color: #fff;
-        }
-
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
-            font-weight: bold;
-            color: #555;
-        }
-
-        .order-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-
-        .order-footer {
-            margin-top: 15px;
-            text-align: right;
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            background-color: #e9ecef;
-            color: #495057;
-        }
-
-        .status-WAITING {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-
-        .status-COMPLETED {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .status-CANCELED {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 50px;
-            color: #888;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/member-css/orders.css">
 
     <script src="/js/common.js"></script>
 
@@ -81,6 +19,7 @@
 <div th:replace="~{layout/header :: header}"></div>
 
 <div class="container2">
+    <aside class="mypage-tabs">
     <nav class="box">
         <a href="/mypage" class="tab-btn">내 정보</a>
         <a href="/mypage/address" class="tab-btn">배송지</a>
@@ -90,6 +29,7 @@
         <a href="/mypage/reviews" class="tab-btn">리뷰</a>
         <a href="/mypage/likes" class="tab-btn">찜 목록</a>
     </nav>
+    </aside>
 
     <section class="tab-content active">
         <h2 class="section-title">주문 내역</h2>

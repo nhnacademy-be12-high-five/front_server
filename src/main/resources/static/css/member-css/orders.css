@@ -1,33 +1,119 @@
+/* ===============================
+   마이페이지 전체 컨테이너
+=============================== */
+
+.container2 {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+/* ===============================
+   상단 탭 (스크롤 고정 X)
+=============================== */
+
+.mypage-tabs {
+    margin-bottom: 32px;
+}
+
+.mypage-tabs .box {
+    display: flex;
+    gap: 10px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.tab-btn {
+    padding: 10px 16px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 14px;
+    color: #444;
+    background-color: #f5f7fa;
+    white-space: nowrap;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.tab-btn:hover {
+    background-color: #e9ecf5;
+}
+
+.tab-btn.active {
+    background-color: #3b5bdb;
+    color: #fff;
+    font-weight: 600;
+}
+
+/* ===============================
+   콘텐츠 영역 (탭과 분리)
+=============================== */
+
+.tab-content {
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+}
+
+.section-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 24px;
+}
+
+/* ===============================
+   주문 리스트
+=============================== */
+
 .order-list {
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
 
+/* ===============================
+   주문 카드
+=============================== */
+
 .order-card {
-    border: 1px solid var(--color-border-light);
+    border: 1px solid #ddd;
     border-radius: 12px;
-    padding: 18px 20px;
-    background: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+    padding: 20px;
+    background-color: #fff;
 }
+
+.order-card.completed {
+    opacity: 0.9;
+}
+
+/* ===============================
+   주문 헤더
+=============================== */
 
 .order-header {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
     margin-bottom: 12px;
-    font-size: 13px;
-    color: var(--color-text-light);
+    font-weight: 600;
+    color: #555;
 }
+
 .order-id strong {
     font-size: 14px;
     color: var(--color-text-dark);
 }
+
 .order-date {
+    font-size: 12px;
     color: #999;
 }
+
+/* ===============================
+   상태 배지
+=============================== */
 
 .badge-status {
     padding: 4px 10px;
@@ -36,50 +122,65 @@
     font-weight: 600;
     white-space: nowrap;
 }
+
 .badge-status.shipping {
     background: #e3f2fd;
     color: #1565c0;
 }
+
 .badge-status.completed {
     background: #e8f5e9;
     color: #2e7d32;
 }
 
+/* ===============================
+   주문 본문
+=============================== */
+
 .order-body {
     display: flex;
     justify-content: space-between;
-    gap: 10px;
+    gap: 16px;
     border-top: 1px solid var(--color-border-light);
     border-bottom: 1px solid var(--color-border-light);
-    padding: 12px 0;
+    padding: 14px 0;
     font-size: 14px;
 }
+
 .order-product .title {
     font-weight: 600;
     margin-bottom: 4px;
 }
+
 .order-product .meta {
     font-size: 12px;
     color: var(--color-text-light);
 }
+
 .order-price {
     text-align: right;
     min-width: 120px;
 }
+
 .order-price .price {
     font-weight: 700;
     margin-bottom: 4px;
 }
+
 .order-price .confirm-deadline {
     font-size: 12px;
     color: #999;
 }
 
+/* ===============================
+   주문 푸터
+=============================== */
+
 .order-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    margin-top: 10px;
+    margin-top: 16px;
+    text-align: right;
+    font-weight: bold;
+    font-size: 16px;
 }
 
 .order-footer .small {
@@ -87,7 +188,40 @@
     font-size: 12px;
 }
 
-/* 구매확정 완료된 주문 카드 살짝 흐리게 */
-.order-card.completed {
-    opacity: 0.9;
+/* ===============================
+   주문 상태 컬러
+=============================== */
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    background-color: #e9ecef;
+    color: #495057;
+}
+
+.status-WAITING {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-COMPLETED {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-CANCELED {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* ===============================
+   데이터 없음
+=============================== */
+
+.no-data {
+    text-align: center;
+    padding: 60px;
+    color: #888;
+    font-size: 14px;
 }
