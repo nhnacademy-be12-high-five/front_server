@@ -13,5 +13,5 @@ public class BookRequest {
     private String publishedDate;
     private String description;
     private String image;
-    private List<String> author;
+    private List<String> authors;
 }
