@@ -54,7 +54,7 @@ public interface BookClient {
     List<BookResponse> getBestSellers(@RequestParam("size") int size);
   
     // 도서 좋아요 조회
-    @GetMapping("/members/me/likes")
+    @GetMapping("/api/members/me/likes")
     Boolean getBookLike(@PathVariable("book-id") Long id);
 
     // 좋아요를 눌렀는데 로그인이 안되어있다면 로그인창으로 리다이렉팅
@@ -62,7 +62,7 @@ public interface BookClient {
     void toggleLike(@PathVariable("book-id") Long bookId,
                           @RequestHeader(value = "X-USER-ID", required = true) Long memberId);
 
-    @GetMapping("/books/{book-id}/likes/status")
+    @GetMapping("/api/books/{book-id}/likes/status")
     ResponseEntity<Boolean> getLikeStatus(@PathVariable("book-id") Long bookId,
                                           @RequestHeader(value = "X-USER-ID", required = true) Long memberId);
 

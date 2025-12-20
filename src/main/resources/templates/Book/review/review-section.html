@@ -1,8 +1,6 @@
 <div class="review-section" th:fragment="review-section">
 
     <div class="review-write-area">
-
-        <!-- 내가 작성한 리뷰 있을 때 -->
         <div th:if="${myReview != null}" class="my-review-card">
             <h3>내가 작성한 리뷰</h3>
             <div class="review-item highlight">
@@ -16,8 +14,11 @@
                 <div class="review-content">
                     <p th:text="${myReview.content}">리뷰 내용...</p>
 
-                    <div th:if="${myReview.imageUrls != null and !myReview.imageUrls.isEmpty()}" class="review-img">
-                        <img th:src="${myReview.imageUrls[0]}" alt="내 리뷰 이미지">
+                    <div th:if="${myReview.reviewImages != null and !myReview.reviewImages.isEmpty()}"
+                         class="review-images-container">
+                        <div th:each="img : ${myReview.reviewImages}" class="review-img-item">
+                            <img th:src="${img.imageUrl}" alt="내 리뷰 이미지" onclick="openImageModal(this.src)">
+                        </div>
                     </div>
                 </div>
                 <div class="review-actions">
@@ -27,6 +28,7 @@
                        th:data-book-id="${book.bookId}"
                        th:data-content="${myReview.content}"
                        th:data-rating="${myReview.rating}"
+                       th:attr="data-review-images=${myReview.reviewImages != null ? #strings.listJoin(myReview.reviewImages.![imageId + '|' + imageUrl], ',') : ''}"
                        onclick="startEditReview(this)">
                         수정
                     </a>
@@ -34,12 +36,9 @@
             </div>
         </div>
 
-        <!-- 내가 작성한 리뷰 없을 때 -->
         <div th:unless="${myReview != null}" class="review-form-card">
             <h3>리뷰 작성</h3>
-
             <form id="reviewForm" enctype="multipart/form-data">
-
                 <div class="star-rating">
                     <span class="rating-label">별점</span>
                     <select name="rating" class="form-select">
@@ -50,18 +49,19 @@
                         <option value="1">★☆☆☆☆ (1점)</option>
                     </select>
                 </div>
-
                 <div class="input-group">
                     <textarea name="content" placeholder="이 책에 대한 솔직한 리뷰를 남겨주세요." required></textarea>
                 </div>
-
                 <div class="file-group">
-                    <input type="file" name="images" multiple accept="image/*">
+                    <input type="file" id="reviewFileInput" name="images" multiple accept="image/*"
+                           style="display: none;" onchange="handleFileSelect(this)">
+                    <button type="button" class="btn-small" onclick="document.getElementById('reviewFileInput').click()"
+                            style="background-color: #6c757d;">
+                        📷 사진 첨부하기
+                    </button>
+                    <div id="file-list" class="file-upload-list"></div>
                 </div>
-
-                <button type="button"
-                        class="btn-primary full-width"
-                        th:onclick="|submitReview(${book.bookId})|">
+                <button type="button" class="btn-primary full-width" th:onclick="|submitReview(${book.bookId})|">
                     리뷰 등록하기
                 </button>
             </form>
@@ -70,7 +70,6 @@
 
     <hr class="divider">
 
-    <!-- 전체 리뷰 리스트 -->
     <div class="review-list-area">
         <h3>전체 리뷰 <span th:text="${reviewList.totalElements}">0</span>건</h3>
 
@@ -83,30 +82,34 @@
                 <div class="review-content">
                     <p th:text="${review.content}">리뷰 내용</p>
 
-                    <div th:if="${review.imageUrls != null and !review.imageUrls.isEmpty()}" class="review-thumb">
-                        <img th:src="${review.imageUrls[0]}" width="100">
+                    <div th:if="${review.reviewImages != null and !review.reviewImages.isEmpty()}"
+                         class="review-images-container">
+                        <div th:each="img : ${review.reviewImages}" class="review-img-item">
+                            <img th:src="${img.imageUrl}" alt="리뷰 이미지" onclick="openImageModal(this.src)">
+                        </div>
                     </div>
                 </div>
 
-                <div class="review-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-
+                <div class="review-footer"
+                     style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
                     <span class="date"
-                        th:text="${#temporals.format(review.createdAt.toLocalDateTime(), 'yyyy-MM-dd')}">
-                    </span>
+                          th:text="${#temporals.format(review.createdAt.toLocalDateTime(), 'yyyy-MM-dd')}"></span>
 
-                    <button type="button"
-                            class="btn-review-like"
-                            th:classappend="${review.isLiked} ? 'active'"
-                            th:onclick="|toggleReviewLike(${book.bookId}, ${review.reviewId}, this)|">
-                        ♥ <span th:id="'like-count-' + ${review.reviewId}" th:text="${review.likeCount}">0</span>
-                    </button>
+                    <div style="display: flex; align-items: center; gap: 10px;">
 
-                    <span class="my-review-badge" th:if="${loginMemberId == review.memberId}">내 글</span>
+                        <button type="button" class="btn-review-like" th:if="${loginMemberId != null and review.memberId != null and loginMemberId != review.memberId}"
+                                th:classappend="${review.isLiked} ? 'active'" th:onclick="|toggleReviewLike(${book.bookId}, ${review.reviewId}, this)|">
+                            ♥ <span th:id="'like-count-' + ${review.reviewId}" th:text="${review.likeCount}">0</span>
+                        </button>
+
+                        <span class="my-review-badge"
+                              th:if="${loginMemberId != null and review.memberId != null and loginMemberId == review.memberId}">
+                            내 글</span>
+                    </div>
                 </div>
             </div>
-
             <div th:if="${reviewList.isEmpty()}" class="no-reviews">
-                <p>아직 작성된 리뷰가 없습니다. 첫 번째 리뷰를 남겨보세요!</p>
+                <p>아직 작성된 리뷰가 없습니다.</p>
             </div>
         </div>
 
@@ -114,7 +117,7 @@
              style="display: flex; justify-content: center; gap: 5px; margin-top: 20px;">
 
             <a th:if="${reviewList.hasPrevious()}"
-               th:href="@{/books/{id}(id=${book.bookId}, page=${reviewList.number - 1})#tab-review}"
+               th:href="@{/books/{id}(id=${book.bookId}, page=${reviewList.number - 1})} + '#tab-review'"
                class="page-link"
                style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; color: #333; text-decoration: none;">&lt;</a>
 
@@ -127,10 +130,14 @@
             </span>
 
             <a th:if="${reviewList.hasNext()}"
-               th:href="@{/books/{id}(id=${book.bookId}, page=${reviewList.number + 1})#tab-review}"
+               th:href="@{/books/{id}(id=${book.bookId}, page=${reviewList.number + 1})} + '#tab-review'"
                class="page-link"
                style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; color: #333; text-decoration: none;">&gt;</a>
         </div>
     </div>
-</div>
 
+    <div id="imageModal" class="image-modal" onclick="closeImageModal()" style="display:none;">
+        <span class="close-modal">&times;</span>
+        <img class="image-modal-content" id="modalImage">
+    </div>
+</div>

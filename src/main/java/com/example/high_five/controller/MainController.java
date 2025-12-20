@@ -12,7 +12,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-public class testController {
+public class MainController {
 
     private final BookClient bookClient; // FeignClient 주입
     private final TagService tagService;
