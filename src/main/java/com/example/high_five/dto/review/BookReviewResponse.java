@@ -1,9 +1,6 @@
 package com.example.high_five.dto.review;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -15,7 +12,8 @@ public record BookReviewResponse(
         String content,
         int rating,
         ZonedDateTime createdAt,
-        List<String> imageUrls,
+        List<ReviewImageResponse> reviewImages,
+
         Integer likeCount,
         boolean isLiked) {
 }

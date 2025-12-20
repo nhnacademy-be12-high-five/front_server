@@ -57,7 +57,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         UserContext user = (UserContext) request.getAttribute("user");
         if (user == null) {
-            response.sendRedirect("/member/login.html");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인이 필요합니다.");
             return false;
         }
 
