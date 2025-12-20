@@ -85,7 +85,7 @@ function fillForm(book) {
 
     previewImage(book.image);
 
-    setFormReadOnly(false);
+    setFormReadOnly(true);
 
     // 화면 스크롤을 폼으로 이동
     form.scrollIntoView({ behavior: 'smooth' });
