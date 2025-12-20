@@ -73,7 +73,7 @@ function fillForm(book) {
     document.getElementById('isbn').value = book.isbn || book.isbn13;
     document.getElementById('title').value = book.title;
     if (Array.isArray(book.authors)) {
-        document.getElementById('author').value = book.authors.join(',');
+        document.getElementById('author').value = book.author.join(',');
     } else {
         document.getElementById('author').value = book.author || ''; // author 필드명 확인 필요
     }
@@ -85,7 +85,7 @@ function fillForm(book) {
 
     previewImage(book.image);
 
-    setFormReadOnly(true);
+    setFormReadOnly(false);
 
     // 화면 스크롤을 폼으로 이동
     form.scrollIntoView({ behavior: 'smooth' });
