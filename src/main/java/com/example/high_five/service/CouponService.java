@@ -36,7 +36,7 @@ public interface CouponService {
     void createCouponTemplate(@RequestBody CouponCreateRequestDto dto);
 
     @PostMapping("/api/coupons/admin/coupons/{couponId}/change-status")
-    void updateCouponStatus(@PathVariable("couponId") Long couponId, @RequestParam String status);
+    void updateCouponStatus(@PathVariable("couponId") Long couponId, @RequestBody CouponStatusRequestDto requestDto);
 
     @DeleteMapping("/api/coupons/admin/coupon-policies/{id}")
     void disableCouponPolicy(@PathVariable("id") Long id);
