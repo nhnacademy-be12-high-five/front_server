@@ -401,10 +401,19 @@ main {
 }
 
 #footer .container {
+    padding: 0 24px;
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
+#footer .footer-info > div:first-child {
+    padding-left: 12px;
+}
+#footer .footer-links {
+    padding-left: 12px;
+}
+
+
 
 .footer-links a {
     color: #c0c0c0;

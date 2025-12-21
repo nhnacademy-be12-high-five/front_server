@@ -1,37 +1,130 @@
+/* =========================
+   FOOTER (Unified / Stable)
+   ========================= */
+
 #footer {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+
     background-color: var(--color-dark-footer);
-    color: #a0a0a0; /* 어두운 배경에 밝은 텍스트 */
+    color: #bcbcbc;
+
     padding: 40px 0;
     font-size: 13px;
+    line-height: 1.65;
+    letter-spacing: -0.01em;
 }
 
+/* 도트 패턴 */
+#footer::before{
+    content:"";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: .55;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Ccircle cx='2' cy='2' r='1' fill='%23DCE2F3'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+}
+
+/* 푸터 내부 요소는 패턴 위에 올라오게 */
+#footer > * { position: relative; }
+
+/* 푸터 내부 전역 리셋(페이지 CSS 영향 차단) */
+#footer * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 푸터 컨테이너 */
 #footer .container {
+    width: 100%;
+    max-width: var(--container, 1200px);
+    margin: 0 auto;
+
+    padding: 0 28px;
+
     display: flex;
     flex-direction: column;
     gap: 18px;
 }
 
-.footer-links a {
-    color: #c0c0c0;
-    margin-right: 15px;
+/* 상단 링크 */
+#footer .footer-links{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding-left: 12px;
+}
+
+#footer .footer-links a{
+    font-size: 13px;
+    font-weight: 600;
+    color: #d6d6d6;
     text-decoration: none;
 }
-.footer-links a:hover {
-    color: white;
+
+#footer .footer-links a strong{
+    font-weight: 800;
 }
 
-.footer-info {
+#footer .footer-links a:hover{
+    text-decoration: underline;
+}
+
+/* 하단 정보(좌/우) */
+#footer .footer-info{
     display: flex;
     justify-content: space-between;
-    gap: 20px;
+    align-items: flex-start;
+    gap: 40px;
 }
 
-.footer-info .copyright,
-.footer-info .customer-center {
-    flex: 1;
-    line-height: 1.8;
+#footer .footer-info > div{
+    display: grid;
+    gap: 6px;
+    color: #bcbcbc;
+    font-size: 13px;
 }
 
-.footer-info .copyright strong {
-    color: #c0c0c0;
+#footer .footer-info > div:first-child{
+    padding-left: 12px;
 }
+
+#footer .footer-info > div:last-child{
+    margin-left: auto;
+    text-align: right;
+    padding-right: 8px;
+}
+
+#footer .footer-info strong{
+    font-weight: 700;
+    color: #e0e0e0;
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px){
+    #footer .footer-info{
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    #footer .footer-info > div:last-child{
+        margin-left: 0;
+        text-align: left;
+        padding-right: 0;
+    }
+}
+
+/*!* =========================*/
+/*   최종 안전장치: 푸터가 "fixed"로 올라오는 문제 차단*/
+/*   (어딘가에서 footer{position:fixed}가 있어도 #footer는 절대 안 올라오게)*/
+/*   ========================= *!*/
+/*#footer{*/
+/*    position: relative !important;*/
+/*    bottom: auto !important;*/
+/*    left: auto !important;*/
+/*    right: auto !important;*/
+/*}*/
