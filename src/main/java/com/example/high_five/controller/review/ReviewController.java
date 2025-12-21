@@ -36,7 +36,7 @@ public class ReviewController {
     // 리뷰 등록
     @PostMapping("/books/{book-id}/reviews")
     @LoginRequired
-    public String addReview(
+    public ResponseEntity<Void> addReview(
             @PathVariable("book-id") Long bookId,
             @ModelAttribute ReviewCreateRequest request,
             @RequestPart(value = "images", required = false) List<MultipartFile> images
@@ -57,7 +57,7 @@ public class ReviewController {
 
         reviewService.createReview(bookId, requestFile, images);
 
-        return "redirect:/books/" + bookId;
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     // 리뷰 리스트 조회

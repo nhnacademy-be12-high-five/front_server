@@ -31,59 +31,6 @@ async function handleReviewError(response, defaultMsg = "요청 처리에 실패
     if (response.status === 401) location.href = "/member/login";
 }
 
-function toggleReviewLike(bookId, reviewId, btn) {
-    if (likeProcessingMap[reviewId]) return;
-
-    likeProcessingMap[reviewId] = true;
-    btn.style.opacity = "0.5";
-    btn.style.cursor = "not-allowed";
-
-    fetch(`/books/${bookId}/reviews/${reviewId}/like`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'}
-    })
-        .then(async response => {
-            if (response.status === 401) {
-                if (confirm("로그인이 필요한 서비스입니다. 로그인 페이지로 이동하시겠습니까?")) {
-                    location.href = "/member/login";
-                }
-                return null;
-            }
-            if (!response.ok) {
-                // 에러 핸들링 함수 호출 혹은 throw
-                await handleReviewError(response, "좋아요 처리 중 오류가 발생했습니다.");
-                return null;
-            }
-            return response.json();
-        })
-        .then(isLiked => {
-            if (isLiked === null) return; // 위에서 에러 처리됨
-
-            const countSpan = document.getElementById(`like-count-${reviewId}`);
-            let currentCount = parseInt(countSpan.innerText) || 0;
-
-            if (isLiked) {
-                btn.classList.add('active');
-                countSpan.innerText = currentCount + 1;
-            } else {
-                btn.classList.remove('active');
-                countSpan.innerText = Math.max(0, currentCount - 1);
-            }
-        })
-        .catch(err => {
-            console.error(err);
-            // 네트워크 에러 등 fetch 자체 실패 시
-            alert("네트워크 상태가 불안정합니다. 잠시 후 다시 시도해주세요.");
-        })
-        .finally(() => {
-            setTimeout(() => {
-                likeProcessingMap[reviewId] = false;
-                btn.style.opacity = "1";
-                btn.style.cursor = "pointer";
-            }, 500);
-        });
-}
-
 // ===================================================================================//
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -312,7 +259,14 @@ async function submitReview(bookId) {
         });
 
         if (response.redirected) {
+            alert("로그인이 필요한 서비스입니다.");
             window.location.href = response.url;
+            return;
+        }
+
+        if (response.status === 401 || response.status === 403) {
+            alert("로그인이 필요한 서비스입니다.");
+            location.href = "/member/login";
             return;
         }
 
@@ -512,4 +466,58 @@ async function submitUpdateReview(reviewId, bookId) {
         console.error(e);
         alert("네트워크 오류가 발생했습니다.");
     }
+}
+
+
+function toggleReviewLike(bookId, reviewId, btn) {
+    if (likeProcessingMap[reviewId]) return;
+
+    likeProcessingMap[reviewId] = true;
+    btn.style.opacity = "0.5";
+    btn.style.cursor = "not-allowed";
+
+    fetch(`/books/${bookId}/reviews/${reviewId}/like`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    })
+        .then(async response => {
+            if (response.status === 401) {
+                if (confirm("로그인이 필요한 서비스입니다. 로그인 페이지로 이동하시겠습니까?")) {
+                    location.href = "/member/login";
+                }
+                return null;
+            }
+            if (!response.ok) {
+                // 에러 핸들링 함수 호출 혹은 throw
+                await handleReviewError(response, "좋아요 처리 중 오류가 발생했습니다.");
+                return null;
+            }
+            return response.json();
+        })
+        .then(isLiked => {
+            if (isLiked === null) return; // 위에서 에러 처리됨
+
+            const countSpan = document.getElementById(`like-count-${reviewId}`);
+            let currentCount = parseInt(countSpan.innerText) || 0;
+
+            if (isLiked) {
+                btn.classList.add('active');
+                countSpan.innerText = currentCount + 1;
+            } else {
+                btn.classList.remove('active');
+                countSpan.innerText = Math.max(0, currentCount - 1);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            // 네트워크 에러 등 fetch 자체 실패 시
+            alert("네트워크 상태가 불안정합니다. 잠시 후 다시 시도해주세요.");
+        })
+        .finally(() => {
+            setTimeout(() => {
+                likeProcessingMap[reviewId] = false;
+                btn.style.opacity = "1";
+                btn.style.cursor = "pointer";
+            }, 500);
+        });
 }
