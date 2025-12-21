@@ -3,6 +3,7 @@ package com.example.high_five.service;
 import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.book.BookPagedResponse;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -20,4 +21,7 @@ public interface BookFeignClient {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     );
+
+    @GetMapping("/api/admin/books/search-api")
+    ResponseEntity<Object> searchBookByIsbn(@RequestParam("isbn") String isbn);
 }
