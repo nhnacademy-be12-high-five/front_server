@@ -462,11 +462,22 @@ async function submitUpdateReview(reviewId, bookId) {
         return;
     }
 
-    // [수정] DTO 생성 시 deleteImageIds 포함
+    if(content.length < 10) {
+        alert("리뷰는 최소 10자 이상 작성해주세요.");
+        return;
+    }
+
+    if(content.length > 1000) {
+        alert("리뷰는 최대 1000자 미만 작성해주세요."); // 오타 수정: 최댜 -> 최대
+        return;
+    }
+
+    // [수정 1] deleteImageIds 배열을 DTO에 포함시켜야 서버가 삭제할 이미지를 알 수 있습니다.
+    // 전역 변수 deleteImageIds를 여기에 매핑합니다.
     const requestDto = {
-        content,
         rating: Number(rating),
-        deleteImageIds: deleteImageIds // 여기에 수집된 ID들이 들어감
+        content: content,
+        deleteImageIds: deleteImageIds // <--- 핵심 수정 사항
     };
 
     const formData = new FormData();
@@ -475,26 +486,19 @@ async function submitUpdateReview(reviewId, bookId) {
         new Blob([JSON.stringify(requestDto)], { type: "application/json" })
     );
 
-    // 새로 추가한 파일들
-    editSelectedFiles.forEach(file => {
+    // [수정 2] 수정 모드에서는 'selectedFiles'가 아니라 'editSelectedFiles'를 보내야 합니다.
+    // selectedFiles는 리뷰 '등록' 시 사용하는 변수입니다.
+    editSelectedFiles.forEach(file => { // <--- 핵심 수정 사항
         formData.append("images", file);
     });
 
     try {
+        // method는 보통 수정일 경우 PUT을 많이 쓰지만,
+        // 컨트롤러 설정에 따라 POST가 맞다면 유지하시면 됩니다.
         const response = await fetch(`/books/${bookId}/reviews/${reviewId}`, {
-            method: "POST", // 또는 "PUT"
+            method: "POST", // 혹은 컨트롤러 매핑에 맞춰 "POST"
             body: formData
         });
-
-        if(content.length < 10) {
-            alert("리뷰는 최소 10자 이상 작성해주세요.");
-            return;
-        }
-
-        if(content.length > 1000) {
-            alert("리뷰는 최댜 1000자 미만 작성해주세요.");
-            return;
-        }
 
         if (!response.ok) {
             await handleReviewError(response, "리뷰 수정에 실패했습니다.");
