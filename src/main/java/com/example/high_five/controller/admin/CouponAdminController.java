@@ -98,6 +98,13 @@ public class CouponAdminController {
         return "redirect:/admin/coupons/page";
     }
 
+    @LoginRequired(adminOnly = true)
+    @PostMapping("/admin/coupons/{couponId}/status")
+    public String updateCouponStatus(@PathVariable("couponId") Long couponId, @RequestParam String status) {
+         couponService.updateCouponStatus(couponId, status);
+         return "redirect:/admin/coupons/page";
+    }
+
     @LoginRequired(adminOnly=true)
     @PostMapping("/admin/coupons/policies/{id}")
     public String disablePolicy(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {

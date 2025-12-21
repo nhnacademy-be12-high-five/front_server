@@ -281,19 +281,36 @@
                                 </span>
                             </td>
                             <td>
-                                <!-- ACTIVE일 때만 중단 버튼 노출 (정책 테이블 방식과 동일) -->
-                                <form th:if="${coupon.status == 'ACTIVE'}"
-                                      th:action="@{/admin/coupons/{id}/deactivate(id=${coupon.id})}"
+                                <form th:if="${coupon.status != 'INACTIVE'}"
+                                      th:action="@{/admin/coupons/{couponId}/status(couponId=${coupon.id})}"
                                       method="post"
-                                      onsubmit="return confirm('정말 이 쿠폰 발급을 중단하시겠습니까?');">
+                                      onsubmit="return confirm('이 쿠폰 발급을 중단하시겠습니까?');">
+
+                                    <input type="hidden" name="status" value="INACTIVE"/>
+
                                     <button type="submit"
-                                            style="background-color:#dc3545; color:#fff; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
-                                        비활성화
+                                            style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                                        중단
                                     </button>
                                 </form>
 
-                                <!-- ACTIVE 아니면 - -->
-                                <span th:unless="${coupon.status == 'ACTIVE'}">-</span>
+                                <form th:if="${coupon.status == 'INACTIVE' and coupon.policyStatus == 'ACTIVE'}"
+                                      th:action="@{/admin/coupons/{couponId}/status(couponId=${coupon.id})}"
+                                      method="post"
+                                      onsubmit="return confirm('쿠폰 발급을 다시 시작하시겠습니까?');">
+
+                                    <input type="hidden" name="status" value="ACTIVE"/>
+
+                                    <button type="submit"
+                                            style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                                        재개
+                                    </button>
+                                </form>
+
+                                <span th:if="${coupon.status == 'INACTIVE' and coupon.policyStatus != 'ACTIVE'}"
+                                      style="color: gray; font-size: 0.8em;">
+                                    (정책 중단됨)
+                                </span>
                             </td>
 
                         </tr>
