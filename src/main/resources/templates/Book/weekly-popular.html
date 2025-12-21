@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HIGH-FIVE 도서 | TOP 10</title>
+
+    <!-- 공통 CSS -->
+    <link rel="stylesheet" href="/css/common/common.css">
+    <link rel="stylesheet" href="/css/common/header.css">
+    <link rel="stylesheet" href="/css/common/footer.css">
+
+    <!-- 페이지 전용 CSS -->
+    <link rel="stylesheet" href="/css/book-css/weekly-popular.css">
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div th:replace="~{layout/header :: header}"></div>
+
+<main>
+
+    <!-- 페이지 헤더 -->
+    <section class="page-header">
+        <div class="container">
+            <h2>🏆 주간 인기 차트 TOP 10</h2>
+            <p>가장 많은 사랑을 받고 있는 도서들을 만나보세요.</p>
+        </div>
+    </section>
+
+    <!-- 카드 그리드 -->
+    <section class="container">
+        <div class="card-grid">
+
+            <article class="card"
+                     th:each="book, iterStat : ${risingBooks}">
+                <a th:href="@{/books/{id}(id=${book.bookId})}" class="book-link">
+
+                    <div class="rank-badge"
+                         th:classappend="${iterStat.count <= 3} ? 'rank-' + ${iterStat.count}"
+                         th:text="${iterStat.count}">
+                    </div>
+
+                    <div class="thumb">
+                        <img th:src="${book.image}" th:alt="${book.title}" />
+                    </div>
+
+                    <div class="info">
+                        <div class="title" th:text="${book.title}"></div>
+                        <div class="meta">
+                            <span th:text="${book.publisher}"></span>
+                        </div>
+                        <div class="price-row">
+                            <span class="price"
+                                  th:text="|${#numbers.formatInteger(book.price, 0, 'COMMA')}원|">
+                            </span>
+                            <span class="badge-best"
+                                  th:if="${iterStat.count <= 3}">
+                                BEST
+                            </span>
+                        </div>
+                    </div>
+
+                </a>
+            </article>
+
+        </div>
+    </section>
+
+</main>
+
+<!-- FOOTER -->
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<!-- 페이지 전용 JS -->
+<script src="/js/book/best-seller.js"></script>
+</body>
+</html>
