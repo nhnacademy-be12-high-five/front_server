@@ -35,6 +35,9 @@ public interface CouponService {
     @PostMapping("/api/coupons/admin/coupons")
     void createCouponTemplate(@RequestBody CouponCreateRequestDto dto);
 
+    @PostMapping("/api/coupons/admin/coupons/{couponId}/change-status")
+    void updateCouponStatus(@PathVariable("couponId") Long couponId, @RequestParam String status);
+
     @DeleteMapping("/api/coupons/admin/coupon-policies/{id}")
     void disableCouponPolicy(@PathVariable("id") Long id);
 
@@ -50,7 +53,6 @@ public interface CouponService {
 
     @GetMapping("/api/coupons/books/{book-id}")
     List<CouponTemplateDto> getBookCoupons(@PathVariable("book-id") Long bookId);
-
 
     @GetMapping("/api/coupons/members/order")
     List<MemberCouponResponseDto> getUsableCoupons(@RequestHeader(name = "X-USER-ID", required = false) Long memberId);
