@@ -317,7 +317,6 @@ input {
     max-width: 1000px; /* 상세페이지는 조금 더 넓게 */
     margin: 30px auto;
     padding: 20px;
-    flex-grow: 1; /* 메인 콘텐츠 영역이 남은 공간을 채우도록 */
 }
 
 /* 상세 정보 섹션 */
@@ -331,13 +330,7 @@ input {
     margin-bottom: 30px;
 }
 
-.book-image {
-    flex-shrink: 0;
-    width: 300px;
-    border: 1px solid var(--color-border-light);
-    border-radius: 8px;
-    overflow: hidden;
-}
+
 
 .book-image img {
     width: 100%;
@@ -581,14 +574,7 @@ input {
     display: block;
 }
 
-/* 푸터 스타일 추가 (마이페이지에는 없었지만, 전체 레이아웃 완성을 위해) */
-#footer {
-    margin-top: auto; /* 본문 내용이 짧아도 항상 하단에 위치 */
-    background-color: var(--color-dark-footer);
-    color: #fff8e1; /* 따뜻한 아이보리 텍스트 */
-    padding: 30px 0;
-    font-size: 14px;
-}
+
 
 #footer .container {
     display: flex;
@@ -674,12 +660,12 @@ input {
     color: var(--color-text-light);
 }
 
-#footer {
-    background-color: var(--color-dark-footer);
-    color: #a0a0a0; /* 어두운 배경에 밝은 텍스트 */
-    padding: 40px 0;
-    font-size: 13px;
-}
+/*#footer {*/
+/*    background-color: var(--color-dark-footer);*/
+/*    color: #a0a0a0; !* 어두운 배경에 밝은 텍스트 *!*/
+/*    padding: 40px 0;*/
+/*    font-size: 13px;*/
+/*}*/
 
 #footer .container {
     display: flex;
