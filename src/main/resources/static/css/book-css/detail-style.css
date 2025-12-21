@@ -1341,3 +1341,53 @@ textarea {
         height: 80px;
     }
 }
+
+.content-area {
+    font-size: 16px;
+    line-height: 1.9;        /* 줄간격을 넓게 */
+    color: #444;
+    white-space: pre-wrap;   /* [핵심] 텍스트의 줄바꿈(\n)을 화면에 그대로 반영 */
+    word-break: keep-all;    /* 한글 단어가 중간에 끊기지 않게 함 */
+}
+
+/* 제목(H3) 태그 스타일 - 위아래 간격을 넓혀서 구분감 주기 */
+.content-area h3 {
+    display: block;
+    margin-top: 50px;        /* 위쪽 여백 대폭 추가 (확실한 분리) */
+    margin-bottom: 20px;     /* 아래쪽 여백 */
+    font-size: 1.4rem;       /* 글자 크기 확대 */
+    font-weight: 800;
+    color: #222;
+    border-bottom: 2px solid var(--color-primary); /* 브랜드 컬러 밑줄 */
+    padding-bottom: 12px;
+}
+
+/* 첫 번째 제목은 위쪽 여백 줄임 */
+.content-area h3:first-child {
+    margin-top: 10px;
+}
+
+/* 강조(Strong) 태그 스타일 */
+.content-area strong {
+    font-weight: 700;
+    color: #0056b3;          /* 진한 파란색으로 포인트 */
+}
+
+/* 문단(P) 스타일 */
+.content-area p {
+    margin-bottom: 20px;     /* 문단 간격 추가 */
+}
+
+/* 리스트(UL, OL) 스타일 - 박스 형태로 깔끔하게 */
+.content-area ul, .content-area ol {
+    margin: 20px 0;
+    padding: 25px 30px;
+    background-color: #f8f9fa; /* 회색 배경 박스 */
+    border-radius: 10px;
+    border: 1px solid #eee;
+}
+
+.content-area li {
+    margin-bottom: 10px;
+    list-style-type: disc;
+}
