@@ -89,3 +89,28 @@ img {
     margin: 0 auto;
     padding: 10px 20px;
 }
+
+/* ===== Fixed Header/Footer (주간/인기/베스트셀러 전용) ===== */
+:root{
+    --header-height: 80px;   /* 실제 헤더 높이에 맞춰 조정 */
+    --footer-height: 160px;  /* 실제 푸터 높이에 맞춰 조정 */
+}
+
+/* header/footer가 fixed일 때 본문이 가려지지 않도록 보정 */
+.page-fixed-layout{
+    padding-top: var(--header-height);
+    padding-bottom: calc(var(--footer-height) + 16px);
+}
+
+/* header/footer 고정 */
+.page-fixed-layout header{
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+}
+.page-fixed-layout footer{
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 900;
+}
+

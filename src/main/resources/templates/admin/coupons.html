@@ -220,6 +220,8 @@
                             <th>발급 종료 일자</th>
                             <th>유효 기간</th>
                             <th>상태</th>
+                            <th>관리</th>
+
 
                         </tr>
                         </thead>
@@ -278,9 +280,25 @@
                                     대기 중
                                 </span>
                             </td>
+                            <td>
+                                <!-- ACTIVE일 때만 중단 버튼 노출 (정책 테이블 방식과 동일) -->
+                                <form th:if="${coupon.status == 'ACTIVE'}"
+                                      th:action="@{/admin/coupons/{id}/deactivate(id=${coupon.id})}"
+                                      method="post"
+                                      onsubmit="return confirm('정말 이 쿠폰 발급을 중단하시겠습니까?');">
+                                    <button type="submit"
+                                            style="background-color:#dc3545; color:#fff; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
+                                        비활성화
+                                    </button>
+                                </form>
+
+                                <!-- ACTIVE 아니면 - -->
+                                <span th:unless="${coupon.status == 'ACTIVE'}">-</span>
+                            </td>
+
                         </tr>
                         <tr th:if="${#lists.isEmpty(coupons)}">
-                            <td colspan="6" style="text-align: center; padding: 20px;">등록된 쿠폰이 없습니다.</td>
+                            <td colspan="10" style="text-align: center; padding: 20px;">등록된 쿠폰이 없습니다.</td>
                         </tr>
                         </tbody>
                     </table>

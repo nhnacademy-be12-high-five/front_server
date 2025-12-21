@@ -1,37 +1,145 @@
+/* =========================
+   FOOTER (Unified / Stable)
+   ========================= */
+
 #footer {
-    background-color: var(--color-dark-footer);
-    color: #a0a0a0; /* 어두운 배경에 밝은 텍스트 */
+    /* 어떤 전역 규칙이 footer를 fixed로 만들더라도 막기 */
+    position: relative !important;
+    bottom: auto !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+
+    width: 100%;
+    overflow: hidden;
+
+    background-color: var(--color-dark-footer, #3e2723);
+    color: #bcbcbc;
+
     padding: 40px 0;
     font-size: 13px;
+    line-height: 1.65;
+    letter-spacing: -0.01em;
+
+    /* 핵심: 페이지가 짧아도 항상 아래로 */
+    margin-top: auto;
 }
 
+/* 도트 패턴 */
+#footer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.55;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Ccircle cx='2' cy='2' r='1' fill='%23DCE2F3'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+}
+
+/* 푸터 내부 요소는 패턴 위로 */
+#footer > * { position: relative; }
+
+/* 컨테이너 */
 #footer .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 22px 24px;
+
     display: flex;
     flex-direction: column;
     gap: 18px;
 }
 
-.footer-links a {
-    color: #c0c0c0;
-    margin-right: 15px;
+/* 상단 링크 */
+#footer .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding-left: 12px;
+    margin-bottom: 14px;
+}
+
+#footer .footer-links a {
+    font-size: 13px;
+    font-weight: 600;
+    color: #d6d6d6;
     text-decoration: none;
 }
-.footer-links a:hover {
-    color: white;
-}
+#footer .footer-links a strong { font-weight: 800; }
+#footer .footer-links a:hover { text-decoration: underline; }
 
-.footer-info {
+/* 하단 정보(좌/우) */
+#footer .footer-info {
     display: flex;
     justify-content: space-between;
-    gap: 20px;
+    align-items: flex-start;
+    gap: 40px;
 }
 
-.footer-info .copyright,
-.footer-info .customer-center {
-    flex: 1;
-    line-height: 1.8;
+#footer .footer-info > div {
+    display: grid;
+    gap: 6px;
+    color: #bcbcbc;
+    font-size: 13px;
+    flex-direction: column;
 }
 
-.footer-info .copyright strong {
-    color: #c0c0c0;
+#footer .footer-info > div:first-child { padding-left: 12px; }
+#footer .footer-info > div:last-child {
+    margin-left: auto;
+    text-align: right;
+    padding-right: 8px;
 }
+
+#footer .footer-info strong {
+    font-weight: 700;
+    color: #e0e0e0;
+}
+
+/* 모바일 */
+@media (max-width: 768px) {
+    #footer .footer-info {
+        flex-direction: column;
+        gap: 12px;
+    }
+    #footer .footer-info > div:last-child {
+        margin-left: 0;
+        text-align: left;
+        padding-right: 0;
+    }
+}
+/* ===== footer typography normalize (page별 전역 CSS 영향 차단) ===== */
+#footer, #footer * {
+    box-sizing: border-box;
+}
+
+#footer {
+    font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    letter-spacing: -0.2px;
+    word-spacing: 0;          /* 띄어쓰기 체감 차이 방지 */
+    text-rendering: geometricPrecision;
+}
+
+#footer a,
+#footer span,
+#footer p,
+#footer li,
+#footer div {
+    font-size: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+}
+
+#footer p {
+    margin: 0;               /* 페이지별 p 기본 margin 차이 제거 */
+}
+
+#footer strong,
+#footer b {
+    font-weight: 700;        /* 페이지별 bold 차이 제거 */
+}
+

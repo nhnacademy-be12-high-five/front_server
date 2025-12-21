@@ -11,12 +11,14 @@
     <link rel="stylesheet" href="/css/common/common.css">
 </head>
 
-<script src="/js/index.js"></script>
-<script src="/js/common.js"></script>
+
 
 <body>
 
 <div th:replace="~{layout/header :: header}"></div>
+
+<script src="/js/index.js"></script>
+<script src="/js/common.js"></script>
 
 <nav id="category-nav">
     <div class="container nav-container">
@@ -444,8 +446,9 @@
 
                 <div th:if="${risingBooks == null or risingBooks.isEmpty()}"
                      style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">
-                    <p>아직 집계된 인기 도서가 없습니다.
+                    <p>아직 집계된 인기 도서가 없습니다.</p>
                 </div>
+
 
                 <article class="card" th:unless="${risingBooks == null}" th:each="book : ${risingBooks}">
                     <a th:href="@{/books/{id}(id=${book.bookId})}" class="book-link" style="display:block; color:inherit;">
