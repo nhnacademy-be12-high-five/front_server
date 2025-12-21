@@ -101,7 +101,8 @@ public class CouponAdminController {
     @LoginRequired(adminOnly = true)
     @PostMapping("/admin/coupons/{couponId}/status")
     public String updateCouponStatus(@PathVariable("couponId") Long couponId, @RequestParam String status) {
-         couponService.updateCouponStatus(couponId, status);
+        CouponStatusRequestDto requestDto = new CouponStatusRequestDto(status);
+         couponService.updateCouponStatus(couponId, requestDto);
          return "redirect:/admin/coupons/page";
     }
 
