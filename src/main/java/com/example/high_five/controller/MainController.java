@@ -65,7 +65,7 @@ public class MainController {
     public String getPopularBooks(Model model){
         List<BookResponse> popular=bookClient.getPopularBooks(10);
         model.addAttribute("risingBooks",popular);
-        return "Book/weeklyPopular";
+        return "Book/weekly-popular";
     }
 
     @GetMapping("/books/new")

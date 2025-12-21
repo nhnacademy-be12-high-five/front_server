@@ -438,3 +438,59 @@ main {
 .footer-info .copyright strong {
     color: #c0c0c0;
 }
+
+/* ==============================
+   footer reset (best-seller 기준)
+   ============================== */
+
+/* 이 페이지 CSS가 footer를 건드리지 못하게 강제 */
+#footer .container {
+    all: unset;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 22px 24px;
+}
+
+/* 링크 영역 간격 통일 */
+#footer .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding-left: 12px;
+    margin-bottom: 14px;
+}
+
+/* 정보 영역 통일 */
+#footer .footer-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+}
+
+#footer .footer-info > div {
+    display: grid;
+    gap: 6px;
+}
+
+#footer .footer-info > div:first-child {
+    padding-left: 12px;
+}
+
+#footer .footer-info > div:last-child {
+    text-align: right;
+    padding-right: 8px;
+}
+
+/* typography 강제 고정 */
+#footer,
+#footer * {
+    font-size: 13px;
+    line-height: 1.65;
+    letter-spacing: -0.01em;
+    margin: 0;
+}
