@@ -1,5 +1,6 @@
 package com.example.high_five.controller.auth;
 
+import com.example.high_five.dto.member.request.EmailRequest;
 import com.example.high_five.dto.member.request.EmailVerifyRequest;
 import com.example.high_five.service.AuthService;
 import feign.FeignException;
@@ -8,22 +9,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth/api")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthRestController {
 
     private final AuthService authService;
 
     @PostMapping("/email/send")
-    public ResponseEntity<String> sendEmail(@RequestParam("email") String email) {
+    public ResponseEntity<String> sendEmail(@RequestBody EmailRequest email) {
         try {
             authService.sendEmail(email);
             return ResponseEntity.ok("인증번호가 발송되었습니다.");
         } catch (FeignException e) {
-            String msg = e.contentUTF8();
-            return ResponseEntity.status(e.status()).body(msg != null ? msg : "발송 실패");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("오류: " + e.getMessage());
+            return ResponseEntity.status(e.status()).body("발송 실패: " + e.contentUTF8());
         }
     }
 
@@ -31,23 +29,37 @@ public class AuthRestController {
     public ResponseEntity<String> verifyEmail(@RequestBody EmailVerifyRequest request) {
         try {
             return authService.verifyEmail(request);
-        } catch (Exception e) {
-            return ResponseEntity.status(400).body("인증 실패");
+        } catch (FeignException e) {
+            return ResponseEntity.status(e.status()).body("인증 실패");
         }
     }
 
-    @PostMapping("/id/check")
-    public ResponseEntity<String> checkId(@RequestParam("loginId") String loginId) {
-        if (loginId == null || loginId.isBlank()) return ResponseEntity.badRequest().body("아이디 입력 필요");
-        
+    @GetMapping("/check-id")
+    public ResponseEntity<Boolean> checkId(@RequestParam("loginId") String loginId) {
         try {
-            Boolean exists = authService.checkLoginId(loginId).getBody();
-            if (Boolean.TRUE.equals(exists)) {
-                return ResponseEntity.status(409).body("이미 사용 중인 아이디입니다.");
-            }
-            return ResponseEntity.ok("사용 가능한 아이디입니다.");
+            return authService.checkId(loginId);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("확인 중 오류 발생");
+            return ResponseEntity.status(500).body(false); // 에러나면 중복된 걸로 처리(가입 막기)
+        }
+    }
+
+    @PostMapping("/email/find-id")
+    public ResponseEntity<String> sendFindIdCode(@RequestBody EmailRequest email) {
+        try {
+            authService.sendFindIdCode(email);
+            return ResponseEntity.ok("인증번호가 발송되었습니다.");
+        } catch (FeignException e) {
+            return ResponseEntity.status(e.status()).body("가입되지 않은 이메일입니다.");
+        }
+    }
+
+    @PostMapping("/email/password-reset")
+    public ResponseEntity<String> sendPasswordResetCode(@RequestBody EmailRequest email) {
+        try {
+            authService.sendPasswordResetCode(email);
+            return ResponseEntity.ok("인증번호가 발송되었습니다.");
+        } catch (FeignException e) {
+            return ResponseEntity.status(e.status()).body("가입 정보를 찾을 수 없습니다.");
         }
     }
 }

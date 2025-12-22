@@ -32,10 +32,10 @@ public class MemberController {
     public String signup(@ModelAttribute MemberCreateRequestDto requestDto) {
         try {
             authService.signup(requestDto);
-            return "redirect:/member/login.html";
+            return "redirect:/member/login";
         } catch (Exception e) {
             log.error("회원가입 실패: {}", e.getMessage());
-            return "redirect:/member/signup.html?error";
+            return "redirect:/member/signup?error=true";
         }
     }
 
@@ -47,7 +47,7 @@ public class MemberController {
             model.addAttribute("myInfo", myInfo);
         } catch (FeignException e) {
             log.error("내 정보 조회 실패: {}", e.getMessage());
-            return "redirect:/member/login.html";
+            return "redirect:/member/login";
         }
         model.addAttribute("currentTab", "info");
         return "mypage/myinfo";
