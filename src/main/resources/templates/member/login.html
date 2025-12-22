@@ -1,4 +1,3 @@
-
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
@@ -53,12 +52,17 @@
                 <button type="submit" class="login-btn">로그인</button>
                 <button type="button" class="login2-btn" onclick="location.href='/member/signup'">회원가입</button>
 
-                <div class="sns-login">
-                    <a href="https://id.payco.com/oauth2.0/authorize?response_type=code&client_id=3RDwsbe24b34tbkpVdYgqZB&serviceProviderCode=FRIENDS&redirect_uri=https://nhnbook.shop/login/oauth2/code/payco&userLocale=ko_KR"
-                       class="sns-btn payco">
-                        PAYCO 로그인
-                    </a>
-                </div>
+                <!--로컬 페이코-->
+                <a href="https://id.payco.com/oauth2.0/authorize?response_type=code&client_id=3RDJfC0EFpgMSp8pe7saxfn&serviceProviderCode=FRIENDS&redirect_uri=http://nhn.highfive:9000/login/oauth2/code/payco&userLocale=ko_KR" class="sns-btn payco">
+                    <!--배포 페이코-->
+                    <!--                    <a href="https://id.payco.com/oauth2.0/authorize?response_type=code&client_id=3RDwsbe24b34tbkpVdYgqZB&serviceProviderCode=FRIENDS&redirect_uri=https://nhnbook.shop/login/oauth2/code/payco&userLocale=ko_KR" class="sns-btn payco">-->
+                    PAYCO 로그인
+                </a>
+            </div>
+
+            <div class="find">
+                <button type="button" class="findId" onclick="openDialog('id')">아이디찾기</button>
+                <button type="button" class="findPwd" onclick="openDialog('pw')">비밀번호 찾기</button>
             </div>
         </form>
 
@@ -84,5 +88,129 @@
 <div th:replace="~{layout/footer :: footer}"></div>
 <script src="/js/common.js"></script>
 <script src="/js/login.js"></script>
+
+<dialog id="findDialog" style="padding: 20px; border: 1px solid #888; border-radius: 8px; width: 300px;">
+
+    <div style="text-align: right;">
+        <button type="button" onclick="closeDialog()" style="border:none; background:none; cursor:pointer;">X</button>
+    </div>
+
+    <div id="boxFindId">
+        <h3 style="margin-top:0;">아이디 찾기</h3>
+        <p>가입하신 이름과 이메일을 입력하세요.</p>
+        <input type="text" id="findIdName" placeholder="이름" style="width: 100%; padding: 5px; margin-bottom: 5px;"><br>
+        <input type="email" id="findIdEmail" placeholder="이메일" style="width: 100%; padding: 5px; margin-bottom: 10px;"><br>
+        <button type="button" onclick="reqFindId()" style="width: 100%; padding: 8px;">아이디 확인</button>
+    </div>
+
+    <div id="boxFindPw" style="display: none;">
+        <h3 style="margin-top:0;">비밀번호 찾기</h3>
+        <p>아이디와 이메일을 입력하시면<br>임시 비밀번호를 전송합니다.</p>
+        <input type="text" id="findPwId" placeholder="아이디" style="width: 100%; padding: 5px; margin-bottom: 5px;"><br>
+        <input type="email" id="findPwEmail" placeholder="이메일" style="width: 100%; padding: 5px; margin-bottom: 10px;"><br>
+        <button type="button" onclick="reqFindPw()" style="width: 100%; padding: 8px;">이메일 발송</button>
+    </div>
+
+    <p id="findResultMsg" style="color: blue; font-weight: bold; text-align: center; margin-top: 15px;"></p>
+
+</dialog>
+
+<script>
+    const dialog = document.getElementById('findDialog');
+    const boxId = document.getElementById('boxFindId');
+    const boxPw = document.getElementById('boxFindPw');
+    const msg = document.getElementById('findResultMsg');
+
+    // 1. 모달 열기
+    function openDialog(type) {
+        msg.innerText = ""; // 메시지 초기화
+
+        // 입력창 값 초기화
+        document.getElementById('findIdName').value = "";
+        document.getElementById('findIdEmail').value = "";
+        document.getElementById('findPwId').value = "";
+        document.getElementById('findPwEmail').value = "";
+
+        if(type === 'id') {
+            boxId.style.display = 'block';
+            boxPw.style.display = 'none';
+        } else {
+            boxId.style.display = 'none';
+            boxPw.style.display = 'block';
+        }
+        dialog.showModal(); // 브라우저 내장 모달 기능
+    }
+
+    // 2. 모달 닫기
+    function closeDialog() {
+        dialog.close();
+    }
+
+    // 3. 아이디 찾기 요청
+    function reqFindId() {
+        const name = document.getElementById('findIdName').value;
+        const email = document.getElementById('findIdEmail').value;
+
+        if(!name || !email) { alert("모두 입력해주세요."); return; }
+
+        // [주의] 실제 Gateway 주소에 맞게 fetch URL 수정 필요
+        fetch('/auth/api/find/id', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name, email: email })
+        })
+            .then(async res => {
+                if(res.ok) {
+                    const text = await res.text();
+                    msg.style.color = "blue";
+                    msg.innerText = "찾은 아이디: " + text;
+                } else {
+                    msg.style.color = "red";
+                    msg.innerText = "정보를 찾을 수 없습니다.";
+                }
+            });
+    }
+
+    // 4. 비밀번호 찾기 요청
+    function reqFindPw() {
+        const id = document.getElementById('findPwId').value;
+        const email = document.getElementById('findPwEmail').value;
+
+        if(!id || !email) { alert("모두 입력해주세요."); return; }
+
+        msg.style.color = "black";
+        msg.innerText = "전송 중...";
+
+        // [주의] 실제 Gateway 주소에 맞게 fetch URL 수정 필요
+        fetch('/auth/api/find/password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ loginId: id, email: email })
+        })
+            .then(async res => {
+                if(res.ok) {
+                    msg.style.color = "green";
+                    msg.innerText = "이메일로 임시 비밀번호가 전송되었습니다.";
+                } else {
+                    msg.style.color = "red";
+                    msg.innerText = "일치하는 정보가 없습니다.";
+                }
+            });
+    }
+</script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const msg = urlParams.get('msg');
+
+        if (msg === 'login_required') {
+            alert("로그인이 필요한 서비스입니다.");
+            // 혹은 alert 대신 더 예쁜 모달(SweetAlert 등)을 띄울 수도 있음
+        }
+    };
+    /*]]>*/
+</script>
 </body>
 </html>
