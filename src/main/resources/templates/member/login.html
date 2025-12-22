@@ -64,6 +64,19 @@
                 <button type="button" class="findId" onclick="openDialog('id')">아이디찾기</button>
                 <button type="button" class="findPwd" onclick="openDialog('pw')">비밀번호 찾기</button>
             </div>
+
+            <div class="aa">
+                <div class="find">
+                    <div class="bb">
+                        <button type="button" class="findId" onclick="location.href='/member/find-id'">아이디찾기 | </button>
+                        <button type="button" class="findPwd" onclick="location.href='/member/find-pwd'" >비밀번호 찾기</button>
+                    </div>
+
+                    <div class="dormant">
+                        <button type="button" class="dormantMember">휴면 회원 전환</button>
+                    </div>
+                </div>
+            </div>
         </form>
 
         <form id="formGuest" class="login-form" action="/order/guest" method="post" style="display: none;">

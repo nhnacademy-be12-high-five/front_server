@@ -46,13 +46,11 @@ public interface BookClient {
     @GetMapping("/api/books/popular")
     List<BookResponse> getPopularBooks(@RequestParam("size") int size);
 
-    @GetMapping("/api/categories/{categoryId}/books")
-    List<BookResponse> getBooksByCategory(@PathVariable("categoryId") long categoryId);
 
     // 베스트셀러
     @GetMapping("/api/books/best-seller")
     List<BookResponse> getBestSellers(@RequestParam("size") int size);
-  
+
     // 도서 좋아요 조회
     @GetMapping("/members/me/likes")
     Boolean getBookLike(@PathVariable("book-id") Long id);
@@ -89,4 +87,7 @@ public interface BookClient {
 //    @DeleteMapping("/api/admin/{id}")
 //    void deleteBook(@PathVariable("id") Long bookId,
 //                    @RequestHeader("X-User-Id") Long userId);
+    @GetMapping("/api/categories/{categoryId}/books")
+    List<BookResponse> getBooksByCategory(@PathVariable("categoryId") int categoryId);
+
 }

@@ -1,35 +1,31 @@
 package com.example.high_five.dto.book.response;
 
-import com.example.high_five.dto.Tag.response.TagResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
-public class BookResponse {
 
-    @JsonProperty("id")
-    private Long bookId;
-    private String title;
-    private String author;
-    private String isbn;
-    private Integer price;
-    private String image;
-    private Integer categoryId;
-    private String content;
-    private String publisher;
-    private String publishedDate;
-    private Double avgRating;
-    private Long reviewCount;
-
-    private String aiSummary;
-    private String aiReviewSummary;
-
-    // book-detail.html 에서 사용하는 태그 필드
-    private List<TagResponse> tags;
+public record BookResponse(
+        @JsonProperty("id") Long bookId,
+        String title,
+        String author,
+        String isbn,
+        Integer price,
+        String image,
+        // 북 서버와 필드명, 타입을 일치시켜야 함
+        List<CategoryResponse> categories,
+        String content,
+        String publisher,
+        String publishedDate,
+        Double avgRating,
+        Long reviewCount,
+        String aiSummary,
+        String aiReviewSummary
+) {
+    // 북 서버의 구조와 100% 일치해야 Jackson이 데이터를 담아줌
+    public record CategoryResponse(
+            Integer categoryId,
+            String categoryName
+    ) {}
 }

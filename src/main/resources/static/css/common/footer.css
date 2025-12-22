@@ -20,9 +20,6 @@
     font-size: 13px;
     line-height: 1.65;
     letter-spacing: -0.01em;
-
-    /* 핵심: 페이지가 짧아도 항상 아래로 */
-    margin-top: auto;
 }
 
 /* 도트 패턴 */

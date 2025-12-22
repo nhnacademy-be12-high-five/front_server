@@ -126,13 +126,13 @@ public class FrontOrderService {
             try {
                 BookResponse bookInfo = bookClient.getBookDetail(bookId);
                 if (bookInfo != null) {
-                    int price = bookInfo.getPrice();
+                    int price = bookInfo.price();
                     int itemTotal = price * qty;
 
                     items.add(OrderResponse.OrderItem.builder()
                             .bookId(bookId)
-                            .title(bookInfo.getTitle())
-                            .imageUrl(bookInfo.getImage())
+                            .title(bookInfo.title())
+                            .imageUrl(bookInfo.image())
                             .price(price)
                             .quantity(qty)
                             .totalPrice(itemTotal)
