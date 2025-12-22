@@ -1,0 +1,144 @@
+:root{
+    --bg:#f5f7fb;
+    --card:#ffffff;
+    --text:#111827;
+    --muted:#6b7280;
+    --primary:#0b73ff;
+    --border:#e6ebf3;
+    --shadow: 0 10px 24px rgba(15,23,42,0.08);
+    --radius: 14px;
+}
+
+*{ box-sizing:border-box; }
+
+body{
+    margin:0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.admin-shell{
+    min-height: 100vh;
+}
+
+.admin-topbar{
+    background: var(--primary);
+    color:#fff;
+    padding: 22px 28px;
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap:16px;
+}
+
+.admin-topbar__title h1{
+    margin:0;
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+}
+
+.admin-topbar__title p{
+    margin:6px 0 0;
+    opacity: 0.9;
+    font-size: 14px;
+}
+
+.admin-topbar__actions{
+    display:flex;
+    gap:10px;
+}
+
+.btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 800;
+    text-decoration:none;
+    cursor:pointer;
+    border: 1px solid transparent;
+}
+
+.btn-outline{
+    background: rgba(255,255,255,0.14);
+    color:#fff;
+    border-color: rgba(255,255,255,0.35);
+}
+.btn-outline:hover{
+    background: rgba(255,255,255,0.22);
+}
+
+.admin-content{
+    padding: 26px 28px;
+}
+
+/* 기존 페이지의 .card 가 이미 있더라도 “살짝 고급”으로만 보정 */
+.card{
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+/* 상단 메시지(성공/에러) 기본 */
+.admin-alert{
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    font-weight: 800;
+}
+.admin-alert--success{
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+.admin-alert--error{
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+/* ===============================
+   관리자 페이지 공통 레이아웃 패치
+   (사이드바 제거 대응)
+================================ */
+
+/* body flex로 밀려있는 구조 해제 */
+body {
+    display: block;
+}
+
+/* sidebar 흔적 완전 제거 */
+.sidebar {
+    display: none !important;
+}
+
+/* 사이드바 전제 margin 제거 */
+.content-area {
+    margin-left: 0 !important;
+    width: 100%;
+}
+
+/* main 영역을 가운데 + 최대폭으로 */
+main,
+.admin-content {
+    width: 100%;
+    max-width: 1200px;   /* ← 핵심 */
+    margin: 0 auto;
+    padding: 30px 24px 60px;
+}
+
+/* 카드가 너무 작게 고정된 것 해제 */
+.card {
+    max-width: none;     /* ← 핵심 */
+}
+
+/* 상단 파란 헤더도 폭 맞추기 */
+header,
+.admin-topbar {
+    width: 100%;
+}
+

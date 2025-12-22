@@ -4,31 +4,33 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Highfive 관리자 - 결제 수단 관리</title>
-    <link rel="stylesheet" href="/css/admin-css/admin-point.css">
+
+    <!-- 공통 + 기존 페이지 CSS -->
+    <link rel="stylesheet" href="/css/admin-css/admin-common.css">
+    <link rel="stylesheet" href="/css/admin-css/point.css">
+    <link rel="stylesheet" href="/css/admin-css/admin-layout-fix.css">
 
 </head>
 
 <body>
-<aside class="sidebar">
-    <h2>HIGHFIVE 관리자</h2>
-    <ul class="menu">
-        <li><a href="/admin/books">도서 관리</a></li>
-        <li><a href="/admin/points">포인트 관리</a></li>
-        <li><a href="/admin/coupons/page">쿠폰 관리</a></li>
-        <li><a href="/admin/coupons/specific-book-coupons">특정 도서 쿠폰 관리</a></li>
-        <li><a href="/admin/payments/stats">매출 통계</a></li>
-        <li><a href="/admin/payments" data-key="payments" class="active">결제 수단 관리</a></li>
-    </ul>
-</aside>
+<div class="admin-shell">
 
-<div style="flex:1; display:flex; flex-direction:column;">
-    <header>결제 수단 관리</header>
-    <main>
+    <header class="admin-topbar">
+        <div class="admin-topbar__title">
+            <h1>결제 수단 관리</h1>
+            <p>결제 수단의 활성/비활성 상태를 설정합니다.</p>
+        </div>
+        <div class="admin-topbar__actions">
+            <a class="btn btn-outline" href="/admin">관리자 홈</a>
+        </div>
+    </header>
+
+    <main class="admin-content">
         <div class="card">
             <h3>결제 수단 ON/OFF 설정</h3>
 
-            <div th:if="${message}" style="color: green; margin-bottom: 10px;" th:text="${message}"></div>
-            <div th:if="${errorMessage}" style="color: red; margin-bottom: 10px;" th:text="${errorMessage}"></div>
+            <div th:if="${message}" class="admin-alert admin-alert--success" th:text="${message}"></div>
+            <div th:if="${errorMessage}" class="admin-alert admin-alert--error" th:text="${errorMessage}"></div>
 
             <table class="method-table">
                 <thead>
@@ -65,7 +67,10 @@
             </table>
         </div>
     </main>
+
 </div>
+
+<!-- 원본의 /assets/admin.js 는 정적 경로가 불명확해서 유지하되, 필요 없으면 삭제 가능 -->
 <script src="/assets/admin.js"></script>
 </body>
 </html>

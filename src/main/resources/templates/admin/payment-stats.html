@@ -2,60 +2,62 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Highfive 관리자 - 결제/매출 통계</title>
+
+    <!-- 공통 + 페이지별 -->
+    <link rel="stylesheet" href="/css/admin-css/admin-common.css">
     <link rel="stylesheet" href="/css/admin-css/payment-stats.css">
+    <link rel="stylesheet" href="/css/admin-css/admin-layout-fix.css">
+
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script th:inline="javascript">
+        window.CHART_DATA = {
+            dailyStats: [[${dailyStats}]]
+        };
+    </script>
 </head>
 
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    window.CHART_DATA = {
-        dailyStats: /*[[${dailyStats}]]*/ []
-    };
-    /*]]>*/
-</script>
-<script src="/js/admin/admin-payment-stats.js"></script>
-
-
-
 <body>
+<div class="admin-shell">
 
-<aside class="sidebar">
-    <h2>HIGHFIVE 관리자</h2>
-    <ul class="menu">
-        <li><a href="/admin/books">도서 관리</a></li>
-        <li><a href="/admin/points/policy">포인트 관리</a></li>
-        <li><a href="/admin/coupons/page">쿠폰 관리</a></li>
-        <li><a href="/admin/coupons/specific-book-coupons">특정 도서 쿠폰 관리</a></li>
-        <li><a href="/admin/payments/stats" class="active">매출 통계</a></li>
-        <li><a href="/admin/payments" data-key="payments">결제 수단 관리</a></li>
-    </ul>
-</aside>
-
-<div class="content-area">
-    <header>
-        <h1>결제 및 매출 통계</h1>
+    <header class="admin-topbar">
+        <div class="admin-topbar__title">
+            <h1>결제 및 매출 통계</h1>
+            <p>기간별 매출/결제 추이를 확인합니다.</p>
+        </div>
+        <div class="admin-topbar__actions">
+            <a class="btn btn-outline" href="/admin">관리자 홈</a>
+        </div>
     </header>
 
-    <main>
+    <main class="admin-content">
         <div class="stats-summary-grid">
             <div class="stat-card blue">
                 <h3>총 매출액</h3>
-                <p class="stat-value" th:text="${#numbers.formatInteger(summary.totalSalesAmount, 0, 'COMMA')} + '원'">0원</p>
+                <p class="stat-value"
+                   th:text="${#numbers.formatInteger(summary.totalSalesAmount, 0, 'COMMA')} + '원'">0원</p>
                 <p class="stat-desc">누적 결제 금액</p>
             </div>
+
             <div class="stat-card green">
                 <h3>순 매출액</h3>
-                <p class="stat-value" th:text="${#numbers.formatInteger(summary.netSalesAmount, 0, 'COMMA')} + '원'">0원</p>
+                <p class="stat-value"
+                   th:text="${#numbers.formatInteger(summary.netSalesAmount, 0, 'COMMA')} + '원'">0원</p>
                 <p class="stat-desc">총 매출 - 환불 금액</p>
             </div>
+
             <div class="stat-card red">
                 <h3>환불 금액</h3>
-                <p class="stat-value" th:text="${#numbers.formatInteger(summary.totalCancelAmount, 0, 'COMMA')} + '원'">0원</p>
+                <p class="stat-value"
+                   th:text="${#numbers.formatInteger(summary.totalCancelAmount, 0, 'COMMA')} + '원'">0원</p>
                 <div class="stat-sub">
                     <span>취소 건수: </span><strong th:text="${summary.cancelCount}">0</strong>건
                 </div>
             </div>
+
             <div class="stat-card yellow">
                 <h3>결제 성공률</h3>
                 <p class="stat-value">
@@ -93,7 +95,10 @@
             </div>
         </div>
     </main>
+
 </div>
 
+<!-- DOM 로딩 안정성 위해 body 끝으로 이동 -->
+<script src="/js/admin/admin-payment-stats.js"></script>
 </body>
 </html>
