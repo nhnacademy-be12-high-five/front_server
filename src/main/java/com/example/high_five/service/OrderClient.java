@@ -19,6 +19,29 @@ public interface OrderClient {
     @GetMapping("/api/orders/wrappers")
     List<OrderResponse.WrapperDto> getWrappers();
 
+    @GetMapping("/api/admin/orders")
+    CommonPageResponse<OrderResponse> getAdminOrders(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam(value = "status", required = false) String status
+    );
+
+    @PutMapping("/api/admin/orders/{orderId}/status")
+    void updateOrderStatus(
+            @PathVariable("orderId") Long orderId,
+            @RequestBody OrderStatusUpdateRequest request
+    );
+
+    class OrderStatusUpdateRequest {
+        public String status;
+        public String trackingNumber;
+
+        public OrderStatusUpdateRequest(String status, String trackingNumber) {
+            this.status = status;
+            this.trackingNumber = trackingNumber;
+        }
+    }
+
     @PostMapping("/api/orders")
     OrderCreateResponse createOrder(@RequestHeader("X-USER-ID") Long userId,
                                     @RequestBody OrderCheckoutRequest request);

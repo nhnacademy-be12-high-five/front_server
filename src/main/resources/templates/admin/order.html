@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Highfive 관리자 - 주문 관리</title>
+    <link rel="stylesheet" href="/css/admin-css/admin-book.css">
+    <link rel="stylesheet" href="/css/admin-css/admin-orders.css">
+</head>
+
+<body>
+<aside class="sidebar">
+    <h2>HIGHFIVE 관리자</h2>
+    <ul class="menu">
+        <li><a href="/admin/books">도서 관리</a></li>
+        <li><a href="/admin/orders" class="active">주문 상태 관리</a></li>
+        <li><a href="/admin/points">포인트 관리</a></li>
+        <li><a href="/admin/coupons/page">쿠폰 관리</a></li>
+        <li><a href="/admin/payments/stats">매출 통계</a></li>
+        <li><a href="/admin/payments">결제 수단 관리</a></li>
+    </ul>
+</aside>
+
+<div style="flex:1; display:flex; flex-direction:column; padding: 20px; overflow-y: auto;">
+    <header><h1>주문 상태 관리</h1></header>
+
+    <main>
+        <div class="search-container">
+            <form action="/admin/orders" method="get" style="display: flex; gap: 10px;">
+                <select name="status" class="status-select" onchange="this.form.submit()">
+                    <option value="">전체 보기</option>
+                    <option value="PAYMENT_WAITING" th:selected="${selectedStatus == 'PAYMENT_WAITING'}">결제 대기</option>
+                    <option value="PREPARING" th:selected="${selectedStatus == 'PREPARING'}">배송 준비중</option>
+                    <option value="DELIVERING" th:selected="${selectedStatus == 'DELIVERING'}">배송 중</option>
+                    <option value="DELIVERY_COMPLETED" th:selected="${selectedStatus == 'DELIVERY_COMPLETED'}">배송 완료</option>
+                    <option value="PURCHASE_CONFIRMED" th:selected="${selectedStatus == 'PURCHASE_CONFIRMED'}">구매 확정</option>
+                    <option value="CANCELED" th:selected="${selectedStatus == 'CANCELED'}">취소됨</option>
+                    <option value="RETURN_REQUESTED" th:selected="${selectedStatus == 'RETURN_REQUESTED'}">반품 요청</option>
+                    <option value="RETURN_COMPLETED" th:selected="${selectedStatus == 'RETURN_COMPLETED'}">반품 완료</option>
+                </select>
+            </form>
+        </div>
+
+        <div class="card">
+            <table class="order-table">
+                <thead>
+                <tr>
+                    <th>주문번호</th>
+                    <th>주문자 ID</th>
+                    <th>상품명</th>
+                    <th>결제금액</th>
+                    <th>주문일시</th>
+                    <th>현재 상태</th>
+                    <th>상태 변경</th>
+                    <th>송장번호</th>
+                    <th>작업</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order : ${orders}">
+                    <td th:text="${order.orderId}">101</td>
+                    <td th:text="${order.userId != null ? order.userId : '비회원'}">user1</td>
+                    <td th:text="${order.items[0].bookTitle + (order.items.size() > 1 ? ' 외 ' + (order.items.size() - 1) + '건' : '')}">책 제목</td>
+                    <td th:text="${#numbers.formatInteger(order.totalAmount, 0, 'COMMA') + '원'}">15,000원</td>
+                    <td th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}">2023-12-20</td>
+                    <td>
+                        <span class="badge" th:classappend="${order.status}" th:text="${order.status}">WAITING</span>
+                    </td>
+                    <td>
+                        <select th:id="'status-' + ${order.orderId}" class="status-change-select">
+                            <option value="PREPARING" th:selected="${order.status == 'PREPARING'}">배송 준비중</option>
+                            <option value="DELIVERING" th:selected="${order.status == 'DELIVERING'}">배송 중</option>
+                            <option value="DELIVERY_COMPLETED" th:selected="${order.status == 'DELIVERY_COMPLETED'}">배송 완료</option>
+                            <option value="RETURN_COMPLETED" th:selected="${order.status == 'RETURN_COMPLETED'}">반품 승인</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" th:id="'tracking-' + ${order.orderId}"
+                               placeholder="송장번호 입력"
+                               th:value="${order.delivery != null ? order.delivery.trackingNumber : ''}"
+                               style="padding: 5px; width: 120px;">
+                    </td>
+                    <td>
+                        <button type="button" class="action-btn" th:onclick="'updateStatus(' + ${order.orderId} + ')'">변경</button>
+                    </td>
+                </tr>
+                <tr th:if="${orders.isEmpty()}">
+                    <td colspan="9" style="text-align:center; padding: 20px;">주문 내역이 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="pagination" th:if="${pageInfo.totalPages > 0}">
+                <a th:href="@{/admin/orders(page=${pageInfo.pageNumber - 1}, status=${selectedStatus})}"
+                   th:if="${!pageInfo.first}">&laquo; 이전</a>
+                <span th:text="${pageInfo.pageNumber + 1} + ' / ' + ${pageInfo.totalPages}">1 / 10</span>
+                <a th:href="@{/admin/orders(page=${pageInfo.pageNumber + 1}, status=${selectedStatus})}"
+                   th:if="${!pageInfo.last}">다음 &raquo;</a>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="/js/admin/admin-order.js"></script>
+</body>
+</html>

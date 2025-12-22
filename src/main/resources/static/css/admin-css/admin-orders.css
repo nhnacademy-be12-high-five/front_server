@@ -1,0 +1,69 @@
+.order-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.order-table th, .order-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.order-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: bold;
+    color: white;
+    background-color: #6c757d; /* Default */
+}
+
+.badge.PAYMENT_WAITING { background-color: #ffc107; color: black; }
+.badge.PREPARING { background-color: #17a2b8; }
+.badge.DELIVERING { background-color: #007bff; }
+.badge.DELIVERY_COMPLETED { background-color: #28a745; }
+.badge.CANCELED { background-color: #dc3545; }
+.badge.RETURN_REQUESTED { background-color: #fd7e14; }
+
+.status-change-select {
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.action-btn {
+    padding: 5px 10px;
+    background-color: #343a40;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.action-btn:hover {
+    background-color: #23272b;
+}
+
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination a {
+    display: inline-block;
+    padding: 8px 16px;
+    text-decoration: none;
+    color: black;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.pagination a:hover {
+    background-color: #f1f1f1;
+}
