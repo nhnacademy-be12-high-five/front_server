@@ -8,12 +8,14 @@
 </head>
 
 <script th:inline="javascript">
+    /*<![CDATA[*/
     window.CHART_DATA = {
-        dailyStats: [[${dailyStats}]]
+        dailyStats: /*[[${dailyStats}]]*/ []
     };
+    /*]]>*/
 </script>
-
 <script src="/js/admin/admin-payment-stats.js"></script>
+
 
 
 <body>
