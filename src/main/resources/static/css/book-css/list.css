@@ -749,4 +749,14 @@ a {
     display: none;
 }
 
+#footer {
+    position: static !important;   /* fixed/absolute 무력화 */
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: auto !important;
+    z-index: auto !important;
+    margin-top: auto;              /* flex column일 때 맨 아래로 */
+}
+
 
