@@ -178,7 +178,7 @@
 
 /* ====== Fixed Header/Footer: Global ====== */
 :root{
-    --header-height: 80px;   /* 실제 헤더 높이에 맞춰 조정 */
+    --header-height: 96px;   /* 실제 헤더 높이에 맞춰 조정 */
     --footer-height: 120px;  /* 실제 푸터 높이에 맞춰 조정 */
 }
 
@@ -210,6 +210,17 @@ body{
 html, body{
     overflow-x: hidden;
 }
+
+#category-nav{
+    position: relative;
+    z-index: 10;                       /* 메뉴가 헤더 뒤로 안 들어가게 */
+    margin-top: 0;
+}
+#category-nav{
+    margin-top: calc(var(--header-height) - 80px);
+}
+
+
 
 
 /* 반응형 */
@@ -247,6 +258,7 @@ html, body{
     #header .search-box{
         width: min(520px, 100%);
     }
+
 
 
 
