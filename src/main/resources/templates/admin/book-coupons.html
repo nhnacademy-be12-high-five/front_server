@@ -9,8 +9,8 @@
 
 <script th:inline="javascript">
     window.PAGE_ENV = {
-        message: [[${message != null ? "'" + message + "'" : "null"}]],
-    errorMessage: [[${errorMessage != null ? "'" + errorMessage + "'" : "null"}]]
+        message: [[${message}]],
+        errorMessage: [[${errorMessage}]]
     };
 </script>
 
