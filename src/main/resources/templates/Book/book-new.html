@@ -29,14 +29,14 @@
         <section class="section">
             <div class="card-grid" style="grid-template-columns: repeat(5, 1fr)">
 
-                <div th:if="${bestSellers == null or bestSellers.isEmpty()}"
+                <div th:if="${newBooks == null or newBooks.isEmpty()}"
                      style="grid-column: 1/-1; text-align: center; padding: 60px;">
-                    <p>집계된 베스트셀러 데이터가 없습니다.</p>
+                    <p>신간 도서가 없습니다.</p>
                 </div>
 
                 <article class="card"
-                         th:unless="${bestSellers == null}"
-                         th:each="book, iterStat : ${bestSellers}">
+                         th:unless="${newBooks == null}"
+                         th:each="book, iterStat : ${newBooks}">
 
                     <a th:href="@{/books/{id}(id=${book.bookId})}" class="book-link" style="display:block; color:inherit; position: relative;">
 

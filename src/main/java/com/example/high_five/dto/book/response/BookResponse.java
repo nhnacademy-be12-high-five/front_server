@@ -1,5 +1,6 @@
 package com.example.high_five.dto.book.response;
 
+import com.example.high_five.dto.Tag.response.TagResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
@@ -15,6 +16,7 @@ public record BookResponse(
         String image,
         // 북 서버와 필드명, 타입을 일치시켜야 함
         List<CategoryResponse> categories,
+        List<TagResponse> tags,
         String content,
         String publisher,
         String publishedDate,
