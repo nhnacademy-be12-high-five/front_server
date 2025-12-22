@@ -34,24 +34,19 @@ public class SearchController {
         // =====================
         // 1) 카테고리 검색 모드
         // =====================
+        // SearchController.java 내부의 카테고리 로직 부분
+
         if ("CATEGORY".equalsIgnoreCase(searchType) && categoryId != null) {
+            // BookClient를 통해 북 서버의 API 호출
+            List<BookResponse> books = bookClient.getBooksByCategory(categoryId.intValue());
 
-            List<BookResponse> books = bookClient.getBooksByCategory(categoryId);
-
-            // 템플릿(Book/booklist.html)에서 쓸 값들
             model.addAttribute("searchType", "CATEGORY");
             model.addAttribute("categoryId", categoryId);
-            model.addAttribute("categoryName", categoryName);
+            model.addAttribute("categoryName", categoryName); // HTML에서 제목으로 사용
+            model.addAttribute("books", books); // 검색 결과 리스트
 
-            // CATEGORY 모드에서는 keyword를 쓰지 않음
-            model.addAttribute("keyword", null);
-
-            model.addAttribute("books", books);
-
-            // 카테고리 조회는 아직 페이징 없으므로 pageInfo는 null 처리
+            // 페이징이나 AI 요약은 카테고리 검색에선 사용하지 않으므로 null 처리
             model.addAttribute("pageInfo", null);
-            model.addAttribute("page", 0);
-            model.addAttribute("sort", sort);
             model.addAttribute("aiSummary", null);
 
             return "Book/booklist";
