@@ -592,3 +592,29 @@ img {
 .btn{
     gap: 0;
 }
+
+.find{
+    padding: 10px;
+    gap: 10px;
+    color: #ffeeba;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 10px;
+    background: white;
+    border-style: none ;
+}
+
+.find button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: black;
+    font-size: 14px;
+}
+
+.find button:hover {
+    text-decoration: underline;
+    color: blue;
+}

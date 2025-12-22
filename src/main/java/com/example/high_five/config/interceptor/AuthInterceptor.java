@@ -56,8 +56,12 @@ public class AuthInterceptor implements HandlerInterceptor {
         }
 
         UserContext user = (UserContext) request.getAttribute("user");
+
         if (user == null) {
-            response.sendRedirect("/member/login.html");
+            String requestURI = request.getRequestURI();
+
+            response.sendRedirect("/member/login?needLogin=true&redirectURL=" + requestURI);
+
             return false;
         }
 

@@ -1,14 +1,9 @@
 package com.example.high_five.service;
 
 import com.example.high_five.common.CustomPage;
-import com.example.high_five.dto.member.request.MemberUpdateRequest;
+import com.example.high_five.dto.member.request.*;
 import com.example.high_five.dto.member.response.MemberResponse;
-import com.example.high_five.dto.point.PointAdminAdjustmentRequest;
-import com.example.high_five.dto.point.PointAdminPolicyRequest;
-import com.example.high_five.dto.point.PointAdminPolicyResponse;
-import com.example.high_five.dto.point.PointBalanceResponse;
-import com.example.high_five.dto.point.PointHistoryResponse;
-import com.example.high_five.dto.point.PointTransactionResponse;
+import com.example.high_five.dto.point.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -111,7 +111,6 @@
     const emailInput = document.getElementById('regEmail');
     const verifiedInput = document.getElementById('emailVerified');
 
-    // 아이디 관련
     const idCheckBtn = document.getElementById('btn-check-id');
     const idInput = document.getElementById('regId');
     const idCheckMsg = document.getElementById('id-check-msg');
@@ -119,6 +118,7 @@
 
     const signupForm = document.getElementById('signup-form');
 
+    // CSRF 설정
     const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
 
@@ -137,14 +137,14 @@
         sendBtn.disabled = true;
         sendBtn.innerText = "전송 중...";
 
-        fetch('/auth/api/email/send', {
+        fetch('/auth/email/send', {
             method: 'POST',
-            headers: getHeaders(),
-            body: new URLSearchParams({ email: email })
+            headers: getHeaders('application/json'),
+            body: JSON.stringify({ email: email })
         })
             .then(async res => {
                 if (res.ok) {
-                    alert("인증번호가 발송되었습니다. 메일함을 확인해주세요.");
+                    alert("인증번호가 발송되었습니다.");
                     verifyBox.style.display = 'block';
                     sendBtn.innerText = "재전송";
                     sendBtn.disabled = false;
@@ -157,9 +157,8 @@
             })
             .catch(err => {
                 console.error(err);
-                alert("서버 통신 오류가 발생했습니다.");
+                alert("서버 통신 오류");
                 sendBtn.disabled = false;
-                sendBtn.innerText = "인증번호 받기";
             });
     });
 
@@ -169,10 +168,14 @@
 
         if(!code) { alert("인증번호를 입력해주세요."); return; }
 
-        fetch('/auth/api/email/verify', {
+        fetch('/auth/email/verify', {
             method: 'POST',
             headers: getHeaders('application/json'),
-            body: JSON.stringify({ email: email, code: code })
+            body: JSON.stringify({
+                email: email,
+                code: code,
+                type: 'SIGNUP'
+            })
         })
             .then(async res => {
                 if (res.ok) {
@@ -182,8 +185,6 @@
                     emailInput.classList.add('input-readonly');
                     sendBtn.disabled = true;
                     sendBtn.innerText = "인증 완료";
-
-                    // 상태 저장 (true)
                     verifiedInput.value = "true";
                 } else {
                     const errorText = await res.text();
@@ -192,29 +193,26 @@
             });
     });
 
-
-
     idCheckBtn.addEventListener('click', () => {
         const loginId = idInput.value;
         if (!loginId) { alert("아이디를 입력해주세요."); return; }
-        fetch('/auth/api/id/check', {
-            method: 'POST',
-            headers: getHeaders(),
-            body: new URLSearchParams({ loginId: loginId })
+
+        fetch(`/auth/check-id?loginId=${loginId}`, {
+            method: 'GET',
+            headers: getHeaders()
         })
             .then(async res => {
-                const text = await res.text();
-                if (res.ok) {
-                    // 사용 가능
-                    alert(text);
+                if (!res.ok) throw new Error("통신 오류");
+                const isDuplicate = await res.json(); // true(중복), false(사용가능)
+
+                if (isDuplicate === false) {
+                    alert("사용 가능한 아이디입니다.");
                     idCheckMsg.innerText = "사용 가능한 아이디입니다.";
                     idCheckMsg.className = "verify-msg success-text";
-
-
                     idCheckedInput.value = "true";
                 } else {
-                    alert(text);
-                    idCheckMsg.innerText = text;
+                    alert("이미 사용 중인 아이디입니다.");
+                    idCheckMsg.innerText = "이미 사용 중인 아이디입니다.";
                     idCheckMsg.className = "verify-msg error-text";
                     idInput.value = "";
                     idInput.focus();
@@ -222,38 +220,35 @@
             })
             .catch(err => {
                 console.error(err);
-                alert("서버 오류가 발생했습니다.");
+                alert("중복 확인 중 오류가 발생했습니다.");
             });
     });
 
-
+    idInput.addEventListener('input', () => {
+        idCheckedInput.value = "false";
+        idCheckMsg.innerText = "";
+        idCheckMsg.className = "verify-msg";
+    });
 
     signupForm.addEventListener('submit', (e) => {
         if (verifiedInput.value !== "true") {
             e.preventDefault();
             alert("이메일 인증을 완료해주세요!");
-            emailInput.focus();
             return;
         }
-
         if (idCheckedInput.value !== "true") {
             e.preventDefault();
             alert("아이디 중복 확인을 해주세요!");
-            idInput.focus();
             return;
         }
-
         const pw = document.getElementById('regPw').value;
         const pwConfirm = document.getElementById('regPwConfirm').value;
         if (pw !== pwConfirm) {
             e.preventDefault();
             alert("비밀번호가 일치하지 않습니다.");
-            document.getElementById('regPwConfirm').focus();
             return;
         }
     });
-
 </script>
-
 </body>
 </html>

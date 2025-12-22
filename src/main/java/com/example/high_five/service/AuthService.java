@@ -1,14 +1,12 @@
 package com.example.high_five.service;
 
-import com.example.high_five.dto.member.request.EmailVerifyRequest;
-import com.example.high_five.dto.member.request.LoginRequest;
-import com.example.high_five.dto.member.request.MemberCreateRequestDto;
+import com.example.high_five.dto.member.request.*;
 import com.example.high_five.dto.member.response.TokenDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "TEAM5-GATEWAY-SERVER", contextId = "authClient", url = "${gateway.uri}")
+@FeignClient(name = "gateway-server", contextId = "authClient", url = "${gateway.uri}")
 public interface AuthService {
 
     @PostMapping("/api/auth/login")
@@ -21,22 +19,30 @@ public interface AuthService {
     ResponseEntity<TokenDto> reissue(@RequestHeader("X-Refresh-Token") String refreshToken);
 
     @PostMapping("/api/auth/login/{provider}")
-    ResponseEntity<TokenDto> loginSocial(
-            @PathVariable("provider") String provider,
-            @RequestParam("code") String code
-    );
+    ResponseEntity<TokenDto> loginSocial(@PathVariable("provider") String provider, @RequestParam("code") String code);
 
-    @PostMapping("/api/auth/signup")
-    ResponseEntity<MemberCreateRequestDto> signup(@RequestBody MemberCreateRequestDto memberRegisterRequestDto);
+    @PostMapping("/api/accounts/signup")
+    ResponseEntity<Void> signup(@RequestBody MemberCreateRequestDto request);
 
-    // AJAX용
-    @PostMapping("/api/auth/email/send")
-    ResponseEntity<Void> sendEmail(@RequestParam("email") String email);
+    @GetMapping("/api/accounts/check-id")
+    ResponseEntity<Boolean> checkId(@RequestParam("loginId") String loginId);
 
-    @PostMapping("/api/auth/email/verify")
+    @PostMapping("/api/accounts/find/id/verify")
+    ResponseEntity<String> findId(@RequestBody EmailVerifyRequest request);
+
+    @PostMapping("/api/accounts/find/password")
+    ResponseEntity<Void> resetPassword(@RequestBody PasswordResetRequest request);
+
+    @PostMapping("/api/emails/find-id")
+    ResponseEntity<Void> sendFindIdCode(@RequestBody EmailRequest email);
+
+    @PostMapping("/api/emails/password-reset")
+    ResponseEntity<Void> sendPasswordResetCode(@RequestBody EmailRequest email);
+
+    @PostMapping("/api/emails/signup")
+    ResponseEntity<Void> sendEmail(@RequestBody EmailRequest email);
+
+    @PostMapping("/api/emails/verify")
     ResponseEntity<String> verifyEmail(@RequestBody EmailVerifyRequest request);
-
-    @GetMapping("/api/auth/exists/login-id/{loginId}")
-    ResponseEntity<Boolean> checkLoginId(@PathVariable("loginId") String loginId);
 
 }
