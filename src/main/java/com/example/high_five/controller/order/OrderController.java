@@ -166,7 +166,7 @@ public class OrderController {
         return "order/payment-fail";
     }
 
-    @PostMapping("/api/{orderId}/cancel")
+    @PostMapping("/{orderId}/cancel")
     @ResponseBody
     public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId) {
         try {
@@ -177,4 +177,17 @@ public class OrderController {
             return ResponseEntity.ok().build();
         }
     }
+
+    @PostMapping("/{orderId}/confirm")
+    @ResponseBody
+    public ResponseEntity<Void> confirmOrder(@PathVariable Long orderId) {
+        try {
+            frontOrderService.confirmOrder(orderId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("구매 확정 API 처리 실패 (orderId={})", orderId, e);
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 }
