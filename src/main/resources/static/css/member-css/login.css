@@ -628,7 +628,6 @@ img {
 /* 1. 아이디 찾기 & 비밀번호 찾기 영역 */
 .find {
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
 }
@@ -648,4 +647,6 @@ img {
     color: #333; /* 마우스 올리면 진해짐 */
 }
 
-
+.column2{
+    color: black;
+}
