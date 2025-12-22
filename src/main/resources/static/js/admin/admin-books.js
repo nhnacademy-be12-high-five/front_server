@@ -1,3 +1,4 @@
+// 1. 도서 검색 (관리자 DB 검색)
 async function searchBooks() {
     const keyword = document.getElementById('bookKeyword').value;
     if (!keyword.trim()) {
@@ -10,7 +11,6 @@ async function searchBooks() {
     resultArea.innerHTML = '<div style="padding:10px;">검색 중...</div>';
 
     try {
-        // BookAdminController의 검색 API 호출
         const response = await fetch(`/admin/books/search?keyword=${encodeURIComponent(keyword)}`);
         const books = await response.json();
 
@@ -24,14 +24,16 @@ async function searchBooks() {
         books.forEach(book => {
             const item = document.createElement('div');
             item.className = 'search-result-item';
-            // 클릭 시 해당 도서 정보를 폼에 로드
-            item.onclick = () => loadBookDetail(book.id);
+            item.onclick = () => loadBookDetail(book.id); // 클릭 시 수정 모드
+
+            // [수정 1] 리스트에서도 저자 목록이 잘 보이도록 수정
+            const authorStr = Array.isArray(book.authors) ? book.authors.join(', ') : (book.author || '');
 
             item.innerHTML = `
                     <img src="${book.image || '/img/no-image.png'}" alt="표지">
                     <div class="book-info">
                         <div class="book-title">${book.title}</div>
-                        <div class="book-meta">${book.author} | ${book.price}원 | ISBN: ${book.isbn}</div>
+                        <div class="book-meta">${authorStr} | ${book.price}원 | ISBN: ${book.isbn}</div>
                     </div>
                 `;
             resultArea.appendChild(item);
@@ -50,52 +52,128 @@ async function loadBookDetail(bookId) {
         if (!response.ok) throw new Error('도서 정보를 불러올 수 없습니다.');
 
         const book = await response.json();
-        fillForm(book);
+        fillForm(book, true); // true = 수정 모드 (읽기 전용)
 
-        // 검색 결과 닫기
         document.getElementById('searchResultArea').style.display = 'none';
     } catch (error) {
         alert(error.message);
     }
 }
 
-// 3. 폼 채우기
-function fillForm(book) {
-    document.getElementById('formTitle').innerText = "도서 정보 수정";
-    document.getElementById('submitBtn').value = "수정 내용 저장";
-    document.getElementById('deleteBtn').style.display = 'block';
+// 3. [추가] AI 도서 가져오기 (Google Books + Gemini)
+async function fetchBookInfoByAi() {
+    // HTML에 id="aiIsbnInput" 인 input 박스와 검색 버튼이 있다고 가정
+    const isbnInput = document.getElementById('aiIsbnInput'); // 혹은 prompt 사용 가능
+    const isbn = isbnInput ? isbnInput.value : prompt("ISBN을 입력하세요:");
 
-    // 폼 Action 변경 (Update API 경로)
-    const form = document.getElementById('bookForm');
-    form.action = `/admin/books/${book.id}/update`;
-
-    document.getElementById('bookId').value = book.id;
-    document.getElementById('isbn').value = book.isbn || book.isbn13;
-    document.getElementById('title').value = book.title;
-    if (Array.isArray(book.authors)) {
-        document.getElementById('author').value = book.author.join(',');
-    } else {
-        document.getElementById('author').value = book.author || ''; // author 필드명 확인 필요
+    if (!isbn || !isbn.trim()) {
+        alert("ISBN을 입력해주세요.");
+        return;
     }
-    document.getElementById('publisher').value = book.publisher;
-    document.getElementById('publishedDate').value = book.publishedDate;
-    document.getElementById('price').value = book.price;
-    document.getElementById('image').value = book.image;
-    document.getElementById('description').value = book.description || book.content; // 필드명 확인 필요
 
-    previewImage(book.image);
+    // 로딩 표시 (선택 사항)
+    const btn = document.getElementById('aiSearchBtn'); // 버튼 ID 확인 필요
+    if(btn) btn.innerText = "AI 검색 중...";
 
-    setFormReadOnly(true);
+    try {
+        // 백엔드 AI 검색 API 호출
+        const response = await fetch(`/admin/books/ai-search?isbn=${encodeURIComponent(isbn)}`);
 
-    // 화면 스크롤을 폼으로 이동
+        if (!response.ok) {
+            throw new Error("도서 정보를 찾을 수 없습니다. (Google Books에 없거나 오류 발생)");
+        }
+
+        const bookData = await response.json();
+
+        // 폼 초기화 후 데이터 채우기 (false = 신규 등록 모드라 수정 가능하게)
+        resetForm();
+        fillForm(bookData, false);
+
+        alert("AI가 도서 정보와 추천 서평을 가져왔습니다! 내용을 확인해주세요.");
+
+    } catch (error) {
+        console.error(error);
+        alert("실패: " + error.message);
+    } finally {
+        if(btn) btn.innerText = "ISBN 검색";
+    }
+}
+
+function safeSetText(elementId, text) {
+    const el = document.getElementById(elementId);
+    if (el) {
+        el.innerText = text;
+    } else {
+        console.warn(`ID가 '${elementId}'인 요소를 찾을 수 없습니다.`); // 디버깅용 로그
+    }
+}
+
+// 4. 폼 채우기 (공통 로직)
+// isReadOnly: 기존 DB 조회 시 true, AI 신규 등록 시 false
+function fillForm(book, isReadOnly) {
+    // 타이틀 설정
+    const modeTitle = isReadOnly ? "도서 정보 수정" : "신규 도서 등록 (AI 자동완성)";
+    safeSetText('formTitle', modeTitle);
+
+    // 버튼 설정
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.value = isReadOnly ? "수정 내용 저장" : "도서 등록";
+
+    // 삭제 버튼은 수정 모드일 때만 노출
+    const deleteBtn = document.getElementById('deleteBtn');
+    if(deleteBtn) deleteBtn.style.display = isReadOnly ? 'block' : 'none';
+
+    // 폼 Action 설정
+    const form = document.getElementById('bookForm');
+    if (isReadOnly && book.id) {
+        form.action = `/admin/books/${book.id}/update`;
+        document.getElementById('bookId').value = book.id;
+    } else {
+        form.action = "/admin/books"; // 신규 등록 경로
+        document.getElementById('bookId').value = '';
+    }
+
+    // [데이터 매핑]
+    document.getElementById('isbn').value = book.isbn || book.isbn13 || '';
+    document.getElementById('title').value = book.title || '';
+    document.getElementById('publisher').value = book.publisher || '';
+    document.getElementById('publishedDate').value = book.publishedDate || '';
+    document.getElementById('price').value = book.price || 0;
+
+    // 이미지 처리
+    const imageUrl = book.image || '';
+    document.getElementById('image').value = imageUrl;
+    previewImage(imageUrl);
+
+    // [수정 2] 저자 처리 버그 수정 (book.author -> book.authors)
+    if (Array.isArray(book.authors)) {
+        document.getElementById('author').value = book.authors.join(', ');
+    } else {
+        document.getElementById('author').value = book.author || '';
+    }
+
+    // 설명 (WYSIWYG 에디터 대응)
+    const desc = book.description || book.content || '';
+    document.getElementById('description').value = desc;
+    const descField = document.getElementById('description');
+    descField.value = desc;
+
+    // 만약 Toast UI Editor나 Summernote를 쓴다면 여기서 값 주입 필요
+    // 예: editor.setHTML(desc);
+
+    // 필드 잠금 설정 (수정 모드면 잠금, AI 모드면 해제)
+    setFormReadOnly(isReadOnly);
+
     form.scrollIntoView({ behavior: 'smooth' });
 }
 
-// 4. 폼 초기화 (신규 등록 모드)
+// 5. 폼 초기화
 function resetForm() {
-    document.getElementById('formTitle').innerText = "신규 도서 등록";
+    safeSetText('formTitle', "신규 도서 등록");
     document.getElementById('submitBtn').value = "도서 등록";
-    document.getElementById('deleteBtn').style.display = 'none';
+
+    const deleteBtn = document.getElementById('deleteBtn');
+    if(deleteBtn) deleteBtn.style.display = 'none';
 
     const form = document.getElementById('bookForm');
     form.action = "/admin/books";
@@ -104,30 +182,34 @@ function resetForm() {
     document.getElementById('bookId').value = '';
     document.getElementById('imgPreview').style.display = 'none';
 
-    setFormReadOnly(false);
+    setFormReadOnly(false); // 잠금 해제
 }
 
-// 5. 이미지 미리보기
+// 6. 이미지 미리보기
 function previewImage(url) {
     const img = document.getElementById('imgPreview');
-    if (url) {
-        img.src = url;
-        img.style.display = 'block';
-    } else {
-        img.style.display = 'none';
+    if (img) {
+        if (url) {
+            img.src = url;
+            img.style.display = 'block';
+        } else {
+            img.style.display = 'none';
+        }
     }
 }
 
-// 6. 필드 잠금/해제 함수
+// 7. 필드 잠금/해제
 function setFormReadOnly(isReadOnly) {
-    const fields = ['isbn', 'title', 'author', 'publisher', 'publishedDate', 'image', 'description'];
+    // description은 에디터를 쓸 경우 readOnly 속성이 안 먹힐 수 있음 (에디터 API 사용 필요)
+    const fields = ['isbn', 'title', 'author', 'publisher', 'publishedDate', 'image', 'price', 'description'];
 
     fields.forEach(fieldId => {
         const el = document.getElementById(fieldId);
         if (el) {
             el.readOnly = isReadOnly;
             el.style.backgroundColor = isReadOnly ? "#e9ecef" : "#fff";
-            el.style.cursor = isReadOnly ? "not-allowed" : "text";
+            // 가격 등은 수정 모드에서도 고칠 수 있게 하려면 예외 처리 필요
+            // 여기서는 원본 로직 유지
         }
     });
 }

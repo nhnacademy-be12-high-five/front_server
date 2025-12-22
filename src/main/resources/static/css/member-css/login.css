@@ -558,7 +558,7 @@ img {
     color: #333;
     text-decoration: none;
     padding: 6px 8px;
-    font-size: 20px;
+
 }
 .user-menu .user-link:hover {
     color: var(--color-primary);
@@ -592,3 +592,60 @@ img {
 .btn{
     gap: 0;
 }
+
+.find{
+    padding: 10px;
+    gap: 10px;
+    color: #ffeeba;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 10px;
+    background: white;
+    border-style: none ;
+}
+
+.find button {
+    background: none;    /* 배경색 제거 */
+    border: none;        /* 테두리 제거 */
+    cursor: pointer;     /* 마우스를 올렸을 때 손가락 모양으로 변경 */
+    padding: 0;          /* 기본 패딩 제거 (필요시 조절) */
+    color: black;      /* 부모(.find)의 글자색을 따라가게 함 */
+    font-size: 14px;     /* 글자 크기 조절 */
+}
+
+/* 마우스를 올렸을 때 효과 (선택 사항) */
+.find button:hover {
+    text-decoration: underline; /* 밑줄 효과 */
+    color: gray         /* 진한 색상으로 변경 */
+}
+
+/* ------------------------------------- */
+/* 로그인 하단 링크 영역 (아이디/비번 찾기, 휴면 전환) */
+/* ------------------------------------- */
+
+
+/* 1. 아이디 찾기 & 비밀번호 찾기 영역 */
+.find {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.dormant button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    color: #999;           /* 윗줄보다 살짝 연하게 */
+    text-decoration: underline; /* 밑줄로 구분감 주기 */
+    font-family: inherit;
+    transition: color 0.2s;
+}
+
+.dormant button:hover {
+    color: #333; /* 마우스 올리면 진해짐 */
+}
+
+

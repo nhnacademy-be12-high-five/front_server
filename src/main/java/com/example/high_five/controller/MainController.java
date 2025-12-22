@@ -12,7 +12,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-public class testController {
+public class MainController {
 
     private final BookClient bookClient; // FeignClient 주입
     private final TagService tagService;
@@ -65,7 +65,7 @@ public class testController {
     public String getPopularBooks(Model model){
         List<BookResponse> popular=bookClient.getPopularBooks(10);
         model.addAttribute("risingBooks",popular);
-        return "Book/weeklyPopular";
+        return "Book/weekly-popular";
     }
 
     @GetMapping("/books/new")

@@ -123,3 +123,31 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. 로그인 상태 확인 (body 태그의 data-is-login 속성 값을 가져옴)
+    const body = document.querySelector('body');
+    const isLogin = body.getAttribute('data-is-login') === 'true';
+
+    // 2. 'require-login' 클래스를 가진 모든 요소 선택
+    const loginRequiredLinks = document.querySelectorAll('.require-login');
+
+    // 3. 각 링크에 클릭 이벤트 리스너 등록
+    loginRequiredLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // 로그인이 되어있지 않다면
+            if (!isLogin) {
+                e.preventDefault(); // 원래 이동하려던 링크 동작(href)을 막음
+
+                // 알림창 띄우기
+                if (confirm('로그인이 필요한 서비스입니다.\n로그인 페이지로 이동하시겠습니까?')) {
+                    location.href = '/member/login'; // 로그인 페이지 URL로 이동
+                }
+                // 취소를 누르면 아무 일도 일어나지 않음 (현재 페이지 유지)
+            }
+            else{
+                location.href = link.href;
+            }
+        });
+    });
+});

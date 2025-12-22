@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>아이디 찾기</title>
+    <link rel="stylesheet" href="/css/member-css/login.css">
+    <link rel="stylesheet" href="/css/common/common.css">
+    <link rel="stylesheet" href="/css/common/header.css">
+    <link rel="stylesheet" href="/css/common/footer.css">
+</head>
+
+<body>
+<div th:replace="~{layout/header :: header}"></div>
+
+<main id="container">
+    <div class="login-area">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="color: #333; font-weight: 700;">아이디 찾기</h2>
+            <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                가입 시 등록한 이메일로 아이디를 찾습니다.
+            </p>
+        </div>
+
+        <form action="/auth/find-id" method="post" class="login-form">
+            <div class="input-group">
+                <label for="userName">이름</label>
+                <div class="input-wrapper">
+                    <input type="text" id="userName" name="userName" placeholder="가입하신 이름을 입력하세요" required />
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="userEmail">이메일</label>
+                <div class="input-wrapper">
+                    <input type="email" id="userEmail" name="email" placeholder="가입하신 이메일을 입력하세요" required />
+                </div>
+            </div>
+
+            <div class="btn">
+                <button type="submit" class="login-btn">아이디 찾기</button>
+                <button type="button" class="login2-btn" onclick="location.href='/login'" style="background-color: #eee; color: #333; margin-top: 10px;">로그인으로 돌아가기</button>
+            </div>
+        </form>
+    </div>
+</main>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+</body>
+</html>

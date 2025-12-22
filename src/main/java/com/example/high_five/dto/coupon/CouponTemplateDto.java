@@ -24,4 +24,5 @@ public class CouponTemplateDto {
     private Integer remainingCount;
     private String status;
     private String couponType;
+    private String policyStatus;
 }

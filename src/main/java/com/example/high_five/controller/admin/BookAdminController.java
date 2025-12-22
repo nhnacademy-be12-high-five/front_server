@@ -17,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Controller
@@ -68,6 +69,13 @@ public class BookAdminController {
             redirectAttributes.addFlashAttribute("errorMessage", "도서 등록에 실패했습니다.");
         }
         return "redirect:/admin/books";
+    }
+
+    @GetMapping("/ai-search") // JS에서 호출할 주소
+    @ResponseBody // HTML이 아니라 JSON 데이터를 반환하기 위해 필수
+    public ResponseEntity<Object> searchBookWithAi(@RequestParam String isbn) {
+        // Book Server로 요청 위임
+        return bookFeignClient.searchBookByIsbn(isbn);
     }
 
     @PostMapping("/{id}/update")

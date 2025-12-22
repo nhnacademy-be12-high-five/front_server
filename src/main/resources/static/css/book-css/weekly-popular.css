@@ -1,0 +1,200 @@
+/* =========================
+   Best Seller Page
+   ========================= */
+
+/* 페이지 헤더 */
+.page-header {
+    padding: 40px 0;
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+    background: #fff;
+}
+
+.page-header h2 {
+    font-size: 32px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.page-header p {
+    color: #666;
+}
+
+/* 카드 그리드 */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 30px;
+    margin-bottom: 60px;
+}
+
+/* 카드 */
+.card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+}
+
+.book-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+/* 순위 뱃지 */
+.rank-badge {
+    position: absolute;
+    top: 0;
+    left: 12px;
+    width: 36px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
+    color: #fff;
+    background: #555;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 85%, 50% 100%, 0% 85%);
+    z-index: 5;
+}
+
+.rank-1 {
+    background: linear-gradient(135deg, #FFD700, #FDB931);
+}
+.rank-2 {
+    background: linear-gradient(135deg, #E0E0E0, #BDBDBD);
+}
+.rank-3 {
+    background: linear-gradient(135deg, #CD7F32, #A0522D);
+}
+
+/* 썸네일 */
+.thumb {
+    aspect-ratio: 1 / 1.4;
+    overflow: hidden;
+    background: #f0f0f0;
+}
+
+.thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.card:hover .thumb img {
+    transform: scale(1.05);
+}
+
+/* 정보 영역 */
+.info {
+    padding: 16px;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 8px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.meta {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.badge-best {
+    font-size: 10px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    background: #ffebee;
+    color: #ff4d4f;
+    border: 1px solid #ffccc7;
+    font-weight: 700;
+}
+
+/* ==============================
+   footer reset (best-seller 기준)
+   ============================== */
+
+/* 이 페이지 CSS가 footer를 건드리지 못하게 강제 */
+#footer .container {
+    all: unset;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 22px 24px;
+}
+
+/* 링크 영역 간격 통일 */
+#footer .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding-left: 12px;
+    margin-bottom: 14px;
+}
+
+/* 정보 영역 통일 */
+#footer .footer-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+}
+
+#footer .footer-info > div {
+    display: grid;
+    gap: 6px;
+}
+
+#footer .footer-info > div:first-child {
+    padding-left: 12px;
+}
+
+#footer .footer-info > div:last-child {
+    text-align: right;
+    padding-right: 8px;
+}
+
+/* typography 강제 고정 */
+#footer,
+#footer * {
+    font-size: 13px;
+    line-height: 1.65;
+    letter-spacing: -0.01em;
+    margin: 0;
+}
+
+
+
+
