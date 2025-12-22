@@ -207,6 +207,17 @@ public class FrontOrderService {
         }
     }
 
+    public void confirmOrder(Long orderId) {
+        try {
+            // Feign Client를 통해 백엔드(주문 서버) 호출
+            orderClient.confirmOrder(orderId);
+            log.info("Purchase Confirm Success: OrderID={}", orderId);
+        } catch (Exception e) {
+            log.error("Purchase Confirm Failed: OrderID={}", orderId, e);
+            throw new RuntimeException("구매 확정 처리 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
     // 내 주문 내역 조회
     public CommonPageResponse<MyOrderResponse> getMyOrders(Long userId, int page, int size) {
         try {

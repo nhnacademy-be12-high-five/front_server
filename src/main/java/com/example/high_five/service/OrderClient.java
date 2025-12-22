@@ -44,6 +44,9 @@ public interface OrderClient {
     @PostMapping("/api/orders/{orderId}/cancel")
     void cancelOrder(@PathVariable("orderId") Long orderId);
 
+    @PostMapping("/api/orders/{orderId}/confirm")
+    void confirmOrder(@PathVariable("orderId") Long orderId);
+
     @GetMapping("/api/orders")
     CommonPageResponse<MyOrderResponse> getMyOrders(
             @RequestHeader("X-USER-ID") Long userId,
