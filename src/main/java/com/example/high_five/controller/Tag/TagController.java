@@ -1,7 +1,6 @@
 package com.example.high_five.controller.Tag;
 
 import com.example.high_five.dto.Tag.request.TagRequest;
-import com.example.high_five.dto.Tag.response.TagResponse;
 import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.service.TagService;
 import lombok.RequiredArgsConstructor;

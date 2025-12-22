@@ -15,6 +15,7 @@ public record BookResponse(
         String image,
         // 북 서버와 필드명, 타입을 일치시켜야 함
         List<CategoryResponse> categories,
+        List<TagResponse> tags,
         String content,
         String publisher,
         String publishedDate,
@@ -28,4 +29,7 @@ public record BookResponse(
             Integer categoryId,
             String categoryName
     ) {}
+
+
+    public record TagResponse(Long tagId,String name){}
 }
