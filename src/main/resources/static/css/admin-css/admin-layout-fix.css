@@ -1,0 +1,56 @@
+/* =========================================================
+   admin-layout-fix.css
+   사이드바 제거 이후 남아있는 고정폭/여백을 강제로 무력화
+   (반드시 "모든 CSS 중 마지막"에 로드)
+========================================================= */
+
+/* 혹시 body가 flex로 남아있는 경우 무력화 */
+html, body{
+    width: 100%;
+}
+body{
+    display: block !important;
+}
+
+/* sidebar 잔재 완전 제거 */
+.sidebar{
+    display: none !important;
+    width: 0 !important;
+    min-width: 0 !important;
+}
+
+/* 사이드바 전제 margin/폭 제거 */
+.content-area{
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+}
+
+/* main 자체가 max-width로 잡혀있으면 풀어버림 */
+main{
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* 실제 컨텐츠 영역(당신이 만든 admin-content)을 가운데/최대폭으로 */
+.admin-content{
+    width: 100% !important;
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 26px 24px 60px !important;
+}
+
+/* 카드가 작게 고정된 케이스 무력화 */
+.card{
+    max-width: none !important;
+}
+
+
+.admin-topbar{
+    width: 100vw !important;
+    margin-left: calc(50% - 50vw) !important;
+    margin-right: calc(50% - 50vw) !important;
+    border-radius: 0 !important;
+}
