@@ -99,12 +99,13 @@
 
                         <button type="button"
                                 class="btn-review-like"
-                                th:if="${review.memberId != null and loginMemberId != review.memberId}"
+                                th:if="${loginMemberId == null or loginMemberId != review.memberId}"
                                 th:classappend="${review.isLiked} ? 'active'"
                                 th:onclick="|toggleReviewLike(${book.bookId}, ${review.reviewId}, this)|">
                             ♥ <span th:id="'like-count-' + ${review.reviewId}"
                                     th:text="${review.likeCount}">0</span>
                         </button>
+
 
 
                         <span class="my-review-badge"

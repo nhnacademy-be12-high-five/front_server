@@ -4,12 +4,11 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title th:text="${book.title} + ' | HIGH-FIVE BOOKS'">도서 상세</title>
-    <link rel="stylesheet" href="/css/common/common.css">
-    <link rel="stylesheet" href="/css/common/header.css">
-    <link rel="stylesheet" href="/css/common/footer.css">
-    <link rel="stylesheet" href="/css/book-css/detail-style.css">
     <link rel="stylesheet" th:href="@{/css/book-css/review-section.css}">
-
+    <link rel="stylesheet" href="/css/book-css/detail-style.css">
+    <link rel="stylesheet" href="/css/common/footer.css">
+    <link rel="stylesheet" href="/css/common/header.css">
+    <link rel="stylesheet" href="/css/common/common.css">
 </head>
 
 <script src="/js/book-detail.js"></script>
@@ -19,10 +18,8 @@
 
 <div th:replace="~{layout/header :: header}"></div>
 
-
-
-<main>
-    <div id="container" class="container2">
+<main id="container">
+    <div class="container2">
         <div class="breadcrumb">
             <span>홈</span>
             <span>도서 상세</span>
@@ -37,7 +34,7 @@
                 </div>
 
                 <div class="book-info">
-                    <h1 th:utext="${book.title}">도서 제목</h1>
+                    <h1 th:text="${book.title}">도서 제목</h1>
                     <p class="author-publisher">
                         <span th:text="${book.author}">저자</span>
                         <span th:if="${book.publisher != null}" th:text="' · ' + ${book.publisher}">· 출판사</span>
@@ -147,28 +144,11 @@
                 </div>
             </div>
 
-            <!-- 태그 선택(회원 저장) -->
-            <div class="user-tag-section"
-                 th:attr="data-book-id=${book.bookId},
-              data-logged-in=${isLoggedIn},
-              data-selected-tags=${selectedTagsCsv}">
-                <div class="user-tag-title">태그 선택 (최대 4개)</div>
-
-                <div class="user-tag-list" role="group" aria-label="태그 선택">
-                    <button type="button" class="tag-chip" data-tag="FREE_SHIP">#읽을예정</button>
-                    <button type="button" class="tag-chip" data-tag="SAME_DAY">#선물후보</button>
-                    <button type="button" class="tag-chip" data-tag="SAFE_PACK">#재구매검토</button>
-                    <button type="button" class="tag-chip" data-tag="MAX_DISCOUNT">#추천하고싶음</button>
-                </div>
-
-            </div>
-
-
             <div class="book-detail-tabs">
                 <button type="button" class="active" data-target="tab-intro">도서 소개</button>
                 <button type="button" data-target="tab-contents">목차</button>
                 <button type="button" data-target="tab-review">리뷰 (<span
-                        th:utext="${reviewList != null ? reviewList.totalElements : 0}">0</span>)
+                        th:text="${reviewList != null ? reviewList.totalElements : 0}">0</span>)
                 </button>
                 <button type="button" data-target="tab-qna">Q&amp;A</button>
                 <button type="button" data-target="tab-shipping">배송/반품</button>
@@ -176,7 +156,7 @@
 
             <div id="tab-intro" class="detail-tab-content">
                 <h2>도서 소개</h2>
-                <p th:utext="${book.content}" style="line-height: 1.8; color: #555;">
+                <p th:text="${book.content}" style="line-height: 1.8; color: #555;">
                     도서 소개 내용
                 </p>
             </div>
@@ -225,7 +205,6 @@
 </main>
 
 <div th:replace="~{layout/footer :: footer}"></div>
-
 
 </body>
 </html>
