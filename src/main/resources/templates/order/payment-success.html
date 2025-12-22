@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HIGH-FIVE 도서 | 주문 완료</title>
     <link rel="stylesheet" href="/css/order-css/payment-result.css">
-    <link rel="stylesheet" href="/css/common/footer.css">
-    <link rel="stylesheet" href="/css/common/header.css">
     <link rel="stylesheet" href="/css/common/common.css">
+    <link rel="stylesheet" href="/css/common/header.css">
+    <link rel="stylesheet" href="/css/common/footer.css">
 </head>
 
 <script src="/js/common.js"></script>
@@ -49,7 +49,8 @@
             </div>
 
             <div class="order-actions">
-                <a class="btn primary" th:href="@{/orders/{id}(id=${orderId})}">주문 상세보기</a>
+                <!--<a class="btn primary" th:href="@{/orders/{id}(id=${orderId})}">주문 상세보기</a> -->
+                <a class="btn primary" href="/mypage/orders">주문 상세보기</a>
                 <a class="btn ghost" href="/">쇼핑 계속하기</a>
             </div>
         </section>

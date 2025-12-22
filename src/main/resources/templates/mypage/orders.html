@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>마이페이지 - 주문 내역</title>
     <link rel="stylesheet" href="/css/member-css/mypage.css">
-    <link rel="stylesheet" href="/css/common/footer.css">
-    <link rel="stylesheet" href="/css/common/header.css">
     <link rel="stylesheet" href="/css/common/common.css">
+    <link rel="stylesheet" href="/css/common/header.css">
+    <link rel="stylesheet" href="/css/common/footer.css">
     <link rel="stylesheet" href="/css/member-css/orders.css">
 
     <script src="/js/common.js"></script>
-
+    <script src="/js/orders.js"></script>
 </head>
 
 <body>
@@ -20,15 +20,15 @@
 
 <div class="container2">
     <aside class="mypage-tabs">
-    <nav class="box">
-        <a href="/mypage" class="tab-btn">내 정보</a>
-        <a href="/mypage/address" class="tab-btn">배송지</a>
-        <a href="/mypage/coupons" class="tab-btn">쿠폰</a>
-        <a href="/mypage/points" class="tab-btn">포인트</a>
-        <a href="/mypage/orders" class="tab-btn active">주문내역</a>
-        <a href="/mypage/reviews" class="tab-btn">리뷰</a>
-        <a href="/mypage/likes" class="tab-btn">찜 목록</a>
-    </nav>
+        <nav class="box">
+            <a href="/mypage" class="tab-btn">내 정보</a>
+            <a href="/mypage/address" class="tab-btn">배송지</a>
+            <a href="/mypage/coupons" class="tab-btn">쿠폰</a>
+            <a href="/mypage/points" class="tab-btn">포인트</a>
+            <a href="/mypage/orders" class="tab-btn active">주문내역</a>
+            <a href="/mypage/reviews" class="tab-btn">리뷰</a>
+            <a href="/mypage/likes" class="tab-btn">찜 목록</a>
+        </nav>
     </aside>
 
     <section class="tab-content active">
@@ -46,75 +46,98 @@
                           th:text="'(주문번호: ' + ${order.orderId} + ')'"></span>
                 </div>
                 <div>
-                    <span class="status-badge"
-                          th:classappend="'status-' + ${order.status}"
-                          th:text="${order.status}">WAITING</span>
+                <span class="status-badge"
+                      th:classappend="'status-' + ${order.status}"
+                      th:switch="${order.status}">
+                    <span th:case="'PAYMENT_WAITING'">결제 대기</span>
+                    <span th:case="'PREPARING'">배송 준비 중</span>
+                    <span th:case="'DELIVERING'">배송 중</span>
+                    <span th:case="'DELIVERY_COMPLETED'">배송 완료</span>
+                    <span th:case="'PURCHASE_CONFIRMED'">구매 확정</span>
+                    <span th:case="'CANCELED'">주문 취소</span>
+                    <span th:case="'RETURN_REQUESTED'">반품 요청</span>
+                    <span th:case="'RETURN_COMPLETED'">반품 완료</span>
+                    <span th:case="*">[[${order.status}]]</span>
+                </span>
                 </div>
             </div>
 
             <div class="order-body">
                 <div th:each="item : ${order.items}" class="order-item">
-                    <span th:text="${item.bookTitle}">책 제목</span>
-                    <span>
-                        <span th:text="${item.quantity} + '권'">1권</span> /
-                        <span th:text="${#numbers.formatInteger(item.price, 0, 'COMMA')} + '원'">10,000원</span>
-                    </span>
+        <span class="item-title"
+              th:text="${item.bookTitle != null ? item.bookTitle : '책 제목 없음'}">
+            책 제목
+        </span>
+                    <span class="item-meta">
+            <span th:text="${item.quantity} + '권'">1권</span>
+            <span style="margin: 0 6px; color: #e9ecef;">|</span>
+            <span class="item-price"
+                  th:text="${#numbers.formatInteger(item.price, 0, 'COMMA')} + '원'">
+                10,000원
+            </span>
+        </span>
                 </div>
             </div>
 
             <div class="order-footer">
-                총 결제금액: <span th:text="${#numbers.formatInteger(order.totalAmount, 0, 'COMMA')}">30,000</span>원
+                <div style="text-align: right; margin-bottom: 12px; font-weight: 600;">
+                    총 결제금액: <span style="color: #d6336c; font-size: 1.1em;"
+                                  th:text="${#numbers.formatInteger(order.totalAmount, 0, 'COMMA')}">30,000</span>원
+                </div>
 
-                <div style="margin-top: 10px;">
-                    <button th:if="${order.status == 'WAITING'}"
+                <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+
+                    <button th:if="${order.status.toString() == 'PAYMENT_WAITING' or order.status.toString() == 'PREPARING'}"
                             th:onclick="'cancelOrder(' + ${order.orderId} + ')'"
-                            style="padding: 5px 10px; font-size: 12px; cursor: pointer;">주문 취소
+                            class="btn-action btn-cancel">
+                        주문 취소
                     </button>
+
+                    <!-- 구매 확정 버튼 -->
+                    <button th:if="${order.status.toString() != 'PURCHASE_CONFIRMED'
+               and order.status.toString() != 'CANCELED'
+               and order.status.toString() != 'RETURN_COMPLETED'}"
+                            th:onclick="'confirmPurchase(' + ${order.orderId} + ')'"
+                            class="btn-action btn-confirm">
+                        구매 확정
+                    </button>
+
+                    <!-- 이미 구매 확정된 경우 버튼 비활성화 -->
+                    <button th:if="${order.status.toString() == 'PURCHASE_CONFIRMED'}"
+                            disabled
+                            class="btn-action btn-confirm disabled">
+                        구매 확정
+                    </button>
+
+                    </button>
+
+                    <button th:if="${order.status.toString() == 'DELIVERY_COMPLETED'}"
+                            th:onclick="'requestReturn(' + ${order.orderId} + ')'"
+                            class="btn-action btn-return">
+                        반품 신청
+                    </button>
+
+                    <span th:if="${order.status.toString() == 'CANCELED'}"
+                          style="font-size: 13px; color: #adb5bd; font-weight: bold; text-decoration: line-through;">
+            취소된 주문
+        </span>
+                    <span th:if="${order.status.toString() == 'RETURN_REQUESTED'}"
+                          style="font-size: 13px; color: #fd7e14; font-weight: bold;">
+            반품 처리 중
+        </span>
+                    <span th:if="${order.status.toString() == 'RETURN_COMPLETED'}"
+                          style="font-size: 13px; color: #fa5252; font-weight: bold;">
+            반품 완료
+        </span>
+
                 </div>
             </div>
+
+            <div class="pagination" th:if="${page.totalPages > 1}">
+            </div>
         </div>
-
-        <div class="pagination" th:if="${page.totalPages > 1}">
-            <a th:if="${page.currentPage > 0}"
-               th:href="@{/mypage/orders(page=${page.currentPage - 1})}"
-               class="page-link">&lt;</a>
-
-            <span th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}">
-        <a th:href="@{/mypage/orders(page=${i})}"
-           th:text="${i + 1}"
-           th:classappend="${i == page.currentPage} ? 'active' : ''"
-           class="page-link">1</a>
-    </span>
-
-            <a th:if="${page.currentPage < page.totalPages - 1}"
-               th:href="@{/mypage/orders(page=${page.currentPage + 1})}"
-               class="page-link">&gt;</a>
-        </div>
-
     </section>
 </div>
-
-<script>
-    function cancelOrder(orderId) {
-        if (!confirm('정말 주문을 취소하시겠습니까?')) return;
-
-        fetch(`/orders/api/${orderId}/cancel`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => {
-                if (response.ok) {
-                    alert('주문이 취소되었습니다.');
-                    window.location.reload();
-                } else {
-                    alert('주문 취소에 실패했습니다.');
-                }
-            })
-            .catch(error => console.error('Error:', error));
-    }
-</script>
-
+<div th:replace="~{layout/footer :: footer}"></div>
 </body>
 </html>

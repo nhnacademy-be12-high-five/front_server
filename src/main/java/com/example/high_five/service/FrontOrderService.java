@@ -1,5 +1,6 @@
 package com.example.high_five.service;
 
+import com.example.high_five.common.CommonPageResponse;
 import com.example.high_five.common.CustomPage;
 import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.coupon.MemberCouponResponseDto;
@@ -125,13 +126,13 @@ public class FrontOrderService {
             try {
                 BookResponse bookInfo = bookClient.getBookDetail(bookId);
                 if (bookInfo != null) {
-                    int price = bookInfo.getPrice();
+                    int price = bookInfo.price();
                     int itemTotal = price * qty;
 
                     items.add(OrderResponse.OrderItem.builder()
                             .bookId(bookId)
-                            .title(bookInfo.getTitle())
-                            .imageUrl(bookInfo.getImage())
+                            .title(bookInfo.title())
+                            .imageUrl(bookInfo.image())
                             .price(price)
                             .quantity(qty)
                             .totalPrice(itemTotal)
@@ -206,13 +207,24 @@ public class FrontOrderService {
         }
     }
 
+    public void confirmOrder(Long orderId) {
+        try {
+            // Feign Client를 통해 백엔드(주문 서버) 호출
+            orderClient.confirmOrder(orderId);
+            log.info("Purchase Confirm Success: OrderID={}", orderId);
+        } catch (Exception e) {
+            log.error("Purchase Confirm Failed: OrderID={}", orderId, e);
+            throw new RuntimeException("구매 확정 처리 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
     // 내 주문 내역 조회
-    public CustomPage<MyOrderResponse> getMyOrders(Long userId, int page, int size) {
+    public CommonPageResponse<MyOrderResponse> getMyOrders(Long userId, int page, int size) {
         try {
             return orderClient.getMyOrders(userId, page, size);
         } catch (Exception e) {
             log.error("주문 내역 조회 실패 UserID={}: {}", userId, e.getMessage());
-            return new CustomPage<>(Collections.emptyList(), 0, 0, size, page);
+            return new CommonPageResponse<>();
         }
     }
 

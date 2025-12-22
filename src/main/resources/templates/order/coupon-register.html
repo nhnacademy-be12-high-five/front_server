@@ -6,9 +6,9 @@
     <title>Booktown - 쿠폰 발급</title>
 
     <link rel="stylesheet" href="/css/order-css/coupon-register.css">
-    <link rel="stylesheet" href="/css/common/footer.css">
-    <link rel="stylesheet" href="/css/common/header.css">
     <link rel="stylesheet" href="/css/common/common.css">
+    <link rel="stylesheet" href="/css/common/header.css">
+    <link rel="stylesheet" href="/css/common/footer.css">
 </head>
 
 <body>
@@ -24,11 +24,11 @@
 <div th:replace="~{layout/header :: header}"></div>
 
 <div class="register-page-container">
-    <h1 class="page-title">🎉 쿠폰 발급</h1>
+    <h1 class="page-title"> 쿠폰 발급 </h1>
 
-    <a class="user-link" href="/">
-        <img src="/img/logo.png" alt="메인페이지로 이동하기" class="user-icon" width="200" height="200"/>
-    </a>
+<!--    <a class="user-link" href="/">-->
+<!--        <img src="/img/logo.png" alt="메인페이지로 이동하기" class="user-icon" width="200" height="200"/>-->
+<!--    </a>-->
 
     <div class="available-coupons">
         <h3>다운로드 가능한 쿠폰 목록</h3>
@@ -46,7 +46,16 @@
 
                 <form method="post" th:action="@{/coupon/issue}">
                     <input type="hidden" name="couponId" th:value="${template.id}">
-                    <button class="btn-download" type="submit">다운로드</button>
+                    <button class="btn-download" aria-label="쿠폰 다운로드">
+                        <svg class="download-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 3v10m0 0l-4-4m4 4l4-4M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"/>
+                        </svg>
+                    </button>
                 </form>
             </div>
 

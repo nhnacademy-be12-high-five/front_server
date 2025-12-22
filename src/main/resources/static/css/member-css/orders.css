@@ -62,28 +62,20 @@
 }
 
 /* ===============================
-   주문 리스트
-=============================== */
-
-.order-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-/* ===============================
-   주문 카드
+   주문 카드 스타일
 =============================== */
 
 .order-card {
-    border: 1px solid #ddd;
+    border: 1px solid #e9ecef;
     border-radius: 12px;
-    padding: 20px;
+    padding: 24px;
     background-color: #fff;
+    margin-bottom: 20px;
+    transition: box-shadow 0.2s;
 }
 
-.order-card.completed {
-    opacity: 0.9;
+.order-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 /* ===============================
@@ -94,125 +86,200 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-    margin-bottom: 12px;
-    font-weight: 600;
-    color: #555;
-}
-
-.order-id strong {
-    font-size: 14px;
-    color: var(--color-text-dark);
-}
-
-.order-date {
-    font-size: 12px;
-    color: #999;
+    border-bottom: 1px solid #f1f3f5;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
 }
 
 /* ===============================
-   상태 배지
-=============================== */
-
-.badge-status {
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 11px;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.badge-status.shipping {
-    background: #e3f2fd;
-    color: #1565c0;
-}
-
-.badge-status.completed {
-    background: #e8f5e9;
-    color: #2e7d32;
-}
-
-/* ===============================
-   주문 본문
+   주문 본문 (아이템 리스트)
 =============================== */
 
 .order-body {
     display: flex;
+    flex-direction: column;
+    gap: 0; /* 아이템 간 간격은 border로 대체 */
+    padding: 10px 0;
+    border: none; /* 위아래 굵은 테두리 제거 */
+}
+
+.order-item {
+    display: flex;
+    align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    border-top: 1px solid var(--color-border-light);
-    border-bottom: 1px solid var(--color-border-light);
-    padding: 14px 0;
-    font-size: 14px;
+    font-size: 15px;
+    color: #333;
+    padding: 12px 0; /* 아이템별 상하 여백 */
+    border-bottom: 1px solid #f1f3f5; /* 얇은 구분선만 남김 */
 }
 
-.order-product .title {
-    font-weight: 600;
-    margin-bottom: 4px;
+/* 마지막 아이템은 밑줄 제거 */
+.order-item:last-child {
+    border-bottom: none;
 }
 
-.order-product .meta {
-    font-size: 12px;
-    color: var(--color-text-light);
+/* 책 제목 영역: 공간 차지하되 넘치면 말줄임(...) 처리 */
+.item-title {
+    flex-grow: 1;               /* 남은 공간 모두 차지 */
+    font-weight: 500;
+    margin-right: 16px;         /* 가격과 간격 확보 */
+
+    /* 긴 제목 말줄임 처리 (선택사항) */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;               /* Flexbox 말줄임 필수 속성 */
 }
 
-.order-price {
+/* 수량 및 가격 영역: 절대 줄바꿈 금지 */
+.item-meta {
+    flex-shrink: 0;             /* 공간 줄어들지 않음 */
+    white-space: nowrap;        /* 줄바꿈 방지 */
     text-align: right;
-    min-width: 120px;
+    font-weight: 600;
+    color: #555;
 }
 
-.order-price .price {
-    font-weight: 700;
-    margin-bottom: 4px;
+/* 가격 강조 */
+.item-price {
+    color: #333;
+    margin-left: 4px;
 }
 
-.order-price .confirm-deadline {
-    font-size: 12px;
-    color: #999;
-}
+/* ... 버튼 스타일(btn-action) 등은 기존 유지 ... */
 
 /* ===============================
-   주문 푸터
+   주문 푸터 (총액 및 버튼)
 =============================== */
 
 .order-footer {
-    margin-top: 16px;
-    text-align: right;
-    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px dashed #e9ecef;
     font-size: 16px;
+    font-weight: 600;
 }
 
-.order-footer .small {
-    padding: 7px 12px;
-    font-size: 12px;
+/* 버튼 공통 스타일 */
+.btn-action {
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-action:active {
+    transform: scale(0.98);
+}
+
+.btn-action.disabled {
+    opacity: 0.5;           /* 반투명 */
+    cursor: not-allowed;    /* 금지 커서 */
+    pointer-events: none;   /* 클릭 방지 */
+    box-shadow: none;
+}
+
+/* 1. 주문 취소 버튼 (빨강) */
+.btn-cancel {
+    background-color: #fa5252; /* Red-6 */
+}
+.btn-cancel:hover {
+    background-color: #e03131; /* Red-8 */
+}
+
+/* 2. 구매 확정 버튼 (파랑) */
+.btn-confirm {
+    background-color: #228be6; /* Blue-6 */
+}
+.btn-confirm:hover {
+    background-color: #1971c2; /* Blue-8 */
+}
+
+/* 3. 반품 신청 버튼 (주황) */
+.btn-return {
+    background-color: #fd7e14; /* Orange-6 */
+}
+.btn-return:hover {
+    background-color: #d9480f; /* Orange-9 */
 }
 
 /* ===============================
-   주문 상태 컬러
+   상태 배지 (Status Badge) - 핵심 수정 부분
 =============================== */
 
 .status-badge {
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    background-color: #e9ecef;
-    color: #495057;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
 }
 
-.status-WAITING {
-    background-color: #fff3cd;
-    color: #856404;
+/* 1. 결제 대기 (PAYMENT_WAITING) - 회색/노랑 */
+.status-PAYMENT_WAITING {
+    background-color: #fff9db;
+    color: #f08c00;
+    border: 1px solid #fcc419;
 }
 
-.status-COMPLETED {
-    background-color: #d4edda;
-    color: #155724;
+/* 2. 배송 준비 중 (PREPARING) - 파란색 계열 */
+.status-PREPARING {
+    background-color: #e7f5ff;
+    color: #1c7ed6;
+    border: 1px solid #74c0fc;
 }
 
+/* 3. 배송 중 (DELIVERING) - 진한 파란색/보라색 */
+.status-DELIVERING {
+    background-color: #f3f0ff;
+    color: #6741d9;
+    border: 1px solid #b197fc;
+}
+
+/* 4. 배송 완료 (DELIVERY_COMPLETED) - 녹색 */
+.status-DELIVERY_COMPLETED {
+    background-color: #ebfbee;
+    color: #2b8a3e;
+    border: 1px solid #8ce99a;
+}
+
+/* 5. 구매 확정 (PURCHASE_CONFIRMED) - 짙은 녹색/검정 */
+.status-PURCHASE_CONFIRMED {
+    background-color: #f8f9fa;
+    color: #212529;
+    border: 1px solid #adb5bd;
+}
+
+/* 6. 주문 취소 (CANCELED) - 빨간색 */
 .status-CANCELED {
-    background-color: #f8d7da;
-    color: #721c24;
+    background-color: #fff5f5;
+    color: #e03131;
+    border: 1px solid #ff8787;
+    text-decoration: line-through;
+}
+
+/* 7. 반품 요청 (RETURN_REQUESTED) - 주황색 */
+.status-RETURN_REQUESTED {
+    background-color: #fff4e6;
+    color: #e8590c;
+    border: 1px solid #ffa94d;
+}
+
+/* 8. 반품 완료 (RETURN_COMPLETED) - 붉은 계열 */
+.status-RETURN_COMPLETED {
+    background-color: #ffe3e3;
+    color: #c92a2a;
+    border: 1px solid #ffa8a8;
 }
 
 /* ===============================
@@ -221,7 +288,44 @@
 
 .no-data {
     text-align: center;
-    padding: 60px;
-    color: #888;
+    padding: 80px 0;
+    color: #adb5bd;
+    font-size: 16px;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+}
+
+/* ===============================
+   페이지네이션
+=============================== */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+    gap: 8px;
+}
+
+.page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid #dee2e6;
+    color: #495057;
+    text-decoration: none;
     font-size: 14px;
+    transition: all 0.2s;
+}
+
+.page-link:hover {
+    background-color: #f1f3f5;
+    color: #212529;
+}
+
+.page-link.active {
+    background-color: #3b5bdb;
+    color: #fff;
+    border-color: #3b5bdb;
 }

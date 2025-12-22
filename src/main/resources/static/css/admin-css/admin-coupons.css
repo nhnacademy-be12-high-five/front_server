@@ -267,6 +267,12 @@ main {
     cursor: pointer;
     font-weight: bold;
 }
+.coupon-table th:last-child,
+.coupon-table td:last-child{
+    text-align: center;
+    width: 110px;
+}
+
 
 /* 반응형: 화면이 좁아지면 (1000px 이하) 카드가 세로로 배치 */
 @media (max-width: 1000px) {

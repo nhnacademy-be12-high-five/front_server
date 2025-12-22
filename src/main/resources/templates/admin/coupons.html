@@ -220,6 +220,8 @@
                             <th>발급 종료 일자</th>
                             <th>유효 기간</th>
                             <th>상태</th>
+                            <th>관리</th>
+
 
                         </tr>
                         </thead>
@@ -278,9 +280,42 @@
                                     대기 중
                                 </span>
                             </td>
+                            <td>
+                                <form th:if="${coupon.status != 'INACTIVE'}"
+                                      th:action="@{/admin/coupons/{couponId}/status(couponId=${coupon.id})}"
+                                      method="post"
+                                      onsubmit="return confirm('이 쿠폰 발급을 중단하시겠습니까?');">
+
+                                    <input type="hidden" name="status" value="INACTIVE"/>
+
+                                    <button type="submit"
+                                            style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                                        중단
+                                    </button>
+                                </form>
+
+                                <form th:if="${coupon.status == 'INACTIVE' and coupon.policyStatus == 'ACTIVE'}"
+                                      th:action="@{/admin/coupons/{couponId}/status(couponId=${coupon.id})}"
+                                      method="post"
+                                      onsubmit="return confirm('쿠폰 발급을 다시 시작하시겠습니까?');">
+
+                                    <input type="hidden" name="status" value="ACTIVE"/>
+
+                                    <button type="submit"
+                                            style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                                        재개
+                                    </button>
+                                </form>
+
+                                <span th:if="${coupon.status == 'INACTIVE' and coupon.policyStatus != 'ACTIVE'}"
+                                      style="color: gray; font-size: 0.8em;">
+                                    (정책 중단됨)
+                                </span>
+                            </td>
+
                         </tr>
                         <tr th:if="${#lists.isEmpty(coupons)}">
-                            <td colspan="6" style="text-align: center; padding: 20px;">등록된 쿠폰이 없습니다.</td>
+                            <td colspan="10" style="text-align: center; padding: 20px;">등록된 쿠폰이 없습니다.</td>
                         </tr>
                         </tbody>
                     </table>

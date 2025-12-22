@@ -46,25 +46,28 @@ public interface BookClient {
     @GetMapping("/api/books/popular")
     List<BookResponse> getPopularBooks(@RequestParam("size") int size);
 
-    @GetMapping("/api/categories/{categoryId}/books")
-    List<BookResponse> getBooksByCategory(@PathVariable("categoryId") long categoryId);
 
     // 베스트셀러
     @GetMapping("/api/books/best-seller")
     List<BookResponse> getBestSellers(@RequestParam("size") int size);
-  
+
     // 도서 좋아요 조회
     @GetMapping("/members/me/likes")
     Boolean getBookLike(@PathVariable("book-id") Long id);
 
-    // 좋아요를 눌렀는데 로그인이 안되어있다면 로그인창으로 리다이렉팅
-    @PostMapping("/api/books/{book-id}/likes")
-    void toggleLike(@PathVariable("book-id") Long bookId,
-                          @RequestHeader(value = "X-USER-ID", required = true) Long memberId);
+    // 좋아요 토글
+    @PostMapping("/api/books/{bookId}/likes")
+    ResponseEntity<Boolean> toggleLike(
+            @PathVariable("bookId") Long bookId,
+            @RequestHeader("X-USER-ID") Long memberId
+    );
 
-    @GetMapping("/books/{book-id}/likes/status")
-    ResponseEntity<Boolean> getLikeStatus(@PathVariable("book-id") Long bookId,
-                                          @RequestHeader(value = "X-USER-ID", required = true) Long memberId);
+    // 좋아요 상태 조회
+    @GetMapping("/api/books/{bookId}/likes/status")
+    ResponseEntity<Boolean> getLikeStatus(
+            @PathVariable("bookId") Long bookId,
+            @RequestHeader("X-USER-ID") Long memberId
+    );
 
     // [관리자] 도서 전체 조회
     @GetMapping("/api/admin/books")
@@ -84,4 +87,7 @@ public interface BookClient {
 //    @DeleteMapping("/api/admin/{id}")
 //    void deleteBook(@PathVariable("id") Long bookId,
 //                    @RequestHeader("X-User-Id") Long userId);
+    @GetMapping("/api/categories/{categoryId}/books")
+    List<BookResponse> getBooksByCategory(@PathVariable("categoryId") int categoryId);
+
 }
