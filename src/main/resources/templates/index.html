@@ -991,9 +991,11 @@
                             <div class="title" th:text="${book.title}">책 제목</div>
                             <div class="meta">
                                 <span th:text="${book.publisher}">출판사</span> ·
-                                <span th:text="${#strings.replace(#strings.substring(book.pubDate, 0, 7), '-', '.')}">
-                            2024.03
-                        </span>
+                                <span th:if="${book.pubDate != null and #strings.length(book.pubDate) >= 7}"
+                                      th:text="${#strings.replace(#strings.substring(book.pubDate, 0, 7), '-', '.')}"></span>
+                                <span th:if="${book.pubDate != null and #strings.length(book.pubDate) < 7}"
+                                      th:text="${book.pubDate}"></span>
+                                <span th:if="${book.pubDate == null}">날짜 정보 없음</span>
                             </div>
                             <div class="price-row">
                         <span class="price"
