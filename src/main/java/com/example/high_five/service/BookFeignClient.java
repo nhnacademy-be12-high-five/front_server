@@ -1,5 +1,6 @@
 package com.example.high_five.service;
 
+import com.example.high_five.dto.book.ParsingDto;
 import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.book.BookPagedResponse;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -23,5 +24,5 @@ public interface BookFeignClient {
     );
 
     @GetMapping("/api/admin/books/search-api")
-    ResponseEntity<Object> searchBookByIsbn(@RequestParam("isbn") String isbn);
+    ResponseEntity<ParsingDto> searchBookByIsbn(@RequestParam("isbn") String isbn);
 }

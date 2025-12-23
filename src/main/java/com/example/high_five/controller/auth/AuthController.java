@@ -37,17 +37,27 @@ public class AuthController {
     }
 
     @PostMapping("/auth/login")
-    public String login(@ModelAttribute LoginRequest loginRequest, HttpServletResponse response) {
-        ResponseEntity<TokenDto> apiResponse = authService.login(loginRequest);
-        TokenDto tokens = apiResponse.getBody();
+    public String login(@ModelAttribute LoginRequest loginRequest,
+                        HttpServletResponse response,
+                        RedirectAttributes rttr) {
+        try {
+            ResponseEntity<TokenDto> apiResponse = authService.login(loginRequest);
+            TokenDto tokens = apiResponse.getBody();
 
-        if (tokens == null) {
-            throw new RuntimeException("로그인 실패: 토큰이 없습니다.");
+            if (tokens == null) {
+                throw new RuntimeException("토큰 없음");
+            }
+
+            setCookie(response, "access-token", tokens.getAccessToken(), accessExpirationTime);
+            setCookie(response, "refresh-token", tokens.getRefreshToken(), refreshExpirationTime);
+
+            return "redirect:/";
+
+        } catch (Exception e) {
+            log.warn("로그인 실패: {}", e.getMessage());
+            rttr.addFlashAttribute("error", "아이디 또는 비밀번호가 일치하지 않습니다.");
+            return "redirect:/member/login";
         }
-        setCookie(response, "access-token", tokens.getAccessToken(), accessExpirationTime);
-        setCookie(response, "refresh-token", tokens.getRefreshToken(), refreshExpirationTime);
-
-        return "redirect:/";
     }
 
     @PostMapping("/auth/reissue")
@@ -57,13 +67,19 @@ public class AuthController {
             return ResponseEntity.status(401).build();
         }
 
-        ResponseEntity<TokenDto> apiResponse = authService.reissue(refreshToken);
-        TokenDto newTokens = apiResponse.getBody();
+        try {
+            ResponseEntity<TokenDto> apiResponse = authService.reissue(refreshToken);
+            TokenDto newTokens = apiResponse.getBody();
 
-        setCookie(response, "access-token", newTokens.getAccessToken(), accessExpirationTime);
-        setCookie(response, "refresh-token", newTokens.getRefreshToken(), refreshExpirationTime);
+            if(newTokens != null) {
+                setCookie(response, "access-token", newTokens.getAccessToken(), accessExpirationTime);
+                setCookie(response, "refresh-token", newTokens.getRefreshToken(), refreshExpirationTime);
+            }
+            return ResponseEntity.ok().build();
 
-        return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(401).build();
+        }
     }
 
     @GetMapping("/logout")
@@ -90,19 +106,26 @@ public class AuthController {
     @GetMapping("/login/oauth2/code/{provider}")
     public String socialLoginCallback(@PathVariable String provider, @RequestParam("code") String code,
                                       HttpServletResponse response, RedirectAttributes redirectAttributes) {
-        ResponseEntity<TokenDto> apiResponse = authService.loginSocial(provider, code);
-        TokenDto tokens = apiResponse.getBody();
+        try {
+            ResponseEntity<TokenDto> apiResponse = authService.loginSocial(provider, code);
+            TokenDto tokens = apiResponse.getBody();
 
-        if (tokens == null) throw new RuntimeException("소셜 로그인 실패");
+            if (tokens == null) throw new RuntimeException("소셜 로그인 실패");
 
-        setCookie(response, "access-token", tokens.getAccessToken(), accessExpirationTime);
-        setCookie(response, "refresh-token", tokens.getRefreshToken(), refreshExpirationTime);
+            setCookie(response, "access-token", tokens.getAccessToken(), accessExpirationTime);
+            setCookie(response, "refresh-token", tokens.getRefreshToken(), refreshExpirationTime);
 
-        if (!tokens.isProfileComplete()) {
-            redirectAttributes.addFlashAttribute("alertMessage", "필수 정보를 입력해주세요.");
-            return "redirect:/mypage?tab=info";
+            if (!tokens.isProfileComplete()) {
+                redirectAttributes.addFlashAttribute("alertMessage", "필수 정보를 입력해주세요.");
+                return "redirect:/mypage?tab=info";
+            }
+            return "redirect:/";
+
+        } catch (Exception e) {
+            log.error("소셜 로그인 실패: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "소셜 로그인 중 오류가 발생했습니다.");
+            return "redirect:/member/login";
         }
-        return "redirect:/";
     }
 
     private void setCookie(HttpServletResponse response, String name, String value, long maxAgeSeconds) {

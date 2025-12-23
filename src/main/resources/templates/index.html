@@ -897,15 +897,15 @@
                 <article class="card" th:unless="${bestSellers == null}" th:each="book : ${bestSellers}">
                     <a th:href="@{/books/{bookId}(bookId=${book.bookId})}" class="book-link" style="display:block; color:inherit;">
                         <div class="thumb">
-                            <img th:src="${book.image}" th:alt="${book.title}"
+                            <img th:src="${book.imageUrl}" th:alt="${book.title}"
                                  style="width: 100%; height: 100%; object-fit: cover;" />
                         </div>
                         <div class="info">
                             <div class="title" th:text="${book.title}">책 제목</div>
                             <div class="meta">
                                 <span th:text="${book.publisher}">출판사</span> ·
-                                <span th:if="${book.publishedDate != null}"
-                                      th:text="${#strings.replace(#strings.substring(book.publishedDate, 0, 7), '-', '.')}">
+                                <span th:if="${book.pubDate != null}"
+                                      th:text="${#strings.replace(#strings.substring(book.pubDate, 0, 7), '-', '.')}">
                         </span>
                             </div>
 
@@ -935,15 +935,20 @@
                 <article class="card" th:unless="${risingBooks == null}" th:each="book : ${risingBooks}">
                     <a th:href="@{/books/{id}(id=${book.bookId})}" class="book-link" style="display:block; color:inherit;">
                         <div class="thumb">
-                            <img th:src="${book.image}"
-                                 th:alt="${book.image}"
+                            <img th:src="${book.imageUrl}"
+                                 th:alt="${book.imageUrl}"
                                  style="width: 100%; height: 100%; object-fit: cover;" />
                         </div>
                         <div class="info">
                             <div class="title" th:text="${book.title}">책 제목</div>
                             <div class="meta">
                                 <span th:text="${book.publisher}">출판사</span> ·
-                                <span th:text="${#strings.replace(#strings.substring(book.publishedDate, 0, 7), '-', '.')}">2024.03</span>
+                                <span th:if="${book.pubDate != null and #strings.length(book.pubDate) >= 7}"
+                                      th:text="${#strings.replace(#strings.substring(book.pubDate, 0, 7), '-', '.')}">
+                                </span>
+                                <span th:unless="${book.pubDate != null and #strings.length(book.pubDate) >= 7}"
+                                      th:text="${book.pubDate}">
+                                </span>
                             </div>
 
                             <div class="price-row">
@@ -978,17 +983,19 @@
                        class="book-link"
                        style="display:block; color:inherit;">
                         <div class="thumb">
-                            <img th:src="${book.image}"
-                                 th:alt="${book.image}"
+                            <img th:src="${book.imageUrl}"
+                                 th:alt="${book.imageUrl}"
                                  style="width: 100%; height: 100%; object-fit: cover;" />
                         </div>
                         <div class="info">
                             <div class="title" th:text="${book.title}">책 제목</div>
                             <div class="meta">
                                 <span th:text="${book.publisher}">출판사</span> ·
-                                <span th:text="${#strings.replace(#strings.substring(book.publishedDate, 0, 7), '-', '.')}">
-                            2024.03
-                        </span>
+                                <span th:if="${book.pubDate != null and #strings.length(book.pubDate) >= 7}"
+                                      th:text="${#strings.replace(#strings.substring(book.pubDate, 0, 7), '-', '.')}"></span>
+                                <span th:if="${book.pubDate != null and #strings.length(book.pubDate) < 7}"
+                                      th:text="${book.pubDate}"></span>
+                                <span th:if="${book.pubDate == null}">날짜 정보 없음</span>
                             </div>
                             <div class="price-row">
                         <span class="price"
