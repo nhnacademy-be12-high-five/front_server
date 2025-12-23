@@ -6,6 +6,7 @@ import com.example.high_five.dto.order.DeliveryPolicyResponse;
 import com.example.high_five.dto.order.MyOrderResponse;
 import com.example.high_five.dto.order.OrderCheckoutRequest;
 import com.example.high_five.dto.order.OrderResponse;
+import com.example.high_five.dto.order.OrderReturnRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -53,4 +54,8 @@ public interface OrderClient {
             @RequestParam("page") int page,
             @RequestParam("size") int size
     );
+
+    @PostMapping("/api/orders/{orderId}/returns")
+    void requestReturn(@PathVariable("orderId") Long orderId,
+                       @RequestBody OrderReturnRequest request);
 }
