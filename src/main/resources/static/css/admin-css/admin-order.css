@@ -1,0 +1,158 @@
+/* 전체 레이아웃 (사이드바 제외 메인 영역) */
+main {
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #333;
+}
+
+/* 검색 및 필터 영역 */
+.search-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.status-select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    min-width: 150px;
+    cursor: pointer;
+}
+
+.status-select:focus {
+    outline: none;
+    border-color: #4a90e2;
+}
+
+/* 카드 박스 (테이블 감싸는 영역) */
+.card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 20px;
+    overflow-x: auto; /* 화면 작을 때 가로 스크롤 */
+}
+
+/* 주문 목록 테이블 */
+.order-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    text-align: center;
+}
+
+.order-table thead tr {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    color: #495057;
+}
+
+.order-table th {
+    padding: 15px 10px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.order-table tbody tr {
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+}
+
+.order-table tbody tr:hover {
+    background-color: #f1f3f5;
+}
+
+.order-table td {
+    padding: 12px 10px;
+    vertical-align: middle;
+}
+
+/* 상태 배지 스타일 */
+.badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+}
+
+/* 상태별 색상 지정 */
+.badge.PAYMENT_WAITING { background-color: #f0ad4e; }   /* 결제 대기 - 주황 */
+.badge.PREPARING { background-color: #17a2b8; }        /* 준비중 - 하늘색 */
+.badge.DELIVERING { background-color: #007bff; }       /* 배송중 - 파랑 */
+.badge.DELIVERY_COMPLETED { background-color: #28a745; } /* 배송완료 - 초록 */
+.badge.PURCHASE_CONFIRMED { background-color: #20c997; } /* 구매확정 - 청록 */
+.badge.CANCELED { background-color: #dc3545; }         /* 취소 - 빨강 */
+.badge.RETURN_REQUESTED { background-color: #fd7e14; } /* 반품 요청 - 진한 주황 */
+.badge.RETURN_COMPLETED { background-color: #6c757d; } /* 반품 완료 - 회색 */
+
+/* 입력 폼 및 버튼 스타일 */
+.status-change-select {
+    padding: 6px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 13px;
+    width: 100%;
+    max-width: 130px;
+}
+
+input[type="text"] {
+    padding: 6px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 13px;
+    width: 100%;
+}
+
+.action-btn {
+    padding: 6px 12px;
+    background-color: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.2s;
+}
+
+.action-btn:hover {
+    background-color: #0b5ed7;
+}
+
+/* 페이지네이션 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    gap: 10px;
+}
+
+.pagination a {
+    text-decoration: none;
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    color: #007bff;
+    background-color: #fff;
+    transition: all 0.2s;
+}
+
+.pagination a:hover {
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+    color: #0056b3;
+}
+
+.pagination span {
+    font-weight: 600;
+    color: #495057;
+    margin: 0 5px;
+}

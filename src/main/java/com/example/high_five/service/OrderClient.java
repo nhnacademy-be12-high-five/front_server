@@ -53,4 +53,20 @@ public interface OrderClient {
             @RequestParam("page") int page,
             @RequestParam("size") int size
     );
+
+    @GetMapping("/api/admin/orders")
+    CommonPageResponse<OrderResponse> getAdminOrders(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam(value = "status", required = false) String status
+    );
+
+    @PutMapping("/api/admin/orders/{orderId}/status")
+    void updateOrderStatus(
+            @PathVariable("orderId") Long orderId,
+            @RequestBody OrderStatusUpdateRequest request
+    );
+
+    // DTO 내부 클래스
+    record OrderStatusUpdateRequest(String status, String trackingNumber) {}
 }

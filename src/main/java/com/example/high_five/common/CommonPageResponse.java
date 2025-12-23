@@ -13,4 +13,12 @@ public class CommonPageResponse<T> {
     private int pageNumber;
     private int pageSize;
     private boolean isLast;
+
+    public boolean isFirst() {
+        return this.pageNumber == 0;
+    }
+
+    public boolean isLast() {
+        return this.pageNumber >= this.totalPages - 1;
+    }
 }
