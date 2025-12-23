@@ -6,6 +6,7 @@ import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.coupon.MemberCouponResponseDto;
 import com.example.high_five.dto.member.response.MemberResponse;
 import com.example.high_five.dto.order.DeliveryPolicyResponse;
+import com.example.high_five.dto.order.GuestOrderDetailResponse;
 import com.example.high_five.dto.order.MyOrderResponse;
 import com.example.high_five.dto.order.OrderCheckoutRequest;
 import com.example.high_five.dto.order.OrderGuestLoginRequest;
@@ -229,7 +230,7 @@ public class FrontOrderService {
             return new CommonPageResponse<>();
         }
     }
-    public OrderResponse getGuestOrder(Long orderId, Integer password) {
+    public GuestOrderDetailResponse getGuestOrder(Long orderId, String password) {
 
         OrderGuestLoginRequest request = new OrderGuestLoginRequest(orderId, password);
 

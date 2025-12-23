@@ -68,7 +68,7 @@ public interface OrderClient {
     void requestReturn(@PathVariable("orderId") Long orderId, @RequestBody OrderReturnRequest request);
 
     @PostMapping("/api/orders/guests/search")
-    ResponseEntity<OrderResponse> getGuestOrder(@RequestBody OrderGuestLoginRequest request);
+    ResponseEntity<GuestOrderDetailResponse> getGuestOrder(@RequestBody OrderGuestLoginRequest request);
 
     // DTO 내부 클래스
     record OrderStatusUpdateRequest(String status, String trackingNumber) {}
