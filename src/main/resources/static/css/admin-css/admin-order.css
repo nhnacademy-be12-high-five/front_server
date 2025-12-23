@@ -1,10 +1,44 @@
-/* 전체 레이아웃 (사이드바 제외 메인 영역) */
+@charset "UTF-8";
+
+/* =========================================
+   1. 전체 레이아웃 (화면 꽉 채우기)
+   ========================================= */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* 사이드바 + 메인 */
+.full-screen-container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+/* 오른쪽 메인 컨텐츠 */
+.content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    overflow-y: auto;
+    background-color: #f5f7fa;
+}
+
+/* 🔥 공통 CSS max-width 완전 해제 */
 main {
     font-family: 'Noto Sans KR', sans-serif;
     color: #333;
+    width: 100%;
+    max-width: none !important;
 }
 
-/* 검색 및 필터 영역 */
+/* =========================================
+   2. 검색 및 필터 영역
+   ========================================= */
 .search-container {
     display: flex;
     justify-content: flex-end;
@@ -13,6 +47,11 @@ main {
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+
+    /* 🔥 가로 제한 제거 */
+    width: 100%;
+    max-width: none !important;
+    box-sizing: border-box;
 }
 
 .status-select {
@@ -29,21 +68,28 @@ main {
     border-color: #4a90e2;
 }
 
-/* 카드 박스 (테이블 감싸는 영역) */
+/* =========================================
+   3. 카드 박스 및 테이블
+   ========================================= */
 .card {
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     padding: 20px;
-    overflow-x: auto; /* 화면 작을 때 가로 스크롤 */
+
+    /* 🔥 가로 꽉 채우기 */
+    width: 100%;
+    max-width: none !important;
+    box-sizing: border-box;
 }
 
-/* 주문 목록 테이블 */
 .order-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
-    text-align: center;
+
+    /* 🔥 핵심 수정 */
+    table-layout: auto;
 }
 
 .order-table thead tr {
@@ -52,10 +98,32 @@ main {
     color: #495057;
 }
 
-.order-table th {
-    padding: 15px 10px;
-    font-weight: 600;
+.order-table th,
+.order-table td {
+    padding: 12px 10px;
+    vertical-align: middle;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+
+.order-table th {
+    font-weight: 600;
+}
+
+/* 상품명 왼쪽 정렬 */
+.order-table th:nth-child(3),
+.order-table td:nth-child(3) {
+    text-align: left;
+    padding-left: 20px;
+}
+
+/* 금액 오른쪽 정렬 */
+.order-table th:nth-child(4),
+.order-table td:nth-child(4) {
+    text-align: right;
+    padding-right: 20px;
 }
 
 .order-table tbody tr {
@@ -67,12 +135,9 @@ main {
     background-color: #f1f3f5;
 }
 
-.order-table td {
-    padding: 12px 10px;
-    vertical-align: middle;
-}
-
-/* 상태 배지 스타일 */
+/* =========================================
+   4. 배지 및 입력 폼
+   ========================================= */
 .badge {
     display: inline-block;
     padding: 6px 10px;
@@ -80,35 +145,26 @@ main {
     font-size: 12px;
     font-weight: 600;
     color: #fff;
-    white-space: nowrap;
+    line-height: 1;
 }
 
-/* 상태별 색상 지정 */
-.badge.PAYMENT_WAITING { background-color: #f0ad4e; }   /* 결제 대기 - 주황 */
-.badge.PREPARING { background-color: #17a2b8; }        /* 준비중 - 하늘색 */
-.badge.DELIVERING { background-color: #007bff; }       /* 배송중 - 파랑 */
-.badge.DELIVERY_COMPLETED { background-color: #28a745; } /* 배송완료 - 초록 */
-.badge.PURCHASE_CONFIRMED { background-color: #20c997; } /* 구매확정 - 청록 */
-.badge.CANCELED { background-color: #dc3545; }         /* 취소 - 빨강 */
-.badge.RETURN_REQUESTED { background-color: #fd7e14; } /* 반품 요청 - 진한 주황 */
-.badge.RETURN_COMPLETED { background-color: #6c757d; } /* 반품 완료 - 회색 */
+.badge.PAYMENT_WAITING { background-color: #f0ad4e; }
+.badge.PREPARING { background-color: #17a2b8; }
+.badge.DELIVERING { background-color: #007bff; }
+.badge.DELIVERY_COMPLETED { background-color: #28a745; }
+.badge.PURCHASE_CONFIRMED { background-color: #20c997; }
+.badge.CANCELED { background-color: #dc3545; }
+.badge.RETURN_REQUESTED { background-color: #fd7e14; }
+.badge.RETURN_COMPLETED { background-color: #6c757d; }
 
-/* 입력 폼 및 버튼 스타일 */
-.status-change-select {
-    padding: 6px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    font-size: 13px;
-    width: 100%;
-    max-width: 130px;
-}
-
+.status-change-select,
 input[type="text"] {
     padding: 6px;
     border: 1px solid #ced4da;
     border-radius: 4px;
     font-size: 13px;
-    width: 100%;
+    width: 90%;
+    box-sizing: border-box;
 }
 
 .action-btn {
@@ -120,13 +176,16 @@ input[type="text"] {
     cursor: pointer;
     font-size: 13px;
     transition: background-color 0.2s;
+    white-space: nowrap;
 }
 
 .action-btn:hover {
     background-color: #0b5ed7;
 }
 
-/* 페이지네이션 */
+/* =========================================
+   5. 페이지네이션
+   ========================================= */
 .pagination {
     display: flex;
     justify-content: center;
@@ -147,12 +206,10 @@ input[type="text"] {
 
 .pagination a:hover {
     background-color: #e9ecef;
-    border-color: #dee2e6;
     color: #0056b3;
 }
 
 .pagination span {
     font-weight: 600;
     color: #495057;
-    margin: 0 5px;
 }
