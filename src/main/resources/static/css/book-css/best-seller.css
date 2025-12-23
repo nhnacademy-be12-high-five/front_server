@@ -1,9 +1,9 @@
 .page-header {
-    padding: 40px 0;
+    padding: 50px 0;
     text-align: center;
     background: #f8f9fa;
-    margin-bottom: 30px;
     border-bottom: 1px solid #eee;
+    margin: 10px;
 }
 .page-header h2 {
     font-size: 32px;
@@ -111,4 +111,9 @@ img {
     position: fixed;
     left: 0; right: 0; bottom: 0;
     z-index: 900;
+}
+
+.card{
+    display: flex;
+    flex-direction: column;
 }

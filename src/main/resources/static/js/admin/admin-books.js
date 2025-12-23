@@ -199,17 +199,72 @@ function previewImage(url) {
 }
 
 // 7. 필드 잠금/해제
-function setFormReadOnly(isReadOnly) {
-    // description은 에디터를 쓸 경우 readOnly 속성이 안 먹힐 수 있음 (에디터 API 사용 필요)
-    const fields = ['isbn', 'title', 'author', 'publisher', 'publishedDate', 'image', 'price', 'description'];
+function setFormReadOnly(isUpdateMode) {
+
+    const isbnEl = document.getElementById('isbn');
+    if (isbnEl) {
+        isbnEl.readOnly = isUpdateMode;
+        isbnEl.style.backgroundColor = isUpdateMode ? "#e9ecef" : "#fff";
+    }
+
+    const fields = ['title', 'author', 'publisher', 'publishedDate', 'image', 'price', 'description'];
 
     fields.forEach(fieldId => {
         const el = document.getElementById(fieldId);
         if (el) {
-            el.readOnly = isReadOnly;
-            el.style.backgroundColor = isReadOnly ? "#e9ecef" : "#fff";
-            // 가격 등은 수정 모드에서도 고칠 수 있게 하려면 예외 처리 필요
-            // 여기서는 원본 로직 유지
+            el.readOnly = false;
+            el.style.backgroundColor = "#fff";
         }
     });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById('bookForm');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault(); // 1. 기존 Form 제출(새로고침) 막기
+
+        // 2. Form 데이터를 JSON 객체로 변환
+        const formData = new FormData(form);
+        const jsonData = {
+            isbn: formData.get('isbn'),
+            title: formData.get('title'),
+            author: formData.get('author'),
+            publisher: formData.get('publisher'),
+            pubDate: formData.get('pubDate'),
+            price: formData.get('price'),
+            imageUrl: formData.get('imageUrl'),
+            description: formData.get('content')
+        };
+
+        const bookId = document.getElementById('bookId').value;
+        const isUpdate = bookId && bookId.trim() !== "";
+
+        // URL 및 메서드 결정
+        const url = isUpdate ? `/api/admin/books/${bookId}` : `/api/admin/books`;
+        const method = isUpdate ? 'PUT' : 'POST';
+
+        console.log("전송 데이터 확인:", jsonData); // F12 콘솔에서 데이터 확인 가능
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json', // ★ JSON으로 보낸다고 명시
+                },
+                body: JSON.stringify(jsonData) // 객체를 JSON 문자열로 변환
+            });
+
+            if (response.ok) {
+                alert(isUpdate ? "수정되었습니다." : "등록되었습니다.");
+                window.location.reload(); // 성공 후 새로고침
+            } else {
+                const errorText = await response.text();
+                alert("처리 실패: " + errorText);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("서버 통신 중 오류 발생");
+        }
+    });
+});

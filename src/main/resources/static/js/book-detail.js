@@ -28,7 +28,9 @@ async function handleReviewError(response, defaultMsg = "요청 처리에 실패
         }
     }
     alert(msg);
-    if (response.status === 401) location.href = "/member/login";
+    if (response.status === 401) {
+        location.href = "/member/login"
+    }
 }
 
 function toggleReviewLike(bookId, reviewId, btn) {
@@ -305,7 +307,7 @@ async function submitReview(bookId) {
         alert("리뷰 내용을 입력해주세요.");
         return;
     }
-    if(content.length < 10) {
+    if(content.length < 10) {+
         alert("리뷰는 최소 10자 이상 작성해주세요.");
         return;
     }

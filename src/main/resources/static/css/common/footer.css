@@ -1,0 +1,90 @@
+
+/* =========================
+   FOOTER (Unified / Stable)
+   ========================= */
+
+#footer {
+    /* 어떤 전역 규칙이 footer를 fixed로 만들더라도 막기 */
+    position: relative !important;
+    /*bottom: auto !important;*/
+    /*top: auto !important;*/
+    /*left: auto !important;*/
+    /*right: auto !important;*/
+
+    width: 100%;
+    overflow: hidden;
+
+    background-color: var(--color-dark-footer, #3e2723);
+    color: white;
+
+    padding: 40px 0;
+    font-size: 13px;
+    z-index: 1;
+}
+
+/* 도트 패턴 */
+#footer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.55;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Ccircle cx='2' cy='2' r='1' fill='%23DCE2F3'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+}
+
+/*/* 푸터 내부 요소는 패턴 위로 */
+/*#footer > * { position: relative; }*/
+
+/*!* 컨테이너 *!*/
+#footer .container {
+    width: 100%;
+    /*max-width: 1200px;*/
+    margin: 0 auto;
+    padding: 22px 24px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    height: 200px;
+}
+
+#footer .footer-links a {
+    font-size: 13px;
+    font-weight: 600;
+    color: #d6d6d6;
+    text-decoration: none;
+}
+#footer .footer-links a strong {
+    font-weight: 800;
+}
+
+
+/* 모바일 */
+@media (max-width: 768px) {
+    #footer .footer-info {
+        flex-direction: column;
+        gap: 12px;
+    }
+    #footer .footer-info > div:last-child {
+        margin-left: 0;
+        text-align: left;
+        padding-right: 0;
+    }
+}
+
+
+body {
+    margin: 0;
+}
+
+.block2{
+    padding: 30px;
+}
+
+.footer-info{
+    display: flex;
+    flex-direction: row;
+    gap: 300px;
+}
+

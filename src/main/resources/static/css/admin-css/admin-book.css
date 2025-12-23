@@ -92,12 +92,14 @@ header {
     margin-bottom: 24px;
 }
 
+
 .form-row {
-    margin-bottom: 18px;
     display: flex;
+    flex-direction: row;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    margin: 20px;
 }
 
 .form-row label {

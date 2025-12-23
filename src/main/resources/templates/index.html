@@ -437,7 +437,7 @@
         <section class="section" aria-labelledby="best-title2">
             <div class="head">
                 <h3>주간 인기 급상승 🔥</h3>
-                <a class="more" href="/books/popular">더보기</a>
+                <a class="more" href="/books/popular">더보기 </a>
             </div>
             <div class="card-grid" style="grid-template-columns: repeat(5, 1fr)">
 
@@ -445,7 +445,6 @@
                      style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">
                     <p>아직 집계된 인기 도서가 없습니다.</p>
                 </div>
-
 
                 <article class="card" th:unless="${risingBooks == null}" th:each="book : ${risingBooks}">
                     <a th:href="@{/books/{id}(id=${book.bookId})}" class="book-link" style="display:block; color:inherit;">
@@ -478,7 +477,7 @@
         <section class="section" aria-label="신간 및 추천">
             <div class="head">
                 <h3>이달의 신간 📚</h3>
-                <a class="more" href="/books/new">더보기</a>
+                <a class="more" href="/books/new">더보기 + </a>
             </div>
 
             <div class="card-grid" style="grid-template-columns: repeat(5, 1fr)">
