@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="/css/member-css/login.css">
     <link rel="stylesheet" href="/css/common/footer.css">
     <link rel="stylesheet" href="/css/common/header.css">
-    <link rel="stylesheet" href="/css/common/header.css">
     <link rel="stylesheet" href="/css/common/common.css">
     <style>
         dialog::backdrop { background: rgba(0,0,0,0.5); }
@@ -45,15 +44,20 @@
             <div class="btn">
                 <button type="submit" class="login-btn">로그인</button>
                 <button type="button" class="login2-btn" onclick="location.href='/member/signup'">회원가입</button>
-                <a href="https://id.payco.com/oauth2.0/authorize?response_type=code&client_id=3RDwsbe24b34tbkpVdYgqZB&serviceProviderCode=FRIENDS&redirect_uri=https://nhnbook.shop/login/oauth2/code/payco&userLocale=ko_KR"
-                   class="sns-btn payco">
-                    PAYCO 로그인
-                </a>
+
+                <!--로컬 페이코-->
+<!--                <a href="https://id.payco.com/oauth2.0/authorize?response_type=code&client_id=3RDJfC0EFpgMSp8pe7saxfn&serviceProviderCode=FRIENDS&redirect_uri=http://nhn.highfive:9000/login/oauth2/code/payco&userLocale=ko_KR" class="sns-btn payco"> PAYCO 로그인</a> -->
+                <!--배포 페이코-->
+                <a href="https://id.payco.com/oauth2.0/authorize?response_type=code&client_id=3RDwsbe24b34tbkpVdYgqZB&serviceProviderCode=FRIENDS&redirect_uri=https://nhnbook.shop/login/oauth2/code/payco&userLocale=ko_KR" class="sns-btn payco">PAYCO 로그인</a>
             </div>
 
             <div class="find">
-                <button type="button" class="findId" onclick="openDialog('id')">아이디찾기</button>
-                <button type="button" class="findPwd" onclick="openDialog('pw')">비밀번호 찾기</button>
+                <button type="button" class="findId" onclick="openFindIdDialog()">아이디찾기</button>
+
+                <button type="button" class="findPwd"
+                        onclick="openPasswordResetDialog({ emailReadonly:false, redirectUrl:'/member/login?pwChanged=true' })">
+                    비밀번호 찾기
+                </button>
             </div>
         </form>
 
@@ -64,197 +68,109 @@
 <div th:replace="~{layout/footer :: footer}"></div>
 <script src="/js/common.js"></script>
 
-<dialog id="findDialog"
+<dialog id="findIdDialog"
         style="padding: 20px; border: 1px solid #888; border-radius: 8px; width: 350px;
                position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%);
                margin: 0; z-index: 9999; background: white;">
     <div style="text-align: right;">
-        <button type="button" onclick="closeDialog()"
+        <button type="button" onclick="closeFindIdDialog()"
                 style="border:none; background:none; cursor:pointer; font-size:16px;">X</button>
     </div>
 
-    <h3 id="dialogTitle" style="margin-top:0;">아이디 찾기</h3>
-    <p id="dialogDesc" style="font-size:13px; color:#666;">가입한 이메일로 인증번호를 받아 입력하세요.</p>
+    <h3 style="margin-top:0;">아이디 찾기</h3>
+    <p style="font-size:13px; color:#666;">가입한 이메일로 인증번호를 받아 입력하세요.</p>
 
-    <input type="text" id="primaryInput"
+    <input type="text" id="findIdName"
            placeholder="이름"
            style="width: 100%; padding: 8px; margin-bottom: 5px; box-sizing: border-box;">
 
     <div style="display: flex; gap: 5px; margin-bottom: 5px;">
-        <input type="email" id="commonEmail" placeholder="이메일"
+        <input type="email" id="findIdEmail" placeholder="이메일"
                style="width: 65%; padding: 8px; box-sizing: border-box;">
-        <button type="button" id="btnSendCode" onclick="sendCode()"
+        <button type="button" onclick="sendFindIdCode()"
                 style="width: 35%; padding: 8px; cursor: pointer; font-size: 12px; background:#eee; border:1px solid #ddd;">
             인증번호 받기
         </button>
     </div>
 
-    <input type="text" id="commonCode" placeholder="인증번호 6자리"
+    <input type="text" id="findIdCode" placeholder="인증번호 6자리"
            style="width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box;">
 
-    <div id="pwResetArea"
-         style="display:none; margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 10px;">
-        <p style="font-size:12px; color:blue;">메일이 발송되었습니다.<br>인증번호와 새 비밀번호를 입력하세요.</p>
-
-        <input type="password" id="newPasswordInput" placeholder="새 비밀번호"
-               style="width: 100%; padding: 8px; margin-bottom: 5px; box-sizing: border-box;">
-
-        <input type="password" id="newPasswordConfirmInput" placeholder="새 비밀번호 확인"
-               style="width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box;">
-    </div>
-
-    <button type="button" id="btnSubmit" onclick="submitAction()"
+    <button type="button" onclick="submitFindId()"
             style="width: 100%; padding: 10px; background-color: #333; color: #fff; border: none; cursor: pointer;">
         아이디 찾기 확인
     </button>
 
-    <p id="findResultMsg"
+    <p id="findIdResultMsg"
        style="color: blue; font-weight: bold; text-align: center; margin-top: 15px; font-size: 14px; white-space: pre-wrap;"></p>
 </dialog>
 
 <script>
-    const dialog = document.getElementById('findDialog');
-    const msg = document.getElementById('findResultMsg');
+    const findIdDialog = document.getElementById('findIdDialog');
+    const findIdMsg = document.getElementById('findIdResultMsg');
 
-    const dialogTitle = document.getElementById('dialogTitle');
-    const dialogDesc  = document.getElementById('dialogDesc');
-
-    const primaryInput = document.getElementById('primaryInput');   // 이름 or 아이디
-    const commonEmail  = document.getElementById('commonEmail');
-    const commonCode   = document.getElementById('commonCode');
-
-    const pwResetArea  = document.getElementById('pwResetArea');
-    const newPwInput   = document.getElementById('newPasswordInput');
-    const newPw2Input  = document.getElementById('newPasswordConfirmInput');
-
-    const btnSubmit = document.getElementById('btnSubmit');
-
-    let mode = 'id';
-
-    function openDialog(type) {
-        mode = type;
-        msg.innerText = "";
-        msg.style.color = "blue";
-
-        primaryInput.value = "";
-        commonEmail.value = "";
-        commonCode.value = "";
-        newPwInput.value = "";
-        newPw2Input.value = "";
-        pwResetArea.style.display = "none"; // 숨김 초기화
-
-        if (mode === 'id') {
-            dialogTitle.innerText = "아이디 찾기";
-            dialogDesc.innerText = "가입한 이메일로 인증번호를 받아 입력하세요.";
-            primaryInput.placeholder = "이름";
-            btnSubmit.innerText = "아이디 찾기 확인";
-        } else {
-            dialogTitle.innerText = "비밀번호 재설정";
-            dialogDesc.innerText = "가입한 아이디와 이메일로 인증번호를 받은 뒤 새 비밀번호를 설정하세요.";
-            primaryInput.placeholder = "아이디";
-            btnSubmit.innerText = "비밀번호 변경하기";
-        }
-
-        dialog.showModal();
+    function openFindIdDialog() {
+        findIdMsg.innerText = "";
+        findIdMsg.style.color = "blue";
+        document.getElementById('findIdName').value = "";
+        document.getElementById('findIdEmail').value = "";
+        document.getElementById('findIdCode').value = "";
+        findIdDialog.showModal();
     }
 
-    function closeDialog() {
-        dialog.close();
+    function closeFindIdDialog() {
+        findIdDialog.close();
     }
 
-    function sendCode() {
-        const email = commonEmail.value;
-        if(!email) { alert("이메일을 입력해주세요."); return; }
+    function sendFindIdCode() {
+        const email = document.getElementById('findIdEmail').value;
+        if (!email) { alert("이메일을 입력해주세요."); return; }
 
-        if(mode === 'pw') {
-            const loginId = primaryInput.value;
-            if(!loginId) { alert("아이디를 입력해주세요."); return; }
-        }
+        findIdMsg.style.color = "black";
+        findIdMsg.innerText = "전송 중...";
 
-        msg.style.color = "black";
-        msg.innerText = "전송 중...";
-
-        const url = (mode === 'id') ? '/auth/email/find-id' : '/auth/email/password-reset';
-
-        fetch(url, {
+        fetch('/auth/email/find-id', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ email })
         }).then(async res => {
-            if(res.ok) {
+            if (res.ok) {
                 alert("인증번호가 발송되었습니다.");
-                msg.style.color = "blue";
-                msg.innerText = "인증번호를 입력해주세요.";
-
-                if(mode === 'pw') pwResetArea.style.display = "block";
+                findIdMsg.style.color = "blue";
+                findIdMsg.innerText = "인증번호를 입력해주세요.";
             } else {
-                msg.innerText = "";
+                findIdMsg.innerText = "";
                 alert("발송 실패: " + await res.text());
-                if(mode === 'pw') pwResetArea.style.display = "none";
             }
         });
     }
 
-    function submitAction() {
-        const email = commonEmail.value;
-        const code  = commonCode.value;
+    function submitFindId() {
+        const email = document.getElementById('findIdEmail').value;
+        const code  = document.getElementById('findIdCode').value;
 
-        if(!email || !code) { alert("이메일과 인증번호를 입력해주세요."); return; }
+        if (!email || !code) { alert("이메일과 인증번호를 입력해주세요."); return; }
 
-        if(mode === 'id') {
-            fetch('/account/api/find/id', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ email: email, code: code, type: 'FIND_ID' })
-            }).then(async res => {
-                if(res.ok) {
-                    const text = await res.text();
-                    msg.style.color = "green";
-                    msg.innerText = "찾은 아이디: " + text;
-                } else {
-                    msg.style.color = "red";
-                    msg.innerText = await res.text();
-                }
-            });
-            return;
-        }
-
-        const loginId = primaryInput.value;
-        if(!loginId) { alert("아이디를 입력해주세요."); return; }
-
-        if(pwResetArea.style.display === "none") {
-            alert("먼저 인증번호 받기를 눌러주세요.");
-            return;
-        }
-
-        const newPw = newPwInput.value;
-        const newPw2 = newPw2Input.value;
-
-        if(!newPw || !newPw2) { alert("새 비밀번호를 2번 입력해주세요."); return; }
-        if(newPw !== newPw2) { alert("새 비밀번호가 일치하지 않습니다."); return; }
-
-        fetch('/account/api/find/password', {
+        fetch('/account/api/find/id', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                loginId: loginId,
-                email: email,
-                authCode: code,
-                newPassword: newPw
-            })
+            body: JSON.stringify({ email: email, code: code, type: 'FIND_ID' })
         }).then(async res => {
-            if(res.ok) {
-                alert("비밀번호가 성공적으로 변경되었습니다.\n새 비밀번호로 로그인해주세요.");
-                location.href = "/member/login?pwChanged=true";
+            if (res.ok) {
+                const text = await res.text();
+                findIdMsg.style.color = "green";
+                findIdMsg.innerText = "찾은 아이디: " + text;
             } else {
-                const errorText = await res.text();
-                alert("변경 실패: " + errorText);
-                msg.style.color = "red";
-                msg.innerText = errorText;
+                findIdMsg.style.color = "red";
+                findIdMsg.innerText = await res.text();
             }
         });
     }
 </script>
+
+<div th:replace="~{layout/password-reset-dialog :: passwordResetDialog(null, false)}"></div>
+
+<script src="/js/password-reset.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -284,5 +200,6 @@
         }
     })();
 </script>
+
 </body>
 </html>
