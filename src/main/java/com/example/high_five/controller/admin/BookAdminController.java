@@ -2,6 +2,7 @@ package com.example.high_five.controller.admin;
 
 import com.example.high_five.common.annotation.LoginRequired;
 import com.example.high_five.dto.book.BookPagedResponse;
+import com.example.high_five.dto.book.ParsingDto;
 import com.example.high_five.dto.book.request.BookAdminUpdateRequest;
 import com.example.high_five.dto.book.request.BookRequest;
 import com.example.high_five.dto.book.response.BookResponse;
@@ -73,7 +74,7 @@ public class BookAdminController {
 
     @GetMapping("/ai-search") // JS에서 호출할 주소
     @ResponseBody // HTML이 아니라 JSON 데이터를 반환하기 위해 필수
-    public ResponseEntity<Object> searchBookWithAi(@RequestParam String isbn) {
+    public ResponseEntity<ParsingDto> searchBookWithAi(@RequestParam String isbn) {
         // Book Server로 요청 위임
         return bookFeignClient.searchBookByIsbn(isbn);
     }
