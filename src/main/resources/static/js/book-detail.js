@@ -336,6 +336,11 @@ async function submitReview(bookId) {
             }
             return null;
         }
+or
+        if(response.status === 403){
+            confirm("해당 책을 구매한 분만 리뷰를 작성할 수 있습니다.")
+            return;
+        }
 
         if (!response.ok) {
             await handleReviewError(response, "리뷰 등록에 실패했습니다.");
