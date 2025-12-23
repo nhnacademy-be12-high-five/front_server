@@ -883,7 +883,7 @@ input {
 
 /* 찜하기 완료 상태 (빨간 하트) - 클래스명 'active'가 붙으면 빨개짐 */
 .btn-heart.active {
-    color: #ff4d4d; /* 빨간색 */
+    color: #e74c3c; /* 빨간색 */
 }
 
 .tag-section {
@@ -1331,6 +1331,26 @@ textarea {
     color: white !important;
     border-color: #007bff !important;
 }
+
+/* 기본 태그 */
+.book-tag {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s ease;
+}
+
+/* 클릭(선택) 상태 */
+.book-tag.active {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+/* 눌리는 느낌 */
+.book-tag:active {
+    transform: scale(0.95);
+}
+
 
 @media screen and (max-width: 600px) {
     .review-item {

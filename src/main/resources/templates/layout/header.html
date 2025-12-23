@@ -4,17 +4,22 @@
 
 <header th:fragment="header">
     <header id="header" role="banner">
+
+        <!-- =====================
+             상단 메인 헤더
+        ====================== -->
         <div class="container">
             <a th:href="@{/}" class="logo">
                 <img th:src="@{/img/logo.png}" alt="HIGH-FIVE 로고" width="100" height="100"/>
                 <div class="brand">HIGH-FIVE BOOKS</div>
             </a>
 
-            <nav class="gnb" aria-label="주요 메뉴">
+            <nav class="gnb" aria-label="검색">
                 <form class="search-box"
                       role="search"
                       th:action="@{/search}"
                       method="get">
+
                     <input type="search"
                            name="keyword"
                            placeholder="도서명, 저자, ISBN, 태그 검색"
@@ -55,9 +60,23 @@
                    th:href="@{/logout}">
                     로그아웃
                 </a>
-
             </div>
         </div>
+
+        <!-- =====================
+              카테고리 네비게이션 (복원)
+        ====================== -->
+        <nav id="category-nav" class="category-nav" aria-label="카테고리">
+            <ul class="category-list">
+                <li th:each="c : ${headerCategories}">
+                    <a th:href="@{/categories/{id}(id=${c.categoryId})}"
+                       th:text="${c.categoryName}">
+                        카테고리
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
     </header>
 </header>
 

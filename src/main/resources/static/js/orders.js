@@ -34,23 +34,71 @@ function confirmPurchase(orderId) {
         .catch(error => console.error('Error:', error));
 }
 
-// 반품 신청 함수
-function requestReturn(orderId) {
-    if (confirm("반품을 신청하시겠습니까?\n(출고일로부터 10일 이내, 파손/파본은 30일 이내 가능)")) {
-        fetch(`/orders/${orderId}/return`, { // 백엔드 API 주소에 맞게 수정
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-            // 필요하다면 반품 사유 등을 body에 추가
-        })
-            .then(response => {
-                if (response.ok) {
-                    alert("반품 요청이 접수되었습니다.");
-                    window.location.reload();
-                } else {
-                    alert("반품 신청에 실패했습니다.");
-                }
-            });
+// 반품 모달 열기
+function openReturnModal(orderId) {
+    document.getElementById('modalOrderId').value = orderId;
+    document.getElementById('returnReason').value = '';
+    document.getElementById('returnDesc').value = '';
+    document.getElementById('feeWarning').style.display = 'none';
+
+    document.getElementById('returnModal').style.display = 'flex';
+}
+
+// 반품 모달 닫기
+function closeReturnModal() {
+    document.getElementById('returnModal').style.display = 'none';
+}
+
+// 단순 변심 선택 시 경고 문구 표시
+function checkReturnFee() {
+    const reason = document.getElementById('returnReason').value;
+    const warning = document.getElementById('feeWarning');
+
+    if (reason === 'SIMPLE_CHANGE') {
+        warning.style.display = 'block';
+    } else {
+        warning.style.display = 'none';
     }
+}
+
+// 반품 신청 제출 (AJAX)
+function submitReturnRequest() {
+    const orderId = document.getElementById('modalOrderId').value;
+    const reason = document.getElementById('returnReason').value;
+    const desc = document.getElementById('returnDesc').value;
+
+    if (!reason) {
+        alert('반품 사유를 선택해주세요.');
+        return;
+    }
+
+    if (!confirm('반품 신청을 하시겠습니까?')) {
+        return;
+    }
+
+    const data = {
+        returnReason: reason,
+        description: desc
+    };
+
+    fetch(`/mypage/orders/${orderId}/return`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+        .then(response => {
+            if (response.ok) {
+                alert('반품 신청이 완료되었습니다.');
+                closeReturnModal();
+                window.location.reload(); // 상태 반영을 위해 새로고침
+            } else {
+                return response.text().then(text => { throw new Error(text) });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('반품 신청 중 오류가 발생했습니다.\n' + error.message);
+        });
 }

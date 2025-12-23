@@ -9,6 +9,7 @@ import com.example.high_five.dto.order.DeliveryPolicyResponse;
 import com.example.high_five.dto.order.MyOrderResponse;
 import com.example.high_five.dto.order.OrderCheckoutRequest;
 import com.example.high_five.dto.order.OrderResponse;
+import com.example.high_five.dto.order.OrderReturnRequest;
 import com.example.high_five.dto.point.PointBalanceResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -226,6 +227,11 @@ public class FrontOrderService {
             log.error("주문 내역 조회 실패 UserID={}: {}", userId, e.getMessage());
             return new CommonPageResponse<>();
         }
+    }
+
+    // 반품 신청
+    public void requestReturn(Long orderId, OrderReturnRequest request) {
+        orderClient.requestReturn(orderId, request);
     }
 
     private record MemberInfoResult(MemberResponse member, Integer point, List<MemberCouponResponseDto> coupons) {}
