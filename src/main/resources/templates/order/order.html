@@ -115,17 +115,22 @@
                 <select th:field="*{couponId}" id="couponSelect" onchange="updateTotal()"
                         th:disabled="${userId == null}"
                         th:classappend="${userId == null} ? 'disabled-overlay' : ''">
-                    <option value="" data-discount="0">사용 안함</option>
+
+                    <option value="" data-discount="0" data-type="" data-min-price="0">사용 안함</option>
+
                     <option th:each="coupon : ${coupons}"
                             th:value="${coupon.id}"
-                            th:data-discount="${coupon.discountValue}"
-                            th:text="|${coupon.couponName} (${#numbers.formatInteger(coupon.discountValue, 0, 'COMMA')}원 할인)|">
-                        쿠폰명
+
+                    th:data-type="${coupon.discountType}"
+                    th:data-discount="${coupon.discountValue}"
+                    th:data-min-price="${coupon.condition}"
+
+                    th:text="|${coupon.couponName} (${coupon.discountType == 'PERCENTAGE' ? coupon.discountValue + '%' : #numbers.formatInteger(coupon.discountValue, 0, 'COMMA') + '원'} 할인, ${coupon.condition})|">
+                    쿠폰명 (10% 할인, 30000원 이상)
                     </option>
                 </select>
                 <span th:if="${userId == null}" class="login-guide">로그인 후 사용 가능</span>
             </div>
-
             <div class="discount-row">
                 <label>포인트 사용 (보유: <span th:text="${#numbers.formatInteger(point, 0, 'COMMA')}">0</span>P)</label>
 
