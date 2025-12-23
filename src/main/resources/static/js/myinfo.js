@@ -77,3 +77,21 @@ if (withdrawBtn) {
         }
     });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("edit-form");
+    if (!form) return;
+
+    const phoneInput = form.querySelector("input[name='phone']");
+    if (!phoneInput) return;
+
+    phoneInput.addEventListener("input", () => autoHyphen(phoneInput));
+
+    form.addEventListener("submit", (e) => {
+        if (!isValidMobilePhone(phoneInput.value)) {
+            e.preventDefault();
+            alert("휴대폰 번호 형식이 올바르지 않습니다.\n예) 010-1234-5678");
+            phoneInput.focus();
+        }
+    });
+});
