@@ -4,4 +4,8 @@ public record UserContext(Long id, String role) {
     public boolean isAdmin() {
         return "ADMIN".equals(role);
     }
+
+    public Long memberId() {
+        return id;
+    }
 }
