@@ -49,7 +49,6 @@
                 <span class="status-badge"
                       th:classappend="'status-' + ${order.status}"
                       th:switch="${order.status}">
-                    <span th:case="'PAYMENT_WAITING'">결제 대기</span>
                     <span th:case="'PREPARING'">배송 준비 중</span>
                     <span th:case="'DELIVERING'">배송 중</span>
                     <span th:case="'DELIVERY_COMPLETED'">배송 완료</span>
@@ -87,7 +86,7 @@
 
                 <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
 
-                    <button th:if="${order.status.toString() == 'PAYMENT_WAITING' or order.status.toString() == 'PREPARING'}"
+                    <button th:if="${order.status.toString() == 'PREPARING'}"
                             th:onclick="'cancelOrder(' + ${order.orderId} + ')'"
                             class="btn-action btn-cancel">
                         주문 취소
@@ -133,8 +132,21 @@
                 </div>
             </div>
 
-            <div class="pagination" th:if="${page.totalPages > 1}">
-            </div>
+            <div class="pagination" th:if="${page.totalPages > 0}">
+
+            <a th:if="${currentPage > 0}"
+               th:href="@{/mypage/orders(page=${currentPage - 1})}" class="page-link">&lt;</a>
+
+            <span th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}">
+                    <a th:href="@{/mypage/orders(page=${i})}"
+                       th:text="${i + 1}"
+                       th:classappend="${i == currentPage} ? 'active' : ''"
+                       class="page-link">1</a>
+                </span>
+
+            <a th:if="${currentPage < page.totalPages - 1}"
+               th:href="@{/mypage/orders(page=${currentPage + 1})}" class="page-link">&gt;</a>
+        </div>
         </div>
     </section>
 </div>

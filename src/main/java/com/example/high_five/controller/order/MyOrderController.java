@@ -41,7 +41,7 @@ public class MyOrderController {
     public String myOrders(@ModelAttribute("myInfo") MemberResponse myInfo,
                            Model model,
                            @RequestParam(defaultValue = "0") int page,
-                           @RequestParam(defaultValue = "10") int size) {
+                           @RequestParam(defaultValue = "5") int size) {
 
         if (myInfo == null) {
             return "redirect:/member/login.html";
@@ -51,6 +51,7 @@ public class MyOrderController {
 
         model.addAttribute("orders", orderPage.getData());
         model.addAttribute("page", orderPage);
+        model.addAttribute("currentPage", page);
         model.addAttribute("currentTab", "orders");
 
         return "mypage/orders";

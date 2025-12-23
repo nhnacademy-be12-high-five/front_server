@@ -298,12 +298,7 @@
 /* ===============================
    페이지네이션
 =============================== */
-.pagination {
-    display: flex;
-    justify-content: center;
-    margin-top: 40px;
-    gap: 8px;
-}
+.pagination { display: flex; justify-content: center; gap: 5px; margin-top: 20px; }
 
 .page-link {
     display: flex;
