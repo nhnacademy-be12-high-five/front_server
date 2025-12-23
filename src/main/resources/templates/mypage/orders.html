@@ -95,7 +95,7 @@
                     <!-- 구매 확정 버튼 -->
                     <button th:if="${order.status.toString() != 'PURCHASE_CONFIRMED'
                and order.status.toString() != 'CANCELED'
-               and order.status.toString() != 'RETURN_COMPLETED'
+               and order.status.toString() != 'RETURN_REQUESTED'
                and order.status.toString() != 'RETURN_COMPLETED'
                and order.status.toString() == 'PURCHASE_CONFIRMED'}"
                             th:onclick="'confirmPurchase(' + ${order.orderId} + ')'"
@@ -110,7 +110,8 @@
                         구매 확정
                     </button>-->
 
-                    <button th:if="${order.status.toString() == 'DELIVERY_COMPLETED' or order.status.toString() == 'DELIVERING'}"
+                    <button th:if="${order.status.toString() == 'DELIVERY_COMPLETED' or order.status.toString() == 'DELIVERING'
+                     or order.status.toString() == 'PURCHASE_CONFIRMED'}"
                             th:onclick="'openReturnModal(' + ${order.orderId} + ')'"
                             class="btn-action btn-return">
                         반품 신청
@@ -166,7 +167,7 @@
             <a th:if="${currentPage < page.totalPages - 1}"
                th:href="@{/mypage/orders(page=${currentPage + 1})}" class="page-link">&gt;</a>
         </div>
-        </div>
+
     </section>
 </div>
 <div th:replace="~{layout/footer :: footer}"></div>
