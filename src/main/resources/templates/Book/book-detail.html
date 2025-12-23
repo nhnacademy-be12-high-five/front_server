@@ -29,8 +29,8 @@
         <section class="book-detail">
             <div class="book-detail-main">
                 <div class="book-image">
-                    <img th:if="${book.image != null}" th:src="${book.image}" alt="도서 표지"/>
-                    <div th:if="${book.image == null}" class="no-cover">도서 이미지</div>
+                    <img th:if="${book.imageUrl != null}" th:src="${book.imageUrl}" alt="도서 표지"/>
+                    <div th:if="${book.imageUrl == null}" class="no-cover">도서 이미지</div>
                 </div>
 
                 <div class="book-info">
@@ -38,7 +38,7 @@
                     <p class="author-publisher">
                         <span th:text="${book.author}">저자</span>
                         <span th:if="${book.publisher != null}" th:text="' · ' + ${book.publisher}">· 출판사</span>
-                        <span th:if="${book.publishedDate != null}" th:text="' · ' + ${book.publishedDate}">· 발행일</span>
+                        <span th:if="${book.pubDate != null}" th:text="' · ' + ${book.pubDate}">· 발행일</span>
                         <span th:if="${book.isbn != null}" th:text="' · ISBN ' + ${book.isbn}">· ISBN</span>
                     </p>
 
@@ -131,9 +131,9 @@
                             <th>출판사</th>
                             <td th:text="${book.publisher}"></td>
                         </tr>
-                        <tr th:if="${book.publishedDate != null}">
+                        <tr th:if="${book.pubDate != null}">
                             <th>발행일</th>
-                            <td th:text="${book.publishedDate}"></td>
+                            <td th:text="${book.pubDate}"></td>
                         </tr>
                         <tr th:if="${book.isbn != null}">
                             <th>ISBN</th>
