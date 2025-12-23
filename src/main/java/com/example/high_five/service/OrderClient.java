@@ -6,7 +6,6 @@ import com.example.high_five.dto.order.DeliveryPolicyResponse;
 import com.example.high_five.dto.order.MyOrderResponse;
 import com.example.high_five.dto.order.OrderCheckoutRequest;
 import com.example.high_five.dto.order.OrderResponse;
-import com.example.high_five.dto.order.OrderReturnRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -55,7 +54,19 @@ public interface OrderClient {
             @RequestParam("size") int size
     );
 
-    @PostMapping("/api/orders/{orderId}/returns")
-    void requestReturn(@PathVariable("orderId") Long orderId,
-                       @RequestBody OrderReturnRequest request);
+    @GetMapping("/api/admin/orders")
+    CommonPageResponse<OrderResponse> getAdminOrders(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam(value = "status", required = false) String status
+    );
+
+    @PutMapping("/api/admin/orders/{orderId}/status")
+    void updateOrderStatus(
+            @PathVariable("orderId") Long orderId,
+            @RequestBody OrderStatusUpdateRequest request
+    );
+
+    // DTO 내부 클래스
+    record OrderStatusUpdateRequest(String status, String trackingNumber) {}
 }
