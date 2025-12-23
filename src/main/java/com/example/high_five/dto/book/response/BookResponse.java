@@ -13,13 +13,15 @@ public record BookResponse(
         String author,
         String isbn,
         Integer price,
-        String image,
+        @JsonProperty("imageUrl")
+        String imageUrl,
         // 북 서버와 필드명, 타입을 일치시켜야 함
         List<CategoryResponse> categories,
         List<TagResponse> tags,
         String content,
         String publisher,
-        String publishedDate,
+        @JsonProperty("pubDate")
+        String pubDate,
         Double avgRating,
         Long reviewCount,
         String aiSummary,
