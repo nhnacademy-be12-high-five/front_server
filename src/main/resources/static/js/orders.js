@@ -34,27 +34,6 @@ function confirmPurchase(orderId) {
         .catch(error => console.error('Error:', error));
 }
 
-// 반품 신청 함수
-function requestReturn(orderId) {
-    if (confirm("반품을 신청하시겠습니까?\n(출고일로부터 10일 이내, 파손/파본은 30일 이내 가능)")) {
-        fetch(`/orders/${orderId}/return`, { // 백엔드 API 주소에 맞게 수정
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-            // 필요하다면 반품 사유 등을 body에 추가
-        })
-            .then(response => {
-                if (response.ok) {
-                    alert("반품 요청이 접수되었습니다.");
-                    window.location.reload();
-                } else {
-                    alert("반품 신청에 실패했습니다.");
-                }
-            });
-    }
-}
-
 // 반품 모달 열기
 function openReturnModal(orderId) {
     document.getElementById('modalOrderId').value = orderId;
