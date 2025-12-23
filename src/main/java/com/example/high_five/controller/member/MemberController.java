@@ -5,6 +5,8 @@ import com.example.high_five.dto.member.request.MemberCreateRequestDto;
 import com.example.high_five.dto.member.request.MemberUpdateRequest;
 import com.example.high_five.service.AuthService;
 import com.example.high_five.service.MemberService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,7 +24,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final AuthService authService;
-
+    private final ObjectMapper objectMapper;
     @GetMapping("/member/signup")
     public String signupForm() {
         return "member/signup";
@@ -55,13 +57,14 @@ public class MemberController {
 
     @LoginRequired
     @PostMapping("/mypage/update")
-    public String updateMember(@ModelAttribute MemberUpdateRequest request, RedirectAttributes redirectAttributes) {
+    public String updateMember(@ModelAttribute MemberUpdateRequest request,
+                               RedirectAttributes redirectAttributes) {
         try {
             memberService.updateMember(request);
-            redirectAttributes.addFlashAttribute("message", "수정되었습니다.");
+            redirectAttributes.addFlashAttribute("alertMessage", "수정되었습니다.");
         } catch (FeignException e) {
-            // 에러 메시지 추출 로직 생략 (기존 코드 사용)
-            redirectAttributes.addFlashAttribute("errorMessage", "수정 실패");
+            String msg = extractFeignMessage(e); // 아래 함수
+            redirectAttributes.addFlashAttribute("alertMessage", msg);
         }
         return "redirect:/mypage";
     }
@@ -86,5 +89,19 @@ public class MemberController {
         cookie.setMaxAge(0);
         cookie.setPath("/");
         response.addCookie(cookie);
+    }
+
+    private String extractFeignMessage(FeignException e) {
+        try {
+            String body = e.contentUTF8();
+            if (body == null || body.isBlank()) return "요청 처리 중 오류가 발생했습니다.";
+
+            JsonNode node = objectMapper.readTree(body);
+
+            if (node.has("message")) return node.get("message").asText();
+            return body;
+        } catch (Exception ex) {
+            return "요청 처리 중 오류가 발생했습니다.";
+        }
     }
 }

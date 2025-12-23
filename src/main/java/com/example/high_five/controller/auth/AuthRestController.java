@@ -3,6 +3,8 @@ package com.example.high_five.controller.auth;
 import com.example.high_five.dto.member.request.EmailRequest;
 import com.example.high_five.dto.member.request.EmailVerifyRequest;
 import com.example.high_five.service.AuthService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthRestController {
 
     private final AuthService authService;
+    private final ObjectMapper objectMapper;
 
     @PostMapping("/email/send")
     public ResponseEntity<String> sendEmail(@RequestBody EmailRequest email) {
@@ -21,7 +24,8 @@ public class AuthRestController {
             authService.sendEmail(email);
             return ResponseEntity.ok("인증번호가 발송되었습니다.");
         } catch (FeignException e) {
-            return ResponseEntity.status(e.status()).body("발송 실패: " + e.contentUTF8());
+            String msg = extractFeignMessage(e);
+            return ResponseEntity.status(e.status()).body(msg);
         }
     }
 
@@ -30,7 +34,8 @@ public class AuthRestController {
         try {
             return authService.verifyEmail(request);
         } catch (FeignException e) {
-            return ResponseEntity.status(e.status()).body("인증 실패");
+            String msg = extractFeignMessage(e);
+            return ResponseEntity.status(e.status()).body(msg);
         }
     }
 
@@ -39,7 +44,7 @@ public class AuthRestController {
         try {
             return authService.checkId(loginId);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(false); // 에러나면 중복된 걸로 처리(가입 막기)
+            return ResponseEntity.status(500).body(false);
         }
     }
 
@@ -49,7 +54,8 @@ public class AuthRestController {
             authService.sendFindIdCode(email);
             return ResponseEntity.ok("인증번호가 발송되었습니다.");
         } catch (FeignException e) {
-            return ResponseEntity.status(e.status()).body("가입되지 않은 이메일입니다.");
+            String msg = extractFeignMessage(e);
+            return ResponseEntity.status(e.status()).body(msg);
         }
     }
 
@@ -59,7 +65,22 @@ public class AuthRestController {
             authService.sendPasswordResetCode(email);
             return ResponseEntity.ok("인증번호가 발송되었습니다.");
         } catch (FeignException e) {
-            return ResponseEntity.status(e.status()).body("가입 정보를 찾을 수 없습니다.");
+            String msg = extractFeignMessage(e);
+            return ResponseEntity.status(e.status()).body(msg);
+        }
+    }
+
+    private String extractFeignMessage(FeignException e) {
+        try {
+            String body = e.contentUTF8();
+            if (body == null || body.isBlank()) return "요청 처리 중 오류가 발생했습니다.";
+
+            JsonNode node = objectMapper.readTree(body);
+            if (node.has("message")) return node.get("message").asText();
+
+            return body;
+        } catch (Exception ex) {
+            return "요청 처리 중 오류가 발생했습니다.";
         }
     }
 }
