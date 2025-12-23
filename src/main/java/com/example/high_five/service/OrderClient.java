@@ -5,6 +5,7 @@ import com.example.high_five.dto.order.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -65,6 +66,9 @@ public interface OrderClient {
 
     @PostMapping("/api/orders/{orderId}/returns")
     void requestReturn(@PathVariable("orderId") Long orderId, @RequestBody OrderReturnRequest request);
+
+    @PostMapping("/api/orders/guests/search")
+    ResponseEntity<OrderResponse> getGuestOrder(@RequestBody OrderGuestLoginRequest request);
 
     // DTO 내부 클래스
     record OrderStatusUpdateRequest(String status, String trackingNumber) {}

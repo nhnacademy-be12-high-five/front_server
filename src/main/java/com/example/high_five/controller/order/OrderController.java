@@ -190,4 +190,22 @@ public class OrderController {
         }
     }
 
+    @PostMapping("/guest")
+    public String getGuestOrder(@RequestParam Long orderId,
+                                @RequestParam Integer password,
+                                Model model) {
+        try {
+            OrderResponse orderResponse = frontOrderService.getGuestOrder(orderId, password);
+
+            model.addAttribute("order", orderResponse);
+
+            return "order/order-detail";
+
+        } catch (Exception e) {
+            log.warn("비회원 주문 조회 실패: {}", e.getMessage());
+            // 실패 시 다시 로그인 페이지로 돌아가며 에러 메시지 표시
+            model.addAttribute("error", "주문 정보가 일치하지 않거나 존재하지 않습니다.");
+            return "member/login";
+        }
+    }
 }
