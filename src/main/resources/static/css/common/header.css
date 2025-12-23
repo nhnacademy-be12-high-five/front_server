@@ -193,7 +193,7 @@ header, .site-header, #header {
 
 /* 스크롤 시에도 푸터가 하단에 고정 */
 footer, .site-footer, #footer {
-    position: fixed;
+    position: static;
     left: 0;
     right: 0;
     bottom: 0;

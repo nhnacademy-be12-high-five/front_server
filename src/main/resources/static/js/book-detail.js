@@ -330,6 +330,18 @@ async function submitReview(bookId) {
             body: formData
         });
 
+        if (!response.ok) {
+            const error = await response.json().catch(() => null);
+
+            if (response.status === 403 && error?.code === "R003") {
+                alert("해당 책을 구매한 분만 리뷰를 작성할 수 있습니다.");
+                return;
+            }
+
+            alert(error?.message ?? "리뷰 등록에 실패했습니다.");
+            return;
+        }
+
         if (response.redirected) {
             if (confirm("로그인이 필요한 서비스입니다. 로그인 페이지로 이동하시겠습니까?")) {
                 location.href = "/member/login";
@@ -337,10 +349,6 @@ async function submitReview(bookId) {
             return null;
         }
 
-        if (!response.ok) {
-            await handleReviewError(response, "리뷰 등록에 실패했습니다.");
-            return;
-        }
 
         alert("리뷰가 성공적으로 등록되었습니다!");
         location.reload();

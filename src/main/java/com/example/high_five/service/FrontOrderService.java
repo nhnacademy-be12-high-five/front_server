@@ -133,7 +133,7 @@ public class FrontOrderService {
                     items.add(OrderResponse.OrderItem.builder()
                             .bookId(bookId)
                             .title(bookInfo.title())
-                            .imageUrl(bookInfo.image())
+                            .imageUrl(bookInfo.imageUrl())
                             .price(price)
                             .quantity(qty)
                             .totalPrice(itemTotal)
