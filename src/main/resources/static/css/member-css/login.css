@@ -326,6 +326,7 @@ img {
     width: 100%;
     max-width: 500px;
     background-color: #ffffff;
+    margin: 100px;
     padding: 50px;
     border-radius: 10px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
@@ -590,19 +591,20 @@ img {
 }
 
 .btn{
-    gap: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
 .find{
     padding: 10px;
     gap: 10px;
-    color: #ffeeba;
+    color: gray;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     margin: 10px;
-    background: white;
-    border-style: none ;
+    border-style: none;
 }
 
 .find button {
@@ -616,5 +618,23 @@ img {
 
 .find button:hover {
     text-decoration: underline;
-    color: blue;
+    color: gray;
+}
+
+.dormant{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 10px;
+    gap: 10px;
+}
+
+.bar{
+    color: black;
+}
+
+.dormantMember{
+    display: flex;
+    justify-content: center;
+    color: gray;
 }

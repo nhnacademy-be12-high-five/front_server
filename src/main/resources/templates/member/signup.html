@@ -40,7 +40,7 @@
             <div class="input-group">
                 <label for="regEmail">이메일</label>
                 <div class="input-box">
-                    <input type="email" id="regEmail" name="email" placeholder="이메일 주소를 입력하세요" required />
+                    <input class="emailInput" type="email" id="regEmail" name="email" placeholder="이메일 주소를 입력하세요" required />
                     <button type="button" id="btn-send-email" class="check-btn">인증번호 받기</button>
                 </div>
             </div>
@@ -70,11 +70,14 @@
             <div class="input-group">
                 <label for="regPw">비밀번호</label>
                 <input type="password" id="regPw" name="password" placeholder="비밀번호를 입력하세요 (8-20자)" required />
+
             </div>
 
             <div class="input-group">
                 <label for="regPwConfirm">비밀번호 확인</label>
                 <input type="password" id="regPwConfirm" placeholder="비밀번호를 입력하세요 (8-20자)" required />
+
+                <p id="pw-match-msg" class="verify-msg"></p>
             </div>
 
             <div class="input-group">
@@ -95,12 +98,16 @@
                 <input type="date" id="birthDate" name="birthDate" style="width: 100%; padding: 14px 15px; border: 1px solid #ddd; border-radius: 4px;" required />
             </div>
 
-            <button type="submit" class="login-btn">가입하기</button>
+            <button type="submit" class="login-btn" id="submit">가입하기</button>
         </form>
     </div>
 </main>
 
-<div th:replace="~{layout/footer :: footer}"></div>
+<!--<div th:replace="~{layout/footer :: footer}"></div>-->
+
+<div>
+    <div></div>
+</div>
 
 <script src="/js/common.js"></script>
 
@@ -243,12 +250,26 @@
         }
         const pw = document.getElementById('regPw').value;
         const pwConfirm = document.getElementById('regPwConfirm').value;
+        const pwMsg = document.getElementById('pw-match-msg'); // 메시지 띄울 요소 가져오기
+
+        pwMsg.innerText = "";
+        pwMsg.classList.remove('error-text');
+
         if (pw !== pwConfirm) {
             e.preventDefault();
+
+            pwMsg.innerText = "비밀번호가 일치하지 않습니다. 다시 입력해주세요.";
+            pwMsg.classList.add('error-text'); // 상단 style 태그에 정의된 .error-text (color: red) 사용
+
+            document.getElementById('regPwConfirm').value = "";
+            document.getElementById('regPwConfirm').focus();
+
             alert("비밀번호가 일치하지 않습니다.");
             return;
         }
+
     });
+
 </script>
 </body>
 </html>

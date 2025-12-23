@@ -186,7 +186,7 @@ input {
 .container2 {
     width: 100%;
     max-width: 1100px;
-    margin: 0 auto;
+    margin: 10px;
     padding: 10px 20px;
 }
 
@@ -315,8 +315,8 @@ input {
 /* ------------------------------------- */
 .container2 {
     max-width: 1000px; /* 상세페이지는 조금 더 넓게 */
-    margin: 30px auto;
-    padding: 20px;
+    margin: 100px auto;
+    padding: 30px;
     flex-grow: 1; /* 메인 콘텐츠 영역이 남은 공간을 채우도록 */
 }
 
@@ -1341,3 +1341,4 @@ textarea {
         height: 80px;
     }
 }
+

@@ -7,10 +7,10 @@
     <link rel="stylesheet" href="/css/member-css/login.css">
     <link rel="stylesheet" href="/css/common/footer.css">
     <link rel="stylesheet" href="/css/common/header.css">
-    <link rel="stylesheet" href="/css/common/header.css">
     <link rel="stylesheet" href="/css/common/common.css">
     <style>
-        dialog::backdrop { background: rgba(0,0,0,0.5); }
+        dialog::backdrop {
+            background: rgba(0,0,0,0.5); }
     </style>
 </head>
 
@@ -52,16 +52,44 @@
             </div>
 
             <div class="find">
-                <button type="button" class="findId" onclick="openDialog('id')">아이디찾기</button>
-                <button type="button" class="findPwd" onclick="openDialog('pw')">비밀번호 찾기</button>
+                <div class="dormant">
+                    <button type="button" class="findId" onclick="openDialog('id')">아이디찾기</button>
+                    <div class="bar"> | </div>
+                    <button type="button" class="findPwd" onclick="openDialog('pw')">비밀번호 찾기</button>
+                </div>
+
+                <div class="dormantMember">
+                    <button type="button" class="dormant">휴면 회원 전환</button>
+                </div>
             </div>
         </form>
 
-        <form id="formGuest" class="login-form" action="/order/guest" method="post" style="display: none;"></form>
+        <form id="formGuest" class="login-form" action="/order/guest/lookup" method="post" style="display: none;">
+            <div class="input-group">
+                <label for="guestOrderId">주문 번호</label>
+                <div class="input-wrapper">
+                    <input type="text" id="guestOrderId" name="orderId" placeholder="주문 번호를 입력하세요" required />
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="guestPwd">비밀번호</label>
+                <div class="input-wrapper">
+                    <input type="password" id="guestPwd" name="password" placeholder="주문 비밀번호를 입력하세요" required />
+                    <img class="input-icon" th:src="@{/img/free-icon-eye.png}" alt="보기" width="20" height="20"
+                         onclick="togglePasswordVisibility('guestPwd', this)" />
+                </div>
+            </div>
+
+            <div class="btn">
+                <button type="submit" class="login-btn">주문 조회</button>
+            </div>
+        </form>
     </div>
 </main>
 
-<div th:replace="~{layout/footer :: footer}"></div>
+<!--<div th:replace="~{layout/footer :: footer}"></div>-->
+
 <script src="/js/common.js"></script>
 
 <dialog id="findDialog"
@@ -283,6 +311,39 @@
             });
         }
     })();
+
+
+    const tabMember = document.getElementById('tabMember');
+    const tabGuest = document.getElementById('tabGuest');
+    const formMember = document.getElementById('formMember');
+    const formGuest = document.getElementById('formGuest');
+
+    // 회원 로그인 탭 클릭
+    tabMember.addEventListener('click', function() {
+        // 탭 스타일 활성화/비활성화
+        tabMember.classList.add('active');
+        tabMember.classList.remove('unactive');
+        tabGuest.classList.add('unactive');
+        tabGuest.classList.remove('active');
+
+        // 폼 보이기/숨기기
+        formMember.style.display = 'block';
+        formGuest.style.display = 'none';
+    });
+
+    // 비회원 주문조회 탭 클릭
+    tabGuest.addEventListener('click', function() {
+        // 탭 스타일 활성화/비활성화
+        tabGuest.classList.add('active');
+        tabGuest.classList.remove('unactive');
+        tabMember.classList.add('unactive');
+        tabMember.classList.remove('active');
+
+        // 폼 보이기/숨기기
+        formGuest.style.display = 'block'; // formGuest에 display:block 적용
+        formMember.style.display = 'none';
+    });
+
 </script>
 </body>
 </html>
