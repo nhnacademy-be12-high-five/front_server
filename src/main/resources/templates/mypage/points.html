@@ -74,21 +74,21 @@
             <div th:if="${#lists.isEmpty(histories)}" class="empty-message">
                 포인트 내역이 없습니다.
             </div>
-        </div>
 
-        <div class="pagination" th:if="${totalPages > 1}">
-            <a th:if="${currentPage > 0}"
-               th:href="@{/mypage/points(page=${currentPage - 1})}" class="page-link">&lt;</a>
+            <div class="pagination" th:if="${totalPages > 0}">
+                <a th:if="${currentPage > 0}"
+                   th:href="@{/mypage/points(page=${currentPage - 1})}" class="page-link">&lt;</a>
 
-            <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
                 <a th:href="@{/mypage/points(page=${i})}"
                    th:text="${i + 1}"
                    th:classappend="${i == currentPage} ? 'active' : ''"
                    class="page-link">1</a>
             </span>
 
-            <a th:if="${currentPage < totalPages - 1}"
-               th:href="@{/mypage/points(page=${currentPage + 1})}" class="page-link">&gt;</a>
+                <a th:if="${currentPage < totalPages - 1}"
+                   th:href="@{/mypage/points(page=${currentPage + 1})}" class="page-link">&gt;</a>
+            </div>
         </div>
     </section>
 </div>

@@ -63,7 +63,11 @@
 
             <br/>
 
-            <button type="button" class="btn-outline" onclick="openPwModal()" style="margin-right: 8px;">비밀번호 변경</button>
+            <button type="button" class="btn-outline"
+                    onclick="openPasswordResetDialog({ emailReadonly: true, redirectUrl: '/member/login?pwChanged=true', loginIdRequired: false, showLoginId: false })"
+                    style="margin-right: 8px;">
+                비밀번호 변경
+            </button>
 
             <button type="button" class="btn-edit" onclick="toggleEditMode(true)">정보 수정</button>
 
@@ -116,51 +120,17 @@
             </div>
         </form>
 
-        <form id="withdraw-form" th:action="@{/mypage/withdraw}" method="post" style="display:none;">
-        </form>
+        <form id="withdraw-form" th:action="@{/mypage/withdraw}" method="post" style="display:none;"></form>
     </section>
 </div>
 
 <div th:replace="~{layout/footer :: footer}"></div>
 
-<dialog id="pwChangeDialog" style="padding: 20px; border: 1px solid #888; border-radius: 8px; width: 350px;
-               position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); margin: 0; z-index: 9999; background: white;">
-    <div style="text-align: right;">
-        <button type="button" onclick="closePwModal()" style="border:none; background:none; cursor:pointer; font-size:16px;">X</button>
-    </div>
-
-    <h3 style="margin-top:0;">비밀번호 변경</h3>
-    <p style="font-size:13px; color:#666;">안전한 변경을 위해 정보를 입력해주세요.</p>
-
-    <div style="margin-bottom: 5px;">
-        <input type="text" id="mypageLoginId" placeholder="아이디를 입력하세요"
-               style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc;">
-    </div>
-
-    <div style="display: flex; gap: 5px; margin-bottom: 5px;">
-        <input type="email" id="mypageEmail" th:value="${myInfo.email}" readonly
-               style="width: 65%; padding: 8px; background:#f0f0f0; color:#555; border:1px solid #ccc;">
-        <button type="button" onclick="sendCodeForPwChange()"
-                style="width: 35%; padding: 8px; cursor: pointer; font-size: 12px; background:#eee; border:1px solid #ddd;">인증번호 받기</button>
-    </div>
-
-    <div id="pwChangeArea" style="display:none; margin-top:10px; border-top:1px dashed #ccc; padding-top:10px;">
-        <p style="font-size:12px; color:blue;">메일이 발송되었습니다.<br>인증번호와 새 비밀번호를 입력하세요.</p>
-
-        <input type="text" id="mypageAuthCode" placeholder="인증번호 6자리"
-               style="width: 100%; padding: 8px; margin-bottom: 5px; box-sizing: border-box;">
-
-        <input type="password" id="mypageNewPw" placeholder="새 비밀번호"
-               style="width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box;">
-
-        <button type="button" onclick="reqChangePw()"
-                style="width: 100%; padding: 10px; background-color: #333; color: #fff; border: none; cursor: pointer;">변경하기</button>
-    </div>
-
-    <p id="pwResultMsg" style="color: blue; font-weight: bold; text-align: center; margin-top: 15px; font-size: 14px; white-space: pre-wrap;"></p>
-</dialog>
+<div th:replace="~{layout/password-reset-dialog :: passwordResetDialog(${myInfo.email}, true)}"></div>
 
 <script src="/js/common.js"></script>
+<script src="/js/password-reset.js"></script>
+
 <script th:inline="javascript">
     /*<![CDATA[*/
 
@@ -172,7 +142,6 @@
         }
     }
 
-    // 2. 수정 모드 토글
     function toggleEditMode(isEdit) {
         const viewMode = document.getElementById('view-mode');
         const editForm = document.getElementById('edit-form');
@@ -186,89 +155,12 @@
         }
     }
 
-    // 3. 회원 탈퇴
     const withdrawBtn = document.getElementById("btn-withdraw");
     const withdrawForm = document.getElementById("withdraw-form");
     if (withdrawBtn) {
         withdrawBtn.addEventListener("click", e => {
             e.preventDefault();
             if (confirm("정말 탈퇴하시겠습니까?")) withdrawForm.submit();
-        });
-    }
-
-    // ============================================
-    // [추가됨] 비밀번호 변경 팝업 로직
-    // ============================================
-    const pwDialog = document.getElementById('pwChangeDialog');
-    const pwResultMsg = document.getElementById('pwResultMsg');
-    const pwChangeArea = document.getElementById('pwChangeArea');
-
-    function openPwModal() {
-        pwResultMsg.innerText = "";
-        pwChangeArea.style.display = 'none';
-        document.getElementById('mypageAuthCode').value = "";
-        document.getElementById('mypageNewPw').value = "";
-        pwDialog.showModal();
-    }
-    function closePwModal() { pwDialog.close(); }
-
-    // (1) 인증번호 발송 요청
-    function sendCodeForPwChange() {
-        const email = document.getElementById('mypageEmail').value;
-        if(!email) { alert("이메일 정보가 없습니다."); return; }
-
-        pwResultMsg.style.color = "black";
-        pwResultMsg.innerText = "전송 중...";
-
-        // 우리가 만든 비밀번호용 발송 API 호출
-        fetch('/auth/email/password-reset', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email: email})
-        }).then(async res => {
-            if(res.ok) {
-                alert("인증번호가 발송되었습니다.");
-                pwResultMsg.innerText = "";
-                pwChangeArea.style.display = 'block'; // 입력창 표시
-            } else {
-                const text = await res.text();
-                alert("발송 실패: " + text);
-                pwResultMsg.innerText = "";
-            }
-        });
-    }
-
-    // (2) 비밀번호 변경 요청
-    function reqChangePw() {
-        const loginId = document.getElementById('mypageLoginId').value;
-        const email = document.getElementById('mypageEmail').value;
-        const code = document.getElementById('mypageAuthCode').value;
-        const newPw = document.getElementById('mypageNewPw').value;
-
-        if(!code || !newPw) { alert("인증번호와 새 비밀번호를 입력해주세요."); return; }
-
-        pwResultMsg.innerText = "처리 중...";
-
-        // 우리가 만든 비밀번호 변경 API 호출
-        fetch('/account/api/find/password', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                loginId: loginId,
-                email: email,
-                authCode: code, // 백엔드 DTO 필드명 확인 (code인지 authCode인지)
-                newPassword: newPw
-            })
-        }).then(async res => {
-            if(res.ok) {
-                alert("비밀번호가 변경되었습니다.\n보안을 위해 다시 로그인해주세요.");
-                location.href = "/auth/logout"; // 로그아웃 처리
-            } else {
-                const errorText = await res.text();
-                alert("변경 실패: " + errorText);
-                pwResultMsg.style.color = "red";
-                pwResultMsg.innerText = errorText;
-            }
         });
     }
 

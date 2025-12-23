@@ -193,7 +193,45 @@ html, body{
     color: #fff;
 }
 
+
 /*  카테고리(nav) 가림 방지(홈에 카테고리가 있을 때) */
+
+/* ====== Fixed Header/Footer: Global ====== */
+:root{
+    --header-height: 96px;   /* 실제 헤더 높이에 맞춰 조정 */
+    --footer-height: 120px;  /* 실제 푸터 높이에 맞춰 조정 */
+}
+
+/* 스크롤 시에도 헤더가 상단에 고정 */
+header, .site-header, #header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+/* 스크롤 시에도 푸터가 하단에 고정 */
+footer, .site-footer, #footer {
+    position: static;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 900;
+}
+
+/* 고정된 헤더/푸터에 본문이 가리지 않도록 여백 확보 */
+body{
+    padding-top: var(--header-height);
+    padding-bottom: var(--footer-height);
+}
+
+/* 모바일에서 가로 스크롤 생기는 경우 방지(선택) */
+html, body{
+    overflow-x: hidden;
+}
+
+
 #category-nav{
     position: relative;
     z-index: 1;
