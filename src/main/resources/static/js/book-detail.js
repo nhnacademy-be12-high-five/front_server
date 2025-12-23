@@ -88,41 +88,82 @@ function toggleReviewLike(bookId, reviewId, btn) {
 
 document.addEventListener('DOMContentLoaded', () => {
     const heartBtn = document.getElementById('heart');
-    if (heartBtn) {
-        heartBtn.addEventListener('click', async function () {
-            const bookId = this.dataset.bookId;
-            const accessToken = localStorage.getItem('accessToken');
+    if (!heartBtn) return;
 
-            const headers = {'Content-Type': 'application/json'};
-            if (accessToken) {
-                headers['Authorization'] = `Bearer ${accessToken}`;
-            }
+    const bookId = heartBtn.dataset.bookId;
+    if (!bookId) return;
 
-            try {
-                const response = await fetch(`/api/books/${bookId}/likes`, {
-                    method: 'POST',
-                    headers
+    function buildHeaders() {
+        const headers = { 'Content-Type': 'application/json' };
+
+
+        const memberId = heartBtn.dataset.memberId;
+
+        if (memberId) headers['X-USER-ID'] = memberId;
+        return headers;
+    }
+
+    // 1) 초기 상태 조회
+    (async function loadLikeStatus() {
+        try {
+            const response = await fetch(`/api/books/${bookId}/likes/status`, {
+                method: 'GET',
+                headers: buildHeaders(),
+                credentials: 'include'
+            });
+
+            if (!response.ok) return;
+
+            const isLiked = await response.json(); // Boolean
+            heartBtn.classList.toggle('active', !!isLiked);
+        } catch (e) {
+            console.warn("좋아요 상태 조회 실패", e);
+        }
+    })();
+
+    // 2) 클릭 -> 토글 (POST)
+    heartBtn.addEventListener('click', async function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const memberId = heartBtn.dataset.memberId;
+        if (!memberId) {
+            alert("로그인이 필요합니다.");
+            location.href = "/member/login";
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/books/${bookId}/likes`, {
+                method: 'POST',
+                headers: buildHeaders(),
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                // 성공 후 상태 재조회로 UI 확정
+                const statusRes = await fetch(`/api/books/${bookId}/likes/status`, {
+                    method: 'GET',
+                    headers: buildHeaders(),
+                    credentials: 'include'
                 });
 
-                if (response.ok) {
-                    this.classList.toggle('active');
-                    if (this.classList.contains('active')) {
-                        if (confirm("관심 도서에 담았습니다!\n마이페이지 찜 목록으로 이동하시겠습니까?")) {
-                            location.href = "/books/my-page/likes";
-                        }
-                    } else {
-                        alert("관심 도서가 해제되었습니다.");
-                    }
+                if (statusRes.ok) {
+                    const isLiked = await statusRes.json();
+                    heartBtn.classList.toggle('active', !!isLiked);
                 } else {
-                    await handleReviewError(response, "관심 도서 등록/해제에 실패했습니다.");
+                    heartBtn.classList.toggle('active');
                 }
-            } catch (e) {
-                console.error(e);
-                alert("서버와 통신 중 오류가 발생했습니다.");
+            } else {
+                await handleReviewError(response, "관심 도서 처리에 실패했습니다.");
             }
-        });
-    }
+        } catch (e) {
+            console.error(e);
+            alert("서버와 통신 중 오류가 발생했습니다.");
+        }
+    });
 });
+
 
 
 // ===================================================================================//
@@ -538,3 +579,19 @@ async function submitUpdateReview(reviewId, bookId) {
         alert("네트워크 오류가 발생했습니다.");
     }
 }
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const tags = document.querySelectorAll(".book-tag");
+
+    tags.forEach(tag => {
+        tag.addEventListener("click", function (e) {
+            e.preventDefault(); // 혹시 모를 이동 방지
+
+            // 선택 토글
+            tag.classList.toggle("active");
+        });
+    });
+});
+
+
