@@ -6,8 +6,10 @@ import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.coupon.MemberCouponResponseDto;
 import com.example.high_five.dto.member.response.MemberResponse;
 import com.example.high_five.dto.order.DeliveryPolicyResponse;
+import com.example.high_five.dto.order.GuestOrderDetailResponse;
 import com.example.high_five.dto.order.MyOrderResponse;
 import com.example.high_five.dto.order.OrderCheckoutRequest;
+import com.example.high_five.dto.order.OrderGuestLoginRequest;
 import com.example.high_five.dto.order.OrderResponse;
 import com.example.high_five.dto.order.OrderReturnRequest;
 import com.example.high_five.dto.point.PointBalanceResponse;
@@ -228,7 +230,12 @@ public class FrontOrderService {
             return new CommonPageResponse<>();
         }
     }
+    public GuestOrderDetailResponse getGuestOrder(Long orderId, String password) {
 
+        OrderGuestLoginRequest request = new OrderGuestLoginRequest(orderId, password);
+
+        return orderClient.getGuestOrder(request).getBody();
+    }
     // 반품 신청
     public void requestReturn(Long orderId, OrderReturnRequest request) {
         orderClient.requestReturn(orderId, request);
