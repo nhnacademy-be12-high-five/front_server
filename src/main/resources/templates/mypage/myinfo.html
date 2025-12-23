@@ -13,7 +13,6 @@
         .input-readonly { background-color: #f0f0f0; color: #888; cursor: not-allowed; }
         .info-msg { color: #007bff; font-size: 12px; margin-top: 5px; }
         .error-msg { color: #e74c3c; font-size: 12px; margin-top: 5px; }
-
         dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
     </style>
 </head>
@@ -37,6 +36,8 @@
     <section class="tab-content active">
         <h2 class="section-title">내 정보</h2>
 
+        <input type="hidden" id="server-alert-msg" th:value="${alertMessage}" />
+
         <div id="view-mode">
             <div class="info-group">
                 <div class="info-item">
@@ -53,7 +54,7 @@
                 </div>
                 <div class="info-item">
                     <label>연락처</label>
-                    <div th:text="${myInfo.phone}">010-0000-0000</div>
+                    <div id="view-phone" th:text="${myInfo.phone}">01000000000</div>
                 </div>
                 <div class="info-item">
                     <label>회원 등급</label>
@@ -109,7 +110,14 @@
                 </div>
                 <div class="info-item">
                     <label>연락처</label>
-                    <input type="text" name="phone" th:value="${myInfo.phone}" class="input-field" required>
+                    <input type="text"
+                           name="phone"
+                           th:value="${myInfo.phone}"
+                           class="input-field"
+                           required
+                           maxlength="13"
+                           oninput="autoHyphen(this)"
+                           placeholder="숫자만 입력하세요">
                 </div>
             </div>
 
@@ -130,42 +138,5 @@
 
 <script src="/js/common.js"></script>
 <script src="/js/password-reset.js"></script>
-
-<script th:inline="javascript">
-    /*<![CDATA[*/
-
-    const alertMessage = /*[[${alertMessage}]]*/ null;
-    if (alertMessage) {
-        alert(alertMessage);
-        if (alertMessage.includes("필수 정보")) {
-            setTimeout(() => toggleEditMode(true), 100);
-        }
-    }
-
-    function toggleEditMode(isEdit) {
-        const viewMode = document.getElementById('view-mode');
-        const editForm = document.getElementById('edit-form');
-        if (isEdit) {
-            viewMode.style.display = 'none';
-            editForm.style.display = 'block';
-        } else {
-            viewMode.style.display = 'block';
-            editForm.style.display = 'none';
-            editForm.reset();
-        }
-    }
-
-    const withdrawBtn = document.getElementById("btn-withdraw");
-    const withdrawForm = document.getElementById("withdraw-form");
-    if (withdrawBtn) {
-        withdrawBtn.addEventListener("click", e => {
-            e.preventDefault();
-            if (confirm("정말 탈퇴하시겠습니까?")) withdrawForm.submit();
-        });
-    }
-
-    /*]]>*/
-</script>
-
-</body>
+<script src="/js/myinfo.js"></script> </body>
 </html>

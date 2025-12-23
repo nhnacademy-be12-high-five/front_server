@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Highfive - 배송지 수정</title>
+    <link rel="stylesheet" href="/css/member-css/mypage.css">
+    <link rel="stylesheet" href="/css/member-css/myinfo.css">
+    <link rel="stylesheet" href="/css/common/common.css">
+    <link rel="stylesheet" href="/css/common/header.css">
+    <link rel="stylesheet" href="/css/common/footer.css">
+
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+    <style>
+        .container2 { max-width: 800px; margin: 50px auto; padding: 0 20px; }
+        .form-box { background: #fff; padding: 40px; border: 1px solid #ddd; border-radius: 10px; }
+        .form-title { margin-bottom: 30px; text-align: center; font-size: 24px; font-weight: bold; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+
+        .zipcode-box { display: flex; gap: 10px; }
+        .btn-zipcode { width: 120px; background: #666; color: white; border: none; cursor: pointer; border-radius: 4px; }
+
+        .btn-group { display: flex; gap: 10px; margin-top: 30px; }
+        .btn-save { flex: 1; background: #333; color: white; padding: 15px; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+        .btn-cancel { flex: 1; background: #fff; border: 1px solid #ddd; color: #333; padding: 15px; border-radius: 4px; font-size: 16px; cursor: pointer; }
+        .btn-cancel:hover { background: #f9f9f9; }
+    </style>
+</head>
+
+<body>
+
+<div th:replace="~{layout/header :: header}"></div>
+
+<div class="container2">
+    <div class="form-box">
+        <h2 class="form-title" th:text="${isUpdate} ? '배송지 수정' : '배송지 추가'">배송지 관리</h2>
+
+        <form th:action="${isUpdate} ? @{/mypage/address/{id}/update(id=${addressId})} : @{/mypage/address/register}"
+              method="post">
+
+            <div class="form-group">
+                <label>배송지 이름 (별칭)</label>
+                <input type="text" name="alias" th:value="${address.alias}" placeholder="예: 우리집, 회사" required>
+            </div>
+
+            <div class="form-group">
+                <label>받는 분</label>
+                <input type="text" name="recipient" th:value="${address.recipient}" required>
+            </div>
+
+            <div class="form-group">
+                <label>연락처</label>
+                <input type="text" name="phone" th:value="${address.phone}" oninput="autoHyphen(this)" maxlength="13" required>
+            </div>
+
+            <div class="form-group">
+                <label>주소</label>
+                <div class="zipcode-box">
+                    <input type="text" id="zipCode" name="zipCode" th:value="${address.zipCode}" readonly required placeholder="우편번호">
+                    <button type="button" class="btn-zipcode" onclick="execDaumPostcode()">주소 검색</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <input type="text" id="roadAddress" name="roadAddress" th:value="${address.roadAddress}" readonly required placeholder="도로명 주소">
+            </div>
+
+            <div class="form-group">
+                <input type="text" id="detailAddress" name="detailAddress" th:value="${address.detailAddress}" placeholder="상세주소">
+            </div>
+
+            <div class="form-group" style="display:flex; align-items:center; gap:5px;">
+                <input type="checkbox" id="chkDefault" name="defaultAddress" value="true"
+                       th:checked="${address != null && address.isDefault}" style="width:auto;">
+
+                <input type="hidden" name="_defaultAddress" value="on"/>
+
+                <label for="chkDefault" style="margin:0; cursor:pointer;">기본 배송지로 설정</label>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn-cancel" onclick="history.back()">취소</button>
+                <button type="submit" class="btn-save">저장하기</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<script>
+    // 다음 주소 API
+    function execDaumPostcode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                document.getElementById('zipCode').value = data.zonecode;
+                document.getElementById("roadAddress").value = data.roadAddress;
+                document.getElementById("detailAddress").focus();
+            }
+        }).open();
+    }
+
+    // 하이픈 자동 입력
+    const autoHyphen = (target) => {
+        target.value = target.value
+            .replace(/[^0-9]/g, '')
+            .substring(0, 11)
+            .replace(/^(\d{0,3})(\d{0,4})(\d{0,4})$/g, "$1-$2-$3")
+            .replace(/(\-{1,2})$/g, "");
+    }
+</script>
+
+</body>
+</html>
