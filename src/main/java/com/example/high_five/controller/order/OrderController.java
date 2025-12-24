@@ -15,6 +15,7 @@ import com.example.high_five.service.MemberService;
 import com.example.high_five.service.PaymentService;
 import feign.FeignException;
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -194,25 +195,39 @@ public class OrderController {
         }
     }
 
+    // [추가] 비회원 로그인 검증용 API (페이지 이동 없음, 확인만 함)
+    @PostMapping("/guest/validate")
+    @ResponseBody // 뷰가 아니라 데이터를 반환
+    public ResponseEntity<?> validateGuestOrder(@RequestBody Map<String, Object> request) {
+        Long orderId = Long.valueOf(request.get("orderId").toString());
+        String password = (String) request.get("password");
+
+        try {
+            // 서비스 호출해서 조회 되는지 확인만 해봄
+            frontOrderService.getGuestOrder(orderId, password);
+
+            // 에러 안 나면 성공
+            return ResponseEntity.ok().body(Map.of("success", true));
+
+        } catch (Exception e) {
+            log.warn("비회원 검증 실패: {}", e.getMessage());
+            // 실패 시 400 에러와 메시지 반환
+            return ResponseEntity.badRequest().body(Map.of("message", "주문 정보가 일치하지 않습니다."));
+        }
+    }
+
+    // [기존 유지] 실제 페이지 이동은 여기서 처리 (HTML 반환)
     @PostMapping("/guest")
     public String getGuestOrder(@RequestParam Long orderId,
                                 @RequestParam String password,
                                 Model model) {
         try {
-            GuestOrderDetailResponse guestOrderDetailResponse = frontOrderService.getGuestOrder(orderId, password);
-
-            // 뷰(HTML)에서 ${order.id}, ${order.orderName} 등으로 접근 가능
-            model.addAttribute("order", guestOrderDetailResponse);
-
-            // 비회원 전용 상세 페이지로 이동
+            GuestOrderDetailResponse response = frontOrderService.getGuestOrder(orderId, password);
+            model.addAttribute("order", response);
             return "order/guest-order-detail";
-
         } catch (Exception e) {
-            log.warn("비회원 주문 조회 실패: orderId={}, message={}", orderId, e.getMessage());
-
-            // 로그인 페이지나 조회 페이지로 돌아갈 때 에러 메시지 전달
-            model.addAttribute("error", "주문 정보가 일치하지 않거나 존재하지 않습니다.");
-            return "member/login";
+            // 혹시라도 여기서 에러나면 로그인 페이지로 (JS 검증 통과했으면 여긴 거의 안 옴)
+            return "redirect:/member/login?error=true";
         }
     }
 }
