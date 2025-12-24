@@ -61,26 +61,26 @@
             </div>
         </form>
 
-        <form id="formGuest" class="login-form" action="/orders/guest" method="post" style="display: none;">
-        <div class="input-group">
-            <label for="orderId">주문 번호</label>
-            <div class="input-wrapper">
-                <input type="number" id="orderId" name="orderId" placeholder="주문 번호를 입력하세요" min="0" required />
+        <form id="formGuest" class="login-form" action="/orders/guest" method="post" style="display: none;" onsubmit="return checkGuestOrder(event)">
+            <div class="input-group">
+                <label for="orderId">주문 번호</label>
+                <div class="input-wrapper">
+                    <input type="number" id="orderId" name="orderId" placeholder="주문 번호를 입력하세요" required
+                           style="width: 100%; height: 48px; padding: 0 12px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px;" />
+                </div>
             </div>
-        </div>
-        <div class="input-group">
-            <label for="orderPassword">비밀번호</label>
-            <div class="input-wrapper">
-                <input type="password" id="orderPassword" name="password" placeholder="주문 비밀번호를 입력하세요" required />
-                <img class="input-icon" src="/img/free-icon-eye.png" alt="보기" width="20" height="20"
-                     onclick="togglePasswordVisibility('orderPassword', this)" />
+            <div class="input-group">
+                <label for="orderPassword">비밀번호</label>
+                <div class="input-wrapper">
+                    <input type="password" id="orderPassword" name="password" placeholder="주문 비밀번호를 입력하세요" required
+                           style="width: 100%; height: 48px; padding: 0 12px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px;" />
+                </div>
             </div>
-        </div>
 
-        <div class="btn">
-            <button type="submit" class="login-btn">주문 조회</button>
-        </div>
-    </form>
+            <div class="btn">
+                <button type="submit" class="login-btn">주문 조회</button>
+            </div>
+        </form>
     </div>
 </main>
 
@@ -219,6 +219,49 @@
             });
         }
     })();
+
+    async function checkGuestOrder(event) {
+        event.preventDefault(); // 1. 무조건 폼 제출(새로고침)을 막음
+
+        const orderId = document.getElementById('orderId').value;
+        const password = document.getElementById('orderPassword').value;
+
+        if(!orderId || !password) {
+            alert("주문번호와 비밀번호를 모두 입력해주세요.");
+            return false;
+        }
+
+        try {
+            // 2. 서버에 "아이디/비번 맞나요?" 물어보기 (AJAX)
+            const response = await fetch('/orders/guest/validate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ orderId: orderId, password: password })
+            });
+
+            // 3. 결과에 따른 처리
+            if (response.ok) {
+                // [성공] 아이디/비번 맞음 -> 실제 폼을 제출해서 페이지 이동
+                // (검증용 함수를 끄고 제출하기 위해 event.target.submit() 사용)
+                event.target.submit();
+            } else if (response.status === 400) {
+                // [실패] 아이디/비번 틀림 (400 Bad Request)
+                const data = await response.json();
+                alert(data.message || "주문 정보가 일치하지 않습니다.");
+                // 새로고침 안 되므로 탭 유지됨!
+            } else {
+                // [에러] 500 등 시스템 에러 (뷰 렌더링 문제 등)
+                alert("시스템 오류가 발생했습니다. 잠시 후 다시 시도해주세요.\n(서버 로그를 확인해주세요)");
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert("서버와 통신 중 오류가 발생했습니다.");
+        }
+
+        return false; // 폼 제출 중단 유지
+    }
 </script>
 
 </body>

@@ -97,7 +97,8 @@
                and order.status.toString() != 'CANCELED'
                and order.status.toString() != 'RETURN_REQUESTED'
                and order.status.toString() != 'RETURN_COMPLETED'
-               and order.status.toString() == 'PURCHASE_CONFIRMED'}"
+               and order.status.toString() == 'PURCHASE_CONFIRMED'
+               and order.status.toString() == 'DELIVERY_COMPLETED'}"
                             th:onclick="'confirmPurchase(' + ${order.id} + ')'"
                             class="btn-action btn-confirm">
                         구매 확정
