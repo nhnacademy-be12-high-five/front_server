@@ -88,4 +88,9 @@ public interface BookClient {
     @GetMapping("/api/categories/{categoryId}/books")
     List<BookResponse> getBooksByCategory(@PathVariable("categoryId") int categoryId);
 
+    // [마이페이지] 내가 좋아요 누른 도서 목록 조회
+    @GetMapping("/api/books/my-page/likes")
+    List<BookResponse> getMyLikedBooks();
+
+
 }
