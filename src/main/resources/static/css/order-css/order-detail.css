@@ -304,7 +304,40 @@ main {
     border-color: #ccc;
     cursor: default;
 }
+/* 테이블 전체 스타일 보정 */
+.order-items-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* 컬럼 너비 고정 */
+}
 
+.order-items-table th,
+.order-items-table td {
+    padding: 12px;
+    vertical-align: middle; /* 세로 중앙 정렬 */
+}
+
+/* 1번째 열 (상품 정보): 왼쪽 정렬 */
+.order-items-table th:first-child,
+.order-items-table td:first-child {
+    text-align: left;
+    padding-left: 10px;
+}
+
+/* 2번째 열 (수량): 가운데 정렬 + 너비 15% */
+.order-items-table th:nth-child(2),
+.order-items-table td:nth-child(2) {
+    text-align: center;
+    width: 15%;
+}
+
+/* 3번째 열 (금액): 오른쪽 정렬 + 너비 20% + 우측 여백 */
+.order-items-table th:last-child,
+.order-items-table td:last-child {
+    text-align: right;
+    width: 20%;
+    padding-right: 20px; /* 금액이 너무 딱 붙지 않게 */
+}
 @media (max-width: 768px) {
     .info-grid {
         grid-template-columns: 1fr;

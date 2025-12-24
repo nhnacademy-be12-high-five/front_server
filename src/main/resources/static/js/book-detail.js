@@ -94,13 +94,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!bookId) return;
 
     function buildHeaders() {
-        const headers = { 'Content-Type': 'application/json' };
+        return { 'Content-Type': 'application/json' };
+    }
 
-
-        const memberId = heartBtn.dataset.memberId;
-
-        if (memberId) headers['X-USER-ID'] = memberId;
-        return headers;
+    async function redirectToLoginIfNeeded(res) {
+        // 백엔드가 401/403을 주는 경우
+        if (res.status === 401 || res.status === 403) {
+            alert("로그인이 필요합니다.");
+            location.href = "/member/login";
+            return true;
+        }
+        return false;
     }
 
     // 1) 초기 상태 조회
@@ -109,29 +113,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`/api/books/${bookId}/likes/status`, {
                 method: 'GET',
                 headers: buildHeaders(),
-                credentials: 'include'
+                credentials: 'include' // 쿠키(access-token) 자동 전송
             });
 
+            if (await redirectToLoginIfNeeded(response)) return;
             if (!response.ok) return;
 
-            const isLiked = await response.json(); // Boolean
+            const isLiked = await response.json();
             heartBtn.classList.toggle('active', !!isLiked);
         } catch (e) {
             console.warn("좋아요 상태 조회 실패", e);
         }
     })();
 
-    // 2) 클릭 -> 토글 (POST)
-    heartBtn.addEventListener('click', async function (e) {
+    // 2) 토글
+    heartBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
-
-        const memberId = heartBtn.dataset.memberId;
-        if (!memberId) {
-            alert("로그인이 필요합니다.");
-            location.href = "/member/login";
-            return;
-        }
 
         try {
             const response = await fetch(`/api/books/${bookId}/likes`, {
@@ -140,8 +138,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 credentials: 'include'
             });
 
+            if (await redirectToLoginIfNeeded(response)) return;
+
             if (response.ok) {
-                // 성공 후 상태 재조회로 UI 확정
+                // 성공 후 상태 재조회
                 const statusRes = await fetch(`/api/books/${bookId}/likes/status`, {
                     method: 'GET',
                     headers: buildHeaders(),
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     heartBtn.classList.toggle('active');
                 }
             } else {
-                await handleReviewError(response, "관심 도서 처리에 실패했습니다.");
+                alert("관심 도서 처리에 실패했습니다.");
             }
         } catch (e) {
             console.error(e);

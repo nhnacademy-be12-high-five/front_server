@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>비회원 주문 상세 - HIGH-FIVE</title>
     <link rel="stylesheet" href="/css/order-css/order-detail.css">
     <link rel="stylesheet" href="/css/common/common.css">
@@ -23,10 +23,13 @@
             <div class="order-top">
                 <div class="order-top-left">
                     <div class="num">
-                        주문번호  <span th:text="${order.orderNumber}">ORD-001</span>
+                        주문번호 <span th:text="${order.orderNumber}">ORD-001</span>
                     </div>
                     <div class="date">
-                        주문일자 <span th:text="${order.orderDate}">2025-12-25</span>
+                        주문일자
+                        <span th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm:ss')}">
+        2025-12-25 16:53:43
+    </span>
                     </div>
                 </div>
                 <div class="order-top-right">
@@ -44,8 +47,8 @@
                     <thead>
                     <tr>
                         <th>상품 정보</th>
-                        <th style="width:15%">수량</th>
-                        <th style="width:20%">금액</th>
+                        <th>수량</th>
+                        <th>금액</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -57,7 +60,9 @@
                             </div>
                         </td>
                         <td class="qty" th:text="${item.quantity} + '개'">1개</td>
-                        <td class="price" th:text="${#numbers.formatInteger(item.totalPrice, 0, 'COMMA')} + '원'">10,000원</td>
+                        <td class="price" th:text="${#numbers.formatInteger(item.totalPrice, 0, 'COMMA')} + '원'">
+                            10,000원
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -71,10 +76,10 @@
                             <label>수령인</label>
                             <div th:text="${order.receiverName}">홍길동</div>
                         </div>
-                        <div class="info-row">
+                        <!--<div class="info-row">
                             <label>연락처</label>
                             <div th:text="${order.receiverPhone}">010-0000-0000</div>
-                        </div>
+                        </div>-->
                         <div class="info-row">
                             <label>주소</label>
                             <div>
@@ -82,10 +87,10 @@
                                 <div class="addr-extra" th:text="${order.addressDetail}">상세주소</div>
                             </div>
                         </div>
-                        <div class="info-row">
-                            <label>요청사항</label>
-                            <div th:text="${order.deliveryRequest}">없음</div>
-                        </div>
+                        <!-- <div class="info-row">
+                             <label>요청사항</label>
+                             <div th:text="${order.deliveryRequest}">없음</div>
+                         </div>-->
                     </div>
 
                     <div class="info-card">
@@ -94,6 +99,10 @@
                             <div class="pay-row">
                                 <span>상품금액</span>
                                 <span th:text="${#numbers.formatInteger(order.totalAmount, 0, 'COMMA')} + '원'">0원</span>
+                            </div>
+                            <div class="pay-row" th:if="${order.wrappingFee > 0}">
+                                <span>포장비</span>
+                                <span th:text="'+ ' + ${#numbers.formatInteger(order.wrappingFee, 0, 'COMMA')} + '원'">+ 1,000원</span>
                             </div>
                             <div class="pay-row">
                                 <span>배송비</span>
