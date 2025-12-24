@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime; // [1] 날짜 타입 import 추가
 import java.util.List;
 
 @Getter
@@ -13,6 +14,17 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderResponse {
+
+
+    private Long id;
+    private Long userId;
+    private String orderName;
+    private Integer totalPrice;
+    private LocalDateTime orderDate;
+    private String status;
+    private String trackingNumber;
+
+
 
     private String name;
     private String phoneNumber;

@@ -3,6 +3,7 @@ package com.example.high_five.controller.order;
 import com.example.high_five.dto.coupon.MemberCouponResponseDto;
 import com.example.high_five.dto.order.GuestOrderDetailResponse;
 import com.example.high_five.dto.order.OrderCheckoutRequest;
+import com.example.high_five.dto.order.OrderCreateResponse;
 import com.example.high_five.dto.order.OrderResponse;
 import com.example.high_five.dto.payment.PaymentConfirmRequest;
 import com.example.high_five.dto.payment.PaymentConfirmResponse;
@@ -11,7 +12,6 @@ import com.example.high_five.dto.point.PointBalanceResponse;
 import com.example.high_five.service.CouponService;
 import com.example.high_five.service.FrontOrderService;
 import com.example.high_five.service.MemberService;
-import com.example.high_five.service.OrderClient.OrderCreateResponse;
 import com.example.high_five.service.PaymentService;
 import feign.FeignException;
 import jakarta.validation.Valid;
@@ -196,15 +196,19 @@ public class OrderController {
                                 @RequestParam String password,
                                 Model model) {
         try {
-            GuestOrderDetailResponse orderResponse = frontOrderService.getGuestOrder(orderId, password);
+            // [수정] 반환 타입을 OrderResponse로 변경하여 서비스 결과와 일치시킴
+            OrderResponse orderResponse = frontOrderService.getGuestOrder(orderId, password);
 
+            // 뷰(HTML)에서 ${order.id}, ${order.orderName} 등으로 접근 가능
             model.addAttribute("order", orderResponse);
 
-            // [수정] 비회원 전용 HTML로 이동
+            // 비회원 전용 상세 페이지로 이동
             return "order/guest-order-detail";
 
         } catch (Exception e) {
-            log.warn("비회원 주문 조회 실패: {}", e.getMessage());
+            log.warn("비회원 주문 조회 실패: orderId={}, message={}", orderId, e.getMessage());
+
+            // 로그인 페이지나 조회 페이지로 돌아갈 때 에러 메시지 전달
             model.addAttribute("error", "주문 정보가 일치하지 않거나 존재하지 않습니다.");
             return "member/login";
         }

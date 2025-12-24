@@ -1,21 +1,13 @@
 package com.example.high_five.service;
 
 import com.example.high_five.common.CommonPageResponse;
-import com.example.high_five.common.CustomPage;
 import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.coupon.MemberCouponResponseDto;
 import com.example.high_five.dto.member.response.MemberResponse;
-import com.example.high_five.dto.order.DeliveryPolicyResponse;
-import com.example.high_five.dto.order.GuestOrderDetailResponse;
-import com.example.high_five.dto.order.MyOrderResponse;
-import com.example.high_five.dto.order.OrderCheckoutRequest;
-import com.example.high_five.dto.order.OrderGuestLoginRequest;
-import com.example.high_five.dto.order.OrderResponse;
-import com.example.high_five.dto.order.OrderReturnRequest;
+import com.example.high_five.dto.order.*; // 분리된 OrderCreateResponse 등 모든 DTO import
 import com.example.high_five.dto.point.PointBalanceResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -68,9 +60,11 @@ public class FrontOrderService {
 
     /**
      * 주문 생성 요청
+     * [수정] OrderClient.OrderCreateResponse -> OrderCreateResponse (외부 클래스 사용)
      */
-    public OrderClient.OrderCreateResponse placeOrder(OrderCheckoutRequest request, Long userId, String guestId) {
+    public OrderCreateResponse placeOrder(OrderCheckoutRequest request, Long userId, String guestId) {
         log.info("Order Request - UserID: {}, GuestID: {}, Items: {}", userId, guestId, request.getOrderItems().size());
+        // [수정] 통합된 createOrder 메소드 호출
         return orderClient.createOrder(userId, guestId, request);
     }
 
@@ -200,7 +194,6 @@ public class FrontOrderService {
     }
 
     public void cancelOrder(Long orderId) {
-
         try {
             orderClient.cancelOrder(orderId);
             log.info("Order Cancel Success: OrderID={}", orderId);
@@ -212,7 +205,6 @@ public class FrontOrderService {
 
     public void confirmOrder(Long orderId) {
         try {
-            // Feign Client를 통해 백엔드(주문 서버) 호출
             orderClient.confirmOrder(orderId);
             log.info("Purchase Confirm Success: OrderID={}", orderId);
         } catch (Exception e) {
@@ -221,7 +213,6 @@ public class FrontOrderService {
         }
     }
 
-    // 내 주문 내역 조회
     public CommonPageResponse<MyOrderResponse> getMyOrders(Long userId, int page, int size) {
         try {
             return orderClient.getMyOrders(userId, page, size);
@@ -230,13 +221,14 @@ public class FrontOrderService {
             return new CommonPageResponse<>();
         }
     }
-    public GuestOrderDetailResponse getGuestOrder(Long orderId, String password) {
 
+    public OrderResponse getGuestOrder(Long orderId, String password) {
+        // 타입 변환 없이 바로 생성자에 전달 (Long, String)
         OrderGuestLoginRequest request = new OrderGuestLoginRequest(orderId, password);
 
-        return orderClient.getGuestOrder(request).getBody();
+        // 백엔드로 요청 전송
+        return orderClient.getGuestOrder(request);
     }
-    // 반품 신청
     public void requestReturn(Long orderId, OrderReturnRequest request) {
         orderClient.requestReturn(orderId, request);
     }
