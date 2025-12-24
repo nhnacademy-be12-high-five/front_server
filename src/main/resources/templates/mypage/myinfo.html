@@ -45,8 +45,19 @@
                 <div class="info-item"><label>회원 등급</label><div th:text="${myInfo.gradeName}"></div></div>
             </div>
             <br/>
-            <button type="button" class="btn-outline" onclick="openPasswordResetDialog({ emailReadonly: true, redirectUrl: '/member/login?pwChanged=true' })">비밀번호 변경</button>
+
+            <button type="button"
+                    class="btn-outline"
+                    th:data-email="${myInfo.email}"
+                    onclick="openPasswordResetDialog({
+                        email: this.getAttribute('data-email'),
+                        emailReadonly: true,
+                        redirectUrl: '/member/login?pwChanged=true'
+                    })">
+                비밀번호 변경
+            </button>
             <button type="button" class="btn-edit" onclick="toggleEditMode(true)">정보 수정</button>
+
             <div class="withdrawal-area" style="margin-top:30px; text-align:right;">
                 <a href="#" id="btn-withdraw" style="font-size:13px; color:#999; text-decoration:underline;">회원 탈퇴</a>
             </div>
@@ -76,8 +87,16 @@
 </div>
 
 <div th:replace="~{layout/footer :: footer}"></div>
+
+<div th:replace="~{layout/password-reset-dialog :: passwordResetDialog(null, false)}"></div>
+
+<form id="withdraw-form" action="/mypage/withdraw" method="post" style="display: none;"></form>
+
 <script src="/js/common.js"></script>
 <script src="/js/myinfo.js"></script>
+
+<script src="/js/password-reset.js"></script>
+
 <script>
     function validateMyInfoForm(target) {
         target.value = target.value.replace(/[^0-9]/g, '').substring(0, 11)
@@ -90,11 +109,18 @@
             submitBtn.disabled = true; submitBtn.style.opacity = "0.5"; submitBtn.style.cursor = "not-allowed";
         }
     }
-    const originalToggle = toggleEditMode;
-    toggleEditMode = function(isEdit) {
-        originalToggle(isEdit);
-        if (isEdit) validateMyInfoForm(document.getElementById('myInfoPhone'));
-    };
+
+    // JS 로드 순서에 따른 toggleEditMode 안전 처리
+    if (typeof toggleEditMode !== 'undefined') {
+        const originalToggle = toggleEditMode;
+        toggleEditMode = function(isEdit) {
+            originalToggle(isEdit);
+            if (isEdit) {
+                const phoneInput = document.getElementById('myInfoPhone');
+                if(phoneInput) validateMyInfoForm(phoneInput);
+            }
+        };
+    }
 </script>
 </body>
 </html>
