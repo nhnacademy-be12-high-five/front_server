@@ -88,41 +88,82 @@ function toggleReviewLike(bookId, reviewId, btn) {
 
 document.addEventListener('DOMContentLoaded', () => {
     const heartBtn = document.getElementById('heart');
-    if (heartBtn) {
-        heartBtn.addEventListener('click', async function () {
-            const bookId = this.dataset.bookId;
-            const accessToken = localStorage.getItem('accessToken');
+    if (!heartBtn) return;
 
-            const headers = {'Content-Type': 'application/json'};
-            if (accessToken) {
-                headers['Authorization'] = `Bearer ${accessToken}`;
-            }
+    const bookId = heartBtn.dataset.bookId;
+    if (!bookId) return;
 
-            try {
-                const response = await fetch(`/api/books/${bookId}/likes`, {
-                    method: 'POST',
-                    headers
+    function buildHeaders() {
+        const headers = { 'Content-Type': 'application/json' };
+
+
+        const memberId = heartBtn.dataset.memberId;
+
+        if (memberId) headers['X-USER-ID'] = memberId;
+        return headers;
+    }
+
+    // 1) 초기 상태 조회
+    (async function loadLikeStatus() {
+        try {
+            const response = await fetch(`/api/books/${bookId}/likes/status`, {
+                method: 'GET',
+                headers: buildHeaders(),
+                credentials: 'include'
+            });
+
+            if (!response.ok) return;
+
+            const isLiked = await response.json(); // Boolean
+            heartBtn.classList.toggle('active', !!isLiked);
+        } catch (e) {
+            console.warn("좋아요 상태 조회 실패", e);
+        }
+    })();
+
+    // 2) 클릭 -> 토글 (POST)
+    heartBtn.addEventListener('click', async function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const memberId = heartBtn.dataset.memberId;
+        if (!memberId) {
+            alert("로그인이 필요합니다.");
+            location.href = "/member/login";
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/books/${bookId}/likes`, {
+                method: 'POST',
+                headers: buildHeaders(),
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                // 성공 후 상태 재조회로 UI 확정
+                const statusRes = await fetch(`/api/books/${bookId}/likes/status`, {
+                    method: 'GET',
+                    headers: buildHeaders(),
+                    credentials: 'include'
                 });
 
-                if (response.ok) {
-                    this.classList.toggle('active');
-                    if (this.classList.contains('active')) {
-                        if (confirm("관심 도서에 담았습니다!\n마이페이지 찜 목록으로 이동하시겠습니까?")) {
-                            location.href = "/books/my-page/likes";
-                        }
-                    } else {
-                        alert("관심 도서가 해제되었습니다.");
-                    }
+                if (statusRes.ok) {
+                    const isLiked = await statusRes.json();
+                    heartBtn.classList.toggle('active', !!isLiked);
                 } else {
-                    await handleReviewError(response, "관심 도서 등록/해제에 실패했습니다.");
+                    heartBtn.classList.toggle('active');
                 }
-            } catch (e) {
-                console.error(e);
-                alert("서버와 통신 중 오류가 발생했습니다.");
+            } else {
+                await handleReviewError(response, "관심 도서 처리에 실패했습니다.");
             }
-        });
-    }
+        } catch (e) {
+            console.error(e);
+            alert("서버와 통신 중 오류가 발생했습니다.");
+        }
+    });
 });
+
 
 
 // ===================================================================================//
@@ -330,6 +371,18 @@ async function submitReview(bookId) {
             body: formData
         });
 
+        if (!response.ok) {
+            const error = await response.json().catch(() => null);
+
+            if (response.status === 403 && error?.code === "R003") {
+                alert("해당 책을 구매한 분만 리뷰를 작성할 수 있습니다.");
+                return;
+            }
+
+            alert(error?.message ?? "리뷰 등록에 실패했습니다.");
+            return;
+        }
+
         if (response.redirected) {
             if (confirm("로그인이 필요한 서비스입니다. 로그인 페이지로 이동하시겠습니까?")) {
                 location.href = "/member/login";
@@ -337,10 +390,6 @@ async function submitReview(bookId) {
             return null;
         }
 
-        if (!response.ok) {
-            await handleReviewError(response, "리뷰 등록에 실패했습니다.");
-            return;
-        }
 
         alert("리뷰가 성공적으로 등록되었습니다!");
         location.reload();
@@ -530,3 +579,78 @@ async function submitUpdateReview(reviewId, bookId) {
         alert("네트워크 오류가 발생했습니다.");
     }
 }
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const tags = document.querySelectorAll(".book-tag");
+
+    tags.forEach(tag => {
+        tag.addEventListener("click", function (e) {
+            e.preventDefault(); // 혹시 모를 이동 방지
+
+            // 선택 토글
+            tag.classList.toggle("active");
+        });
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    const categoryId = document.getElementById("bookCategoryId").value;
+    const breadcrumbContainer = document.querySelector("#breadcrumb-container");
+    const titleSpan = breadcrumbContainer.querySelector("span:last-child"); // 책 제목 span
+
+    // 백엔드 CategoryMapper 규칙을 프론트에 정의
+    const categoryMap = {
+        // 소분류 ID : { 이름, 부모이름, 부모ID }
+        8:  { name: "소설/시/희곡", parent: "소설/문학", parentId: 1 },
+        9:  { name: "경제/경영",   parent: "경제/경영", parentId: 2 },
+        10: { name: "IT/컴퓨터",   parent: "IT/모바일", parentId: 3 },
+        11: { name: "인문/사회",   parent: "인문/사회", parentId: 4 },
+        12: { name: "유아/만화",   parent: "유아/아동", parentId: 5 },
+        13: { name: "수험서/자격증", parent: "수험서",    parentId: 6 },
+        14: { name: "과학/공학",   parent: "자연/과학", parentId: 7 }
+    };
+
+    if (categoryId && categoryMap[categoryId]) {
+        const info = categoryMap[categoryId];
+
+        // 1. 대분류 링크 생성
+        const parentLink = document.createElement("a");
+        parentLink.href = `/search?searchType=CATEGORY&categoryId=${info.parentId}`; // 대분류 검색(필요시)
+        parentLink.textContent = info.parent;
+        parentLink.style.marginLeft = "8px";
+
+        // 2. 소분류 링크 생성
+        const childLink = document.createElement("a");
+        childLink.href = `/search?searchType=CATEGORY&categoryId=${categoryId}&categoryName=${info.name}`;
+        childLink.textContent = info.name;
+        childLink.style.marginLeft = "8px";
+
+        // 3. 구분자 생성
+        const sep1 = document.createElement("span");
+        sep1.className = "separator";
+        sep1.textContent = "›";
+        sep1.style.margin = "0 8px";
+
+        const sep2 = document.createElement("span");
+        sep2.className = "separator";
+        sep2.textContent = "›";
+        sep2.style.margin = "0 8px";
+
+        // 4. DOM 삽입 (홈 > 대분류 > 소분류 > 책제목)
+        // 기존 '홈' 뒤에 삽입하기 위해 책제목 앞에 삽입
+        breadcrumbContainer.insertBefore(sep1, titleSpan); // 홈 >
+        breadcrumbContainer.insertBefore(parentLink, titleSpan); // 홈 > 대분류
+        breadcrumbContainer.insertBefore(sep2, titleSpan); // 홈 > 대분류 >
+        breadcrumbContainer.insertBefore(childLink, titleSpan); // 홈 > 대분류 > 소분류
+
+        // 책 제목 앞의 마지막 구분자 추가
+        const sepFinal = document.createElement("span");
+        sepFinal.className = "separator";
+        sepFinal.textContent = "›";
+        sepFinal.style.margin = "0 8px";
+        breadcrumbContainer.insertBefore(sepFinal, titleSpan);
+    }
+});
+
+

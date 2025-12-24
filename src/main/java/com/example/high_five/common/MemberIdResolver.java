@@ -22,7 +22,6 @@ public class MemberIdResolver {
 
         Map<String, Object> claims = JwtPayloadParser.parseClaims(token);
 
-        // 팀마다 키 이름이 다를 수 있어서 안전하게 여러 후보를 확인
         Object v = firstNonNull(
                 claims.get("memberId"),
                 claims.get("member_id"),

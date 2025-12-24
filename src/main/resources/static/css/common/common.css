@@ -61,8 +61,8 @@ img {
 .container {
     width: 100%;
     max-width: var(--container);
-    margin: 0 auto;
-    padding: 10px 20px;
+    margin: 1rem auto;
+    padding: 10px;
 }
 
 /* main이 없거나, 내용이 absolute로 빠져도 footer를 바닥으로 밀기 위한 안전장치 */

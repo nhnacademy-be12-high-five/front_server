@@ -47,15 +47,50 @@ function updateTotal() {
 
     let deliveryFee = productTotal >= freeDeliveryThreshold ? 0 : standardDeliveryFee;
 
-    const couponDiscount =
-        parseInt($('#couponSelect option:selected').data('discount')) || 0;
+    let couponDiscount = 0;
+    const $couponOption = $('#couponSelect option:selected');
+// 선택된 쿠폰이 있을 경우만 계산
+    if ($couponOption.val()) {
+        const discountType = $couponOption.data('type'); // AMOUNT or PERCENTAGE
+        const discountValue = parseInt($couponOption.data('discount')) || 0;
+        const minPrice = parseInt($couponOption.data('min-price')) || 0;
 
+        // 3-1. 최소 주문 금액 조건 확인
+        if (productTotal < minPrice) {
+            alert("이 쿠폰은 상품 금액이 " + minPrice.toLocaleString() + "원 이상일 때만 사용할 수 있습니다.");
+            $('#couponSelect').val("").trigger('change'); // 선택 초기화 및 재계산
+            return; // 함수 종료 (재귀 호출됨)
+        }
+
+        // 3-2. 할인 타입에 따른 계산
+        if (discountType === 'PERCENTAGE') {
+            // 정률 할인 (예: 10%) -> 소수점 버림 처리
+            couponDiscount = Math.floor(productTotal * (discountValue / 100));
+        } else {
+            // 정액 할인 (예: 1000원)
+            couponDiscount = discountValue;
+        }
+
+        // 3-3. 할인이 상품 금액을 초과하지 않도록 방어
+        if (couponDiscount > productTotal) {
+            couponDiscount = productTotal;
+        }
+    }
+
+    // 4. 포인트 사용량 검증
     let usedPoint = parseInt($('#usedPoint').val()) || 0;
 
-    if (usedPoint > maxPoint) {
-        alert('보유 포인트를 초과할 수 없습니다.');
-        usedPoint = maxPoint;
-        $('#usedPoint').val(maxPoint);
+    // (선택 사항) 포인트 사용 한도: 결제 금액보다 많이 쓸 수 없음
+    const maxUseablePoint = productTotal + deliveryFee + wrappingFee - couponDiscount;
+    const realMaxPoint = Math.min(maxPoint, maxUseablePoint);
+
+    if (usedPoint > realMaxPoint) {
+        // 단순히 보유 포인트(maxPoint)만 체크하는 게 아니라, 결제할 금액보다 더 입력했는지도 체크하면 좋음
+        if(usedPoint > maxPoint) alert('보유 포인트를 초과할 수 없습니다.');
+        else alert('결제 금액을 초과하여 포인트를 사용할 수 없습니다.');
+
+        usedPoint = realMaxPoint;
+        $('#usedPoint').val(usedPoint);
     }
 
     const totalDiscount = couponDiscount + usedPoint;

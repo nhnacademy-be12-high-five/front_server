@@ -1,6 +1,7 @@
 package com.example.high_five.controller.order;
 
 import com.example.high_five.dto.coupon.MemberCouponResponseDto;
+import com.example.high_five.dto.order.GuestOrderDetailResponse;
 import com.example.high_five.dto.order.OrderCheckoutRequest;
 import com.example.high_five.dto.order.OrderResponse;
 import com.example.high_five.dto.payment.PaymentConfirmRequest;
@@ -190,4 +191,22 @@ public class OrderController {
         }
     }
 
+    @PostMapping("/guest")
+    public String getGuestOrder(@RequestParam Long orderId,
+                                @RequestParam String password,
+                                Model model) {
+        try {
+            GuestOrderDetailResponse orderResponse = frontOrderService.getGuestOrder(orderId, password);
+
+            model.addAttribute("order", orderResponse);
+
+            // [수정] 비회원 전용 HTML로 이동
+            return "order/guest-order-detail";
+
+        } catch (Exception e) {
+            log.warn("비회원 주문 조회 실패: {}", e.getMessage());
+            model.addAttribute("error", "주문 정보가 일치하지 않거나 존재하지 않습니다.");
+            return "member/login";
+        }
+    }
 }

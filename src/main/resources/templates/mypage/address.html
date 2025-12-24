@@ -1,40 +1,64 @@
-
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Booktown - 마이페이지</title>
-  <link rel="stylesheet" href="/css/member-css/mypage.css">
-  <link rel="stylesheet" href="/css/member-css/myinfo.css">
-  <link rel="stylesheet" href="/css/common/common.css">
-  <link rel="stylesheet" href="/css/common/header.css">
-  <link rel="stylesheet" href="/css/common/footer.css">
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Highfive - 배송지 관리</title>
 
-  <style>
-    .container2 { display: flex; gap: 30px; max-width: 1200px; margin: 50px auto; }
+    <link rel="stylesheet" href="/css/member-css/mypage.css">
+    <link rel="stylesheet" href="/css/member-css/myinfo.css">
+    <link rel="stylesheet" href="/css/common/common.css">
+    <link rel="stylesheet" href="/css/common/header.css">
+    <link rel="stylesheet" href="/css/common/footer.css">
 
-    .tab-btn { cursor: pointer; } /* 탭 버튼 커서 변경 */
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
-    /* 배송지 테이블 스타일 (기존 코드 유지) */
-    .address-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-    .address-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    .address-table th, .address-table td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
-    .address-table th { background-color: #f9f9f9; text-align: center; }
-    .badge-default { background-color: #e7f3ff; color: #007bff; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-right: 5px; }
+    <style>
+        /* 레이아웃 관련 스타일 제거됨 (mypage.css 따름) */
 
-    /* 모달 스타일 */
-    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
-    .modal-content { background-color: #fff; margin: 10% auto; padding: 30px; border-radius: 10px; width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-    .close { float: right; font-size: 24px; cursor: pointer; }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-    .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-    .zipcode-box { display: flex; gap: 10px; }
-    .btn-zipcode { width: 30%; background: #666; color: white; border: none; cursor: pointer; border-radius: 4px; }
-    .btn-submit { width: 100%; background-color: #333; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px; }
-    .btn-add { background-color: #333; color: white; padding: 8px 15px; border-radius: 4px; border: none; cursor: pointer; }
-  </style>
+        .address-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        /* 테이블 스타일 */
+        .address-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        .address-table th { background-color: #f8f9fa; text-align: center; font-weight: bold; padding: 12px; border-bottom: 2px solid #ddd; }
+        .address-table td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
+
+        /* [등록 버튼] 검은 배경 + 흰 글씨 */
+        .btn-add { background-color: #333; color: white; padding: 8px 15px; border-radius: 4px; border: none; cursor: pointer; font-size: 13px; }
+        .btn-add:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        /* [수정/삭제 버튼] 흰 배경 + 검은 글씨 + 테두리 */
+        .btn-edit, .btn-delete {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            background-color: white;
+            color: #333 !important; /* ★중요★ 글자색 검정으로 강제 지정 */
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 4px;
+        }
+        .btn-edit:hover, .btn-delete:hover { background-color: #f1f1f1; }
+
+        /* 모달 스타일 */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: #fff; margin: 10% auto; padding: 30px; border-radius: 10px; width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .close { float: right; font-size: 24px; cursor: pointer; }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .zipcode-box { display: flex; gap: 10px; }
+        .btn-zipcode { width: 30%; background: #666; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        .btn-submit { width: 100%; background-color: #333; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+    </style>
 </head>
 
 <body>
@@ -42,108 +66,150 @@
 <div th:replace="~{layout/header :: header}"></div>
 
 <div class="container2">
-  <nav class="box">
-    <a href="/mypage" class="tab-btn">내 정보</a>
-    <a href="/mypage/address" class="tab-btn active">배송지</a>
-    <a href="/mypage/coupons" class="tab-btn">쿠폰</a>
-    <a href="/mypage/points" class="tab-btn">포인트</a>
-    <a href="/mypage/orders" class="tab-btn">주문내역</a>
-    <a href="/mypage/reviews" class="tab-btn">리뷰</a>
-    <a href="/mypage/likes" class="tab-btn">찜 목록</a>
-  </nav>
+    <nav class="box">
+        <a href="/mypage" class="tab-btn">내 정보</a>
+        <a href="/mypage/address" class="tab-btn active">배송지</a>
+        <a href="/mypage/coupons" class="tab-btn">쿠폰</a>
+        <a href="/mypage/points" class="tab-btn">포인트</a>
+        <a href="/mypage/orders" class="tab-btn">주문내역</a>
+        <a href="/mypage/reviews" class="tab-btn">리뷰</a>
+        <a href="/mypage/likes" class="tab-btn">찜 목록</a>
+    </nav>
 
-  <section id="section-address" class="tab-content">
-    <div class="address-header">
-      <h2>배송지 관리 (<span th:text="${#lists.size(addressList)}">0</span>/10)</h2>
-      <button type="button" class="btn-add" onclick="openModal()"
-              th:if="${#lists.size(addressList) < 10}">+ 배송지 추가</button>
-      <button type="button" class="btn-add" disabled
-              th:unless="${#lists.size(addressList) < 10}">추가 불가 (최대 10개)</button>
-    </div>
+    <section class="tab-content active">
 
-    <table class="address-table">
-      <thead>
-      <tr>
-        <th width="15%">배송지명</th>
-        <th width="15%">받는분</th>
-        <th>주소</th>
-        <th width="15%">연락처</th>
-        <th width="15%">관리</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr th:each="addr : ${addressList}">
-        <td style="text-align: center;">
-          <span th:if="${addr.isDefault}" class="badge-default">기본</span>
-          <span th:text="${addr.alias}">집</span>
-        </td>
-        <td style="text-align: center;" th:text="${addr.recipient}">홍길동</td>
-        <td>(<span th:text="${addr.zipCode}"></span>) <span th:text="${addr.roadAddress}"></span> <span th:text="${addr.detailAddress}"></span></td>
-        <td style="text-align: center;" th:text="${addr.phone}"></td>
-        <td style="text-align: center;">
-          <button type="button">수정</button>
-          <button type="button">삭제</button>
-        </td>
-      </tr>
-      <tr th:if="${#lists.isEmpty(addressList)}">
-        <td colspan="5" style="text-align: center; padding: 50px;">등록된 배송지가 없습니다.</td>
-      </tr>
-      </tbody>
-    </table>
-  </section>
+        <div class="address-header">
+            <h2 style="font-size: 20px; font-weight: bold; margin: 0;">
+                배송지 관리 (<span th:text="${addresses == null ? 0 : #lists.size(addresses)}">0</span>/10)
+            </h2>
+
+            <button type="button" class="btn-add" onclick="openModal()"
+                    th:if="${addresses == null or #lists.size(addresses) < 10}">
+                + 배송지 추가
+            </button>
+            <button type="button" class="btn-add" disabled
+                    th:if="${addresses != null and #lists.size(addresses) >= 10}">
+                추가 불가
+            </button>
+        </div>
+
+        <table class="address-table">
+            <colgroup>
+                <col width="15%" />
+                <col width="15%" />
+                <col width="*" />
+                <col width="18%" />
+                <col width="15%" />
+            </colgroup>
+            <thead>
+            <tr>
+                <th>별칭</th>
+                <th>받는 분</th>
+                <th>주소</th>
+                <th>연락처</th>
+                <th>관리</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="addr : ${addresses}">
+                <td style="text-align: center; font-weight: bold;" th:text="${addr.alias}">집</td>
+                <td style="text-align: center;" th:text="${addr.recipient}">홍길동</td>
+                <td>
+                    <div style="font-size:12px; color:#666; margin-bottom:2px;" th:text="'[' + ${addr.zipCode} + ']'">[12345]</div>
+                    <span th:text="${addr.roadAddress}">서울시...</span>
+                    <span th:text="${addr.detailAddress}" style="color:#555;">101호</span>
+                    <span th:if="${addr.isDefault}" style="color:#007bff; font-size:11px; border:1px solid #007bff; padding:1px 4px; border-radius:3px; margin-left:5px;">기본</span>
+                </td>
+                <td style="text-align: center;" th:text="${addr.phone}">010-1234-5678</td>
+                <td style="text-align: center;">
+                    <button type="button" class="btn-edit"
+                            th:onclick="|location.href='@{/mypage/address/{id}/update(id=${addr.addressId})}'|">수정</button>
+                    <form th:action="@{/mypage/address/{id}/delete(id=${addr.addressId})}" method="post" style="display:inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                        <button type="submit" class="btn-delete">삭제</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${addresses == null or #lists.isEmpty(addresses)}">
+                <td colspan="5" style="text-align: center; padding: 60px 0; color: #999;">
+                    등록된 배송지가 없습니다.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
 </div>
 
 <div id="addressModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal()">&times;</span>
-    <h3 style="margin-top: 0;">배송지 추가</h3>
-    <form action="/mypage/address/add" method="post">
-      <div class="form-group"><label>별칭</label><input type="text" name="alias" required></div>
-      <div class="form-group"><label>받는 분</label><input type="text" name="recipient" required></div>
-      <div class="form-group"><label>연락처</label><input type="text" name="phone" required></div>
-      <div class="form-group">
-        <label>주소</label>
-        <div class="zipcode-box">
-          <input type="text" id="zipCode" name="zipCode" readonly required>
-          <button type="button" class="btn-zipcode" onclick="execDaumPostcode()">검색</button>
-        </div>
-      </div>
-      <div class="form-group"><input type="text" id="roadAddress" name="roadAddress" readonly required></div>
-      <div class="form-group"><input type="text" id="detailAddress" name="detailAddress" placeholder="상세주소"></div>
-      <div class="form-group"><label><input type="checkbox" name="isDefault"> 기본 배송지 설정</label></div>
-      <button type="submit" class="btn-submit">저장하기</button>
-    </form>
-  </div>
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3 style="margin-top: 0; margin-bottom: 20px;">배송지 추가</h3>
+
+        <form action="/mypage/address/register" method="post">
+            <div class="form-group"><label>별칭</label><input type="text" name="alias" placeholder="예: 우리집, 회사" required></div>
+            <div class="form-group"><label>받는 분</label><input type="text" name="recipient" required></div>
+            <div class="form-group"><label>연락처</label>
+                <input type="text" name="phone" oninput="autoHyphen(this)" maxlength="13" required>
+            </div>
+            <div class="form-group">
+                <label>주소</label>
+                <div class="zipcode-box">
+                    <input type="text" id="zipCode" name="zipCode" readonly required placeholder="우편번호">
+                    <button type="button" class="btn-zipcode" onclick="execDaumPostcode()">검색</button>
+                </div>
+            </div>
+            <input type="text" id="roadAddress" name="roadAddress" readonly required placeholder="도로명 주소" style="margin-bottom:10px;">
+            <div class="form-group"><input type="text" id="detailAddress" name="detailAddress" placeholder="상세주소"></div>
+
+            <div class="form-group" style="display:flex; align-items:center; gap:5px;">
+                <input type="checkbox" id="chkDefault" name="defaultAddress" value="true"
+                       th:checked="${address != null && address.isDefault}" style="width:auto;">
+
+                <input type="hidden" name="_defaultAddress" value="on"/>
+
+                <label for="chkDefault" style="margin:0; cursor:pointer;">기본 배송지로 설정</label>
+            </div>
+
+            <button type="submit" class="btn-submit">저장하기</button>
+        </form>
+    </div>
 </div>
 
 <div th:replace="~{layout/footer :: footer}"></div>
 
 <script>
+    function openModal() { document.getElementById('addressModal').style.display = 'block'; }
+    function closeModal() { document.getElementById('addressModal').style.display = 'none'; }
 
-
-  // --- [2] 내 정보 수정 모드 토글 ---
-  function toggleEditMode(isEdit) {
-    const viewMode = document.getElementById('view-mode');
-    const editForm = document.getElementById('edit-form');
-    if (isEdit) {
-      viewMode.style.display = 'none';
-      editForm.style.display = 'block';
-    } else {
-      viewMode.style.display = 'block';
-      editForm.style.display = 'none';
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('addressModal')) {
+            closeModal();
+        }
     }
-  }
 
-  // --- [3] 모달 및 주소 API ---
-  function openModal() { document.getElementById('addressModal').style.display = 'block'; }
-  function closeModal() { document.getElementById('addressModal').style.display = 'none'; }
-
-  // 모달 외부 클릭 시 닫기
-  window.onclick = function(event) {
-    if (event.target == document.getElementById('addressModal')) {
-      closeModal();
+    function execDaumPostcode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                document.getElementById('zipCode').value = data.zonecode;
+                document.getElementById("roadAddress").value = data.roadAddress;
+                document.getElementById("detailAddress").focus();
+            }
+        }).open();
     }
-  }
+
+    const autoHyphen = (target) => {
+        target.value = target.value
+            .replace(/[^0-9]/g, '')
+            .substring(0, 11)
+            .replace(/^(\d{0,3})(\d{0,4})(\d{0,4})$/g, "$1-$2-$3")
+            .replace(/(\-{1,2})$/g, "");
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorMsg = urlParams.get('error');
+    if (errorMsg) {
+        alert(errorMsg);
+        history.replaceState(null, "", location.pathname);
+    }
 </script>
 
 </body>

@@ -6,9 +6,12 @@ import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.coupon.MemberCouponResponseDto;
 import com.example.high_five.dto.member.response.MemberResponse;
 import com.example.high_five.dto.order.DeliveryPolicyResponse;
+import com.example.high_five.dto.order.GuestOrderDetailResponse;
 import com.example.high_five.dto.order.MyOrderResponse;
 import com.example.high_five.dto.order.OrderCheckoutRequest;
+import com.example.high_five.dto.order.OrderGuestLoginRequest;
 import com.example.high_five.dto.order.OrderResponse;
+import com.example.high_five.dto.order.OrderReturnRequest;
 import com.example.high_five.dto.point.PointBalanceResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -132,7 +135,7 @@ public class FrontOrderService {
                     items.add(OrderResponse.OrderItem.builder()
                             .bookId(bookId)
                             .title(bookInfo.title())
-                            .imageUrl(bookInfo.image())
+                            .imageUrl(bookInfo.imageUrl())
                             .price(price)
                             .quantity(qty)
                             .totalPrice(itemTotal)
@@ -226,6 +229,16 @@ public class FrontOrderService {
             log.error("주문 내역 조회 실패 UserID={}: {}", userId, e.getMessage());
             return new CommonPageResponse<>();
         }
+    }
+    public GuestOrderDetailResponse getGuestOrder(Long orderId, String password) {
+
+        OrderGuestLoginRequest request = new OrderGuestLoginRequest(orderId, password);
+
+        return orderClient.getGuestOrder(request).getBody();
+    }
+    // 반품 신청
+    public void requestReturn(Long orderId, OrderReturnRequest request) {
+        orderClient.requestReturn(orderId, request);
     }
 
     private record MemberInfoResult(MemberResponse member, Integer point, List<MemberCouponResponseDto> coupons) {}

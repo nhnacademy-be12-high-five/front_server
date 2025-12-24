@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Highfive 관리자 - 주문 관리</title>
+
+    <link rel="stylesheet" href="/css/admin-css/admin-common.css">
+    <link rel="stylesheet" href="/css/admin-css/admin-point.css">
+    <link rel="stylesheet" href="/css/admin-css/admin-order.css">
+
+    <style>
+        /* =========================================
+           1. 전체 레이아웃
+           ========================================= */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .full-screen-container {
+            display: flex;
+            width: 100%;          /* 🔥 100vw → 100% */
+            height: 100vh;
+        }
+
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #f5f7fa;
+        }
+
+        main {
+            width: 100%;
+        }
+
+        .card {
+            width: 100%;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-sizing: border-box;
+        }
+
+        /* =========================================
+           2. 검색 영역
+           ========================================= */
+        .search-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .status-select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+
+        /* =========================================
+           3. 테이블
+           ========================================= */
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            table-layout: auto;  /* 🔥 fixed → auto */
+        }
+
+        .order-table th,
+        .order-table td {
+            padding: 12px 10px;
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        /* 상품명 왼쪽 정렬 */
+        .order-table th:nth-child(3),
+        .order-table td:nth-child(3) {
+            text-align: left;
+            padding-left: 20px;
+        }
+
+        /* 금액 오른쪽 정렬 */
+        .order-table th:nth-child(4),
+        .order-table td:nth-child(4) {
+            text-align: right;
+            padding-right: 20px;
+        }
+
+        .order-table tbody tr:hover {
+            background-color: #f1f3f5;
+        }
+
+        /* =========================================
+           4. 상태 배지 & 입력
+           ========================================= */
+        .badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .badge.PAYMENT_WAITING { background-color: #f0ad4e; }
+        .badge.PREPARING { background-color: #17a2b8; }
+        .badge.DELIVERING { background-color: #007bff; }
+        .badge.DELIVERY_COMPLETED { background-color: #28a745; }
+        .badge.PURCHASE_CONFIRMED { background-color: #20c997; }
+        .badge.CANCELED { background-color: #dc3545; }
+        .badge.RETURN_REQUESTED { background-color: #fd7e14; }
+        .badge.RETURN_COMPLETED { background-color: #6c757d; }
+
+        .status-change-select,
+        input[type="text"] {
+            width: 90%;
+            padding: 6px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            background-color: #0d6efd;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .action-btn:hover {
+            background-color: #0b5ed7;
+        }
+
+        /* =========================================
+           5. 페이지네이션
+           ========================================= */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            gap: 10px;
+        }
+
+        .pagination a {
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .pagination a:hover {
+            background-color: #e9ecef;
+        }
+
+        .pagination span {
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+<div class="full-screen-container">
+    <aside class="sidebar">
+        <h2>HIGHFIVE 관리자</h2>
+        <ul class="menu">
+            <li><a href="/admin/books">도서 관리</a></li>
+            <li><a href="/admin/points">포인트 관리</a></li>
+            <li><a href="/admin/orders" class="active">주문 관리</a></li>
+            <li><a href="/admin/coupons/page">쿠폰 관리</a></li>
+            <li><a href="/admin/coupons/specific-book-coupons">특정 도서 쿠폰 관리</a></li>
+            <li><a href="/admin/payments/stats">매출 통계</a></li>
+            <li><a href="/admin/payments">결제 수단 관리</a></li>
+        </ul>
+    </aside>
+
+    <div class="content-area">
+        <header><h1>📦 주문 상태 관리</h1></header>
+
+        <main>
+            <div class="search-container">
+                <form action="/admin/orders" method="get">
+                    <select name="status" class="status-select" onchange="this.form.submit()">
+                        <option value="">전체 주문 보기</option>
+                        <option value="PAYMENT_WAITING">결제 대기</option>
+                        <option value="PREPARING">배송 준비중</option>
+                        <option value="DELIVERING">배송 중</option>
+                        <option value="DELIVERY_COMPLETED">배송 완료</option>
+                        <option value="PURCHASE_CONFIRMED">구매 확정</option>
+                        <option value="CANCELED">취소됨</option>
+                        <option value="RETURN_REQUESTED">반품 요청</option>
+                        <option value="RETURN_COMPLETED">반품 완료</option>
+                    </select>
+                </form>
+            </div>
+
+            <div class="card">
+                <table class="order-table">
+                    <thead>
+                    <tr>
+                        <th>주문번호</th>
+                        <th>주문자</th>
+                        <th>주문 상품</th>
+                        <th>결제금액</th>
+                        <th>주문일시</th>
+                        <th>현재 상태</th>
+                        <th>상태 변경</th>
+                        <th>송장번호</th>
+                        <th>관리</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${orders.isEmpty()}">
+                        <td colspan="9" style="padding:40px; text-align:center;">
+                            주문 내역이 존재하지 않습니다.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="/js/admin/admin-order.js"></script>
+</body>
+</html>

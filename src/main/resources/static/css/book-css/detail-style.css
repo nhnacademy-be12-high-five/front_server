@@ -186,8 +186,8 @@ input {
 .container2 {
     width: 100%;
     max-width: 1100px;
-    margin: 10px;
-    padding: 10px 20px;
+    margin: 100px;
+    /*padding: 10px 20px;*/
 }
 
 #header {
@@ -316,9 +316,10 @@ input {
 .container2 {
     max-width: 1000px; /* 상세페이지는 조금 더 넓게 */
     margin: 100px auto;
-    padding: 30px;
+    padding: 50px;
     flex-grow: 1; /* 메인 콘텐츠 영역이 남은 공간을 채우도록 */
 }
+
 
 /* 상세 정보 섹션 */
 .book-detail-main {
@@ -883,7 +884,7 @@ input {
 
 /* 찜하기 완료 상태 (빨간 하트) - 클래스명 'active'가 붙으면 빨개짐 */
 .btn-heart.active {
-    color: #ff4d4d; /* 빨간색 */
+    color: #e74c3c; /* 빨간색 */
 }
 
 .tag-section {
@@ -1332,6 +1333,25 @@ textarea {
     border-color: #007bff !important;
 }
 
+/* 기본 태그 */
+.book-tag {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s ease;
+}
+
+/* 클릭(선택) 상태 */
+.book-tag.active {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+/* 눌리는 느낌 */
+.book-tag:active {
+    transform: scale(0.95);
+}
+
 @media screen and (max-width: 600px) {
     .review-item {
         padding: 15px;
@@ -1341,4 +1361,3 @@ textarea {
         height: 80px;
     }
 }
-

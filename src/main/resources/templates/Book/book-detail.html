@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -11,26 +12,20 @@
     <link rel="stylesheet" href="/css/common/common.css">
 </head>
 
-<script src="/js/book-detail.js"></script>
-<script src="/js/common.js"></script>
-
 <body>
 
 <div th:replace="~{layout/header :: header}"></div>
 
 <main id="container">
     <div class="container2">
-        <div class="breadcrumb">
-            <span>홈</span>
-            <span>도서 상세</span>
-            <span th:utext="${book.title}">도서 제목</span>
-        </div>
+<!--        <div class="breadcrumb">-->
+<!--        </div>-->
 
         <section class="book-detail">
             <div class="book-detail-main">
                 <div class="book-image">
-                    <img th:if="${book.image != null}" th:src="${book.image}" alt="도서 표지"/>
-                    <div th:if="${book.image == null}" class="no-cover">도서 이미지</div>
+                    <img th:if="${book.imageUrl != null}" th:src="${book.imageUrl}" alt="도서 표지"/>
+                    <div th:if="${book.imageUrl == null}" class="no-cover">도서 이미지</div>
                 </div>
 
                 <div class="book-info">
@@ -38,9 +33,22 @@
                     <p class="author-publisher">
                         <span th:text="${book.author}">저자</span>
                         <span th:if="${book.publisher != null}" th:text="' · ' + ${book.publisher}">· 출판사</span>
-                        <span th:if="${book.publishedDate != null}" th:text="' · ' + ${book.publishedDate}">· 발행일</span>
+                        <span th:if="${book.pubDate != null}" th:text="' · ' + ${book.pubDate}">· 발행일</span>
                         <span th:if="${book.isbn != null}" th:text="' · ISBN ' + ${book.isbn}">· ISBN</span>
                     </p>
+
+                    <a href="/">홈</a>
+
+                    <th:block th:if="${book.categories != null}" th:each="cat : ${book.categories}">
+                        <span class="separator">›</span>
+                        <a th:href="@{/search(
+                    searchType='CATEGORY',
+                    categoryId=${cat.categoryId},
+                    categoryName=${cat.categoryName},
+                    sort='POPULAR'
+                 )}"
+                           th:text="${cat.categoryName}">카테고리명</a>
+                    </th:block>
 
                     <div class="price-section" th:if="${book.price != null}">
                         <div class="original-price">
@@ -57,13 +65,14 @@
                         </div>
                     </div>
 
-                    <div class="tag-section" th:if="${book.tags != null and !book.tags.isEmpty()}">
+                    <div class="tag-section"
+                         th:with="fixedTags=${T(java.util.List).of('읽을예정','선물후보','재구매검토','추천하고싶음')}">
                         <div class="tag-list">
-                            <a th:href="@{/search(keyword=${tag.name})}"
-                               class="book-tag"
-                               th:each="tag, stat : ${book.tags}"
-                               th:if="${stat.index < 5}">
-                                #<span th:text="${tag.name}">태그명</span>
+                            <a th:each="t : ${fixedTags}"
+                               href="javascript:void(0)"
+                               role="button"
+                               class="book-tag">
+                                #<span th:text="${t}">태그명</span>
                             </a>
                         </div>
                     </div>
@@ -102,9 +111,12 @@
                                 th:classappend="${isLiked} ? 'active' : ''"
                                 aria-label="관심도서"
                                 id="heart"
-                                th:data-book-id="${book.bookId}">
+                                th:data-book-id="${book.bookId}"
+                                th:data-member-id="${currentUser != null ? currentUser.memberId : ''}">
                             &#9829;
                         </button>
+
+
                         <button type="button" class="btn-primary" id="add-to-cart-btn" th:data-book-id="${book.bookId}">
                             장바구니 담기
                         </button>
@@ -114,26 +126,15 @@
                         </a>
                     </div>
 
-                    <div class="tag-section" th:if="${book.tags != null and !book.tags.isEmpty()}">
-                        <div class="tag-list">
-                            <a th:href="@{/search(keyword=${tag})}"
-                               class="book-tag"
-                               th:each="tag, stat : ${book.tags}"
-                               th:if="${stat.index < 5}">
-                                #<span th:text="${tag}">태그명</span>
-                            </a>
-                        </div>
-                    </div>
-
                     <table class="summary-table">
                         <tbody>
                         <tr th:if="${book.publisher != null}">
                             <th>출판사</th>
                             <td th:text="${book.publisher}"></td>
                         </tr>
-                        <tr th:if="${book.publishedDate != null}">
+                        <tr th:if="${book.pubDate != null}">
                             <th>발행일</th>
-                            <td th:text="${book.publishedDate}"></td>
+                            <td th:text="${book.pubDate}"></td>
                         </tr>
                         <tr th:if="${book.isbn != null}">
                             <th>ISBN</th>
@@ -205,6 +206,9 @@
 </main>
 
 <div th:replace="~{layout/footer :: footer}"></div>
+
+<script src="/js/book-detail.js"></script>
+<script src="/js/common.js"></script>
 
 </body>
 </html>
