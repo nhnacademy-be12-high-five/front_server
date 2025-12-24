@@ -1,5 +1,6 @@
 package com.example.high_five.dto.order;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,12 +17,11 @@ public class GuestOrderDetailResponse {
     // 1. 주문 기본 정보
     private Long orderId;
     private String orderNumber;    // 주문번호
-    private LocalDate orderDate;   // 주문일자
+    private LocalDateTime orderDate;   // 주문일자
     private String statusName;     // 주문상태 (한글)
 
-    // 2. 배송지 정보 (MyOrderResponse에는 이게 없음)
     private String receiverName;
-    private String receiverPhone;
+   // private String receiverPhone; 넣으려면 주문서버 엔티티부터 추가해야함
     private String address;
     private String addressDetail;
     private String deliveryRequest;
