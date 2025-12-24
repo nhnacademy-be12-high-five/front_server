@@ -58,15 +58,13 @@ public interface BookClient {
     // 좋아요 토글
     @PostMapping("/api/books/{bookId}/likes")
     ResponseEntity<Boolean> toggleLike(
-            @PathVariable("bookId") Long bookId,
-            @RequestHeader("X-USER-ID") Long memberId
+            @PathVariable("bookId") Long bookId
     );
 
     // 좋아요 상태 조회
     @GetMapping("/api/books/{bookId}/likes/status")
     ResponseEntity<Boolean> getLikeStatus(
-            @PathVariable("bookId") Long bookId,
-            @RequestHeader("X-USER-ID") Long memberId
+            @PathVariable("bookId") Long bookId
     );
 
     // [관리자] 도서 전체 조회
