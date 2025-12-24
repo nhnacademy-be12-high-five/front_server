@@ -125,26 +125,29 @@ public class OrderController {
 
     @GetMapping("/success")
     public String paymentSuccess(@RequestParam String paymentKey,
-                                 @RequestParam String orderId,
+                                 @RequestParam("orderId") String orderKey,
                                  @RequestParam Long amount,
                                  Model model) {
-        log.info("결제 승인 요청: orderId={}, amount={}", orderId, amount);
+        log.info("결제 승인 요청: orderKey={}, amount={}", orderKey, amount);
         try {
             PaymentConfirmRequest confirmRequest = PaymentConfirmRequest.builder()
                     .paymentKey(paymentKey)
-                    .orderKey(orderId)
+                    .orderKey(orderKey)
                     .amount(amount)
                     .paymentMethod("TOSS")
                     .build();
+
             PaymentConfirmResponse response = paymentService.confirmPayment(confirmRequest);
 
-            model.addAttribute("orderNumber", response.getPaymentId());
+            model.addAttribute("orderId", response.getOrderId());
+
+            // 기존 코드 유지
             model.addAttribute("totalPrice", response.getAmount());
             model.addAttribute("payMethodName", "Toss Payments");
             model.addAttribute("orderDateTime", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-            model.addAttribute("orderId", orderId);
 
             return "order/payment-success";
+
         } catch (FeignException e) {
             log.error("결제 승인 실패 (Feign): status={}, body={}", e.status(), e.contentUTF8());
             model.addAttribute("code", "PAYMENT_CONFIRM_ERROR");
@@ -196,11 +199,10 @@ public class OrderController {
                                 @RequestParam String password,
                                 Model model) {
         try {
-            // [수정] 반환 타입을 OrderResponse로 변경하여 서비스 결과와 일치시킴
-            OrderResponse orderResponse = frontOrderService.getGuestOrder(orderId, password);
+            GuestOrderDetailResponse guestOrderDetailResponse = frontOrderService.getGuestOrder(orderId, password);
 
             // 뷰(HTML)에서 ${order.id}, ${order.orderName} 등으로 접근 가능
-            model.addAttribute("order", orderResponse);
+            model.addAttribute("order", guestOrderDetailResponse);
 
             // 비회원 전용 상세 페이지로 이동
             return "order/guest-order-detail";

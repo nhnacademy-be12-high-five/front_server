@@ -15,4 +15,6 @@ public class PaymentConfirmResponse {
     private PaymentStatus status;
 
     private Long amount;
+
+    private Long orderId;
 }

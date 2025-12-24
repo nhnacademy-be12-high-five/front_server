@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MyOrderResponse {
 
-    private Long orderId;
+    private Long id;
     private LocalDateTime orderDate;
     private String status;
-    private Integer totalAmount;
+    private Integer totalPrice;
     private List<MyOrderItemResponse> items;
 
     @Getter

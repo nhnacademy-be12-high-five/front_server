@@ -64,5 +64,5 @@ public interface OrderClient {
     // 10. [추가] 비회원 주문 조회
     // 백엔드의 @PostMapping("/guests/search")와 매핑됩니다.
     @PostMapping("/api/orders/guests/search")
-    OrderResponse getGuestOrder(@RequestBody OrderGuestLoginRequest request);
+    GuestOrderDetailResponse getGuestOrder(@RequestBody OrderGuestLoginRequest request);
 }
