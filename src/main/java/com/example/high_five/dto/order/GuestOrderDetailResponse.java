@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -25,6 +24,7 @@ public class GuestOrderDetailResponse {
     private String address;
     private String addressDetail;
     private String deliveryRequest;
+    private Long wrappingFee;
 
     // 3. 결제 금액 정보
     private Long totalAmount;      // 상품 총액
