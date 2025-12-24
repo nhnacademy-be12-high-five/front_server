@@ -122,7 +122,7 @@
 
                         <td>
                             <select th:id="'status-' + ${order.id}" class="status-change-select"
-                                    th:disabled="${order.status == 'CANCELED' or order.status == 'PURCHASE_CONFIRMED'}">
+                                    th:disabled="${order.status == 'CANCELED'}">
                                 <option value="PAYMENT_WAITING" th:selected="${order.status == 'PAYMENT_WAITING'}">결제 대기</option>
                                 <option value="PREPARING" th:selected="${order.status == 'PREPARING'}">배송 준비중</option>
                                 <option value="DELIVERING" th:selected="${order.status == 'DELIVERING'}">배송 중</option>
@@ -141,7 +141,7 @@
 
                         <td>
                             <button type="button" class="action-btn"
-                                    th:if="${order.status != 'CANCELED' and order.status != 'PURCHASE_CONFIRMED'}"
+                                    th:if="${order.status != 'CANCELED'}"
                                     th:onclick="'updateStatus(' + ${order.id} + ')'">
                                 저장
                             </button>
