@@ -104,10 +104,10 @@
                                 th:classappend="${isLiked} ? 'active' : ''"
                                 aria-label="관심도서"
                                 id="heart"
-                                th:data-book-id="${book.bookId}"
-                                th:data-member-id="${currentUser != null ? currentUser.memberId : ''}">
+                                th:data-book-id="${book.bookId}">
                             &#9829;
                         </button>
+
 
 
                         <button type="button" class="btn-primary" id="add-to-cart-btn" th:data-book-id="${book.bookId}">

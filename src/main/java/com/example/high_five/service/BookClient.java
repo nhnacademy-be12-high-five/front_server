@@ -58,15 +58,13 @@ public interface BookClient {
     // 좋아요 토글
     @PostMapping("/api/books/{bookId}/likes")
     ResponseEntity<Boolean> toggleLike(
-            @PathVariable("bookId") Long bookId,
-            @RequestHeader("X-USER-ID") Long memberId
+            @PathVariable("bookId") Long bookId
     );
 
     // 좋아요 상태 조회
     @GetMapping("/api/books/{bookId}/likes/status")
     ResponseEntity<Boolean> getLikeStatus(
-            @PathVariable("bookId") Long bookId,
-            @RequestHeader("X-USER-ID") Long memberId
+            @PathVariable("bookId") Long bookId
     );
 
     // [관리자] 도서 전체 조회
@@ -89,5 +87,10 @@ public interface BookClient {
 //                    @RequestHeader("X-User-Id") Long userId);
     @GetMapping("/api/categories/{categoryId}/books")
     List<BookResponse> getBooksByCategory(@PathVariable("categoryId") int categoryId);
+
+    // [마이페이지] 내가 좋아요 누른 도서 목록 조회
+    @GetMapping("/api/books/my-page/likes")
+    List<BookResponse> getMyLikedBooks();
+
 
 }

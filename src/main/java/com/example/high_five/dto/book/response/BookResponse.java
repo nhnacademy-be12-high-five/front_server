@@ -31,5 +31,6 @@ public record BookResponse(
     public record CategoryResponse(
             Integer categoryId,
             String categoryName
-    ) {}
+    ) {
+    }
 }
