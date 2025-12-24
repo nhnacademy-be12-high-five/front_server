@@ -11,16 +11,17 @@
     margin: 0;
 }
 
-.box{
-    margin: 100px;
-}
-
-
 .logo .brand {
     font-size: 21px;
     font-weight: 900;
     color: black;
     margin-top: 5px;
+}
+
+.container2 {
+    max-width: 700px !important;
+    margin: 120px auto 50px !important;
+    display: block !important;
 }
 
 .container2 nav {
