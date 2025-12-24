@@ -100,6 +100,10 @@
                                 <span>상품금액</span>
                                 <span th:text="${#numbers.formatInteger(order.totalAmount, 0, 'COMMA')} + '원'">0원</span>
                             </div>
+                            <div class="pay-row" th:if="${order.wrappingFee > 0}">
+                                <span>포장비</span>
+                                <span th:text="'+ ' + ${#numbers.formatInteger(order.wrappingFee, 0, 'COMMA')} + '원'">+ 1,000원</span>
+                            </div>
                             <div class="pay-row">
                                 <span>배송비</span>
                                 <span th:text="'+ ' + ${#numbers.formatInteger(order.deliveryFee, 0, 'COMMA')} + '원'">0원</span>

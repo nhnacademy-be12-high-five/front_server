@@ -77,7 +77,7 @@ public class BookController {
         boolean isLiked = false;
         if (loginMemberId != null) {
             try {
-                ResponseEntity<Boolean> likeResponse = bookClient.getLikeStatus(id, loginMemberId);
+                ResponseEntity<Boolean> likeResponse = bookClient.getLikeStatus(id);
                 if (likeResponse != null && likeResponse.getBody() != null) {
                     isLiked = likeResponse.getBody();
                 }

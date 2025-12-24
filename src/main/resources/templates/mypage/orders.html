@@ -43,7 +43,7 @@
                 <div>
                     <span th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}">2024-01-01</span>
                     <span style="margin-left: 10px; font-size: 12px; color: #888;"
-                          th:text="'(주문번호: ' + ${order.orderId} + ')'"></span>
+                          th:text="'(주문번호: ' + ${order.id} + ')'"></span>
                 </div>
                 <div>
                 <span class="status-badge"
@@ -81,38 +81,27 @@
             <div class="order-footer">
                 <div style="text-align: right; margin-bottom: 12px; font-weight: 600;">
                     총 결제금액: <span style="color: #d6336c; font-size: 1.1em;"
-                                  th:text="${#numbers.formatInteger(order.totalAmount, 0, 'COMMA')}">30,000</span>원
+                                  th:text="${#numbers.formatInteger(order.totalPrice, 0, 'COMMA')}">30,000</span>원
                 </div>
 
                 <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
 
                     <button th:if="${order.status.toString() == 'PREPARING'}"
-                            th:onclick="'cancelOrder(' + ${order.orderId} + ')'"
+                            th:onclick="'cancelOrder(' + ${order.id} + ')'"
                             class="btn-action btn-cancel">
                         주문 취소
                     </button>
-
-                    <!-- 구매 확정 버튼 -->
-                    <button th:if="${order.status.toString() != 'PURCHASE_CONFIRMED'
-               and order.status.toString() != 'CANCELED'
-               and order.status.toString() != 'RETURN_REQUESTED'
-               and order.status.toString() != 'RETURN_COMPLETED'
-               and order.status.toString() == 'PURCHASE_CONFIRMED'}"
-                            th:onclick="'confirmPurchase(' + ${order.orderId} + ')'"
+                    <button th:if="${order.status.toString() == 'PREPARING'
+              or order.status.toString() == 'DELIVERING'
+              or order.status.toString() == 'DELIVERY_COMPLETED'}"
+                            th:onclick="'confirmPurchase(' + ${order.id} + ')'"
                             class="btn-action btn-confirm">
                         구매 확정
                     </button>
 
-                    <!-- 이미 구매 확정된 경우 버튼 비활성화
-                    <button th:if="${order.status.toString() == 'PURCHASE_CONFIRMED'}"
-                            disabled
-                            class="btn-action btn-confirm disabled">
-                        구매 확정
-                    </button>-->
-
                     <button th:if="${order.status.toString() == 'DELIVERY_COMPLETED' or order.status.toString() == 'DELIVERING'
                      or order.status.toString() == 'PURCHASE_CONFIRMED'}"
-                            th:onclick="'openReturnModal(' + ${order.orderId} + ')'"
+                            th:onclick="'openReturnModal(' + ${order.id} + ')'"
                             class="btn-action btn-return">
                         반품 신청
                     </button>

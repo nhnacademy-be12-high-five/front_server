@@ -74,7 +74,7 @@ public class FrontOrderService {
         }
 
         MemberResponse member = null;
-        Integer myPoint = 0;
+        int myPoint = 0;
         List<MemberCouponResponseDto> coupons = new ArrayList<>();
 
         try {
@@ -99,7 +99,8 @@ public class FrontOrderService {
                     Map<String, Object> couponPageMap = couponService.getMemberCoupons(token, 0, 100);
                     if (couponPageMap != null && couponPageMap.containsKey("content")) {
                         Object content = couponPageMap.get("content");
-                        coupons = objectMapper.convertValue(content, new TypeReference<List<MemberCouponResponseDto>>() {});
+                        coupons = objectMapper.convertValue(content, new TypeReference<>() {
+                        });
                     }
                 } catch (Exception e) {
                     log.warn("쿠폰 조회 실패: {}", e.getMessage());
@@ -222,7 +223,7 @@ public class FrontOrderService {
         }
     }
 
-    public OrderResponse getGuestOrder(Long orderId, String password) {
+    public GuestOrderDetailResponse getGuestOrder(Long orderId, String password) {
         // 타입 변환 없이 바로 생성자에 전달 (Long, String)
         OrderGuestLoginRequest request = new OrderGuestLoginRequest(orderId, password);
 
