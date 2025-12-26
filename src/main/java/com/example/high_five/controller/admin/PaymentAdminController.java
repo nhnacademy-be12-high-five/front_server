@@ -1,5 +1,6 @@
 package com.example.high_five.controller.admin;
 
+import com.example.high_five.common.annotation.LoginRequired;
 import com.example.high_five.dto.payment.DailySalesResponse;
 import com.example.high_five.dto.payment.MethodStatusRequest;
 import com.example.high_five.dto.payment.PaymentMethodResponse;
@@ -28,6 +29,7 @@ public class PaymentAdminController {
     private final PaymentService paymentClient;
 
     @GetMapping
+    @LoginRequired(adminOnly = true)
     public String getPaymentMethods(Model model) {
         try {
             List<PaymentMethodResponse> methods = paymentClient.getAllMethods();
@@ -54,6 +56,7 @@ public class PaymentAdminController {
     }
 
     @GetMapping("/stats")
+    @LoginRequired(adminOnly = true)
     public String paymentStatsPage(
             @RequestParam(required = false) LocalDate startDate,
             @RequestParam(required = false) LocalDate endDate,

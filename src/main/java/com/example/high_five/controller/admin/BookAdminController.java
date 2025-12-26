@@ -18,7 +18,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Controller
@@ -29,7 +28,7 @@ public class BookAdminController {
     private final BookFeignClient bookFeignClient;
 
     @GetMapping
-    @LoginRequired
+    @LoginRequired(adminOnly = true)
     public String bookPage(Model model) {
         return "admin/books";
     }

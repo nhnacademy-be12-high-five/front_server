@@ -1,5 +1,6 @@
 package com.example.high_five.controller.admin;
 
+import com.example.high_five.common.annotation.LoginRequired;
 import com.example.high_five.dto.point.PointAdminAdjustmentRequest;
 import com.example.high_five.dto.point.PointAdminPolicyRequest;
 import com.example.high_five.dto.point.PointAdminPolicyResponse;
@@ -25,6 +26,7 @@ public class PointAdminController {
     private final MemberService memberService;
 
     @GetMapping("/policy")
+    @LoginRequired(adminOnly = true)
     public String getPointPage(Model model) {
         try {
             PointAdminPolicyResponse policy = memberService.getPolicy().getBody();
