@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HIGH-FIVE BOOKS | 도서 검색 결과</title>
-
+    <link rel="icon" href="/img/favicon.png">
     <link rel="stylesheet" href="/css/book-css/list.css">
     <link rel="stylesheet" href="/css/common/common.css">
     <link rel="stylesheet" href="/css/common/header.css">
@@ -203,35 +203,6 @@
                     </a>
                 </div>
 
-                <!-- AI 검색일 때 -->
-                <div class="sort-options"
-                     th:if="${searchType == 'AI'}">
-                    <a th:href="@{/rag-search(keyword=${keyword}, sort='POPULAR', page=0, searchType='AI')}"
-                       th:classappend="${sort} == 'POPULAR' ? ' active' : ''">
-                        인기순
-                    </a>
-                    <a th:href="@{/rag-search(keyword=${keyword}, sort='NEW', page=0, searchType='AI')}"
-                       th:classappend="${sort} == 'NEW' ? ' active' : ''">
-                        신간순
-                    </a>
-                    <a th:href="@{/rag-search(keyword=${keyword}, sort='LOW_PRICE', page=0, searchType='AI')}"
-                       th:classappend="${sort} == 'LOW_PRICE' ? ' active' : ''">
-                        가격 낮은순
-                    </a>
-                    <a th:href="@{/rag-search(keyword=${keyword}, sort='HIGH_PRICE', page=0, searchType='AI')}"
-                       th:classappend="${sort} == 'HIGH_PRICE' ? ' active' : ''">
-                        가격 높은순
-                    </a>
-                    <a th:href="@{/rag-search(keyword=${keyword}, sort='RATING', page=0, searchType='AI')}"
-                       th:classappend="${sort} == 'RATING' ? ' active' : ''">
-                        평점순
-                    </a>
-                    <a th:href="@{/rag-search(keyword=${keyword}, sort='REVIEW', page=0, searchType='AI')}"
-                       th:classappend="${sort} == 'REVIEW' ? ' active' : ''">
-                        리뷰순
-                    </a>
-                </div>
-
                 <!-- 일반/AI 결과 탭: 카테고리 모드일 때는 숨김 -->
                 <div class="view-options"
                      th:if="${keyword != null}">
@@ -262,10 +233,10 @@
 
                         <!-- 왼쪽: 도서 이미지 -->
                         <div class="book-cover">
-                            <img th:if="${book.image != null}"
-                                 th:src="${book.image}"
+                            <img th:if="${book.imageUrl != null}"
+                                 th:src="${book.imageUrl}"
                                  alt="도서 표지" />
-                            <span th:if="${book.image == null}">도서 표지</span>
+                            <span th:if="${book.imageUrl == null}">도서 표지</span>
                         </div>
 
                         <!-- 오른쪽: 텍스트 + AI 설명 -->
@@ -342,7 +313,7 @@
 
             <!-- =================== 페이지네이션 =================== -->
             <div class="pagination"
-                 th:if="${pageInfo != null and pageInfo.totalPages > 1}">
+                 th:if="${searchType != 'AI' and pageInfo != null and pageInfo.totalPages > 1}">
                 <!-- 이전 버튼 -->
                 <a class="page-link prev"
                    th:if="${page > 0}"
