@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "book-service", contextId = "bookClient", url = "${gateway.uri}")
+@FeignClient(name = "gateway-server", contextId = "bookClient", url = "${gateway.uri}")
 public interface BookClient {
 
     // 1. 도서 상세 조회
@@ -28,13 +28,10 @@ public interface BookClient {
 
     // 3. AI 검색 (RAG 리스트)
     @GetMapping("/api/search/rag-search")
-    PagedResponse<BookResponse> ragSearch(
-            @RequestParam("keyword") String keyword,
-            @RequestParam("page") int page,
-            @RequestParam("size") int size
+    List<BookResponse> ragSearch(
+            @RequestParam("keyword") String keyword
     );
 
-    // 4. AI 답변 (RAG 요약)
     @GetMapping("/api/search/rag-answer")
     String ragAnswer(@RequestParam("keyword") String keyword);
 
