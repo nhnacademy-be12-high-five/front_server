@@ -104,13 +104,6 @@ public class AuthRestController {
     @PostMapping("/dormant/verify")
     public ResponseEntity<String> verifyAndActivate(@RequestBody DormantRequest request) {
         try {
-            EmailVerifyRequest verifyReq = new EmailVerifyRequest(
-                    request.getEmail(),
-                    request.getAuthCode(),
-                    "ACTIVATE"
-            );
-            authService.verifyEmail(verifyReq);
-
             memberService.activateDormant(request);
 
             return ResponseEntity.ok("휴면 상태가 해제되었습니다.");
