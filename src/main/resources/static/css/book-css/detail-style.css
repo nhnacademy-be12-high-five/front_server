@@ -1351,6 +1351,18 @@ textarea {
     transform: scale(0.95);
 }
 
+/* 탭 클릭 시 섹션이 "딱 위로 붙어" 보이도록 오프셋 */
+.detail-tab-content{
+    scroll-margin-top: 140px; /* 헤더+탭바 높이에 맞게 조정 */
+}
+
+.detail-tab-content:target h2,
+.detail-tab-content:target h3{
+    transition: background-color .2s ease;
+    background: rgba(0, 123, 255, 0.08);
+}
+
+
 
 @media screen and (max-width: 600px) {
     .review-item {
