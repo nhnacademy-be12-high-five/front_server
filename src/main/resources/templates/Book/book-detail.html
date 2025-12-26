@@ -57,13 +57,15 @@
                         </div>
                     </div>
 
-                    <div class="tag-section" th:if="${book.tags != null and !book.tags.isEmpty()}">
+
+                    <div class="tag-section"
+                         th:with="fixedTags=${T(java.util.List).of('읽을예정','선물후보','재구매검토','추천하고싶음')}">
                         <div class="tag-list">
-                            <a th:href="@{/search(keyword=${tag.name})}"
-                               class="book-tag"
-                               th:each="tag, stat : ${book.tags}"
-                               th:if="${stat.index < 5}">
-                                #<span th:text="${tag.name}">태그명</span>
+                            <a th:each="t : ${fixedTags}"
+                               href="javascript:void(0)"
+                               role="button"
+                               class="book-tag">
+                                #<span th:text="${t}">태그명</span>
                             </a>
                         </div>
                     </div>
@@ -105,6 +107,9 @@
                                 th:data-book-id="${book.bookId}">
                             &#9829;
                         </button>
+
+
+
                         <button type="button" class="btn-primary" id="add-to-cart-btn" th:data-book-id="${book.bookId}">
                             장바구니 담기
                         </button>
@@ -114,16 +119,7 @@
                         </a>
                     </div>
 
-                    <div class="tag-section" th:if="${book.tags != null and !book.tags.isEmpty()}">
-                        <div class="tag-list">
-                            <a th:href="@{/search(keyword=${tag})}"
-                               class="book-tag"
-                               th:each="tag, stat : ${book.tags}"
-                               th:if="${stat.index < 5}">
-                                #<span th:text="${tag}">태그명</span>
-                            </a>
-                        </div>
-                    </div>
+
 
                     <table class="summary-table">
                         <tbody>

@@ -27,8 +27,8 @@
 
             <div class="order-meta">
                 <div class="order-meta-row">
-                    <strong>결제 번호</strong>
-                    <span th:text="${orderNumber}">ORD-001</span>
+                    <strong>주문 번호</strong>
+                    <span th:text="${orderId}">001</span>
                 </div>
                 <div class="order-meta-row">
                     <strong>결제 금액</strong>
@@ -50,8 +50,7 @@
 
             <div class="order-actions">
                 <!--<a class="btn primary" th:href="@{/orders/{id}(id=${orderId})}">주문 상세보기</a> -->
-                <a class="btn primary" href="/mypage/orders">주문 상세보기</a>
-                <a class="btn ghost" href="/">쇼핑 계속하기</a>
+                <a class="btn ghost" href="/">홈으로 돌아가기</a>
             </div>
         </section>
     </div>

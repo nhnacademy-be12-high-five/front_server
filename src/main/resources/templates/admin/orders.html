@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Highfive 관리자 - 주문 관리</title>
+
+    <link rel="stylesheet" href="/css/admin-css/admin-common.css">
+    <link rel="stylesheet" href="/css/admin-css/admin-point.css">
+    <link rel="stylesheet" href="/css/admin-css/admin-order.css">
+
+    <style>
+        /* 화면 꽉 채우기 스타일 */
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
+        .full-screen-container { display: flex; width: 100%; height: 100vh; }
+        .content-area { flex: 1; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; background-color: #f5f7fa; }
+        main { width: 100%; }
+        .card { width: 100%; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); box-sizing: border-box; }
+
+        /* 검색 영역 */
+        .search-container { display: flex; justify-content: flex-end; margin-bottom: 20px; padding: 15px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .status-select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; min-width: 150px; }
+
+        /* 테이블 스타일 */
+        .order-table { width: 100%; border-collapse: collapse; font-size: 14px; table-layout: fixed; }
+        .order-table th, .order-table td { padding: 12px 10px; text-align: center; vertical-align: middle; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid #eee; }
+        .order-table th { background-color: #f8f9fa; font-weight: 600; color: #495057; border-bottom: 2px solid #dee2e6; }
+
+        /* 정렬 */
+        .order-table th:nth-child(3), .order-table td:nth-child(3) { text-align: left; padding-left: 20px; }
+        .order-table th:nth-child(4), .order-table td:nth-child(4) { text-align: right; padding-right: 20px; }
+
+        /* 배지 및 입력창 */
+        .badge { display: inline-block; padding: 6px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; color: #fff; }
+        .badge.PAYMENT_WAITING { background-color: #f0ad4e; }
+        .badge.PREPARING { background-color: #17a2b8; }
+        .badge.DELIVERING { background-color: #007bff; }
+        .badge.DELIVERY_COMPLETED { background-color: #28a745; }
+        .badge.PURCHASE_CONFIRMED { background-color: #20c997; }
+        .badge.CANCELED { background-color: #dc3545; }
+        .badge.RETURN_REQUESTED { background-color: #fd7e14; }
+        .badge.RETURN_COMPLETED { background-color: #6c757d; }
+
+        .status-change-select, input[type="text"] { width: 90%; padding: 6px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px; box-sizing: border-box; }
+        .action-btn { padding: 6px 12px; background-color: #0d6efd; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
+        .action-btn:hover { background-color: #0b5ed7; }
+
+        /* 페이지네이션 */
+        .pagination { display: flex; justify-content: center; align-items: center; margin-top: 30px; gap: 10px; }
+        .pagination a { padding: 8px 12px; border: 1px solid #dee2e6; border-radius: 4px; text-decoration: none; color: #007bff; }
+        .pagination a:hover { background-color: #e9ecef; }
+        .pagination a.disabled { pointer-events: none; color: #adb5bd; background-color: #f8f9fa; }
+    </style>
+</head>
+
+<body>
+<div class="full-screen-container">
+    <aside class="sidebar">
+        <h2>HIGHFIVE 관리자</h2>
+        <ul class="menu">
+            <li><a href="/admin/books">도서 관리</a></li>
+            <li><a href="/admin/points">포인트 관리</a></li>
+            <li><a href="/admin/orders" class="active">주문 관리</a></li>
+            <li><a href="/admin/coupons/page">쿠폰 관리</a></li>
+            <li><a href="/admin/coupons/specific-book-coupons">특정 도서 쿠폰 관리</a></li>
+            <li><a href="/admin/payments/stats">매출 통계</a></li>
+            <li><a href="/admin/payments">결제 수단 관리</a></li>
+        </ul>
+    </aside>
+
+    <div class="content-area">
+        <header><h1>📦 주문 상태 관리</h1></header>
+
+        <main>
+            <div class="search-container">
+                <form action="/admin/orders" method="get">
+                    <select name="status" class="status-select" onchange="this.form.submit()">
+                        <option value="">전체 주문 보기</option>
+                        <option value="PAYMENT_WAITING" th:selected="${selectedStatus == 'PAYMENT_WAITING'}">결제 대기</option>
+                        <option value="PREPARING" th:selected="${selectedStatus == 'PREPARING'}">배송 준비중</option>
+                        <option value="DELIVERING" th:selected="${selectedStatus == 'DELIVERING'}">배송 중</option>
+                        <option value="DELIVERY_COMPLETED" th:selected="${selectedStatus == 'DELIVERY_COMPLETED'}">배송 완료</option>
+                        <option value="PURCHASE_CONFIRMED" th:selected="${selectedStatus == 'PURCHASE_CONFIRMED'}">구매 확정</option>
+                        <option value="CANCELED" th:selected="${selectedStatus == 'CANCELED'}">취소됨</option>
+                        <option value="RETURN_REQUESTED" th:selected="${selectedStatus == 'RETURN_REQUESTED'}">반품 요청</option>
+                        <option value="RETURN_COMPLETED" th:selected="${selectedStatus == 'RETURN_COMPLETED'}">반품 완료</option>
+                    </select>
+                </form>
+            </div>
+
+            <div class="card">
+                <table class="order-table">
+                    <thead>
+                    <tr>
+                        <th style="width: 8%">주문번호</th>
+                        <th style="width: 10%">주문자</th>
+                        <th style="width: 25%">주문 상품</th>
+                        <th style="width: 10%">결제금액</th>
+                        <th style="width: 12%">주문일시</th>
+                        <th style="width: 8%">현재 상태</th>
+                        <th style="width: 10%">상태 변경</th>
+                        <th style="width: 10%">송장번호</th>
+                        <th style="width: 7%">관리</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="order : ${orders}">
+                        <td th:text="${order.id}">1001</td>
+
+                        <td th:text="${order.userId != null ? order.userId : '비회원'}">user1</td>
+
+                        <td th:text="${order.orderName}" style="text-align: left; padding-left: 20px;">책 제목 외 1건</td>
+
+                        <td th:text="${#numbers.formatInteger(order.totalPrice, 0, 'COMMA') + '원'}" style="text-align: right; padding-right: 20px;">15,000원</td>
+
+                        <td th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}">2023-12-25</td>
+
+                        <td>
+                            <span class="badge" th:classappend="${order.status}" th:text="${order.status}">WAITING</span>
+                        </td>
+
+                        <td>
+                            <select th:id="'status-' + ${order.id}" class="status-change-select"
+                                    th:disabled="${order.status == 'CANCELED'}">
+                                <option value="PAYMENT_WAITING" th:selected="${order.status == 'PAYMENT_WAITING'}">결제 대기</option>
+                                <option value="PREPARING" th:selected="${order.status == 'PREPARING'}">배송 준비중</option>
+                                <option value="DELIVERING" th:selected="${order.status == 'DELIVERING'}">배송 중</option>
+                                <option value="DELIVERY_COMPLETED" th:selected="${order.status == 'DELIVERY_COMPLETED'}">배송 완료</option>
+                                <option value="CANCELED" th:selected="${order.status == 'CANCELED'}">주문 취소</option>
+                                <option value="RETURN_COMPLETED" th:selected="${order.status == 'RETURN_COMPLETED'}">반품 처리완료</option>
+                            </select>
+                        </td>
+
+                        <td>
+                            <input type="text" th:id="'tracking-' + ${order.id}"
+                                   placeholder="송장번호"
+                                   th:value="${order.trackingNumber}"
+                                   th:disabled="${order.status == 'CANCELED'}">
+                        </td>
+
+                        <td>
+                            <button type="button" class="action-btn"
+                                    th:if="${order.status != 'CANCELED'}"
+                                    th:onclick="'updateStatus(' + ${order.id} + ')'">
+                                저장
+                            </button>
+                            <span th:if="${order.status == 'CANCELED'}" style="color: #aaa; font-size: 0.8rem;">취소됨</span>
+                        </td>
+                    </tr>
+
+                    <tr th:if="${orders == null or orders.isEmpty()}">
+                        <td colspan="9" style="padding:40px; text-align:center; color: #888;">
+                            주문 내역이 존재하지 않습니다.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div class="pagination" th:if="${pageInfo != null and pageInfo.totalPages > 0}">
+                    <a th:href="@{/admin/orders(page=${pageInfo.pageNumber - 1}, status=${selectedStatus})}"
+                       th:classappend="${pageInfo.pageNumber == 0} ? 'disabled'">&laquo; 이전</a>
+
+                    <span th:text="${pageInfo.pageNumber + 1} + ' / ' + ${pageInfo.totalPages}">1 / 5</span>
+
+                    <a th:href="@{/admin/orders(page=${pageInfo.pageNumber + 1}, status=${selectedStatus})}"
+                       th:classappend="${pageInfo.pageNumber == pageInfo.totalPages - 1} ? 'disabled'">다음 &raquo;</a>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="/js/admin/admin-order.js"></script>
+</body>
+</html>

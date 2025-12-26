@@ -43,13 +43,12 @@
                 <div>
                     <span th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}">2024-01-01</span>
                     <span style="margin-left: 10px; font-size: 12px; color: #888;"
-                          th:text="'(주문번호: ' + ${order.orderId} + ')'"></span>
+                          th:text="'(주문번호: ' + ${order.id} + ')'"></span>
                 </div>
                 <div>
                 <span class="status-badge"
                       th:classappend="'status-' + ${order.status}"
                       th:switch="${order.status}">
-                    <span th:case="'PAYMENT_WAITING'">결제 대기</span>
                     <span th:case="'PREPARING'">배송 준비 중</span>
                     <span th:case="'DELIVERING'">배송 중</span>
                     <span th:case="'DELIVERY_COMPLETED'">배송 완료</span>
@@ -82,60 +81,82 @@
             <div class="order-footer">
                 <div style="text-align: right; margin-bottom: 12px; font-weight: 600;">
                     총 결제금액: <span style="color: #d6336c; font-size: 1.1em;"
-                                  th:text="${#numbers.formatInteger(order.totalAmount, 0, 'COMMA')}">30,000</span>원
+                                  th:text="${#numbers.formatInteger(order.totalPrice, 0, 'COMMA')}">30,000</span>원
                 </div>
 
                 <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
 
-                    <button th:if="${order.status.toString() == 'PAYMENT_WAITING' or order.status.toString() == 'PREPARING'}"
-                            th:onclick="'cancelOrder(' + ${order.orderId} + ')'"
+                    <button th:if="${order.status.toString() == 'PREPARING'}"
+                            th:onclick="'cancelOrder(' + ${order.id} + ')'"
                             class="btn-action btn-cancel">
                         주문 취소
                     </button>
-
-                    <!-- 구매 확정 버튼 -->
-                    <button th:if="${order.status.toString() != 'PURCHASE_CONFIRMED'
-               and order.status.toString() != 'CANCELED'
-               and order.status.toString() != 'RETURN_COMPLETED'}"
-                            th:onclick="'confirmPurchase(' + ${order.orderId} + ')'"
+                    <button th:if="${order.status.toString() == 'PREPARING'
+              or order.status.toString() == 'DELIVERING'
+              or order.status.toString() == 'DELIVERY_COMPLETED'}"
+                            th:onclick="'confirmPurchase(' + ${order.id} + ')'"
                             class="btn-action btn-confirm">
                         구매 확정
                     </button>
 
-                    <!-- 이미 구매 확정된 경우 버튼 비활성화 -->
-                    <button th:if="${order.status.toString() == 'PURCHASE_CONFIRMED'}"
-                            disabled
-                            class="btn-action btn-confirm disabled">
-                        구매 확정
-                    </button>
-
-                    </button>
-
-                    <button th:if="${order.status.toString() == 'DELIVERY_COMPLETED'}"
-                            th:onclick="'requestReturn(' + ${order.orderId} + ')'"
+                    <button th:if="${order.status.toString() == 'DELIVERY_COMPLETED' or order.status.toString() == 'DELIVERING'
+                     or order.status.toString() == 'PURCHASE_CONFIRMED'}"
+                            th:onclick="'openReturnModal(' + ${order.id} + ')'"
                             class="btn-action btn-return">
                         반품 신청
                     </button>
 
-                    <span th:if="${order.status.toString() == 'CANCELED'}"
-                          style="font-size: 13px; color: #adb5bd; font-weight: bold; text-decoration: line-through;">
-            취소된 주문
-        </span>
-                    <span th:if="${order.status.toString() == 'RETURN_REQUESTED'}"
-                          style="font-size: 13px; color: #fd7e14; font-weight: bold;">
-            반품 처리 중
-        </span>
-                    <span th:if="${order.status.toString() == 'RETURN_COMPLETED'}"
-                          style="font-size: 13px; color: #fa5252; font-weight: bold;">
-            반품 완료
-        </span>
-
                 </div>
             </div>
 
-            <div class="pagination" th:if="${page.totalPages > 1}">
+            <div id="returnModal" class="modal-overlay">
+                <div class="modal-content">
+                    <h3 class="modal-title">반품 신청</h3>
+                    <input type="hidden" id="modalOrderId">
+
+                    <div class="form-group">
+                        <label for="returnReason">반품 사유</label>
+                        <select id="returnReason" class="form-control" onchange="checkReturnFee()">
+                            <option value="">사유를 선택하세요</option>
+                            <option value="SIMPLE_CHANGE">단순 변심 (반품비 5,000원 차감)</option>
+                            <option value="PRODUCT_DEFECT">상품 불량 (무료)</option>
+                            <option value="DELIVERY_DELAY">배송 지연 (무료)</option>
+                            <option value="WRONG_DELIVERY">오배송 (무료)</option>
+                        </select>
+                        <div id="feeWarning" class="warning-text">
+                            * 단순 변심의 경우 환불 금액에서 배송비 5,000원이 차감됩니다.
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="returnDesc">상세 사유</label>
+                        <textarea id="returnDesc" class="form-control" placeholder="상세 사유를 입력해주세요."></textarea>
+                    </div>
+
+                    <div class="modal-buttons">
+                        <button type="button" class="btn-action" style="background:#ccc;" onclick="closeReturnModal()">취소</button>
+                        <button type="button" class="btn-action btn-confirm" onclick="submitReturnRequest()">신청하기</button>
+                    </div>
+                </div>
             </div>
         </div>
+
+            <div class="pagination" th:if="${page.totalPages > 0}">
+
+            <a th:if="${currentPage > 0}"
+               th:href="@{/mypage/orders(page=${currentPage - 1})}" class="page-link">&lt;</a>
+
+            <span th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}">
+                    <a th:href="@{/mypage/orders(page=${i})}"
+                       th:text="${i + 1}"
+                       th:classappend="${i == currentPage} ? 'active' : ''"
+                       class="page-link">1</a>
+                </span>
+
+            <a th:if="${currentPage < page.totalPages - 1}"
+               th:href="@{/mypage/orders(page=${currentPage + 1})}" class="page-link">&gt;</a>
+        </div>
+
     </section>
 </div>
 <div th:replace="~{layout/footer :: footer}"></div>

@@ -1,7 +1,9 @@
 package com.example.high_five.controller.order;
 
 import com.example.high_five.dto.coupon.MemberCouponResponseDto;
+import com.example.high_five.dto.order.GuestOrderDetailResponse;
 import com.example.high_five.dto.order.OrderCheckoutRequest;
+import com.example.high_five.dto.order.OrderCreateResponse;
 import com.example.high_five.dto.order.OrderResponse;
 import com.example.high_five.dto.payment.PaymentConfirmRequest;
 import com.example.high_five.dto.payment.PaymentConfirmResponse;
@@ -10,10 +12,10 @@ import com.example.high_five.dto.point.PointBalanceResponse;
 import com.example.high_five.service.CouponService;
 import com.example.high_five.service.FrontOrderService;
 import com.example.high_five.service.MemberService;
-import com.example.high_five.service.OrderClient.OrderCreateResponse;
 import com.example.high_five.service.PaymentService;
 import feign.FeignException;
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -124,26 +126,29 @@ public class OrderController {
 
     @GetMapping("/success")
     public String paymentSuccess(@RequestParam String paymentKey,
-                                 @RequestParam String orderId,
+                                 @RequestParam("orderId") String orderKey,
                                  @RequestParam Long amount,
                                  Model model) {
-        log.info("결제 승인 요청: orderId={}, amount={}", orderId, amount);
+        log.info("결제 승인 요청: orderKey={}, amount={}", orderKey, amount);
         try {
             PaymentConfirmRequest confirmRequest = PaymentConfirmRequest.builder()
                     .paymentKey(paymentKey)
-                    .orderKey(orderId)
+                    .orderKey(orderKey)
                     .amount(amount)
                     .paymentMethod("TOSS")
                     .build();
+
             PaymentConfirmResponse response = paymentService.confirmPayment(confirmRequest);
 
-            model.addAttribute("orderNumber", response.getPaymentId());
+            model.addAttribute("orderId", response.getOrderId());
+
+            // 기존 코드 유지
             model.addAttribute("totalPrice", response.getAmount());
             model.addAttribute("payMethodName", "Toss Payments");
             model.addAttribute("orderDateTime", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-            model.addAttribute("orderId", orderId);
 
             return "order/payment-success";
+
         } catch (FeignException e) {
             log.error("결제 승인 실패 (Feign): status={}, body={}", e.status(), e.contentUTF8());
             model.addAttribute("code", "PAYMENT_CONFIRM_ERROR");
@@ -190,4 +195,39 @@ public class OrderController {
         }
     }
 
+    // [추가] 비회원 로그인 검증용 API (페이지 이동 없음, 확인만 함)
+    @PostMapping("/guest/validate")
+    @ResponseBody // 뷰가 아니라 데이터를 반환
+    public ResponseEntity<?> validateGuestOrder(@RequestBody Map<String, Object> request) {
+        Long orderId = Long.valueOf(request.get("orderId").toString());
+        String password = (String) request.get("password");
+
+        try {
+            // 서비스 호출해서 조회 되는지 확인만 해봄
+            frontOrderService.getGuestOrder(orderId, password);
+
+            // 에러 안 나면 성공
+            return ResponseEntity.ok().body(Map.of("success", true));
+
+        } catch (Exception e) {
+            log.warn("비회원 검증 실패: {}", e.getMessage());
+            // 실패 시 400 에러와 메시지 반환
+            return ResponseEntity.badRequest().body(Map.of("message", "주문 정보가 일치하지 않습니다."));
+        }
+    }
+
+    // [기존 유지] 실제 페이지 이동은 여기서 처리 (HTML 반환)
+    @PostMapping("/guest")
+    public String getGuestOrder(@RequestParam Long orderId,
+                                @RequestParam String password,
+                                Model model) {
+        try {
+            GuestOrderDetailResponse response = frontOrderService.getGuestOrder(orderId, password);
+            model.addAttribute("order", response);
+            return "order/guest-order-detail";
+        } catch (Exception e) {
+            // 혹시라도 여기서 에러나면 로그인 페이지로 (JS 검증 통과했으면 여긴 거의 안 옴)
+            return "redirect:/member/login?error=true";
+        }
+    }
 }

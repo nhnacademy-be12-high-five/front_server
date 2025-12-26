@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>마이페이지 - 찜 목록</title>
+
+    <link rel="stylesheet" href="/css/member-css/mypage.css">
+    <link rel="stylesheet" href="/css/common/common.css">
+    <link rel="stylesheet" href="/css/common/header.css">
+    <link rel="stylesheet" href="/css/common/footer.css">
+
+    <!-- 찜목록 전용 -->
+    <link rel="stylesheet" href="/css/mypage-css/likes.css">
+</head>
+
+<script src="/js/common.js"></script>
+
+<body>
+<div th:replace="~{layout/header :: header}"></div>
+
+<div class="container2">
+    <!-- 리뷰 페이지와 동일한 탭 -->
+    <nav class="box">
+        <a href="/mypage" class="tab-btn">내 정보</a>
+        <a href="/mypage/address" class="tab-btn">배송지</a>
+        <a href="/mypage/coupons" class="tab-btn">쿠폰</a>
+        <a href="/mypage/points" class="tab-btn">포인트</a>
+        <a href="/mypage/orders" class="tab-btn">주문내역</a>
+        <a href="/mypage/reviews" class="tab-btn">리뷰</a>
+        <a href="/mypage/likes" class="tab-btn active">찜 목록</a>
+    </nav>
+
+    <section class="tab-content active" style="display: block;">
+        <div class="like-panel">
+            <div class="like-panel-head">
+                <div class="head-left">
+                    <h2 class="section-title like-title">나의 찜 목록</h2>
+                    <p class="like-desc">관심 도서를 모아보고 빠르게 상세 페이지로 이동할 수 있습니다.</p>
+                </div>
+
+                <div class="head-right">
+                    <span class="like-count"
+                          th:text="|총 ${likedBooks == null ? 0 : #lists.size(likedBooks)}권|">총 0권</span>
+                </div>
+            </div>
+
+            <!-- 본문 영역 -->
+            <div class="like-body">
+
+                <!-- 빈 상태 -->
+                <div class="like-empty"
+                     th:if="${likedBooks == null or #lists.isEmpty(likedBooks)}">
+                    <div class="like-empty-icon">♡</div>
+                    <div class="like-empty-title">아직 찜한 도서가 없습니다.</div>
+                    <div class="like-empty-desc">마음에 드는 책에서 하트를 눌러 찜 목록에 추가해 보세요.</div>
+                    <a class="btn-primary" href="/">도서 보러가기</a>
+                </div>
+
+                <!-- 리스트 -->
+                <div class="like-grid"
+                     th:if="${likedBooks != null and !#lists.isEmpty(likedBooks)}">
+
+                    <article class="like-card" th:each="b : ${likedBooks}">
+                        <a class="thumb" th:href="@{/books/{id}(id=${b.bookId})}">
+                            <img th:src="${b.imageUrl}" alt="표지" onerror="this.src='/img/no-image.png'">
+
+
+                        </a>
+
+                        <div class="info">
+                            <a class="title"
+                               th:href="@{/books/{id}(id=${b.bookId})}"
+                               th:text="${b.title}">
+                                도서 제목
+                            </a>
+
+                            <div class="meta">
+                                <span class="author" th:text="${b.author}">저자</span>
+                                <span class="dot">·</span>
+                                <span class="publisher" th:text="${b.publisher}">출판사</span>
+                            </div>
+
+                            <div class="price-row">
+                                <span class="price" th:text="|${b.price}원|">0원</span>
+                            </div>
+
+                            <div class="actions">
+                                <a class="btn-line"
+                                   th:href="@{/books/{id}(id=${b.bookId})}">상세보기</a>
+
+                                <!-- 선택: 찜 해제 -->
+                                <button type="button"
+                                        class="btn-danger"
+                                        th:attr="data-book-id=${b.bookId}">
+                                    찜 해제
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- (선택) 페이지네이션: 필요하면 리뷰처럼 붙이세요 -->
+        <!--
+        <div class="pagination" th:if="${page != null and page.totalPages > 0}">
+            ...
+        </div>
+        -->
+    </section>
+</div>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<script src="/js/mypage/likes.js"></script>
+</body>
+</html>
