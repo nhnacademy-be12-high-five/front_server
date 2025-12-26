@@ -85,7 +85,7 @@
         }
 
         applyLoginIdUi();
-        resetUi();
+        resetUi(); // 여기서 display: none 실행됨
         dialog.showModal();
     };
 
@@ -116,6 +116,7 @@
             if (res.ok) {
                 alert("인증번호가 발송되었습니다.");
                 if (msg) msg.innerText = "";
+
                 if ($("pwResetArea")) $("pwResetArea").style.display = "block";
             } else {
                 const text = await res.text();

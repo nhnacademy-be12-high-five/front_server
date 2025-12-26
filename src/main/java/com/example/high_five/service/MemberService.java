@@ -39,4 +39,13 @@ public interface MemberService {
 
     @DeleteMapping("/api/members/me/withdraw")
     ResponseEntity<Void> withdrawMember();
+
+    @PostMapping("/api/members/open/dormant/check")
+    ResponseEntity<Boolean> checkDormantMember(@RequestBody DormantRequest request);
+
+    @PostMapping("/api/members/open/dormant/activate")
+    ResponseEntity<Void> activateDormant(@RequestBody DormantRequest request);
+
+    @PostMapping("/api/emails/dormant/send")
+    void sendDormantEmail(@RequestBody EmailRequest request);
 }
