@@ -13,5 +13,6 @@ public class BookRequest {
     private String publishedDate;
     private String description;
     private String image;
-    private List<String> authors;
+    private String author;
+    private Integer categoryId;
 }

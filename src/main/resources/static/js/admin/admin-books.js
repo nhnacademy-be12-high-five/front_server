@@ -64,7 +64,8 @@ async function loadBookDetail(bookId) {
 async function fetchBookInfoByAi() {
     // HTML에 id="aiIsbnInput" 인 input 박스와 검색 버튼이 있다고 가정
     const isbnInput = document.getElementById('aiIsbnInput'); // 혹은 prompt 사용 가능
-    const isbn = isbnInput ? isbnInput.value : prompt("ISBN을 입력하세요:");
+
+    let isbn = isbnInput ? isbnInput.value.trim().replace(/-/g, "") : "";
 
     if (!isbn || !isbn.trim()) {
         alert("ISBN을 입력해주세요.");
@@ -77,7 +78,7 @@ async function fetchBookInfoByAi() {
 
     try {
         // 백엔드 AI 검색 API 호출
-        const response = await fetch(`/admin/books/ai-search?isbn=${encodeURIComponent(isbn)}`);
+        const response = await fetch(`/admin/books/search-api?isbn=${encodeURIComponent(isbn)}`);
 
         if (!response.ok) {
             throw new Error("도서 정보를 찾을 수 없습니다. (Google Books에 없거나 오류 발생)");
@@ -139,6 +140,7 @@ function fillForm(book, isReadOnly) {
     document.getElementById('publisher').value = book.publisher || '';
     document.getElementById('publishedDate').value = book.publishedDate || '';
     document.getElementById('price').value = book.price || 0;
+    document.getElementById('categoryId').value = book.categoryId || "";
 
     // 이미지 처리
     const imageUrl = book.image || '';

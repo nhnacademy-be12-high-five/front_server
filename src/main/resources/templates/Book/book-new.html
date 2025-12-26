@@ -45,14 +45,17 @@
                              th:text="${iterStat.count}">1</div>
 
                         <div class="thumb">
-                            <img th:src="${book.image}" th:alt="${book.title}"
+                            <img th:src="${bookUrl}" th:alt="${book.title}"
                                  style="width: 100%; height: 100%; object-fit: cover;" />
                         </div>
                         <div class="info">
                             <div class="title" th:text="${book.title}">책 제목</div>
                             <div class="meta">
                                 <span th:text="${book.publisher}">출판사</span> ·
-                                <span th:text="${#strings.replace(#strings.substring(book.publishedDate, 0, 7), '-', '.')}">2024.03</span>
+                                <span th:if="${book.pubDate != null and #strings.length(book.pubDate) >= 7}"
+                                      th:text="${#strings.replace(#strings.substring(book.pubDate, 0, 7), '-', '.')}">
+                                    2024.03
+                                </span>
                             </div>
                             <div class="price-row">
                                 <span class="price" th:text="|${#numbers.formatInteger(book.price, 0, 'COMMA')}|">₩15,000</span>

@@ -72,6 +72,6 @@ public class MainController {
     public String getNewBooks(Model model){
         List<BookResponse> newBooks=bookClient.getNewBooks(10);
         model.addAttribute("newBooks",newBooks);
-        return "Book/new";
+        return "Book/book-new";
     }
 }
