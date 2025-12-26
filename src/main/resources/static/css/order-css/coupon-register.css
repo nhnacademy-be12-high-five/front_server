@@ -456,3 +456,27 @@ button{ font-family: inherit; }
         align-items: stretch;
     }
 }
+
+/* =========================
+   Coupon page: 헤더 아래 잘림 방지
+   - 헤더가 fixed/sticky여도 본문이 안 가려지게
+   ========================= */
+
+/* 헤더 높이가 변해도 대응하기 쉽게 변수로 관리 */
+:root{
+    --header-offset: 110px; /* 우선 110px로 시작 (필요시 100~130 사이로 조절) */
+}
+
+/* 쿠폰 본문 컨테이너를 헤더 아래로 확실히 내림 */
+.register-page-container{
+    margin-top: 0 !important;                 /* 기존 56px이 불충분할 수 있어 제거 */
+    padding-top: 34px;                         /* 기존 유지 */
+    /* 헤더 아래 공간 확보 */
+    margin: calc(var(--header-offset) + 24px) auto 56px !important;
+}
+
+/* 혹시 body::before(고정 오버레이)가 클릭/시각에 영향 주면 footer/본문 레이어 확보 */
+.register-page-container{
+    position: relative;
+    z-index: 1;
+}

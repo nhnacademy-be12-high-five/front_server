@@ -494,3 +494,19 @@ main {
     letter-spacing: -0.01em;
     margin: 0;
 }
+
+/* =========================
+   Cart page: 헤더 아래 잘림 방지
+   (쿠폰 페이지와 동일 패턴)
+   ========================= */
+
+/* 헤더 높이 보정값 */
+:root{
+    --header-offset: 110px; /* 필요 시 100~130px 범위에서 조절 */
+}
+
+/* 장바구니 본문을 헤더 아래로 확실히 내림 */
+main.main_con{
+    padding-top: var(--header-offset);
+}
+
