@@ -82,7 +82,7 @@
 
                 <div class="form-row">
                     <label for="author">저자</label>
-                    <input id="author" name="authors" type="text" placeholder="저자 (여러 명일 경우 콤마로 구분)" required />
+                    <input id="author" name="author" type="text" placeholder="저자 (여러 명일 경우 콤마로 구분)" required />
                 </div>
 
                 <div class="form-row">
@@ -100,6 +100,20 @@
                     <input id="price" name="price" type="number" placeholder="가격" />
                 </div>
 
+                <div class="form-row2">
+                    <label for="categoryId" class="Category">카테고리</label>
+                    <select id="categoryId" name="categoryId" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 10px;">
+                        <option value="">카테고리 선택 (필수)</option>
+                        <option value="8">소설/시/희곡</option>
+                        <option value="9">경제/경영</option>
+                        <option value="10">IT/모바일</option>
+                        <option value="11">인문/사회</option>
+                        <option value="12">유아/아동</option>
+                        <option value="13">수험서/자격증</option>
+                        <option value="14">자연/과학</option>
+                    </select>
+                </div>
+
                 <div class="form-row">
                     <label for="image">이미지 URL</label>
                     <input id="image" name="image" type="text" placeholder="이미지 URL" onchange="previewImage(this.value)" />
@@ -108,8 +122,8 @@
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <label for="description">설명</label>
+                <div class="form-row2">
+                    <label for="description" class="des">설명</label>
                     <textarea id="description" name="description" placeholder="도서 설명" rows="5"
                               style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 10px;"></textarea>
                 </div>
