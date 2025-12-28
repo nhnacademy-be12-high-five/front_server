@@ -68,7 +68,7 @@ public class OrderController {
         }
 
         try {
-            List<MemberCouponResponseDto> coupons = couponService.getUsableCoupons(userId);
+            List<MemberCouponResponseDto> coupons = couponService.getUsableCoupons(userId, bookIds);
             model.addAttribute("coupons", coupons);
         } catch (Exception e) {
             model.addAttribute("coupons", Collections.emptyList());
