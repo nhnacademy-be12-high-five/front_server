@@ -52,7 +52,7 @@ async function searchBooks() {
 // 2. 도서 상세 정보 로드 (수정 모드 전환)
 async function loadBookDetail(bookId) {
     try {
-        const response = await fetch(`/admin/books/${bookId}`);
+        const response = await fetch(`/admin/books`);
         if (!response.ok) throw new Error('도서 정보를 불러올 수 없습니다.');
 
         const book = await response.json();
