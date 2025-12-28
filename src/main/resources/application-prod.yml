@@ -1,6 +1,7 @@
 # application-prod.yml
 
 server:
+  forward-headers-strategy: framework
   # docker-compose에서 넘겨준 SERVER_PORT 사용 (예: 10483)
   # 만약 0으로 설정하면 Eureka가 랜덤 포트로 인식하지만,
   # Docker 포트 매핑을 위해 고정 포트가 필요할 수 있음.
