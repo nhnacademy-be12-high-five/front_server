@@ -315,7 +315,7 @@ input {
 /* ------------------------------------- */
 .container2 {
     max-width: 1000px; /* 상세페이지는 조금 더 넓게 */
-    margin: 30px auto;
+    margin: 100px auto;
     padding: 20px;
     flex-grow: 1; /* 메인 콘텐츠 영역이 남은 공간을 채우도록 */
 }

@@ -48,7 +48,7 @@ async function searchBooks() {
 // 2. 도서 상세 정보 로드 (수정 모드 전환)
 async function loadBookDetail(bookId) {
     try {
-        const response = await fetch(`/admin/books/${bookId}`);
+        const response = await fetch(`/admin/books`);
         if (!response.ok) throw new Error('도서 정보를 불러올 수 없습니다.');
 
         const book = await response.json();
@@ -138,12 +138,22 @@ function fillForm(book, isReadOnly) {
     document.getElementById('isbn').value = book.isbn || book.isbn13 || '';
     document.getElementById('title').value = book.title || '';
     document.getElementById('publisher').value = book.publisher || '';
-    document.getElementById('publishedDate').value = book.publishedDate || '';
+    // document.getElementById('publishedDate').value = book.publishedDate || '';
+
+    // pubDate(AI 검색 결과) 또는 publishedDate(DB 조회 결과)를 가져옴
+    let pDate = book.pubDate || book.publishedDate || '';
+
+// 날짜가 T00:00... 처럼 길면 앞 10자리만 자름
+    if (pDate.length > 10) {
+        pDate = pDate.substring(0, 10);
+    }
+    document.getElementById('publishedDate').value = pDate;
+
     document.getElementById('price').value = book.price || 0;
     document.getElementById('categoryId').value = book.categoryId || "";
 
     // 이미지 처리
-    const imageUrl = book.image || '';
+    const imageUrl = book.image || book.imageUrl || '';
     document.getElementById('image').value = imageUrl;
     previewImage(imageUrl);
 

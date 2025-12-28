@@ -1,76 +1,79 @@
-
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HIGH-FIVE 도서 | 베스트셀러 TOP 10</title>
+    <title>HIGH-FIVE 도서 | TOP 10</title>
+
+    <!-- 공통 CSS -->
     <link rel="stylesheet" href="/css/common/common.css">
     <link rel="stylesheet" href="/css/common/header.css">
     <link rel="stylesheet" href="/css/common/footer.css">
-    <link rel="stylesheet" href="/css/book-css/book-new.css">
-</head>
 
-<script src="/js/common.js"></script>
+    <!-- 페이지 전용 CSS -->
+    <link rel="stylesheet" href="/css/book-css/weekly-popular.css">
+</head>
 
 <body>
 
+<!-- HEADER -->
 <div th:replace="~{layout/header :: header}"></div>
 
 <main>
-    <div class="page-header">
+
+    <!-- 페이지 헤더 -->
+    <section class="page-header">
         <div class="container">
-            <h2>🏆 신간 TOP 10</h2>
+            <h2>🏆신간 TOP 10</h2>
             <p>가장 많은 사랑을 받고 있는 도서들을 만나보세요.</p>
         </div>
-    </div>
+    </section>
 
-    <div class="container">
-        <section class="section">
-            <div class="card-grid" style="grid-template-columns: repeat(5, 1fr)">
+    <!-- 카드 그리드 -->
+    <section class="container">
+        <div class="card-grid">
 
-                <div th:if="${newBooks == null or newBooks.isEmpty()}"
-                     style="grid-column: 1/-1; text-align: center; padding: 60px;">
-                    <p>신간 도서가 없습니다.</p>
-                </div>
+            <article class="card"
+                     th:each="book, iterStat : ${risingBooks}">
+                <a th:href="@{/books/{id}(id=${book.bookId})}" class="book-link">
 
-                <article class="card"
-                         th:unless="${newBooks == null}"
-                         th:each="book, iterStat : ${newBooks}">
+                    <div class="rank-badge"
+                         th:classappend="${iterStat.count <= 3} ? 'rank-' + ${iterStat.count}"
+                         th:text="${iterStat.count}">
+                    </div>
 
-                    <a th:href="@{/books/{id}(id=${book.bookId})}" class="book-link" style="display:block; color:inherit; position: relative;">
+                    <div class="thumb">
+                        <img th:src="${book.imageUrl}" th:alt="${book.title}" />
+                    </div>
 
-                        <div class="rank-badge"
-                             th:classappend="${iterStat.count <= 3} ? 'rank-' + ${iterStat.count}"
-                             th:text="${iterStat.count}">1</div>
-
-                        <div class="thumb">
-                            <img th:src="${bookUrl}" th:alt="${book.title}"
-                                 style="width: 100%; height: 100%; object-fit: cover;" />
+                    <div class="info">
+                        <div class="title" th:text="${book.title}"></div>
+                        <div class="meta">
+                            <span th:text="${book.publisher}"></span>
                         </div>
-                        <div class="info">
-                            <div class="title" th:text="${book.title}">책 제목</div>
-                            <div class="meta">
-                                <span th:text="${book.publisher}">출판사</span> ·
-                                <span th:if="${book.pubDate != null and #strings.length(book.pubDate) >= 7}"
-                                      th:text="${#strings.replace(#strings.substring(book.pubDate, 0, 7), '-', '.')}">
-                                    2024.03
-                                </span>
-                            </div>
-                            <div class="price-row">
-                                <span class="price" th:text="|${#numbers.formatInteger(book.price, 0, 'COMMA')}|">₩15,000</span>
-                                <span class="badge" style="background-color: #ff4d4f; color: #fff;" th:if="${iterStat.count <= 3}">BEST</span>
-                            </div>
+                        <div class="price-row">
+                            <span class="price"
+                                  th:text="|${#numbers.formatInteger(book.price, 0, 'COMMA')}원|">
+                            </span>
+                            <span class="badge-best"
+                                  th:if="${iterStat.count <= 3}">
+                                BEST
+                            </span>
                         </div>
-                    </a>
-                </article>
+                    </div>
 
-            </div>
-        </section>
-    </div>
+                </a>
+            </article>
+
+        </div>
+    </section>
+
 </main>
 
+<!-- FOOTER -->
 <div th:replace="~{layout/footer :: footer}"></div>
 
+<!-- 페이지 전용 JS -->
+<script src="/js/book-new.js"></script>
 </body>
 </html>

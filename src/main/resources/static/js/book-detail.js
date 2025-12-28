@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1) 초기 상태 조회
     (async function loadLikeStatus() {
         try {
-            const response = await fetch(`/api/books/${bookId}/likes/status`, {
+            const response = await fetch(`/books/${bookId}/likes/status`, {
                 method: 'GET',
                 headers: buildHeaders(),
                 credentials: 'include' // 쿠키(access-token) 자동 전송
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.stopPropagation();
 
         try {
-            const response = await fetch(`/api/books/${bookId}/likes`, {
+            const response = await fetch(`/books/${bookId}/likes`, {
                 method: 'POST',
                 headers: buildHeaders(),
                 credentials: 'include'
@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 // 성공 후 상태 재조회
-                const statusRes = await fetch(`/api/books/${bookId}/likes/status`, {
+                const statusRes = await fetch(`/books/${bookId}/likes/status`, {
                     method: 'GET',
                     headers: buildHeaders(),
                     credentials: 'include'
@@ -163,7 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
 
 
 // ===================================================================================//

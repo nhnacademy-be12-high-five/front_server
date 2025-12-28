@@ -16,6 +16,8 @@ main {
 .slides {
     display: flex;
     transition: transform 0.5s ease;
+    /*background: #2e7d32;*/
+    margin: 30px;
 }
 .slide {
     min-width: 100%;
@@ -38,6 +40,7 @@ main {
     margin-top: 14px;
     display: flex;
     gap: 10px;
+    background: #2e7d32;
 }
 .hero .nav {
     position: absolute;
@@ -62,6 +65,7 @@ main {
     border-radius: 12px;
     object-fit: cover;
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+    margin-right: 100px;
 }
 
 /* 카테고리 탭 (기존 탭용 – 구조만 유지) */
@@ -97,6 +101,7 @@ main {
 /* 섹션 헤더 */
 .section {
     margin-top: 28px;
+    /*background: #2e7d32;*/
 }
 .section .head {
     display: flex;
@@ -239,18 +244,25 @@ main {
 #category-nav {
     background: #fff;
     border-bottom: 1px solid #ddd;
+    width: 100%;
+    /* 상단 메뉴가 배너보다 위에 오도록 z-index 설정 */
     position: relative;
-    z-index: 100;
+    z-index: 1000;
 }
 .nav-container {
+    width: 1200px; /* 혹은 100% */
+    max-width: 100%;
+    margin: 0 auto; /* 가운데 정렬 */
+    height: 50px;
     display: flex;
     align-items: center;
-    height: 50px;
+    /* 기존의 margin: 300px 제거함 */
 }
 .all-menu-wrapper {
     position: relative;
     height: 100%;
-    width: 140px;
+    wid2th: 140px;
+    margin: 400px;
 }
 .all-menu-btn {
     width: 100%;
@@ -286,6 +298,7 @@ main {
     border-top: none;
     box-shadow: 0 10px 20px rgba(0,0,0,0.15);
     z-index: 1000;
+    margin: 500px;
 }
 
 .all-menu-wrapper:hover .mega-menu {
@@ -401,65 +414,93 @@ main {
     color: var(--color-primary);
 }
 
-.footer-links{
-    margin-left: 20px;
-    gap: 10rem;
+.categoryBtn{
+    margin: 300px;
 }
 
-/* ==============================
-   footer reset (best-seller 기준)
-   ============================== */
-
-/* 이 페이지 CSS가 footer를 건드리지 못하게 강제 */
-#footer .container {
-    all: unset;
+.categoryBtn button.all-menu-btn {
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 15px;
+    height: 50px; /* 네비게이션 높이와 맞춤 */
     display: flex;
-    flex-direction: column;
-    gap: 18px;
-
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 22px 24px;
+    align-items: center;
+    gap: 8px; /* 아이콘과 글자 사이 간격 */
 }
 
-/* 링크 영역 간격 통일 */
-#footer .footer-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 18px;
-    padding-left: 12px;
-    margin-bottom: 14px;
+.mega-menu {
+    display: none; /* 평소에는 안 보임 */
+    position: absolute;
+    top: 50px; /* 네비게이션 높이만큼 아래에 위치 */
+    left: 0;
+    width: 250px; /* 메뉴 너비 */
+    background: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* 정보 영역 통일 */
-#footer .footer-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 40px;
-}
+/*.footer-links{*/
+/*    margin-left: 20px;*/
+/*    gap: 10rem;*/
+/*}*/
 
-#footer .footer-info > div {
-    display: grid;
-    gap: 6px;
-}
+/*!* ==============================*/
+/*   footer reset (best-seller 기준)*/
+/*   ============================== *!*/
 
-#footer .footer-info > div:first-child {
-    padding-left: 12px;
-}
+/*!* 이 페이지 CSS가 footer를 건드리지 못하게 강제 *!*/
+/*#footer .container {*/
+/*    all: unset;*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    gap: 18px;*/
 
-#footer .footer-info > div:last-child {
-    text-align: right;
-    padding-right: 8px;
-}
+/*    max-width: 1200px;*/
+/*    margin: 0 auto;*/
+/*    padding: 22px 24px;*/
+/*}*/
 
-/* typography 강제 고정 */
-#footer,
-#footer * {
-    font-size: 13px;
-    line-height: 1.65;
-    letter-spacing: -0.01em;
-    margin: 0;
-}
+/*!* 링크 영역 간격 통일 *!*/
+/*#footer .footer-links {*/
+/*    display: flex;*/
+/*    flex-wrap: wrap;*/
+/*    gap: 18px;*/
+/*    padding-left: 12px;*/
+/*    margin-bottom: 14px;*/
+/*}*/
+
+/*!* 정보 영역 통일 *!*/
+/*#footer .footer-info {*/
+/*    display: flex;*/
+/*    justify-content: space-between;*/
+/*    align-items: flex-start;*/
+/*    gap: 40px;*/
+/*}*/
+
+/*#footer .footer-info > div {*/
+/*    display: grid;*/
+/*    gap: 6px;*/
+/*}*/
+
+/*#footer .footer-info > div:first-child {*/
+/*    padding-left: 12px;*/
+/*}*/
+
+/*#footer .footer-info > div:last-child {*/
+/*    text-align: right;*/
+/*    padding-right: 8px;*/
+/*}*/
+
+/*!* typography 강제 고정 *!*/
+/*#footer,*/
+/*#footer * {*/
+/*    font-size: 13px;*/
+/*    line-height: 1.65;*/
+/*    letter-spacing: -0.01em;*/
+/*    margin: 0;*/
+/*}*/
 
 
