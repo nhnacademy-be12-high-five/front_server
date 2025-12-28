@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="/css/common/common.css">
     <link rel="stylesheet" href="/css/common/header.css">
     <link rel="stylesheet" href="/css/common/footer.css">
-    <link rel="stylesheet" th:href="@{/css/book-css/review-section.css}">
     <link rel="stylesheet" href="/css/book-css/detail-style.css">
 
 
@@ -22,12 +21,6 @@
 
 <main id="container">
     <div class="container2">
-        <div class="breadcrumb">
-            <span>홈</span>
-            <span>도서 상세</span>
-            <span th:utext="${book.title}">도서 제목</span>
-        </div>
-
         <section class="book-detail">
             <div class="book-detail-main">
                 <div class="book-image">
