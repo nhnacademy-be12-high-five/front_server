@@ -26,7 +26,9 @@ public record BookResponse(
         Double avgRating,
         Long reviewCount,
         String aiSummary,
-        String aiReviewSummary
+        String aiReviewSummary,
+        Integer categoryId,
+        Integer parentId
 ) {
     public BookResponse {
         if (title != null) {
