@@ -1,3 +1,7 @@
+document.addEventListener("DOMContentLoaded", function () {
+    loadRootCategories(); // 페이지 로드 시 1차 카테고리 가져오기
+});
+
 // 1. 도서 검색 (관리자 DB 검색)
 async function searchBooks() {
     const keyword = document.getElementById('bookKeyword').value;
@@ -143,14 +147,20 @@ function fillForm(book, isReadOnly) {
     if (pDate.includes('T')) pDate = pDate.substring(0, 10);
     document.getElementById('publishedDate').value = pDate;
     document.getElementById('price').value = book.price || 0;
-    document.getElementById('categoryId').value = book.categoryId || "";
+    if (book.parentId) {
+        document.getElementById('parentCategory').value = book.parentId;
+        // 비동기로 2차 불러오고, 완료되면 2차 값 세팅
+        loadSubCategories(book.parentId, book.categoryId);
+    } else {
+        // 부모 ID가 없으면 그냥 최종 ID만 히든 필드에 넣고 (화면엔 표시 안됨)
+        document.getElementById('categoryId').value = book.categoryId || "";
+    }
 
     // 이미지 처리
     const imageUrl = book.image || book.imageUrl || '';
     document.getElementById('image').value = imageUrl;
     previewImage(imageUrl);
 
-    // [수정 2] 저자 처리 버그 수정 (book.author -> book.authors)
     if (Array.isArray(book.authors)) {
         document.getElementById('author').value = book.authors.join(', ');
     } else {
@@ -162,9 +172,6 @@ function fillForm(book, isReadOnly) {
     document.getElementById('description').value = desc;
     const descField = document.getElementById('description');
     descField.value = desc;
-
-    // 만약 Toast UI Editor나 Summernote를 쓴다면 여기서 값 주입 필요
-    // 예: editor.setHTML(desc);
 
     // 필드 잠금 설정 (수정 모드면 잠금, AI 모드면 해제)
     setFormReadOnly(isReadOnly);
@@ -217,4 +224,74 @@ function setFormReadOnly(isReadOnly) {
             // 여기서는 원본 로직 유지
         }
     });
+}
+
+// 1차 카테고리 로드
+function loadRootCategories() {
+    fetch('/api/categories/root')
+        .then(res => res.json())
+        .then(data => {
+            const parentSelect = document.getElementById('parentCategory');
+            if(!parentSelect) return; // 요소가 없으면 중단
+
+            // 기존 옵션 유지 (1차 카테고리 선택) 외에 추가
+            parentSelect.innerHTML = '<option value="">1차 카테고리 선택</option>';
+            data.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.categoryId;
+                option.text = cat.categoryName;
+                parentSelect.appendChild(option);
+            });
+        })
+        .catch(err => console.error('카테고리 로드 실패:', err));
+}
+
+// 2차 카테고리 로드 (1차 선택 시 호출)
+// selectedSubId: (선택사항) 로딩 후 자동으로 선택할 2차 카테고리 ID (수정 모드용)
+function loadSubCategories(parentId, selectedSubId = null) {
+    const subSelect = document.getElementById('subCategory');
+    const finalInput = document.getElementById('categoryId');
+
+    if (!parentId) {
+        subSelect.innerHTML = '<option value="">2차 카테고리 선택</option>';
+        subSelect.disabled = true;
+        finalInput.value = "";
+        return;
+    }
+
+    fetch(`/api/categories/${parentId}/children`)
+        .then(res => res.json())
+        .then(data => {
+            subSelect.innerHTML = '<option value="">2차 카테고리 선택</option>';
+
+            if (data.length > 0) {
+                subSelect.disabled = false;
+                data.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.categoryId;
+                    option.text = cat.categoryName;
+                    subSelect.appendChild(option);
+                });
+
+                // [수정 모드 지원] 기존 2차 카테고리 값이 있다면 선택
+                if (selectedSubId) {
+                    subSelect.value = selectedSubId;
+                    setFinalCategory(selectedSubId); // 최종 ID 설정
+                } else {
+                    // 하위가 있는데 선택 안 했으면 초기화
+                    finalInput.value = "";
+                }
+            } else {
+                // 하위 카테고리가 없으면 1차 카테고리가 최종값
+                subSelect.disabled = true;
+                finalInput.value = parentId;
+            }
+        });
+}
+
+// 최종 카테고리 ID 설정 (히든 필드에 값 주입)
+function setFinalCategory(subId) {
+    if (subId) {
+        document.getElementById('categoryId').value = subId;
+    }
 }

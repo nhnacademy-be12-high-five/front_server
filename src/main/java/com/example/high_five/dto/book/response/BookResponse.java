@@ -25,7 +25,9 @@ public record BookResponse(
         Double avgRating,
         Long reviewCount,
         String aiSummary,
-        String aiReviewSummary
+        String aiReviewSummary,
+        Integer categoryId,
+        Integer parentId
 ) {
     // 북 서버의 구조와 100% 일치해야 Jackson이 데이터를 담아줌
     public record CategoryResponse(
