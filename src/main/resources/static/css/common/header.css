@@ -33,6 +33,12 @@ html, body{
     overflow-x: hidden;
 }
 
+/* 브라우저 기본 여백 제거 */
+body {
+    margin: 0;
+    padding: 0;
+}
+
 /* 헤더 내부 컨테이너만 flex 적용 (전역 .container 건드리지 않음) */
 #header .container{
     display: flex;
@@ -256,7 +262,6 @@ html, body{
     #header .gnb{
         order: 2;
         width: 100%;
-        justify-content: center;
     }
     #header .user-menu{
         order: 3;
