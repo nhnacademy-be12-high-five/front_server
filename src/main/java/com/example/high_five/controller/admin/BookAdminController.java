@@ -49,7 +49,7 @@ public class BookAdminController {
 
     @GetMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<BookResponse> getBookDetail(@PathVariable("id") Long id) {
+    public ResponseEntity<BookResponse> getBookDetail(@PathVariable Long id) {
         try {
             BookResponse book = bookClient.getBookDetail(id);
             return ResponseEntity.ok(book);
@@ -65,11 +65,11 @@ public class BookAdminController {
                              RedirectAttributes redirectAttributes) {
         try {
             bookClient.createBook(bookRequest);
-            log.info("도서 등록 요청: {}", bookRequest);
+            log.info("도서 동록 성공 : {}",bookRequest);
             redirectAttributes.addFlashAttribute("message", "도서가 성공적으로 등록되었습니다.");
         } catch (Exception e) {
             log.error("도서 등록 실패", e);
-            redirectAttributes.addFlashAttribute("errorMessage", "도서 등록에 실패했습니다.");
+//            redirectAttributes.addFlashAttribute("errorMessage", "도서 등록에 실패했습니다.");
         }
         return "redirect:/admin/books";
     }

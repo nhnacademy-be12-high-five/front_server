@@ -52,6 +52,35 @@
                         </div>
                     </div>
 
+<!--                    <div class="breadcrumb">-->
+
+<!--                        <th:block th:if="${book.categories!= null}" th:each="category : ${book.categories}">-->
+<!--                            <span class="separator">&gt;</span>-->
+<!--&lt;!&ndash;                            <a th:href="@{/categories/{id}(id=${category.id})}"&ndash;&gt;-->
+<!--&lt;!&ndash;                               th:text="${category.name}">카테고리명</a>&ndash;&gt;-->
+<!--                        </th:block>-->
+
+<!--                        <span class="separator">&gt;</span>-->
+<!--                        <span class="current-book" th:text="${book.title}">도서 제목</span>-->
+
+<!--                        <th:block th:if="${book.categories() != null}" th:each="${book.categories()}">-->
+<!--                            <span class="separator">&gt;</span>-->
+<!--                        </th:block>-->
+<!--                    </div>-->
+
+
+                    <div class="breadcrumb">
+                        <a th:href="@{/}">홈</a>
+
+                        <th:block th:if="${book.categories != null}" th:each="category : ${book.categories}">
+                            <span class="separator">&gt;</span>
+                            <a th:href="@{/categories/{id}(id=${category.categoryId})}"
+                               th:text="${category.categoryName}">카테고리명</a>
+                        </th:block>
+
+                        <span class="separator">&gt;</span>
+                        <span class="current-book" th:text="${book.title}">도서 제목</span>
+                    </div>
 
                     <div class="tag-section"
                          th:with="fixedTags=${T(java.util.List).of('읽을예정','선물후보','재구매검토','추천하고싶음')}">
@@ -113,7 +142,6 @@
                             바로 구매
                         </a>
                     </div>
-
 
 
                     <table class="summary-table">

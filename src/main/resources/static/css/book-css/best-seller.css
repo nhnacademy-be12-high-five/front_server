@@ -2,9 +2,11 @@
     padding: 40px 0;
     text-align: center;
     background: #f8f9fa;
-    margin-bottom: 30px;
+    margin: 110px;
     border-bottom: 1px solid #eee;
+
 }
+
 .page-header h2 {
     font-size: 32px;
     color: #333;
