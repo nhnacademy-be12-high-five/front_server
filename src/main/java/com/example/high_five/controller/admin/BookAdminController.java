@@ -1,6 +1,7 @@
 package com.example.high_five.controller.admin;
 
 import com.example.high_five.common.annotation.LoginRequired;
+import com.example.high_five.dto.book.BookInfoDto;
 import com.example.high_five.dto.book.BookPagedResponse;
 import com.example.high_five.dto.book.ParsingDto;
 import com.example.high_five.dto.book.request.BookAdminUpdateRequest;
@@ -75,7 +76,7 @@ public class BookAdminController {
 
     @GetMapping("/search-api")
     @ResponseBody
-    public ResponseEntity<ParsingDto> searchBookWithAi(@RequestParam("isbn") String isbn) {
+    public ResponseEntity<BookInfoDto> searchBookWithAi(@RequestParam("isbn") String isbn) {
         // Book Server로 요청 위임
         return bookFeignClient.searchBookByIsbn(isbn);
     }

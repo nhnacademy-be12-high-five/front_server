@@ -138,12 +138,15 @@ function fillForm(book, isReadOnly) {
     document.getElementById('isbn').value = book.isbn || book.isbn13 || '';
     document.getElementById('title').value = book.title || '';
     document.getElementById('publisher').value = book.publisher || '';
-    document.getElementById('publishedDate').value = book.publishedDate || '';
+
+    let pDate = book.publishedDate || book.pubDate || '';
+    if (pDate.includes('T')) pDate = pDate.substring(0, 10);
+    document.getElementById('publishedDate').value = pDate;
     document.getElementById('price').value = book.price || 0;
     document.getElementById('categoryId').value = book.categoryId || "";
 
     // 이미지 처리
-    const imageUrl = book.image || '';
+    const imageUrl = book.image || book.imageUrl || '';
     document.getElementById('image').value = imageUrl;
     previewImage(imageUrl);
 
