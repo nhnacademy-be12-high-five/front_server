@@ -44,20 +44,18 @@
             <div class="btn">
                 <button type="submit" class="login-btn">로그인</button>
                 <button type="button" class="login2-btn" onclick="location.href='/member/signup'">회원가입</button>
-
-                <!--로컬 페이코-->
-<!--                <a href="https://id.payco.com/oauth2.0/authorize?response_type=code&client_id=3RDJfC0EFpgMSp8pe7saxfn&serviceProviderCode=FRIENDS&redirect_uri=http://nhn.highfive:9000/login/oauth2/code/payco&userLocale=ko_KR" class="sns-btn payco"> PAYCO 로그인</a> -->
-                <!--배포 페이코-->
                 <a href="https://id.payco.com/oauth2.0/authorize?response_type=code&client_id=3RDwsbe24b34tbkpVdYgqZB&serviceProviderCode=FRIENDS&redirect_uri=https://nhnbook.shop/login/oauth2/code/payco&userLocale=ko_KR" class="sns-btn payco">PAYCO 로그인</a>
             </div>
 
             <div class="find">
-                <button type="button" class="findId" onclick="openFindIdDialog()">아이디찾기</button>
-
-                <button type="button" class="findPwd"
-                        onclick="openPasswordResetDialog({ emailReadonly:false, redirectUrl:'/member/login?pwChanged=true' })">
-                    비밀번호 찾기
-                </button>
+                <div>
+                    <button type="button" class="findId" onclick="openFindIdDialog()">아이디찾기</button>
+                    <button type="button" class="findPwd"
+                            onclick="openPasswordResetDialog({ emailReadonly:false, redirectUrl:'/member/login?pwChanged=true' })">
+                        비밀번호 찾기
+                    </button>
+                    <button type="button" class="dormant" onclick="openDormantDialog()">휴면 회원 해제</button>
+                </div>
             </div>
         </form>
 
@@ -100,8 +98,7 @@
     <h3 style="margin-top:0;">아이디 찾기</h3>
     <p style="font-size:13px; color:#666;">가입한 이메일로 인증번호를 받아 입력하세요.</p>
 
-    <input type="text" id="findIdName"
-           placeholder="이름"
+    <input type="text" id="findIdName" placeholder="이름"
            style="width: 100%; padding: 8px; margin-bottom: 5px; box-sizing: border-box;">
 
     <div style="display: flex; gap: 5px; margin-bottom: 5px;">
@@ -113,19 +110,62 @@
         </button>
     </div>
 
-    <input type="text" id="findIdCode" placeholder="인증번호 6자리"
-           style="width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box;">
+    <div id="findIdStep2" style="display: none;">
+        <input type="text" id="findIdCode" placeholder="인증번호 6자리"
+               style="width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box;">
 
-    <button type="button" onclick="submitFindId()"
-            style="width: 100%; padding: 10px; background-color: #333; color: #fff; border: none; cursor: pointer;">
-        아이디 찾기 확인
-    </button>
+        <button type="button" onclick="submitFindId()"
+                style="width: 100%; padding: 10px; background-color: #333; color: #fff; border: none; cursor: pointer;">
+            아이디 찾기 확인
+        </button>
+    </div>
 
     <p id="findIdResultMsg"
        style="color: blue; font-weight: bold; text-align: center; margin-top: 15px; font-size: 14px; white-space: pre-wrap;"></p>
 </dialog>
 
+<dialog id="dormantDialog"
+        style="padding: 20px; border: 1px solid #888; border-radius: 8px; width: 350px;
+               position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%);
+               margin: 0; z-index: 9999; background: white;">
+    <div style="text-align: right;">
+        <button type="button" onclick="closeDormantDialog()"
+                style="border:none; background:none; cursor:pointer; font-size:16px;">X</button>
+    </div>
+
+    <h3 style="margin-top:0;">휴면 계정 활성화</h3>
+    <p style="font-size:13px; color:#666;">아이디와 가입한 이메일을 입력해주세요.</p>
+
+    <input type="text" id="dormantLoginId" placeholder="아이디 입력"
+           style="width: 100%; padding: 8px; margin-bottom: 5px; box-sizing: border-box;">
+
+    <div style="display: flex; gap: 5px; margin-bottom: 5px;">
+        <input type="email" id="dormantEmail" placeholder="이메일 입력"
+               style="width: 65%; padding: 8px; box-sizing: border-box;">
+        <button type="button" onclick="sendDormantCode()"
+                style="width: 35%; padding: 8px; cursor: pointer; font-size: 12px; background:#eee; border:1px solid #ddd;">
+            인증번호 받기
+        </button>
+    </div>
+
+    <div id="dormantStep2" style="display: none;">
+        <input type="text" id="dormantAuthCode" placeholder="인증번호 6자리"
+               style="width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box;">
+
+        <button type="button" onclick="submitDormantActivation()"
+                style="width: 100%; padding: 10px; background-color: #333; color: #fff; border: none; cursor: pointer;">
+            인증 및 휴면 해제
+        </button>
+    </div>
+
+    <p id="dormantMsg"
+       style="color: blue; font-weight: bold; text-align: center; margin-top: 15px; font-size: 14px; white-space: pre-wrap;"></p>
+</dialog>
+
 <script>
+    /* =============================
+       아이디 찾기 로직
+       ============================= */
     const findIdDialog = document.getElementById('findIdDialog');
     const findIdMsg = document.getElementById('findIdResultMsg');
 
@@ -135,6 +175,11 @@
         document.getElementById('findIdName').value = "";
         document.getElementById('findIdEmail').value = "";
         document.getElementById('findIdCode').value = "";
+
+        // [수정] Step2 숨기기
+        const step2 = document.getElementById('findIdStep2');
+        if(step2) step2.style.display = 'none';
+
         findIdDialog.showModal();
     }
 
@@ -158,6 +203,10 @@
                 alert("인증번호가 발송되었습니다.");
                 findIdMsg.style.color = "blue";
                 findIdMsg.innerText = "인증번호를 입력해주세요.";
+
+                const step2 = document.getElementById('findIdStep2');
+                if(step2) step2.style.display = 'block';
+
             } else {
                 findIdMsg.innerText = "";
                 alert("발송 실패: " + await res.text());
@@ -196,33 +245,26 @@
 <script>
     (function () {
         const params = new URLSearchParams(location.search);
-
         if (params.get("needLogin") === "true") {
             Swal.fire({
                 icon: "warning",
                 title: "로그인이 필요합니다",
                 text: "로그인 후 다시 시도해주세요.",
                 confirmButtonText: "확인"
-            }).then(() => {
-                history.replaceState(null, "", location.pathname);
-            });
+            }).then(() => history.replaceState(null, "", location.pathname));
         }
-
         if (params.get("pwChanged") === "true") {
             Swal.fire({
                 icon: "success",
                 title: "비밀번호 변경 완료",
                 text: "새 비밀번호로 로그인해주세요.",
                 confirmButtonText: "확인"
-            }).then(() => {
-                history.replaceState(null, "", location.pathname);
-            });
+            }).then(() => history.replaceState(null, "", location.pathname));
         }
     })();
 
     async function checkGuestOrder(event) {
-        event.preventDefault(); // 1. 무조건 폼 제출(새로고침)을 막음
-
+        event.preventDefault();
         const orderId = document.getElementById('orderId').value;
         const password = document.getElementById('orderPassword').value;
 
@@ -230,39 +272,26 @@
             alert("주문번호와 비밀번호를 모두 입력해주세요.");
             return false;
         }
-
         try {
-            // 2. 서버에 "아이디/비번 맞나요?" 물어보기 (AJAX)
             const response = await fetch('/orders/guest/validate', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ orderId: orderId, password: password })
             });
-
-            // 3. 결과에 따른 처리
             if (response.ok) {
-                // [성공] 아이디/비번 맞음 -> 실제 폼을 제출해서 페이지 이동
-                // (검증용 함수를 끄고 제출하기 위해 event.target.submit() 사용)
                 event.target.submit();
             } else if (response.status === 400) {
-                // [실패] 아이디/비번 틀림 (400 Bad Request)
                 const data = await response.json();
                 alert(data.message || "주문 정보가 일치하지 않습니다.");
-                // 새로고침 안 되므로 탭 유지됨!
             } else {
-                // [에러] 500 등 시스템 에러 (뷰 렌더링 문제 등)
-                alert("시스템 오류가 발생했습니다. 잠시 후 다시 시도해주세요.\n(서버 로그를 확인해주세요)");
+                alert("시스템 오류가 발생했습니다.");
             }
         } catch (error) {
             console.error('Error:', error);
             alert("서버와 통신 중 오류가 발생했습니다.");
         }
-
-        return false; // 폼 제출 중단 유지
+        return false;
     }
 </script>
-
 </body>
 </html>

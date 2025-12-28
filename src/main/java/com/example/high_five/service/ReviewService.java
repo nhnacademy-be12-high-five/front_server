@@ -57,10 +57,3 @@ public interface ReviewService {
             @PathVariable("review-id") Long reviewId
     );
 }
-
-    // 6. 리뷰 삭제 (로그인 필요)
-//    @LoginRequired
-//    @DeleteMapping("/api/reviews/{reviewId}")
-//    ResponseEntity<Void> removeReview(
-//            @PathVariable("reviewId") Long reviewId
-//    );

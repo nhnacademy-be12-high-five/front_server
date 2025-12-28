@@ -64,19 +64,18 @@
                             </div>
 
                             <div class="form-row">
-                                <label>카테고리 선택</label>
-                                <div style="flex: 1; display: flex; gap: 8px;">
-                                    <select id="parentCategory" onchange="loadChildCategories(this.value)" style="flex: 1;">
-                                        <option value="">1차 선택</option>
+                                <label>적용 카테고리</label>
+                                <div class="d-flex gap-2">
+                                    <select id="category-select-1" onchange="loadCouponSubCategories(this.value)">
+                                        <option value="">1차 카테고리 선택</option>
                                     </select>
-                                    <select id="childCategory" style="flex: 1;">
-                                        <option value="">2차 선택</option>
+
+                                    <select id="category-select-2" onchange="setFinalCouponCategory(this.value)" disabled>
+                                        <option value="">2차 카테고리 선택</option>
                                     </select>
-                                    <button type="button" onclick="addCategory()"
-                                            style="padding: 0 12px; background-color: #333; color: white; border-radius: 10px; border:none; cursor: pointer;">
-                                        추가
-                                    </button>
                                 </div>
+
+                                <input type="hidden" id="categoryId" name="categoryId">
                             </div>
 
                             <div class="form-row" style="margin-top: -10px;">
@@ -316,5 +315,6 @@
     </main>
 
 </div>
+<script src="/js/admin/admin-coupons.js?v=reset"></script>
 </body>
 </html>

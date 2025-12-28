@@ -101,17 +101,20 @@
                 </div>
 
                 <div class="form-row2">
-                    <label for="categoryId" class="Category">카테고리</label>
-                    <select id="categoryId" name="categoryId" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 10px;">
-                        <option value="">카테고리 선택 (필수)</option>
-                        <option value="8">소설/시/희곡</option>
-                        <option value="9">경제/경영</option>
-                        <option value="10">IT/모바일</option>
-                        <option value="11">인문/사회</option>
-                        <option value="12">유아/아동</option>
-                        <option value="13">수험서/자격증</option>
-                        <option value="14">자연/과학</option>
-                    </select>
+                    <label class="Category">카테고리</label>
+                    <div style="display: flex; gap: 10px; width: 100%;">
+                        <select id="parentCategory" class="form-select" onchange="loadSubCategories(this.value)"
+                                style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 10px;">
+                            <option value="">1차 카테고리 선택</option>
+                        </select>
+
+                        <select id="subCategory" class="form-select" onchange="setFinalCategory(this.value)" disabled
+                                style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 10px;">
+                            <option value="">2차 카테고리 선택</option>
+                        </select>
+                    </div>
+
+                    <input type="hidden" id="categoryId" name="categoryId" required>
                 </div>
 
                 <div class="form-row">

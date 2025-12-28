@@ -1,30 +1,21 @@
 const signupButton = document.querySelector(".login2-btn");
 
-// 2. 버튼이 존재하면 클릭 이벤트를 연결합니다.
 if (signupButton) {
     signupButton.addEventListener("click", function (event) {
-        // 기본 폼 제출 동작을 막고 페이지 이동만 수행
         event.preventDefault();
-
-        // 회원가입 페이지 경로로 이동
         window.location.href = "/member/signup";
     });
 }
 
 const loginBtnTop = document.querySelector(".login-btn-top");
-
-// 2. 버튼이 존재하면 클릭 이벤트를 연결합니다.
 if (loginBtnTop) {
     loginBtnTop.addEventListener("click", function (event) {
         event.preventDefault();
-
-        // 회원가입 페이지 경로로 이동
         window.location.href = "/login.html";
     });
 }
 
 const mypageLinkInHeader = document.querySelector('a[title="마이페이지"]');
-
 if (mypageLinkInHeader) {
     mypageLinkInHeader.addEventListener("click", function (event) {
         event.preventDefault();
@@ -34,22 +25,14 @@ if (mypageLinkInHeader) {
 
 // ==== 비밀번호 보이기/숨기기 함수 ====
 function togglePasswordVisibility(id, icon) {
-    // 1. 넘겨받은 ID로 해당 input 찾기
     const inputField = document.getElementById(id);
+    if (!inputField) return;
 
-    // 요소가 없으면 중단
-    if (!inputField) {
-        console.error("해당 ID의 input을 찾을 수 없습니다: " + id);
-        return;
-    }
-
-    // 2. 타입 토글 및 아이콘 변경
     if (inputField.type === "password") {
-        inputField.type = "text"; // 비밀번호 보이기
-        // 클릭된 그 아이콘의 이미지를 변경
+        inputField.type = "text";
         icon.src = "/img/free-icon-closed-eyes.png";
     } else {
-        inputField.type = "password"; // 비밀번호 숨기기
+        inputField.type = "password";
         icon.src = "/img/free-icon-eye.png";
     }
 }
@@ -59,38 +42,147 @@ const tabGuest = document.getElementById("tabGuest");
 const formMember = document.getElementById("formMember");
 const formGuest = document.getElementById("formGuest");
 
-// 회원 로그인 탭 클릭 시
 if (tabMember) {
     tabMember.addEventListener("click", function () {
-
-        // 탭 스타일 변경
         tabMember.classList.add("active");
         tabMember.classList.remove("unactive");
         tabGuest.classList.add("unactive");
         tabGuest.classList.remove("active");
-
-        console.log("회원 선택");
-
-        // 폼 표시/숨김
         formMember.style.display = "block";
         formGuest.style.display = "none";
     });
 }
 
-// 비회원 주문조회 탭 클릭 시
 if (tabGuest) {
     tabGuest.addEventListener("click", function () {
-
-        console.log("비회원 선택");
-
-        // 탭 스타일 변경
         tabGuest.classList.add("active");
         tabGuest.classList.remove("unactive");
         tabMember.classList.add("unactive");
         tabMember.classList.remove("active");
-
-        // 폼 표시/숨김
         formMember.style.display = "none";
         formGuest.style.display = "block";
     });
+}
+const dormantDialog = document.getElementById('dormantDialog');
+
+function openDormantDialog() {
+    const dialog = document.getElementById('dormantDialog');
+
+    if (dialog) {
+        const msg = document.getElementById('dormantMsg');
+        if (msg) {
+            msg.innerText = "";
+            msg.style.color = "blue";
+        }
+
+        const idInput = document.getElementById('dormantLoginId');
+        const emailInput = document.getElementById('dormantEmail');
+        const codeInput = document.getElementById('dormantAuthCode');
+
+        if (idInput) idInput.value = "";
+        if (emailInput) emailInput.value = "";
+        if (codeInput) codeInput.value = "";
+
+        const step2 = document.getElementById('dormantStep2');
+        if (step2) step2.style.display = 'none';
+
+        dialog.showModal();
+    } else {
+        console.error("dormantDialog를 찾을 수 없습니다.");
+    }
+}
+
+function closeDormantDialog() {
+    const dialog = document.getElementById('dormantDialog');
+    if (dialog) {
+        dialog.close();
+    }
+}
+
+function sendDormantCode() {
+    const loginId = document.getElementById('dormantLoginId').value;
+    const email = document.getElementById('dormantEmail').value;
+
+    if (!loginId || !email) {
+        alert("아이디와 이메일을 모두 입력해주세요.");
+        return;
+    }
+
+    const msg = document.getElementById('dormantMsg');
+    if (msg) {
+        msg.style.color = "black";
+        msg.innerText = "정보 확인 및 발송 중...";
+    }
+
+    fetch('/auth/dormant/send', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            loginId: loginId,
+            email: email,
+            type: 'ACTIVATE'
+        })
+    }).then(async res => {
+        if (res.ok) {
+            alert("인증번호가 발송되었습니다.");
+            if (msg) {
+                msg.style.color = "blue";
+                msg.innerText = "이메일로 전송된 인증번호를 입력하세요.";
+            }
+
+            // [추가] 성공 시 Step2(인증번호 입력란) 보이기
+            const step2 = document.getElementById('dormantStep2');
+            if (step2) step2.style.display = 'block';
+
+        } else {
+            const errorText = await res.text();
+            if (msg) {
+                msg.style.color = "red";
+                msg.innerText = errorText;
+            }
+        }
+    }).catch(err => {
+        console.error(err);
+        if (msg) msg.innerText = "서버 통신 오류";
+    });
+}
+
+async function submitDormantActivation() {
+    const loginId = document.getElementById('dormantLoginId').value;
+    const email = document.getElementById('dormantEmail').value;
+    const code  = document.getElementById('dormantAuthCode').value;
+
+    if (!code) {
+        alert("인증번호를 입력해주세요.");
+        return;
+    }
+
+    try {
+        const response = await fetch('/auth/dormant/verify', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                loginId: loginId,
+                email: email,
+                authCode: code,
+                type: 'ACTIVATE'
+            })
+        });
+
+        if (response.ok) {
+            alert("휴면 상태가 해제되었습니다! 로그인해주세요.");
+            closeDormantDialog();
+            window.location.reload();
+        } else {
+            const errorText = await response.text();
+            const msg = document.getElementById('dormantMsg');
+            if (msg) {
+                msg.style.color = "red";
+                msg.innerText = errorText;
+            }
+        }
+    } catch (e) {
+        console.error(e);
+        alert("시스템 오류가 발생했습니다.");
+    }
 }

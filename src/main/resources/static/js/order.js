@@ -170,7 +170,29 @@ function requestPayment() {
             });
         },
         error(xhr) {
-            alert("주문 생성 실패");
+            console.error("Order Creation Error:", xhr);
+
+            let errorMessage = "주문 생성 중 알 수 없는 오류가 발생했습니다.";
+
+            // 1. JSON 응답(responseJSON)에 message 필드가 있는 경우 (가장 일반적)
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMessage = xhr.responseJSON.message;
+            }
+            // 2. responseText로 왔을 경우 JSON 파싱 시도
+            else if (xhr.responseText) {
+                try {
+                    const parsed = JSON.parse(xhr.responseText);
+                    if (parsed.message) {
+                        errorMessage = parsed.message;
+                    }
+                } catch (e) {
+                    // JSON 파싱 실패 시, HTML 에러 페이지 등이 넘어왔을 수 있음
+                    // 필요하다면 console.log로 확인
+                }
+            }
+
+            // 사용자에게 에러 메시지 알림 (예: "유효기간이 만료된 쿠폰입니다.")
+            alert(errorMessage);
         }
     });
 }

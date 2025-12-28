@@ -1,3 +1,6 @@
+// ==============================
+// 리뷰 좋아요 처리
+// ==============================
 const likeProcessingMap = {};
 
 async function handleReviewError(response, defaultMsg = "요청 처리에 실패했습니다.") {
@@ -7,24 +10,12 @@ async function handleReviewError(response, defaultMsg = "요청 처리에 실패
         if (data && data.message) msg = data.message;
     } catch (e) {
         switch (response.status) {
-            case 400:
-                msg = "입력 정보가 올바르지 않습니다.";
-                break;
-            case 401:
-                msg = "로그인이 필요합니다.";
-                break;
-            case 403:
-                msg = "권한이 없습니다.";
-                break;
-            case 404:
-                msg = "대상을 찾을 수 없습니다.";
-                break;
-            case 413:
-                msg = "업로드하려는 파일 크기가 너무 큽니다. (이미지 용량을 확인해주세요)";
-                break;
-            case 500:
-                msg = "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
-                break;
+            case 400: msg = "입력 정보가 올바르지 않습니다."; break;
+            case 401: msg = "로그인이 필요합니다."; break;
+            case 403: msg = "권한이 없습니다."; break;
+            case 404: msg = "대상을 찾을 수 없습니다."; break;
+            case 413: msg = "업로드하려는 파일 크기가 너무 큽니다. (이미지 용량을 확인해주세요)"; break;
+            case 500: msg = "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요."; break;
         }
     }
     alert(msg);
@@ -50,16 +41,17 @@ function toggleReviewLike(bookId, reviewId, btn) {
                 return null;
             }
             if (!response.ok) {
-                // 에러 핸들링 함수 호출 혹은 throw
                 await handleReviewError(response, "좋아요 처리 중 오류가 발생했습니다.");
                 return null;
             }
             return response.json();
         })
         .then(isLiked => {
-            if (isLiked === null) return; // 위에서 에러 처리됨
+            if (isLiked === null) return;
 
             const countSpan = document.getElementById(`like-count-${reviewId}`);
+            if (!countSpan) return;
+
             let currentCount = parseInt(countSpan.innerText) || 0;
 
             if (isLiked) {
@@ -72,7 +64,6 @@ function toggleReviewLike(bookId, reviewId, btn) {
         })
         .catch(err => {
             console.error(err);
-            // 네트워크 에러 등 fetch 자체 실패 시
             alert("네트워크 상태가 불안정합니다. 잠시 후 다시 시도해주세요.");
         })
         .finally(() => {
@@ -84,8 +75,10 @@ function toggleReviewLike(bookId, reviewId, btn) {
         });
 }
 
-// ===================================================================================//
 
+// ==============================
+// 도서 좋아요(하트) 처리
+// ==============================
 document.addEventListener('DOMContentLoaded', () => {
     const heartBtn = document.getElementById('heart');
     if (!heartBtn) return;
@@ -98,7 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function redirectToLoginIfNeeded(res) {
-        // 백엔드가 401/403을 주는 경우
         if (res.status === 401 || res.status === 403) {
             alert("로그인이 필요합니다.");
             location.href = "/member/login";
@@ -107,13 +99,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return false;
     }
 
-    // 1) 초기 상태 조회
+    // 초기 상태 조회
     (async function loadLikeStatus() {
         try {
             const response = await fetch(`/books/${bookId}/likes/status`, {
                 method: 'GET',
                 headers: buildHeaders(),
-                credentials: 'include' // 쿠키(access-token) 자동 전송
+                credentials: 'include'
             });
 
             if (await redirectToLoginIfNeeded(response)) return;
@@ -126,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })();
 
-    // 2) 토글
+    // 토글
     heartBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -165,153 +157,161 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// ===================================================================================//
-// 탭 관련 로직은 기존 코드 유지 (생략 없음)
+// ==============================
+// 탭(도서소개/목차/리뷰/Q&A/배송반품) 처리 - 핵심 수정본
+// 1) 클릭 시: active 설정 + (선택) 섹션 표시/숨김 + 스크롤 이동
+// 2) 스크롤 시: 현재 섹션에 맞게 active 갱신 (currentId 있을 때만)
+// ==============================
 document.addEventListener('DOMContentLoaded', function () {
-    const tabButtons = document.querySelectorAll('.book-detail-tabs button');
-    const sections = document.querySelectorAll('.detail-tab-content');
     const navBar = document.querySelector('.book-detail-tabs');
-
     if (!navBar) return;
 
-    /* ======================
-       탭 클릭 → 스크롤 이동
-       ====================== */
-    tabButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const targetId = btn.dataset.target;
-            const targetSection = document.getElementById(targetId);
-            if (!targetSection) return;
+    const tabButtons = Array.from(navBar.querySelectorAll('button[data-target]'));
+    const sections = Array.from(document.querySelectorAll('.detail-tab-content'));
+    if (tabButtons.length === 0 || sections.length === 0) return;
 
-            const navHeight = navBar.offsetHeight;
-
-            const y =
-                targetSection.getBoundingClientRect().top +
-                window.pageYOffset -
-                navHeight - 10;
-
-            window.scrollTo({
-                top: y,
-                behavior: 'smooth'
-            });
-        });
-    });
-
-    /* ======================
-       스크롤 → 탭 active 갱신
-       ====================== */
-    window.addEventListener('scroll', () => {
-        let currentId = null;
-        const navHeight = navBar.offsetHeight + 20;
-
-        sections.forEach(section => {
-            const rect = section.getBoundingClientRect();
-            if (rect.top <= navHeight && rect.bottom > navHeight) {
-                currentId = section.id;
-            }
-        });
-
+    function setActive(targetId) {
         tabButtons.forEach(btn => {
-            btn.classList.toggle(
-                'active',
-                btn.dataset.target === currentId
-            );
+            btn.classList.toggle('active', btn.dataset.target === targetId);
+        });
+    }
+
+    function scrollToTarget(targetId) {
+        const target = document.getElementById(targetId);
+        if (!target) return;
+
+        // CSS scroll-margin-top이 적용되어 "딱 위로" 올라오게 됨
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const targetId = btn.dataset.target;
+            if (!targetId) return;
+
+            setActive(targetId);
+            scrollToTarget(targetId);
         });
     });
+
+    // 스크롤 시 현재 섹션에 따라 active 갱신
+    window.addEventListener('scroll', () => {
+        // 헤더/탭바 가림 보정: 기준선을 화면 상단에서 약간 아래로 둠
+        const 기준선 = 160;
+
+        let currentId = null;
+        for (const section of sections) {
+            const rect = section.getBoundingClientRect();
+            if (rect.top <= 기준선 && rect.bottom > 기준선) {
+                currentId = section.id;
+                break;
+            }
+        }
+
+        if (currentId) setActive(currentId);
+    });
+
+    // 초기 active 세팅
+    const initialBtn = tabButtons.find(b => b.classList.contains('active')) || tabButtons[0];
+    if (initialBtn?.dataset?.target) setActive(initialBtn.dataset.target);
 });
 
 
-
-
-// 장바구니 담기 버튼
+// ==============================
+// 장바구니 담기
+// ==============================
 document.addEventListener("DOMContentLoaded", function () {
     const addToCartBtn = document.getElementById("add-to-cart-btn");
-    if (addToCartBtn) {
-        addToCartBtn.addEventListener("click", async () => {
-            const bookId = addToCartBtn.getAttribute("data-book-id");
+    if (!addToCartBtn) return;
 
-            const requestBody = {bookId: Number(bookId), quantity: 1};
+    addToCartBtn.addEventListener("click", async () => {
+        const bookId = addToCartBtn.getAttribute("data-book-id");
+        const requestBody = { bookId: Number(bookId), quantity: 1 };
 
-            try {
-                const response = await fetch("/cart/items", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify(requestBody)
-                });
+        try {
+            const response = await fetch("/cart/items", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(requestBody)
+            });
 
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        if (confirm("로그인이 필요합니다.\n로그인 페이지로 이동하시겠습니까?")) {
-                            window.location.href = "/member/login.html";
-                        }
-                        return;
-                    } else if (response.status === 409) { // 재고 부족 등의 상황 가정
-                        alert("재고가 부족하여 장바구니에 담을 수 없습니다.");
-                        return;
+            if (!response.ok) {
+                if (response.status === 401) {
+                    if (confirm("로그인이 필요합니다.\n로그인 페이지로 이동하시겠습니까?")) {
+                        window.location.href = "/member/login.html";
                     }
-
-                    await handleReviewError(response, "장바구니 담기에 실패했습니다.");
+                    return;
+                } else if (response.status === 409) {
+                    alert("재고가 부족하여 장바구니에 담을 수 없습니다.");
                     return;
                 }
 
-                if (confirm("장바구니에 상품이 담겼습니다.\n장바구니로 이동하시겠습니까?")) {
-                    window.location.href = "/cart";
-                }
-
-            } catch (error) {
-                console.error(error);
-                alert("서버 연결 상태가 원활하지 않습니다.");
+                await handleReviewError(response, "장바구니 담기에 실패했습니다.");
+                return;
             }
-        });
-    }
+
+            if (confirm("장바구니에 상품이 담겼습니다.\n장바구니로 이동하시겠습니까?")) {
+                window.location.href = "/cart";
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert("서버 연결 상태가 원활하지 않습니다.");
+        }
+    });
 });
 
-// ===================================================================================//
+
+// ==============================
+// 리뷰 이미지/파일 업로드 및 모달
+// ==============================
 
 // 전역 변수로 선택된 파일 관리
 let selectedFiles = [];
 let editSelectedFiles = [];
 let deleteImageIds = [];
 
-// ========== 이미지 모달 기능 ==========
+// 이미지 모달
 function openImageModal(src) {
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
+    if (!modal || !modalImg) return;
     modal.style.display = "flex";
     modalImg.src = src;
 }
 
 function closeImageModal() {
     const modal = document.getElementById('imageModal');
+    if (!modal) return;
     modal.style.display = "none";
 }
 
-// ========== 리뷰 작성 파일 관리 ==========
+// 리뷰 작성 파일 관리
 function handleFileSelect(input) {
     const files = Array.from(input.files);
 
-    // 최대 개수 제한 (기존 + 새 파일)
     if (selectedFiles.length + files.length > 5) {
         alert("이미지는 최대 5장까지 업로드 가능합니다.");
-        input.value = ""; // 초기화
+        input.value = "";
         return;
     }
 
     files.forEach(file => {
-        // 중복 방지 (파일명과 사이즈로 비교)
         const isDuplicate = selectedFiles.some(f => f.name === file.name && f.size === file.size);
-        if (!isDuplicate) {
-            // 10MB 제한 체크
-            if(file.size > 10 * 1024 * 1024) {
-                alert(`파일 '${file.name}'의 크기가 10MB를 초과합니다.`);
-                return;
-            }
-            selectedFiles.push(file);
+        if (isDuplicate) return;
+
+        if (file.size > 10 * 1024 * 1024) {
+            alert(`파일 '${file.name}'의 크기가 10MB를 초과합니다.`);
+            return;
         }
+        selectedFiles.push(file);
     });
 
     renderFileList();
-    input.value = ""; // 같은 파일 다시 선택 가능하도록 input 초기화
+    input.value = "";
 }
 
 function renderFileList() {
@@ -338,6 +338,8 @@ function removeFile(index) {
 
 async function submitReview(bookId) {
     const form = document.getElementById("reviewForm");
+    if (!form) return;
+
     const content = form.querySelector("textarea[name='content']").value;
     const rating = form.querySelector("select[name='rating']").value;
 
@@ -345,13 +347,12 @@ async function submitReview(bookId) {
         alert("리뷰 내용을 입력해주세요.");
         return;
     }
-    if(content.length < 10) {
+    if (content.length < 10) {
         alert("리뷰는 최소 10자 이상 작성해주세요.");
         return;
     }
-
-    if(content.length > 1000) {
-        alert("리뷰는 최댜 1000자 미만 작성해주세요.");
+    if (content.length > 1000) {
+        alert("리뷰는 최대 1000자 미만 작성해주세요.");
         return;
     }
 
@@ -359,10 +360,7 @@ async function submitReview(bookId) {
     formData.append("rating", rating);
     formData.append("content", content);
 
-    // 관리 중인 파일 배열을 FormData에 추가
-    selectedFiles.forEach(file => {
-        formData.append("images", file);
-    });
+    selectedFiles.forEach(file => formData.append("images", file));
 
     try {
         const response = await fetch(`/books/${bookId}/reviews`, {
@@ -386,9 +384,8 @@ async function submitReview(bookId) {
             if (confirm("로그인이 필요한 서비스입니다. 로그인 페이지로 이동하시겠습니까?")) {
                 location.href = "/member/login";
             }
-            return null;
+            return;
         }
-
 
         alert("리뷰가 성공적으로 등록되었습니다!");
         location.reload();
@@ -400,41 +397,40 @@ async function submitReview(bookId) {
 }
 
 
-// ========== 리뷰 수정 관련 로직 ==========
-
+// ==============================
+// 리뷰 수정
+// ==============================
 function startEditReview(btn) {
     const reviewId = btn.dataset.reviewId;
     const bookId = btn.dataset.bookId;
     const content = btn.dataset.content;
     const rating = btn.dataset.rating;
 
-    // [수정] 'ID|URL,ID|URL' 형태의 문자열을 파싱해서 객체 배열로 변환
     const imagesDataString = btn.dataset.reviewImages || "";
-    const existingImages = imagesDataString ? imagesDataString.split(',').map(str => {
-        const parts = str.split('|');
-        return { id: parts[0], url: parts[1] }; // {id: "10", url: "http://..."}
-    }) : [];
+    const existingImages = imagesDataString
+        ? imagesDataString.split(',').map(str => {
+            const parts = str.split('|');
+            return { id: parts[0], url: parts[1] };
+        })
+        : [];
 
-    // 초기화
     editSelectedFiles = [];
     deleteImageIds = [];
 
     const container = document.querySelector(".my-review-card");
+    if (!container) return;
 
-    // 기존 이미지 리스트 HTML 생성
     let existingImagesHtml = '';
     if (existingImages.length > 0) {
         existingImagesHtml = `<div class="existing-images-list">`;
         existingImages.forEach((img, idx) => {
-            if (img.url) {
-                // [수정] 삭제 버튼에 ID 전달 (img.id)
-                existingImagesHtml += `
-                    <div class="existing-image-item" id="existing-img-${idx}">
-                        <img src="${img.url}">
-                        <button type="button" class="btn-remove-image" onclick="markImageAsDeleted('${img.id}', ${idx})">X</button>
-                    </div>
-                `;
-            }
+            if (!img.url) return;
+            existingImagesHtml += `
+                <div class="existing-image-item" id="existing-img-${idx}">
+                    <img src="${img.url}">
+                    <button type="button" class="btn-remove-image" onclick="markImageAsDeleted('${img.id}', ${idx})">X</button>
+                </div>
+            `;
         });
         existingImagesHtml += `</div>`;
     }
@@ -462,8 +458,11 @@ function startEditReview(btn) {
                 ${existingImagesHtml}
                 
                 <label style="font-weight:bold; display:block; margin-top:15px; margin-bottom:5px;">이미지 추가</label>
-                <input type="file" id="editFileInput" name="images" multiple accept="image/*" style="display: none;" onchange="handleEditFileSelect(this)">
-                <button type="button" class="btn-small" onclick="document.getElementById('editFileInput').click()" style="background-color: #6c757d;">
+                <input type="file" id="editFileInput" name="images" multiple accept="image/*"
+                       style="display: none;" onchange="handleEditFileSelect(this)">
+                <button type="button" class="btn-small"
+                        onclick="document.getElementById('editFileInput').click()"
+                        style="background-color: #6c757d;">
                     📷 사진 추가하기
                 </button>
                 <div id="edit-file-list" class="file-upload-list"></div>
@@ -481,30 +480,30 @@ function startEditReview(btn) {
 }
 
 function markImageAsDeleted(imageId, index) {
-    // UI에서 숨김
     const el = document.getElementById(`existing-img-${index}`);
     if (el) el.style.display = 'none';
-
-    // [중요] 삭제할 ID 배열에 추가 (DTO의 deleteImageIds와 매핑됨)
     deleteImageIds.push(parseInt(imageId));
 }
-// 수정 모드: 새 파일 추가 핸들러
+
 function handleEditFileSelect(input) {
     const files = Array.from(input.files);
-    // 개수 제한 로직은 기존 이미지 개수를 고려해야 하나, 여기선 단순화함
+
     files.forEach(file => {
-        if(file.size > 10 * 1024 * 1024) {
+        if (file.size > 10 * 1024 * 1024) {
             alert("10MB 이하의 파일만 업로드 가능합니다.");
             return;
         }
         editSelectedFiles.push(file);
     });
+
     renderEditFileList();
     input.value = "";
 }
 
 function renderEditFileList() {
     const container = document.getElementById('edit-file-list');
+    if (!container) return;
+
     container.innerHTML = "";
     editSelectedFiles.forEach((file, idx) => {
         container.innerHTML += `
@@ -523,6 +522,8 @@ function removeEditFile(index) {
 
 async function submitUpdateReview(reviewId, bookId) {
     const form = document.getElementById("updateReviewForm");
+    if (!form) return;
+
     const rating = form.querySelector("select[name='rating']").value;
     const content = form.querySelector("textarea[name='content']").value;
 
@@ -530,40 +531,31 @@ async function submitUpdateReview(reviewId, bookId) {
         alert("리뷰 내용을 입력해주세요.");
         return;
     }
+    if (content.length < 10) {
+        alert("리뷰는 최소 10자 이상 작성해주세요.");
+        return;
+    }
+    if (content.length > 1000) {
+        alert("리뷰는 최대 1000자 미만 작성해주세요.");
+        return;
+    }
 
-    // [수정] DTO 생성 시 deleteImageIds 포함
     const requestDto = {
         content,
         rating: Number(rating),
-        deleteImageIds: deleteImageIds // 여기에 수집된 ID들이 들어감
+        deleteImageIds: deleteImageIds
     };
 
     const formData = new FormData();
-    formData.append(
-        "request",
-        new Blob([JSON.stringify(requestDto)], { type: "application/json" })
-    );
+    formData.append("request", new Blob([JSON.stringify(requestDto)], { type: "application/json" }));
 
-    // 새로 추가한 파일들
-    editSelectedFiles.forEach(file => {
-        formData.append("images", file);
-    });
+    editSelectedFiles.forEach(file => formData.append("images", file));
 
     try {
         const response = await fetch(`/books/${bookId}/reviews/${reviewId}`, {
-            method: "POST", // 또는 "PUT"
+            method: "POST",
             body: formData
         });
-
-        if(content.length < 10) {
-            alert("리뷰는 최소 10자 이상 작성해주세요.");
-            return;
-        }
-
-        if(content.length > 1000) {
-            alert("리뷰는 최댜 1000자 미만 작성해주세요.");
-            return;
-        }
 
         if (!response.ok) {
             await handleReviewError(response, "리뷰 수정에 실패했습니다.");
@@ -580,17 +572,15 @@ async function submitUpdateReview(reviewId, bookId) {
 }
 
 
+// ==============================
+// 태그 클릭 토글
+// ==============================
 document.addEventListener("DOMContentLoaded", function () {
     const tags = document.querySelectorAll(".book-tag");
-
     tags.forEach(tag => {
         tag.addEventListener("click", function (e) {
-            e.preventDefault(); // 혹시 모를 이동 방지
-
-            // 선택 토글
+            e.preventDefault();
             tag.classList.toggle("active");
         });
     });
 });
-
-

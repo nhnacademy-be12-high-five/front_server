@@ -1,8 +1,10 @@
 package com.example.high_five.controller.auth;
 
+import com.example.high_five.dto.member.request.DormantRequest;
 import com.example.high_five.dto.member.request.EmailRequest;
 import com.example.high_five.dto.member.request.EmailVerifyRequest;
 import com.example.high_five.service.AuthService;
+import com.example.high_five.service.MemberService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
@@ -17,6 +19,7 @@ public class AuthRestController {
 
     private final AuthService authService;
     private final ObjectMapper objectMapper;
+    private final MemberService memberService;
 
     @PostMapping("/email/send")
     public ResponseEntity<String> sendEmail(@RequestBody EmailRequest email) {
@@ -81,6 +84,31 @@ public class AuthRestController {
             return body;
         } catch (Exception ex) {
             return "요청 처리 중 오류가 발생했습니다.";
+        }
+    }
+
+    @PostMapping("/dormant/send")
+    public ResponseEntity<String> sendDormantCode(@RequestBody DormantRequest request) {
+        try {
+            memberService.checkDormantMember(request);
+
+            EmailRequest emailReq = new EmailRequest(request.getEmail());
+            memberService.sendDormantEmail(emailReq);
+
+            return ResponseEntity.ok("인증번호가 발송되었습니다.");
+        } catch (FeignException e) {
+            return ResponseEntity.status(e.status()).body("정보가 일치하지 않습니다.");
+        }
+    }
+
+    @PostMapping("/dormant/verify")
+    public ResponseEntity<String> verifyAndActivate(@RequestBody DormantRequest request) {
+        try {
+            memberService.activateDormant(request);
+
+            return ResponseEntity.ok("휴면 상태가 해제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("인증번호가 틀렸거나 오류가 발생했습니다.");
         }
     }
 }

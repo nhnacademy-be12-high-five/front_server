@@ -1,5 +1,6 @@
 package com.example.high_five.service;
 
+import com.example.high_five.dto.book.BookInfoDto;
 import com.example.high_five.dto.book.ParsingDto;
 import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.dto.book.BookPagedResponse;
@@ -24,5 +25,5 @@ public interface BookFeignClient {
     );
 
     @GetMapping("/api/admin/books/search-api")
-    ResponseEntity<ParsingDto> searchBookByIsbn(@RequestParam("isbn") String isbn);
+    ResponseEntity<BookInfoDto> searchBookByIsbn(@RequestParam("isbn") String isbn);
 }
