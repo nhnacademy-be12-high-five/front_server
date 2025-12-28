@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -8,7 +9,6 @@
     <link rel="stylesheet" href="/css/index-css/index-css.css">
     <link rel="stylesheet" href="/css/common/common.css">
     <link rel="stylesheet" href="/css/common/header.css">
-    <link rel="stylesheet" href="/css/common/footer.css">
 </head>
 
 <body th:data-is-login="${currentUser != null}">
@@ -20,18 +20,13 @@
 
 <nav id="category-nav">
     <div class="container nav-container">
-        <!-- 왼쪽: 전체 분야 + 메가메뉴 -->
         <div class="all-menu-wrapper">
-            <div class="categoryBtn">
-                <button class="all-menu-btn" type="button">
-                    <span class="icon">☰</span> 카테고리
-                </button>
-            </div>
+            <button class="all-menu-btn" type="button">
+                <span class="icon">☰</span> 카테고리
+            </button>
 
-            <!-- 메가메뉴 (hover 시 표시) -->
             <div class="mega-menu">
                 <ul class="depth1">
-                    <!-- 1. 소설/시/희곡 (categoryId = 1) -->
                     <li>
                         <a href="/search?searchType=CATEGORY&categoryId=8&categoryName=소설/시/희곡">소설/시/희곡 <span class="arrow">›</span></a>
                         <div class="depth2">
@@ -43,7 +38,6 @@
                             <a href="/search?searchType=CATEGORY&categoryId=8&categoryName=소설/시/희곡">시/에세이</a>
                         </div>
                     </li>
-
                     <li>
                         <a href="/search?searchType=CATEGORY&categoryId=9&categoryName=경제/경영">경제/경영 <span class="arrow">›</span></a>
                         <div class="depth2">
@@ -54,7 +48,6 @@
                             <a href="/search?searchType=CATEGORY&categoryId=9&categoryName=경제/경영">마케팅</a>
                         </div>
                     </li>
-
                     <li>
                         <a href="/search?searchType=CATEGORY&categoryId=10&categoryName=IT/컴퓨터">IT/모바일 <span class="arrow">›</span></a>
                         <div class="depth2">
@@ -65,7 +58,6 @@
                             <a href="/search?searchType=CATEGORY&categoryId=10&categoryName=IT/컴퓨터">인공지능/보안</a>
                         </div>
                     </li>
-
                     <li>
                         <a href="/search?searchType=CATEGORY&categoryId=11&categoryName=인문/사회">인문/사회 <span class="arrow">›</span></a>
                         <div class="depth2">
@@ -76,7 +68,6 @@
                             <a href="/search?searchType=CATEGORY&categoryId=11&categoryName=인문/사회">요리/여행</a>
                         </div>
                     </li>
-
                     <li>
                         <a href="/search?searchType=CATEGORY&categoryId=12&categoryName=유아/아동">유아/아동 <span class="arrow">›</span></a>
                         <div class="depth2">
@@ -86,7 +77,6 @@
                             <a href="/search?searchType=CATEGORY&categoryId=12&categoryName=유아/아동">만화/애니</a>
                         </div>
                     </li>
-
                     <li>
                         <a href="/search?searchType=CATEGORY&categoryId=13&categoryName=수험서">수험서/자격증 <span class="arrow">›</span></a>
                         <div class="depth2">
@@ -95,7 +85,6 @@
                             <a href="/search?searchType=CATEGORY&categoryId=13&categoryName=수험서">자격증/수험서</a>
                         </div>
                     </li>
-
                     <li>
                         <a href="/search?searchType=CATEGORY&categoryId=14&categoryName=자연/과학">자연/과학 <span class="arrow">›</span></a>
                         <div class="depth2">
@@ -107,37 +96,21 @@
                 </ul>
             </div>
         </div>
-
     </div>
-
 </nav>
 
 <main class="main">
     <div class="container">
-        <!-- 히어로 배너 -->
-        <section class="hero" aria-label="프로모션 배너">
-            <div class="slides" id="slides">
-            </div>
-            <div class="nav" aria-label="슬라이드 위치 표시">
-                <span class="dot active" data-idx="0"></span>
-                <span class="dot" data-idx="1"></span>
-                <span class="dot" data-idx="2"></span>
-            </div>
-        </section>
-
-        <!-- 베스트셀러 -->
         <section class="section" aria-labelledby="best-title">
             <div class="head">
                 <h3>베스트셀러 ☘️</h3>
                 <a class="more" href="/books/best-seller">더보기</a>
             </div>
             <div class="card-grid" style="grid-template-columns: repeat(5, 1fr)">
-
                 <div th:if="${bestSellers == null or bestSellers.isEmpty()}"
                      style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">
                     <p>베스트셀러가 없습니다.</p>
                 </div>
-
                 <article class="card" th:unless="${bestSellers == null}" th:each="book : ${bestSellers}">
                     <a th:href="@{/books/{bookId}(bookId=${book.bookId})}" class="book-link" style="display:block; color:inherit;">
                         <div class="thumb">
@@ -152,7 +125,6 @@
                                       th:text="${#strings.replace(#strings.substring(book.pubDate, 0, 7), '-', '.')}">
                                 </span>
                             </div>
-
                             <div class="price-row">
                                 <span class="price" th:text="|${#numbers.formatInteger(book.price, 0, 'COMMA')}|">₩15,000</span>
                                 <span class="badge" style="background-color: #ff4d4f; color: #fff;">BEST</span>
@@ -169,18 +141,14 @@
                 <a class="more" href="/books/popular">더보기</a>
             </div>
             <div class="card-grid" style="grid-template-columns: repeat(5, 1fr)">
-
                 <div th:if="${risingBooks == null or risingBooks.isEmpty()}"
                      style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">
                     <p>아직 집계된 인기 도서가 없습니다.</p>
                 </div>
-
-
                 <article class="card" th:unless="${risingBooks == null}" th:each="book : ${risingBooks}">
                     <a th:href="@{/books/{id}(id=${book.bookId})}" class="book-link" style="display:block; color:inherit;">
                         <div class="thumb">
-                            <img th:src="${book.imageUrl}"
-                                 th:alt="${book.imageUrl}"
+                            <img th:src="${book.imageUrl}" th:alt="${book.imageUrl}"
                                  style="width: 100%; height: 100%; object-fit: cover;" />
                         </div>
                         <div class="info">
@@ -191,10 +159,8 @@
                                       th:text="${#strings.replace(#strings.substring(book.pubDate, 0, 7), '-', '.')}">
                                 </span>
                             </div>
-
                             <div class="price-row">
                                 <span class="price" th:text="|${#numbers.formatInteger(book.price, 0, 'COMMA')}|">₩15,000</span>
-
                                 <span class="badge" style="background-color: #e9c46a; color: #333;">NEW</span>
                             </div>
                         </div>
@@ -203,29 +169,20 @@
             </div>
         </section>
 
-        <!-- 이달의 신간 -->
         <section class="section" aria-label="신간 및 추천">
             <div class="head">
                 <h3>이달의 신간 📚</h3>
                 <a class="more" href="/books/new">더보기</a>
             </div>
-
             <div class="card-grid" style="grid-template-columns: repeat(5, 1fr)">
                 <div th:if="${newBooks == null or newBooks.isEmpty()}"
                      style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">
                     <p>준비된 신간 도서가 없습니다.</p>
                 </div>
-
-                <article class="card"
-                         th:unless="${newBooks == null}"
-                         th:each="book : ${newBooks}">
-
-                    <a th:href="@{/books/{book-id}(book-id=${book.bookId})}"
-                       class="book-link"
-                       style="display:block; color:inherit;">
+                <article class="card" th:unless="${newBooks == null}" th:each="book : ${newBooks}">
+                    <a th:href="@{/books/{book-id}(book-id=${book.bookId})}" class="book-link" style="display:block; color:inherit;">
                         <div class="thumb">
-                            <img th:src="${book.imageUrl}"
-                                 th:alt="${book.imageUrl}"
+                            <img th:src="${book.imageUrl}" th:alt="${book.imageUrl}"
                                  style="width: 100%; height: 100%; object-fit: cover;" />
                         </div>
                         <div class="info">
@@ -235,11 +192,9 @@
                                 <span th:if="${book.pubDate != null and #strings.length(book.pubDate) >= 7}"
                                       th:text="${#strings.replace(#strings.substring(book.pubDate, 0, 7), '-', '.')}">
                                 </span>
-                        </span>
                             </div>
                             <div class="price-row">
-                        <span class="price"
-                              th:text="|${#numbers.formatInteger(book.price, 0, 'COMMA')}|">₩15,000</span>
+                                <span class="price" th:text="|${#numbers.formatInteger(book.price, 0, 'COMMA')}|">₩15,000</span>
                                 <span class="badge" style="background-color: #e9c46a; color: #333;">NEW</span>
                             </div>
                         </div>
@@ -253,5 +208,4 @@
 <footer th:replace="~{layout/footer :: footer}"></footer>
 
 </body>
-
 </html>

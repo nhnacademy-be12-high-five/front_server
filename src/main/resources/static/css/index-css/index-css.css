@@ -1,3 +1,4 @@
+
 /* 메인 */
 main {
     flex: 1;
@@ -40,7 +41,6 @@ main {
     margin-top: 14px;
     display: flex;
     gap: 10px;
-    background: #2e7d32;
 }
 .hero .nav {
     position: absolute;
@@ -58,15 +58,15 @@ main {
 .dot.active {
     background: #0b5ed7;
     opacity: 1;
-}
-.hero{
-    width: 100%;
-    height: auto;
-    border-radius: 12px;
-    object-fit: cover;
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
-    margin-right: 100px;
-}
+}/*.hero{*/
+/*    width: 100%;*/
+/*    height: auto;*/
+/*    border-radius: 12px;*/
+/*    object-fit: cover;*/
+/*    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);*/
+/*    margin-right: 100px;*/
+/*}*/
+
 
 /* 카테고리 탭 (기존 탭용 – 구조만 유지) */
 .tabs{
@@ -100,8 +100,7 @@ main {
 
 /* 섹션 헤더 */
 .section {
-    margin-top: 28px;
-    /*background: #2e7d32;*/
+    margin-top:50px;
 }
 .section .head {
     display: flex;
@@ -241,42 +240,46 @@ main {
 /* ============================
    카테고리 네비게이션 (전체 분야)
    ============================ */
-#category-nav {
-    background: #fff;
-    border-bottom: 1px solid #ddd;
-    width: 100%;
-    /* 상단 메뉴가 배너보다 위에 오도록 z-index 설정 */
-    position: relative;
-    z-index: 1000;
-}
+/*#category-nav {*/
+/*    background: #fff;*/
+/*    border-bottom: 1px solid #ddd;*/
+/*    width: 100%;*/
+/*    height: 50px; !* 네비게이션 높이 고정 *!*/
+/*    position: relative;*/
+/*    margin-top: -20px;*/
+/*}*/
+
 .nav-container {
-    width: 1200px; /* 혹은 100% */
+    width: 1200px;
     max-width: 100%;
-    margin: 0 auto; /* 가운데 정렬 */
+    margin: 0 auto;
     height: 50px;
     display: flex;
     align-items: center;
-    /* 기존의 margin: 300px 제거함 */
+    /* (참고) 만약 꽉 찬 파란색 줄이 싫고 '버튼만' 파랗게 하고 싶다면
+       여기 배경을 지우고 .categoryBtn 에 background를 주면 됩니다. */
 }
+
 .all-menu-wrapper {
     position: relative;
     height: 100%;
-    wid2th: 140px;
-    margin: 400px;
+    width: 140px;
+    margin-top: 250px;
+
 }
-.all-menu-btn {
-    width: 100%;
-    height: 100%;
-    background: var(--color-primary);
-    color: #fff;
-    font-weight: 700;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-}
+/*.all-menu-btn {*/
+/*    width: 100%;*/
+/*    height: 100%;*/
+/*    background: var(--color-primary);*/
+/*    color: #fff;*/
+/*    font-weight: 700;*/
+/*    font-size: 16px;*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    justify-content: center;*/
+/*    gap: 8px;*/
+/*    cursor: pointer;*/
+/*}*/
 .quick-menu a {
     color: #333;
     font-weight: 600;
@@ -291,14 +294,14 @@ main {
     display: none;
     top: 50px;
     left: 0;
-    height: 400px;
+    /*height: 400px;*/
     width: 220px;
     /*background: #fff;*/
     border: 1px solid #333;
     border-top: none;
     box-shadow: 0 10px 20px rgba(0,0,0,0.15);
     z-index: 1000;
-    margin: 500px;
+    /*margin: 500px;*/
 }
 
 .all-menu-wrapper:hover .mega-menu {
@@ -414,9 +417,9 @@ main {
     color: var(--color-primary);
 }
 
-.categoryBtn{
-    margin: 300px;
-}
+/*.categoryBtn{*/
+/*    margin: 300px;*/
+/*}*/
 
 .categoryBtn button.all-menu-btn {
     background: transparent;
@@ -437,10 +440,35 @@ main {
     top: 50px; /* 네비게이션 높이만큼 아래에 위치 */
     left: 0;
     width: 250px; /* 메뉴 너비 */
-    background: #fff;
+    /*background: #fff;*/
     border: 1px solid #ddd;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
+
+.nav-container {
+    width: 1200px;
+    max-width: 100%;
+    margin: 0 auto;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    background: #0b73ff; /* ❗ 배경색 필수 (이게 없으면 흰 글씨가 안 보임) */
+}
+
+.main{
+    margin-top: 50px;
+}
+
+/*.categoryBtn{*/
+/*    background: #ffeeba;*/
+/*    width: 1000px;*/
+/*    height: 1000px;*/
+
+/*}*/
+
+/*.main{*/
+/*    background: #6f42c1;*/
+/*}*/
 
 /*.footer-links{*/
 /*    margin-left: 20px;*/
