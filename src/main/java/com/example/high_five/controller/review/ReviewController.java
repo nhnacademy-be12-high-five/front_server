@@ -142,17 +142,3 @@ public class ReviewController {
         return ResponseEntity.ok(isLiked);
     }
 }
-
-
-
-
-// ★ 리뷰 삭제 처리
-// HTML: th:action="@{.../delete}" method="post" 와 매핑됨
-//    @PostMapping("/books/{book-id}/{review-id}/delete")
-//    public String removeReview(
-//            @PathVariable("book-id") Long bookId,
-//            @PathVariable("review-id") Long reviewId
-//    ) {
-//        reviewService.deleteMyReview(bookId, reviewId);
-//        return "redirect:/books/" + bookId;
-//    }

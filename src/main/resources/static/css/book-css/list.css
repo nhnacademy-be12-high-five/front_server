@@ -8,6 +8,13 @@
     --color-border-light: #eee;
     --color-border: #ddd;
     --color-danger: #dc3545;
+
+    /* ==============================
+       [A안 핵심] 헤더 높이 보정값
+       - 헤더 실제 높이보다 작으면 "가려짐" 발생
+       - 일단 96px로 시작, 가리면 104~120으로 올리세요
+       ============================== */
+    --header-height: 300px;
 }
 
 * {
@@ -16,14 +23,20 @@
     box-sizing: border-box;
 }
 
+html, body {
+    overflow-x: hidden;
+}
+
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Noto Sans KR", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
     color: var(--color-text-dark);
     background-color: #ffffff;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+
+    /* ✅ A안: fixed 헤더에 가리지 않도록 본문 전체를 아래로 밀기 */
+    padding-top: var(--header-height) !important;
 }
 
 a {
@@ -39,8 +52,14 @@ a {
 }
 
 /* -------------------- 헤더 -------------------- */
-
+/* ✅ A안: 헤더를 fixed로 확정 */
 #header {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+
     background-color: #ffffff;
     border-bottom: 3px solid var(--color-primary);
     padding: 5px 0;
@@ -141,11 +160,17 @@ a {
 }
 
 /* -------------------- 메인 -------------------- */
-
+/* ✅ 핵심: body가 이미 padding-top으로 내려갔으니,
+   #container에서 위로 당기는 margin/position이 있으면 가려짐이 재발합니다. */
 #container {
     flex: 1;
     background-color: var(--color-background);
     padding: 30px 0 60px;
+
+    /* 혹시 다른 CSS가 #container를 위로 올리는 경우 대비 */
+    margin-top: 0 !important;
+    position: relative;
+    z-index: 1;
 }
 
 .category-page {
@@ -259,7 +284,6 @@ a {
     cursor: pointer;
 }
 
-/* 본문: 접힌 상태 / 펼친 상태 */
 .ai-main-summary-body {
     font-size: 14px;
     color: #444;
@@ -267,13 +291,13 @@ a {
 }
 
 .ai-main-summary-body.collapsed {
-    max-height: 72px;     /* 3~4줄 정도 */
+    max-height: 72px;
     overflow: hidden;
 }
 
 .ai-main-summary-body.expanded {
     max-height: 260px;
-    overflow-y: auto;     /* 말풍선 안에서 스크롤 */
+    overflow-y: auto;
 }
 
 /* 도서 카드 그리드 : 2열 */
@@ -409,7 +433,6 @@ a {
     cursor: pointer;
 }
 
-/* AI 전체 설명 박스: 카드 안에서만 고정 높이 + 스크롤 */
 .ai-snippet-full {
     margin-top: 4px;
     border-radius: 8px;
@@ -418,7 +441,7 @@ a {
 }
 
 .ai-snippet-scroll {
-    max-height: 140px;    /* 너무 길어지지 않게 */
+    max-height: 140px;
     padding: 8px 10px;
     overflow-y: auto;
     font-size: 13px;
@@ -459,12 +482,12 @@ a {
 }
 
 /* -------------------- 푸터 -------------------- */
-
 #footer {
     background-color: var(--color-dark-footer);
     color: #a0a0a0;
     padding: 40px 0;
     font-size: 13px;
+    position: static !important;
 }
 
 #footer .container {
@@ -509,210 +532,9 @@ a {
     .book-grid {
         grid-template-columns: 1fr;
     }
-
-    .book-card-inner {
-        flex-direction: row;
-    }
 }
 
-/* ==== 서점 스타일 네비게이션 바 (홈/검색 공통) ==== */
-#category-nav {
-    background: #fff;
-    border-bottom: 1px solid #ddd;
-    position: relative;
-    z-index: 100;
-}
-
-.nav-container {
-    display: flex;
-    align-items: center;
-    height: 50px;
-}
-
-/* 전체 분야 버튼 영역 */
-.all-menu-wrapper {
-    position: relative;
-    height: 100%;
-    width: 140px;
-}
-
-.all-menu-btn {
-    width: 100%;
-    height: 100%;
-    background: var(--color-primary);
-    color: #fff;
-    font-weight: 700;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-}
-
-/* 퀵 메뉴 (베스트셀러 / 신간도서) */
-.quick-menu {
-    display: flex;
-    list-style: none;
-    margin-left: 20px;
-    gap: 24px;
-}
-
-.quick-menu a {
-    color: #333;
-    font-weight: 600;
-    font-size: 15px;
-}
-
-.quick-menu a:hover {
-    color: var(--color-primary);
-}
-
-/* ==== 메가 메뉴 (대분류 + 소분류) ==== */
-.mega-menu {
-    display: none;
-    position: absolute;
-    top: 50px;            /* 네비게이션 바로 아래 */
-    left: 0;
-    height: 400px;        /* 히어로 배너 높이 정도 */
-    width: 220px;
-    background: #fff;
-    border: 1px solid #333;
-    border-top: none;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-    z-index: 1000;
-}
-
-/* 전체 분야 호버 시 메가 메뉴 표시 */
-.all-menu-wrapper:hover .mega-menu {
-    display: block;
-}
-/* 대분류에 마우스를 올렸을 때 소분류 표시 */
-.depth1 > li:hover .depth2 {
-    display: grid;
-}
-
-/* 대분류(depth1) 영역 */
-.depth1 {
-    list-style: none;
-    height: 100%;
-    overflow-y: auto;
-    background: #fff;
-    border-right: 1px solid #ddd;
-}
-
-/* 스크롤바 꾸미기 (옵션) */
-.depth1::-webkit-scrollbar {
-    width: 6px;
-}
-.depth1::-webkit-scrollbar-thumb {
-    background-color: #ccc;
-    border-radius: 3px;
-}
-.depth1::-webkit-scrollbar-track {
-    background-color: transparent;
-}
-
-.depth1 > li > a {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 11px 16px;
-    font-size: 14px;
-    color: #333;
-    text-decoration: none;
-    border-bottom: 1px solid #f5f5f5;
-    transition: all 0.2s;
-}
-
-.depth1 > li > a:hover {
-    background: #f9f9f9;
-    color: var(--color-primary);
-    font-weight: 700;
-    padding-left: 20px;
-}
-
-.arrow {
-    font-size: 10px;
-    color: #bbb;
-    transition: transform 0.2s, color 0.2s;
-}
-
-.depth1 > li:hover .arrow {
-    color: var(--color-primary);
-}
-
-/* 소분류(depth2) 영역 */
-.depth2 {
-    display: none;
-    position: absolute;
-    top: 0;
-    left: 219px;          /* depth1 너비 맞춰서 옆으로 */
-    height: 400px;
-    width: 600px;
-    background: #fff;
-    border: 1px solid #333;
-    border-left: 1px solid #eee;
-    box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
-    padding: 24px 30px;
-    overflow-y: auto;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px 20px;
-    align-content: start;
-}
-
-/* 대분류에 마우스 올리면 소분류 보이기 */
-.depth1 > li:hover .depth2 {
-    display: grid;
-}
-
-/* 소분류 타이틀 */
-.depth2 h4 {
-    grid-column: 1 / -1;
-    font-size: 17px;
-    font-weight: 800;
-    color: #000;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid #333;
-}
-
-/* 소분류 개별 링크 스타일 */
-.depth2 a {
-    display: block;
-    width: 100%;
-    padding: 8px 12px;
-    font-size: 14px;
-    color: #555;
-    text-decoration: none;
-    border-radius: 6px;
-    transition: all 0.15s ease-in-out;
-
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* 링크 앞 점(·) 추가 */
-.depth2 a::before {
-    content: '·';
-    margin-right: 6px;
-    font-weight: bold;
-    color: #ddd;
-    transition: color 0.15s;
-}
-
-/* 호버 시 버튼처럼 보이도록 */
-.depth2 a:hover {
-    background-color: #f2f8ff;
-    color: var(--color-primary);
-    font-weight: 700;
-    transform: translateX(3px);
-}
-
-.depth2 a:hover::before {
-    color: var(--color-primary);
-}
+/* 로딩 오버레이 */
 .ai-loading-overlay {
     position: fixed;
     inset: 0;
@@ -745,18 +567,35 @@ a {
     to { transform: rotate(360deg); }
 }
 
-.hidden {
-    display: none;
+.hidden { display: none; }
+
+/* =========================
+   [FIX-ABSOLUTE] 북리스트 헤더 가림 100% 차단
+   - body padding-top이 다른 CSS에서 0!important로 덮여도 동작
+   - #container를 헤더 높이만큼 강제 하강
+   ========================= */
+
+:root{
+    --header-height: 96px; /* 여기만 조절 (필요 시 110~140) */
 }
 
-#footer {
-    position: static !important;   /* fixed/absolute 무력화 */
-    bottom: auto !important;
-    left: auto !important;
-    right: auto !important;
-    width: auto !important;
-    z-index: auto !important;
-    margin-top: auto;              /* flex column일 때 맨 아래로 */
+/* 헤더는 무조건 fixed */
+#header{
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1000 !important;
 }
 
+#container{
+    margin-top: var(--header-height) !important;
+    /* 기존 padding(30px 0 60px)은 유지해도 되고,
+       혹시 위쪽 여백이 부족하면 아래처럼 추가로 줘도 됨 */
+    padding-top: 30px !important;
+}
 
+/* 혹시 category-page가 위로 끌려 올라오면 이것도 방지 */
+.category-page{
+    margin-top: 0 !important;
+}

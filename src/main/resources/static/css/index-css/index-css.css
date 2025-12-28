@@ -503,4 +503,57 @@ main {
 /*    margin: 0;*/
 /*}*/
 
+/* =========================================
+   CATEGORY NAV ONLY - height/typography fix
+   - 다른 영역 영향 X
+   - 둥글게 만들지 않음
+   ========================================= */
 
+#category-nav{
+    /* 바 자체가 얇아 보이는 원인: 높이/패딩 부족 */
+    border-bottom: 1px solid #ddd;
+}
+
+/* 카테고리 바 높이만 살짝 키움 (50px → 58px) */
+#category-nav .nav-container{
+    height: 59px !important;
+    align-items: center;
+}
+
+/* 왼쪽 '전체분야/카테고리' 버튼 영역 */
+#category-nav .all-menu-wrapper{
+    height: 100%;
+}
+
+/* 버튼: 둥글게 금지 + 높이 꽉 채우기 + 글자 살짝 키우기 */
+#category-nav .all-menu-btn{
+    height: 100% !important;
+    padding: 0 16px !important;
+    font-size: 17px !important;
+    font-weight: 900 !important;
+
+    /* 동그랗게 만들지 말 것 */
+    border-radius: 0 !important;
+}
+
+/* 퀵 메뉴(베스트셀러/신간 등)도 세로로 가운데 + 납작함 방지 */
+#category-nav .quick-menu{
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+/* 퀵 메뉴 링크도 바 높이에 맞게 클릭 영역 확보 */
+#category-nav .quick-menu a{
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 8px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+/* 메가 메뉴 위치는 nav 높이에 맞춰서만 보정 (카테고리 영역 내부만) */
+#category-nav .mega-menu{
+    top: 80px !important;
+}

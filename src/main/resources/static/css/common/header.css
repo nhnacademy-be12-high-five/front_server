@@ -1,17 +1,32 @@
 /* ============================
-   COMMON HEADER (CLEAN & SAFE)
-   - 전역 fixed 강제 제거
-   - header는 sticky(본문/카테고리 가림 방지)
+   COMMON HEADER (CLEAN & SAFE) - A안 (STICKY)
+   - 전역 fixed 강제 제거 (본문 가림 방지)
+   - header는 sticky로 상단 고정
    - 검색박스 높이 고정(세로 늘어남 방지)
+   - 전역 body padding 강제 없음
    ============================ */
 
+/* header 관련 변수 */
 :root{
     --header-z: 1000;
     --header-bg: #fff;
     --header-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-/*  헤더는 sticky */
+/* 모바일 가로 스크롤 방지 */
+html, body{
+    overflow-x: hidden;
+}
+
+/* ❗ header.css에서 body padding을 강제하지 않습니다 (sticky는 본문을 덮지 않음) */
+body{
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* =========================
+   HEADER (STICKY)
+   ========================= */
 #header{
     position: sticky;
     top: 0;
@@ -22,18 +37,7 @@
     box-shadow: var(--header-shadow);
 }
 
-/* ❗ header.css에서 body padding/fixed footer 같은 전역 강제 금지 */
-body{
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-}
-
-/* 모바일 가로 스크롤 방지 */
-html, body{
-    overflow-x: hidden;
-}
-
-/* 헤더 내부 컨테이너만 flex 적용 (전역 .container 건드리지 않음) */
+/* 헤더 내부 컨테이너만 flex 적용 (전역 .container는 건드리지 않음) */
 #header .container{
     display: flex;
     align-items: center;
@@ -42,7 +46,9 @@ html, body{
     flex-wrap: nowrap;
 }
 
-/* 로고 */
+/* =========================
+   LOGO
+   ========================= */
 #header .logo{
     display: flex;
     align-items: center;
@@ -66,7 +72,9 @@ html, body{
     white-space: nowrap;
 }
 
-/* 가운데 영역(검색) */
+/* =========================
+   CENTER (SEARCH)
+   ========================= */
 #header .gnb{
     flex: 1 1 auto;
     display: flex;
@@ -114,7 +122,9 @@ html, body{
     filter: brightness(0.95);
 }
 
-/* 오른쪽 유저 메뉴 */
+/* =========================
+   RIGHT (USER MENU)
+   ========================= */
 #header .user-menu{
     flex: 0 0 auto;
     display: flex;
@@ -123,12 +133,14 @@ html, body{
     margin-left: auto;
 }
 
+/* 아이콘 링크 */
 #header .user-menu .user-link{
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 4px;
     line-height: 1;
+    text-decoration: none;
 }
 
 #header .user-menu .user-icon{
@@ -193,52 +205,16 @@ html, body{
     color: #fff;
 }
 
-
-/*  카테고리(nav) 가림 방지(홈에 카테고리가 있을 때) */
-
-/* ====== Fixed Header/Footer: Global ====== */
-:root{
-    --header-height: 96px;   /* 실제 헤더 높이에 맞춰 조정 */
-    --footer-height: 120px;  /* 실제 푸터 높이에 맞춰 조정 */
-}
-
-/* 스크롤 시에도 헤더가 상단에 고정 */
-header, .site-header, #header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-}
-
-/* 스크롤 시에도 푸터가 하단에 고정 */
-footer, .site-footer, #footer {
-    position: static;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 900;
-}
-
-/* 고정된 헤더/푸터에 본문이 가리지 않도록 여백 확보 */
-body{
-    padding-top: var(--header-height);
-    padding-bottom: var(--footer-height);
-}
-
-/* 모바일에서 가로 스크롤 생기는 경우 방지(선택) */
-html, body{
-    overflow-x: hidden;
-}
-
-
+/* 카테고리(nav)가 있다면 헤더 아래에서 자연스럽게 흐르게 (가림 방지) */
 #category-nav{
     position: relative;
     z-index: 1;
     margin-top: 0;
 }
 
-/* 반응형 */
+/* =========================
+   RESPONSIVE
+   ========================= */
 @media (max-width: 992px){
     #header .search-box{ width: 420px; }
 }

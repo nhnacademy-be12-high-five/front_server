@@ -85,23 +85,16 @@ public class SearchController {
      * AI 검색 (RAG 기반)
      */
     @GetMapping("/rag-search")
-    public String ragSearch(@RequestParam String keyword,
-                            @RequestParam(defaultValue = "POPULAR") String sort,
-                            @RequestParam(defaultValue = "0") int page,
-                            Model model) {
+    public String ragSearch(
+            @RequestParam String keyword,
+            Model model
+    ) {
+        List<BookResponse> books = bookClient.ragSearch(keyword);
 
-        int size = PAGE_SIZE;
-
-        // 1) AI 기반 책 목록 검색
-        PagedResponse response = bookClient.ragSearch(keyword, page, size);
-        if (response == null) {
-            response = new PagedResponse();
+        if (books == null) {
+            books = List.of();
         }
 
-        int currentPage = response.getNumber();
-        response.setPage(currentPage);
-
-        // 2) AI 요약 문장 가져오기
         String aiMessage;
         try {
             aiMessage = bookClient.ragAnswer(keyword);
@@ -109,12 +102,8 @@ public class SearchController {
             aiMessage = "현재 AI 추천 설명을 불러오지 못했습니다.";
         }
 
-        // model 설정
         model.addAttribute("keyword", keyword);
-        model.addAttribute("books", response.getContent());
-        model.addAttribute("pageInfo", response);
-        model.addAttribute("page", currentPage);
-        model.addAttribute("sort", sort);
+        model.addAttribute("books", books);
 
         model.addAttribute("searchType", "AI");
         model.addAttribute("aiSummary", aiMessage);

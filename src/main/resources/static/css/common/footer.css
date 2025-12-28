@@ -154,6 +154,91 @@ body {
     margin-bottom: 0;
 }
 
+/* =========================
+   FOOTER SANDBOX (전역 CSS 영향 차단)
+   - detail-style/review-section 등에서 strong, div, p에 준 전역 스타일이 footer에 침범하는 문제 차단
+   ========================= */
+
+/* footer 내부 기본 레이아웃 고정 */
+#footer .footer-info{
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    gap: 40px !important;
+}
+
+#footer .footer-info > div{
+    /* 어떤 페이지 CSS가 div에 flex/grid/center를 줘도 footer에선 고정 */
+    display: block !important;
+    text-align: left !important;
+    white-space: normal !important;
+}
+
+/* 오른쪽 블록만 우측 정렬 유지 */
+#footer .footer-info > div:last-child{
+    margin-left: auto !important;
+    text-align: right !important;
+}
+
+/* 전역 strong/p 스타일이 footer에 침범하는 경우가 가장 흔함 */
+#footer strong{
+    display: inline !important;      /* 전역에서 block/inline-block으로 바꾸는 경우 방지 */
+    margin: 0 !important;
+}
+
+#footer p{
+    margin: 0 !important;            /* 전역 p margin 차단 */
+}
+
+/* 전역에서 br의 line-height를 건드리는 경우 방지(안전) */
+#footer br{
+    line-height: inherit !important;
+}
+
+/* =========================
+   FOOTER FINAL (홈/북상세 통일 고정)
+   ========================= */
+
+#footer .container{
+    width: 100% !important;
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 22px 24px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 18px !important;
+}
+
+#footer .footer-links{
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 18px !important;
+    padding-left: 12px !important;
+    margin-bottom: 14px !important;
+}
+
+#footer .footer-info{
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    gap: 40px !important;
+}
+
+#footer .footer-info > div{
+    display: block !important;
+    text-align: left !important;
+    margin: 0 !important;
+}
+
+#footer .footer-info > div:last-child{
+    margin-left: auto !important;
+    text-align: right !important;
+}
+
+#footer strong{ font-weight: 700 !important; }
+#footer p{ margin: 0 !important; }
+
 
 
 
