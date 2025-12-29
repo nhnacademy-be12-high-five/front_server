@@ -16,9 +16,6 @@
 
 <div th:replace="~{layout/header :: header}"></div>
 
-<script src="/js/index.js"></script>
-<script src="/js/common.js"></script>
-
 <nav id="category-nav">
     <div class="container nav-container">
         <div class="all-menu-wrapper">
@@ -103,14 +100,6 @@
 <main class="main">
     <div class="container">
 
-        <div class="hero">
-
-<!--            <div class="nav">-->
-<!--                <div class="dot active" data-idx="0"></div>-->
-<!--                <div class="dot" data-idx="1"></div>-->
-<!--                <div class="dot" data-idx="2"></div>-->
-<!--            </div>-->
-        </div>
         <section class="section" aria-labelledby="best-title">
             <div class="head">
                 <h3>베스트셀러 ☘️</h3>
@@ -215,7 +204,10 @@
     </div>
 </main>
 
-<footer th:replace="~{layout/footer :: footer}">< /footer>
+<footer th:replace="~{layout/footer :: footer}"></footer>
+
+<script src="/js/index.js"></script>
+<script src="/js/common.js"></script>
 
 </body>
 </html>
