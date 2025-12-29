@@ -108,7 +108,54 @@ function updateTotal() {
 // 포인트 전액 사용
 // ===========================
 function useAllPoints() {
-    $('#usedPoint').val(maxPoint);
+    // 1. 현재 상품 총액 및 포장비 계산
+    let productTotal = 0;
+    let wrappingFee = 0;
+
+    $('.order-item-row').each(function () {
+        const price = parseInt($(this).find('.item-price').val()) || 0;
+        let qty = parseInt($(this).find('.item-qty-input').val()) || 1;
+
+        productTotal += price * qty;
+
+        const wrapperPrice = parseInt($(this).find('.wrapper-select option:selected').data('price')) || 0;
+        wrappingFee += wrapperPrice * qty;
+    });
+
+    // 2. 배송비 계산
+    let deliveryFee = productTotal >= freeDeliveryThreshold ? 0 : standardDeliveryFee;
+
+    // 3. 쿠폰 할인액 계산
+    let couponDiscount = 0;
+    const $couponOption = $('#couponSelect option:selected');
+    if ($couponOption.val()) {
+        const discountType = $couponOption.data('type');
+        const discountValue = parseInt($couponOption.data('discount')) || 0;
+        const minPrice = parseInt($couponOption.data('min-price')) || 0;
+
+        // 최소 주문 금액 만족 시에만 할인 적용
+        if (productTotal >= minPrice) {
+            if (discountType === 'PERCENTAGE') {
+                couponDiscount = Math.floor(productTotal * (discountValue / 100));
+            } else {
+                couponDiscount = discountValue;
+            }
+            // 할인이 상품 금액을 초과하면 상품 금액까지만 할인
+            if (couponDiscount > productTotal) {
+                couponDiscount = productTotal;
+            }
+        }
+    }
+
+    // 4. 포인트 사용 가능한 최대 금액 계산 (결제할 금액이 최대 한도)
+    // 식: (상품 + 배송 + 포장) - 쿠폰할인
+    const maxUseableAmount = productTotal + deliveryFee + wrappingFee - couponDiscount;
+
+    // 5. [내 보유 포인트]와 [결제할 금액] 중 더 작은 값 선택
+    const finalPoint = Math.min(maxPoint, maxUseableAmount);
+
+    // 6. 값 적용 및 화면 업데이트
+    $('#usedPoint').val(finalPoint);
     updateTotal();
 }
 
@@ -195,4 +242,33 @@ function requestPayment() {
             alert(errorMessage);
         }
     });
+}
+// 모달 열기
+function openAddressModal() {
+    document.getElementById('addressModal').style.display = 'flex';
+}
+
+// 모달 닫기
+function closeAddressModal() {
+    document.getElementById('addressModal').style.display = 'none';
+}
+
+// 주소 선택 시 입력창에 값 채우기
+function selectAddress(element) {
+    const recipient = element.getAttribute('data-recipient');
+    const phone = element.getAttribute('data-phone');
+    const road = element.getAttribute('data-road');
+    const detail = element.getAttribute('data-detail');
+    const zip = element.getAttribute('data-zip');
+
+    // 입력 필드 ID에 맞춰 값 주입
+    document.getElementById('receiverName').value = recipient;
+    document.getElementById('receiverPhone').value = phone;
+
+    // 주소 포맷은 원하시는 대로 조합하세요 (예: 우편번호 + 도로명 + 상세)
+    const fullAddress = `(${zip}) ${road} ${detail}`;
+    document.getElementById('receiverAddress').value = fullAddress;
+
+    // 모달 닫기
+    closeAddressModal();
 }
