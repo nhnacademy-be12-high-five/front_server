@@ -6,9 +6,12 @@ document.addEventListener("click", async (e) => {
     if (!bookId) return;
 
     try {
-        const res = await fetch(`/api/books/${bookId}/likes`, {
+        const res = await fetch(`/books/${bookId}/likes`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" }
+            headers: {
+                "Content-Type": "application/json",
+                "X-USER-ID": "1"
+            }
         });
 
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
