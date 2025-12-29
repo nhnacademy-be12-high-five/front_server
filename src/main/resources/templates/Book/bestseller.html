@@ -42,10 +42,11 @@
                              th:classappend="${iterStat.count <= 3} ? 'rank-' + ${iterStat.count}"
                              th:text="${iterStat.count}">1</div>
 
-                        <div class="thumb">
+                        <div class="thumb" style="height: 220px; display: flex; justify-content: center; align-items: center; overflow: hidden; background-color: #f8f9fa;">
                             <img th:src="${book.imageUrl}" th:alt="${book.title}"
-                                 style="width: 100%; height: 100%; object-fit: cover;" />
+                                 style="height: 100%; width: auto; object-fit: contain;" />
                         </div>
+
                         <div class="info">
                             <div class="title" th:text="${book.title}">책 제목</div>
                             <div class="meta">
@@ -69,6 +70,8 @@
 </main>
 
 <div th:replace="~{layout/footer :: footer}"></div>
+
+<script src="/js/book/best-seller.js"></script>
 
 </body>
 </html>
