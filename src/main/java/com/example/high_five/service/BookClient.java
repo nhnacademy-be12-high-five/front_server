@@ -83,7 +83,9 @@ public interface BookClient {
 //    void deleteBook(@PathVariable("id") Long bookId,
 //                    @RequestHeader("X-User-Id") Long userId);
     @GetMapping("/api/categories/{categoryId}/books")
-    List<BookResponse> getBooksByCategory(@PathVariable("categoryId") int categoryId);
+    PagedResponse<BookResponse> getBooksByCategory(@PathVariable("categoryId") int categoryId,
+                                                   @RequestParam("page") int page,
+                                                   @RequestParam("size") int size);
 
     // [마이페이지] 내가 좋아요 누른 도서 목록 조회
     @GetMapping("/api/books/my-page/likes")
