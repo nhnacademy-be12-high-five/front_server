@@ -52,7 +52,7 @@ async function searchBooks() {
 // 2. 도서 상세 정보 로드 (수정 모드 전환)
 async function loadBookDetail(bookId) {
     try {
-        const response = await fetch(`/admin/books`);
+        const response = await fetch(`/admin/books/${bookId}`);
         if (!response.ok) throw new Error('도서 정보를 불러올 수 없습니다.');
 
         const book = await response.json();
@@ -211,17 +211,30 @@ function previewImage(url) {
 }
 
 // 7. 필드 잠금/해제
-function setFormReadOnly(isReadOnly) {
+function setFormReadOnly(isUpdateMode) {
     // description은 에디터를 쓸 경우 readOnly 속성이 안 먹힐 수 있음 (에디터 API 사용 필요)
     const fields = ['isbn', 'title', 'author', 'publisher', 'publishedDate', 'image', 'price', 'description'];
 
     fields.forEach(fieldId => {
         const el = document.getElementById(fieldId);
-        if (el) {
-            el.readOnly = isReadOnly;
-            el.style.backgroundColor = isReadOnly ? "#e9ecef" : "#fff";
-            // 가격 등은 수정 모드에서도 고칠 수 있게 하려면 예외 처리 필요
-            // 여기서는 원본 로직 유지
+        if (!el) return;
+
+        if (isUpdateMode) {
+            // === 수정 모드 (기존 도서 불러옴) ===
+            if (fieldId === 'isbn') {
+                // 1. ISBN은 절대 수정 불가
+                el.readOnly = true;
+                el.style.backgroundColor = "#e9ecef"; // 회색 배경 (잠김 표시)
+            } else {
+                // 2. 나머지 필드는 수정 가능하도록 활성화
+                el.readOnly = false;
+                el.style.backgroundColor = "#fff";    // 흰색 배경
+            }
+        } else {
+            // === 신규 등록 모드 ===
+            // 모든 필드 입력 가능
+            el.readOnly = false;
+            el.style.backgroundColor = "#fff";
         }
     });
 }
@@ -293,5 +306,37 @@ function loadSubCategories(parentId, selectedSubId = null) {
 function setFinalCategory(subId) {
     if (subId) {
         document.getElementById('categoryId').value = subId;
+    }
+}
+async function deleteBook() {
+    const bookId = document.getElementById('bookId').value;
+
+    if (!bookId) {
+        alert("삭제할 도서가 선택되지 않았습니다.");
+        return;
+    }
+
+    if (!confirm("정말로 이 도서를 삭제하시겠습니까?\n삭제 후에는 복구할 수 없습니다.")) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/admin/books/${bookId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            alert("도서가 성공적으로 삭제되었습니다.");
+            window.location.reload(); // 목록 갱신을 위해 새로고침
+        } else {
+            const errorMsg = await response.text();
+            throw new Error(errorMsg);
+        }
+    } catch (error) {
+        console.error(error);
+        alert("삭제 실패: " + error.message);
     }
 }

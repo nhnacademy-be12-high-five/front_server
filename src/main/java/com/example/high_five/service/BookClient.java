@@ -78,10 +78,10 @@ public interface BookClient {
     BookResponse updateBook(@PathVariable("id") Long bookId,
                             @RequestBody BookAdminUpdateRequest updateRequest);
 
-    // [관리자] 도서 삭제
-//    @DeleteMapping("/api/admin/{id}")
-//    void deleteBook(@PathVariable("id") Long bookId,
-//                    @RequestHeader("X-User-Id") Long userId);
+//     [관리자] 도서 삭제
+    @DeleteMapping("/api/admin/books/{id}")
+    void deleteBook(@PathVariable("id") Long bookId);
+
     @GetMapping("/api/categories/{categoryId}/books")
     PagedResponse<BookResponse> getBooksByCategory(@PathVariable("categoryId") int categoryId,
                                                    @RequestParam("page") int page,
