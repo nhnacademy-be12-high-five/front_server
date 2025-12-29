@@ -66,7 +66,7 @@ public class CouponAdminController {
             couponService.createCouponPolicy(dto);
             redirectAttributes.addFlashAttribute("message", "쿠폰 정책이 성공적으로 생성되었습니다.");
         } catch (FeignException e) {
-            String serverMessage = e.getMessage();
+            String serverMessage = e.contentUTF8();
             String alertMsg = "정책 생성 실패: " + e.status();
 
             if (serverMessage != null && serverMessage.contains("\"message\":\"")) {

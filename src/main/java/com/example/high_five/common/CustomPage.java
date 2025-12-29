@@ -14,4 +14,10 @@ public class CustomPage<T> {
     private long totalElements;
     private int size;
     private int number;
+
+    public void setContent(List<Object> objects) {
+    }
+
+    public void setTotalPages(int i) {
+    }
 }

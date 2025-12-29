@@ -23,5 +23,7 @@ public class CommonPageResponse<T> {
     }
 
 
+    public void setData(List<Object> objects) {
 
+    }
 }
