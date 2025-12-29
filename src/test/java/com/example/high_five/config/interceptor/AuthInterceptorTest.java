@@ -101,11 +101,11 @@ class AuthInterceptorTest {
             parser.when(() -> JwtPayloadParser.parseClaims(anyString()))
                     .thenReturn(Map.of("sub", 1L, "exp", exp));
 
-          //  TokenDto newTokens = new TokenDto("new-access", "new-refresh", "Bearer");
-          //  given(authService.reissue(anyString())).willReturn(ResponseEntity.ok(newTokens));
+            TokenDto newTokens = new TokenDto("new-access", "new-refresh", true);
+            given(authService.reissue(anyString())).willReturn(ResponseEntity.ok(newTokens));
 
             // when
-            authInterceptor.preHandle(request, response, handlerMethod); // HandlerMethod 관련 로직은 무시(null 리턴 등으로 처리하거나 위에서 걸림)
+            authInterceptor.preHandle(request, response, handlerMethod);
 
             // then
             verify(authService).reissue("refresh-token-val");
