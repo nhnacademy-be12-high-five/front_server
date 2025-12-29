@@ -24,7 +24,7 @@ public class OrderCheckoutRequest {
     private LocalDate requestDeliveryDate;
 
     private Long couponId;
-    private Integer usedPoint;
+    private Integer usedPoint = 0;
 
     private List<OrderItemDto> orderItems;
 
