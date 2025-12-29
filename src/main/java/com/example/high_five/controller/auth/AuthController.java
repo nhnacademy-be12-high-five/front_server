@@ -155,6 +155,11 @@ public class AuthController {
 
             return "redirect:/";
 
+        } catch (FeignException e) {
+            FeignError fe = extractFeignError(e);
+            log.warn("소셜 로그인 실패 (Feign): code={}, message={}", fe.code(), fe.message());
+            rttr.addAttribute("errorCode", fe.code());
+            return "redirect:/member/login";
         } catch (Exception e) {
             log.error("소셜 로그인 실패", e);
             rttr.addAttribute("errorCode", "C002");
