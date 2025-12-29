@@ -1,6 +1,8 @@
 package com.example.high_five.controller.order;
 
 import com.example.high_five.dto.coupon.MemberCouponResponseDto;
+import com.example.high_five.dto.member.response.AddressListResponse;
+import com.example.high_five.dto.member.response.AddressResponse;
 import com.example.high_five.dto.order.GuestOrderDetailResponse;
 import com.example.high_five.dto.order.OrderCheckoutRequest;
 import com.example.high_five.dto.order.OrderCreateResponse;
@@ -9,6 +11,7 @@ import com.example.high_five.dto.payment.PaymentConfirmRequest;
 import com.example.high_five.dto.payment.PaymentConfirmResponse;
 import com.example.high_five.dto.payment.PaymentMethodResponse;
 import com.example.high_five.dto.point.PointBalanceResponse;
+import com.example.high_five.service.AddressService;
 import com.example.high_five.service.CouponService;
 import com.example.high_five.service.FrontOrderService;
 import com.example.high_five.service.MemberService;
@@ -41,6 +44,7 @@ public class OrderController {
     private final PaymentService paymentService;
     private final MemberService memberService;
     private final CouponService couponService;
+    private final AddressService addressService;
 
     @Value("test_ck_d46qopOB8969zAlo4YJY3ZmM75y0")
     private String tossClientKey;
@@ -53,36 +57,61 @@ public class OrderController {
                              @RequestHeader(value = "Authorization", required = false) String token,
                              Model model) {
 
-
-        OrderResponse orderSheet = frontOrderService.createOrderSheet(userId, token, bookIds, quantities);
+        // 주문 시트
+        OrderResponse orderSheet =
+                frontOrderService.createOrderSheet(userId, token, bookIds, quantities);
         model.addAttribute("orderSheet", orderSheet);
 
+        // 포인트
+        Long point = 0L;
         try {
             PointBalanceResponse pointResponse = memberService.getMyBalance(token).getBody();
-            model.addAttribute("point", pointResponse.getCurrentPoint());
-            if (userId == null) {
-                userId = pointResponse.getMemberId();
+            if (pointResponse != null) {
+                point = pointResponse.getCurrentPoint();
+                if (userId == null) {
+                    userId = pointResponse.getMemberId();
+                }
             }
-        } catch (Exception e) {
-            model.addAttribute("point", 0);
+        } catch (Exception ignore) {
         }
-
-        try {
-            List<MemberCouponResponseDto> coupons = couponService.getUsableCoupons(userId, bookIds);
-            model.addAttribute("coupons", coupons);
-        } catch (Exception e) {
-            model.addAttribute("coupons", Collections.emptyList());
-        }
+        model.addAttribute("point", point);
         model.addAttribute("userId", userId);
 
+        // 쿠폰
+        List<MemberCouponResponseDto> coupons = Collections.emptyList();
+        if (userId != null) {
+            try {
+                coupons = couponService.getUsableCoupons(userId, bookIds);
+            } catch (Exception ignore) {
+            }
+        }
+        model.addAttribute("coupons", coupons);
+
+        // 결제 수단
+        List<PaymentMethodResponse> paymentMethods = Collections.emptyList();
         try {
-            List<PaymentMethodResponse> paymentMethods = paymentService.getAllMethods();
-            model.addAttribute("paymentMethods", paymentMethods);
+            paymentMethods = paymentService.getAllMethods();
         } catch (Exception e) {
             log.warn("결제 수단 조회 실패", e);
-            model.addAttribute("paymentMethods", List.of());
         }
+        model.addAttribute("paymentMethods", paymentMethods);
 
+        // 배송지
+        List<AddressResponse> addresses = Collections.emptyList();
+        if (userId != null) {
+            try {
+                AddressListResponse response =
+                        addressService.getAddressList().getBody();
+                if (response != null && response.getAddressList() != null) {
+                    addresses = response.getAddressList();
+                }
+            } catch (Exception e) {
+                log.warn("배송지 목록 조회 실패", e);
+            }
+        }
+        model.addAttribute("savedAddresses", addresses);
+
+        // 기본 CheckoutRequest
         OrderCheckoutRequest checkoutRequest = new OrderCheckoutRequest();
         checkoutRequest.setReceiverName(orderSheet.getName());
         model.addAttribute("checkoutRequest", checkoutRequest);
