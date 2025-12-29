@@ -1,10 +1,10 @@
 .page-header {
     padding: 40px 0;
     text-align: center;
-    background: #f8f9fa;
-    margin: 110px;
+    /*background: #f8f9fa;*/
+    margin: 50px;
     border-bottom: 1px solid #eee;
-
+    background: white;
 }
 
 .page-header h2 {

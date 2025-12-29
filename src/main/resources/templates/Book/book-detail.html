@@ -52,23 +52,6 @@
                         </div>
                     </div>
 
-<!--                    <div class="breadcrumb">-->
-
-<!--                        <th:block th:if="${book.categories!= null}" th:each="category : ${book.categories}">-->
-<!--                            <span class="separator">&gt;</span>-->
-<!--&lt;!&ndash;                            <a th:href="@{/categories/{id}(id=${category.id})}"&ndash;&gt;-->
-<!--&lt;!&ndash;                               th:text="${category.name}">카테고리명</a>&ndash;&gt;-->
-<!--                        </th:block>-->
-
-<!--                        <span class="separator">&gt;</span>-->
-<!--                        <span class="current-book" th:text="${book.title}">도서 제목</span>-->
-
-<!--                        <th:block th:if="${book.categories() != null}" th:each="${book.categories()}">-->
-<!--                            <span class="separator">&gt;</span>-->
-<!--                        </th:block>-->
-<!--                    </div>-->
-
-
                     <div class="breadcrumb">
                         <a th:href="@{/}">홈</a>
 
@@ -131,8 +114,6 @@
                                 th:data-book-id="${book.bookId}">
                             &#9829;
                         </button>
-
-
 
                         <button type="button" class="btn-primary" id="add-to-cart-btn" th:data-book-id="${book.bookId}">
                             장바구니 담기
@@ -218,7 +199,6 @@
                     <p><strong>반품/교환 안내</strong><br>상품 수령 후 7일 이내 교환/반품 가능합니다.</p>
                 </div>
             </div>
-
         </section>
     </div>
 </main>

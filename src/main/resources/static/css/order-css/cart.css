@@ -502,11 +502,11 @@ main {
 
 /* 헤더 높이 보정값 */
 :root{
-    --header-offset: 110px; /* 필요 시 100~130px 범위에서 조절 */
+    --header-offset: 20px; /* 필요 시 100~130px 범위에서 조절 */
 }
 
-/* 장바구니 본문을 헤더 아래로 확실히 내림 */
-main.main_con{
-    padding-top: var(--header-offset);
-}
+/*!* 장바구니 본문을 헤더 아래로 확실히 내림 *!*/
+/*main.main_con{*/
+/*    padding-top: var(--header-offset);*/
+/*}*/
 
