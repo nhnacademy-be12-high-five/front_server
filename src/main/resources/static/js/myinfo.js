@@ -15,8 +15,7 @@ const autoHyphen = (target) => {
     } else {
         target.innerText = val;
     }
-}
-
+};
 
 document.addEventListener("DOMContentLoaded", () => {
     const viewPhone = document.getElementById("view-phone");
@@ -28,14 +27,27 @@ document.addEventListener("DOMContentLoaded", () => {
     handleAlertMessage();
 });
 
+function mapAlertCodeToMessage(code) {
+    const map = {
+        "MP200": "수정되었습니다.",
+        "M011": "이미 존재하는 이메일입니다.",
+        "M012": "이미 존재하는 전화번호입니다.",
+        "M013": "생일은 변경할 수 없습니다.",
+        "C002": "요청 처리 중 오류가 발생했습니다."
+    };
+    return map[code] || "요청 처리 중 오류가 발생했습니다.";
+}
+
 function handleAlertMessage() {
     const serverMsgInput = document.getElementById('server-alert-msg');
     const modelMessage = serverMsgInput ? serverMsgInput.value : null;
 
     const urlParams = new URLSearchParams(window.location.search);
+
+    const alertCode = urlParams.get('alertCode');
     const urlMessage = urlParams.get('errorMessage');
 
-    const finalMessage = modelMessage || urlMessage;
+    const finalMessage = modelMessage || urlMessage || (alertCode ? mapAlertCodeToMessage(alertCode) : null);
 
     if (finalMessage) {
         alert(finalMessage);
@@ -44,7 +56,7 @@ function handleAlertMessage() {
             setTimeout(() => toggleEditMode(true), 100);
         }
 
-        if (urlMessage) {
+        if (urlMessage || alertCode) {
             history.replaceState(null, "", location.pathname);
         }
     }

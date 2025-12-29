@@ -3,10 +3,9 @@ package com.example.high_five.controller.member;
 import com.example.high_five.common.annotation.LoginRequired;
 import com.example.high_five.dto.member.request.MemberCreateRequestDto;
 import com.example.high_five.dto.member.request.MemberUpdateRequest;
+import com.example.high_five.exception.FeignErrorParser;
 import com.example.high_five.service.AuthService;
 import com.example.high_five.service.MemberService;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,7 +23,8 @@ public class MemberController {
 
     private final MemberService memberService;
     private final AuthService authService;
-    private final ObjectMapper objectMapper;
+    private final FeignErrorParser feignErrorParser;
+
     @GetMapping("/member/signup")
     public String signupForm() {
         return "member/signup";
@@ -36,21 +36,24 @@ public class MemberController {
             authService.signup(requestDto);
             return "redirect:/member/login";
         } catch (Exception e) {
-            log.error("회원가입 실패: {}", e.getMessage());
+            log.error("회원가입 실패: {}", e.getMessage(), e);
             return "redirect:/member/signup?error=true";
         }
     }
 
     @LoginRequired
     @GetMapping("/mypage")
-    public String myPage(Model model) {
+    public String myPage(Model model,
+                         @RequestParam(value = "alertCode", required = false) String alertCode) {
         try {
             var myInfo = memberService.getMyInfo().getBody();
             model.addAttribute("myInfo", myInfo);
         } catch (FeignException e) {
-            log.error("내 정보 조회 실패: {}", e.getMessage());
+            log.error("내 정보 조회 실패: {}", e.getMessage(), e);
             return "redirect:/member/login";
         }
+
+        model.addAttribute("alertCode", alertCode);
         model.addAttribute("currentTab", "info");
         return "mypage/myinfo";
     }
@@ -58,28 +61,45 @@ public class MemberController {
     @LoginRequired
     @PostMapping("/mypage/update")
     public String updateMember(@ModelAttribute MemberUpdateRequest request,
-                               RedirectAttributes redirectAttributes) {
+                               RedirectAttributes rttr) {
         try {
             memberService.updateMember(request);
-            redirectAttributes.addFlashAttribute("alertMessage", "수정되었습니다.");
+
+            rttr.addAttribute("alertCode", "MP200");
+            return "redirect:/mypage";
+
         } catch (FeignException e) {
-            String msg = extractFeignMessage(e); // 아래 함수
-            redirectAttributes.addFlashAttribute("alertMessage", msg);
+            FeignErrorParser.FeignError fe =
+                    feignErrorParser.parse(e, "C002", "수정에 실패했습니다.");
+
+            rttr.addAttribute("alertCode", fe.code());
+            return "redirect:/mypage";
+
+        } catch (Exception e) {
+            rttr.addAttribute("alertCode", "C002");
+            return "redirect:/mypage";
         }
-        return "redirect:/mypage";
     }
 
     @LoginRequired
     @PostMapping("/mypage/withdraw")
-    public String withdrawMember(HttpServletResponse response, RedirectAttributes redirectAttributes) {
+    public String withdrawMember(HttpServletResponse response, RedirectAttributes rttr) {
         try {
             memberService.withdrawMember();
             deleteCookie(response, "access-token");
             deleteCookie(response, "refresh-token");
-            redirectAttributes.addFlashAttribute("message", "탈퇴되었습니다.");
+
+            rttr.addAttribute("alertCode", "MP201"); // 예: 탈퇴 성공 코드
             return "redirect:/";
+
+        } catch (FeignException e) {
+            FeignErrorParser.FeignError fe =
+                    feignErrorParser.parse(e, "C002", "탈퇴에 실패했습니다.");
+            rttr.addAttribute("alertCode", fe.code());
+            return "redirect:/mypage";
+
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "탈퇴 실패");
+            rttr.addAttribute("alertCode", "C002");
             return "redirect:/mypage";
         }
     }
@@ -89,19 +109,5 @@ public class MemberController {
         cookie.setMaxAge(0);
         cookie.setPath("/");
         response.addCookie(cookie);
-    }
-
-    private String extractFeignMessage(FeignException e) {
-        try {
-            String body = e.contentUTF8();
-            if (body == null || body.isBlank()) return "요청 처리 중 오류가 발생했습니다.";
-
-            JsonNode node = objectMapper.readTree(body);
-
-            if (node.has("message")) return node.get("message").asText();
-            return body;
-        } catch (Exception ex) {
-            return "요청 처리 중 오류가 발생했습니다.";
-        }
     }
 }
