@@ -18,6 +18,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -39,25 +40,38 @@ class SearchControllerTest {
     }
 
     @Test
-    @DisplayName("카테고리 검색 - 성공")
+    @DisplayName("카테고리 검색 - 성공 (PagedResponse 반환 수정)")
     void search_Category() throws Exception {
         // given
         Long categoryId = 1L;
-        List<BookResponse> books = List.of(createBookResponse(1L));
 
-        given(bookClient.getBooksByCategory(categoryId.intValue())).willReturn(books);
+        // [수정] List가 아닌 PagedResponse 객체 생성
+        PagedResponse<BookResponse> pagedResponse = new PagedResponse<>();
+        BookResponse book = createBookResponse(1L);
+        pagedResponse.setContent(List.of(book));
+        pagedResponse.setNumber(0);
+        pagedResponse.setTotalPages(1);
+
+        // [수정] 메서드 시그니처 변경 반영 (id, page, size) 및 리턴 타입 일치
+        given(bookClient.getBooksByCategory(eq(categoryId.intValue()), anyInt(), anyInt()))
+                .willReturn(pagedResponse);
 
         // when & then
         mockMvc.perform(get("/search")
                         .param("searchType", "CATEGORY")
                         .param("categoryId", String.valueOf(categoryId))
-                        .param("categoryName", "Novel"))
+                        .param("categoryName", "Novel")
+                        .param("page", "0"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("Book/booklist"))
                 .andExpect(model().attribute("searchType", "CATEGORY"))
                 .andExpect(model().attribute("categoryId", categoryId))
                 .andExpect(model().attribute("categoryName", "Novel"))
-                .andExpect(model().attributeExists("books"));
+                // books는 pagedResponse.getContent()로 꺼내져서 담김
+                .andExpect(model().attributeExists("books"))
+                // 컨트롤러 로직에 따라 추가된 모델 속성 검증
+                .andExpect(model().attributeExists("pageInfo"))
+                .andExpect(model().attribute("page", 0));
     }
 
     @Test
@@ -65,7 +79,7 @@ class SearchControllerTest {
     void search_Normal_NoKeyword() throws Exception {
         mockMvc.perform(get("/search")
                         .param("searchType", "NORMAL")
-                        .param("keyword", "")) // 빈 키워드
+                        .param("keyword", ""))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
     }
@@ -76,7 +90,6 @@ class SearchControllerTest {
         // given
         String keyword = "Java";
         PagedResponse<BookResponse> pagedResponse = new PagedResponse<>();
-        // PagedResponse 내부 필드 설정 (Setter가 있다고 가정하거나 Reflection 사용)
         pagedResponse.setContent(List.of(createBookResponse(1L)));
         pagedResponse.setNumber(0);
 
@@ -133,9 +146,7 @@ class SearchControllerTest {
                 .andExpect(model().attribute("aiSummary", "현재 AI 추천 설명을 불러오지 못했습니다."));
     }
 
-    // 테스트용 BookResponse 생성 헬퍼
     private BookResponse createBookResponse(Long id) {
-        // BookResponse 생성자 (이전 코드 참고하여 더미 데이터 채움)
         return new BookResponse(id, "Title", "Author", "ISBN", 10000, "url",
                 Collections.emptyList(), Collections.emptyList(), "Desc", "Pub",
                 "2024-01-01", 4.5, 10L, "AiSummary", "ReviewSummary", 1, null);
