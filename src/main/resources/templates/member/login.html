@@ -10,6 +10,21 @@
     <link rel="stylesheet" href="/css/common/common.css">
     <style>
         dialog::backdrop { background: rgba(0,0,0,0.5); }
+        .btn2{
+            display: flex;
+            flex-direction: column;
+            color: gray;
+        }
+        .findId2{
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            color: gray;
+        }
+
+        .findId2:hover{
+            color: black;
+        }
     </style>
 </head>
 
@@ -48,12 +63,14 @@
             </div>
 
             <div class="find">
-                <div>
-                    <button type="button" class="findId" onclick="openFindIdDialog()">아이디찾기</button>
-                    <button type="button" class="findPwd"
-                            onclick="openPasswordResetDialog({ emailReadonly:false, redirectUrl:'/member/login?pwChanged=true' })">
-                        비밀번호 찾기
-                    </button>
+                <div class="btn2">
+                    <div class="findId2">
+                        <button type="button" class="findId" onclick="openFindIdDialog()">아이디찾기</button>
+                        <button type="button" class="findPwd"
+                                onclick="openPasswordResetDialog({ emailReadonly:false, redirectUrl:'/member/login?pwChanged=true' })">
+                            비밀번호 찾기
+                        </button>
+                    </div>
                     <button type="button" class="dormant" onclick="openDormantDialog()">휴면 회원 해제</button>
                 </div>
             </div>

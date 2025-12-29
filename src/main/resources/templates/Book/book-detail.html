@@ -52,11 +52,10 @@
                     </div>
 
                     <div class="breadcrumb">
-                        <a th:href="@{/}">홈</a>
 
                         <th:block th:if="${book.categories != null}" th:each="category : ${book.categories}">
                             <span class="separator">&gt;</span>
-                            <a th:href="@{/categories/{id}(id=${category.categoryId})}"
+                            <a th:href="@{/BookCategories/{id}(id=${category.categoryId()})}"
                                th:text="${category.categoryName}">카테고리명</a>
                         </th:block>
 
