@@ -3,6 +3,7 @@ package com.example.high_five.controller.auth;
 import com.example.high_five.dto.member.request.LoginRequest;
 import com.example.high_five.dto.member.response.TokenDto;
 import com.example.high_five.service.AuthService;
+import feign.FeignException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,6 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.fasterxml.jackson.databind.JsonNode;      // ★ readTree의 반환 타입
+import com.fasterxml.jackson.databind.ObjectMapper;  // ★ readTree 메서드를 가진 클래스
+import feign.FeignException;
 
 @Controller
 @RequiredArgsConstructor
@@ -22,6 +26,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class AuthController {
 
     private final AuthService authService;
+    private final ObjectMapper objectMapper;
+
 
     @Value("${jwt.expiration_time}")
     private Long accessExpirationTime;
@@ -50,12 +56,19 @@ public class AuthController {
 
             setCookie(response, "access-token", tokens.getAccessToken(), accessExpirationTime);
             setCookie(response, "refresh-token", tokens.getRefreshToken(), refreshExpirationTime);
-
             return "redirect:/";
 
+        } catch (FeignException e) {
+            // [수정] Feign 에러(4xx, 5xx)인 경우 서버 메시지 파싱
+            String serverMessage = extractFeignMessage(e);
+            log.warn("로그인 실패 (Feign): {}", serverMessage);
+            rttr.addFlashAttribute("error", serverMessage); // 서버 메시지 그대로 전달
+            return "redirect:/member/login";
+
         } catch (Exception e) {
-            log.warn("로그인 실패: {}", e.getMessage());
-            rttr.addFlashAttribute("error", "아이디 또는 비밀번호가 일치하지 않습니다.");
+            // 그 외 알 수 없는 에러
+            log.error("로그인 시스템 오류", e);
+            rttr.addFlashAttribute("error", "시스템 오류가 발생했습니다.");
             return "redirect:/member/login";
         }
     }
@@ -71,7 +84,7 @@ public class AuthController {
             ResponseEntity<TokenDto> apiResponse = authService.reissue(refreshToken);
             TokenDto newTokens = apiResponse.getBody();
 
-            if(newTokens != null) {
+            if (newTokens != null) {
                 setCookie(response, "access-token", newTokens.getAccessToken(), accessExpirationTime);
                 setCookie(response, "refresh-token", newTokens.getRefreshToken(), refreshExpirationTime);
             }
@@ -143,5 +156,18 @@ public class AuthController {
             }
         }
         return null;
+    }
+
+    private String extractFeignMessage(FeignException e) {
+        try {
+            String body = e.contentUTF8();
+            if (body == null || body.isBlank()) return "로그인에 실패했습니다.";
+
+            JsonNode node = objectMapper.readTree(body);
+            if (node.has("message")) return node.get("message").asText();
+            return "로그인에 실패했습니다.";
+        } catch (Exception ex) {
+            return "로그인에 실패했습니다.";
+        }
     }
 }
