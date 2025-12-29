@@ -98,10 +98,11 @@ main {
     color: #333;
 }
 
-/* 섹션 헤더 */
+ /*섹션 헤더 */
 .section {
-    margin-top:50px;
+    margin-top:0px;
 }
+
 .section .head {
     display: flex;
     justify-content: space-between;
@@ -253,20 +254,17 @@ main {
     width: 1200px;
     max-width: 100%;
     margin: 0 auto;
-    height: 50px;
     display: flex;
     align-items: center;
-    /* (참고) 만약 꽉 찬 파란색 줄이 싫고 '버튼만' 파랗게 하고 싶다면
-       여기 배경을 지우고 .categoryBtn 에 background를 주면 됩니다. */
 }
 
 .all-menu-wrapper {
     position: relative;
     height: 100%;
     width: 140px;
-    margin-top: 250px;
-
+    margin-top: 40px;
 }
+
 /*.all-menu-btn {*/
 /*    width: 100%;*/
 /*    height: 100%;*/
@@ -280,6 +278,13 @@ main {
 /*    gap: 8px;*/
 /*    cursor: pointer;*/
 /*}*/
+
+.all-menu-btn{
+    background: #7EACFC;
+    cursor: pointer;
+    color: whitesmoke;
+}
+
 .quick-menu a {
     color: #333;
     font-weight: 600;
@@ -452,11 +457,14 @@ main {
     height: 50px;
     display: flex;
     align-items: center;
-    background: #0b73ff; /* ❗ 배경색 필수 (이게 없으면 흰 글씨가 안 보임) */
 }
 
 .main{
     margin-top: 50px;
+}
+
+.icon{
+    color:whitesmoke;
 }
 
 /*.categoryBtn{*/
@@ -470,66 +478,66 @@ main {
 /*    background: #6f42c1;*/
 /*}*/
 
-/*.footer-links{*/
-/*    margin-left: 20px;*/
-/*    gap: 10rem;*/
-/*}*/
+.footer-links{
+    margin-left: 20px;
+    gap: 10rem;
+}
 
-/*!* ==============================*/
-/*   footer reset (best-seller 기준)*/
-/*   ============================== *!*/
+/* ==============================
+   footer reset (best-seller 기준)
+   ============================== */
 
-/*!* 이 페이지 CSS가 footer를 건드리지 못하게 강제 *!*/
-/*#footer .container {*/
-/*    all: unset;*/
-/*    display: flex;*/
-/*    flex-direction: column;*/
-/*    gap: 18px;*/
+/* 이 페이지 CSS가 footer를 건드리지 못하게 강제 */
+#footer .container {
+    all: unset;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
 
-/*    max-width: 1200px;*/
-/*    margin: 0 auto;*/
-/*    padding: 22px 24px;*/
-/*}*/
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 22px 24px;
+}
 
-/*!* 링크 영역 간격 통일 *!*/
-/*#footer .footer-links {*/
-/*    display: flex;*/
-/*    flex-wrap: wrap;*/
-/*    gap: 18px;*/
-/*    padding-left: 12px;*/
-/*    margin-bottom: 14px;*/
-/*}*/
+/* 링크 영역 간격 통일 */
+#footer .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding-left: 12px;
+    margin-bottom: 14px;
+}
 
-/*!* 정보 영역 통일 *!*/
-/*#footer .footer-info {*/
-/*    display: flex;*/
-/*    justify-content: space-between;*/
-/*    align-items: flex-start;*/
-/*    gap: 40px;*/
-/*}*/
+/* 정보 영역 통일 */
+#footer .footer-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+}
 
-/*#footer .footer-info > div {*/
-/*    display: grid;*/
-/*    gap: 6px;*/
-/*}*/
+#footer .footer-info > div {
+    display: grid;
+    gap: 6px;
+}
 
-/*#footer .footer-info > div:first-child {*/
-/*    padding-left: 12px;*/
-/*}*/
+#footer .footer-info > div:first-child {
+    padding-left: 12px;
+}
 
-/*#footer .footer-info > div:last-child {*/
-/*    text-align: right;*/
-/*    padding-right: 8px;*/
-/*}*/
+#footer .footer-info > div:last-child {
+    text-align: right;
+    padding-right: 8px;
+}
 
-/*!* typography 강제 고정 *!*/
-/*#footer,*/
-/*#footer * {*/
-/*    font-size: 13px;*/
-/*    line-height: 1.65;*/
-/*    letter-spacing: -0.01em;*/
-/*    margin: 0;*/
-/*}*/
+/* typography 강제 고정 */
+#footer,
+#footer * {
+    font-size: 13px;
+    line-height: 1.65;
+    letter-spacing: -0.01em;
+    margin: 0;
+}
 
 /* =========================================
    CATEGORY NAV ONLY - height/typography fix
@@ -537,21 +545,16 @@ main {
    - 둥글게 만들지 않음
    ========================================= */
 
-#category-nav{
-    /* 바 자체가 얇아 보이는 원인: 높이/패딩 부족 */
-    border-bottom: 1px solid #ddd;
-}
+/*!* 카테고리 바 높이만 살짝 키움 (50px → 58px) *!*/
+/*#category-nav .nav-container{*/
+/*    height: 59px !important;*/
+/*    align-items: center;*/
+/*}*/
 
-/* 카테고리 바 높이만 살짝 키움 (50px → 58px) */
-#category-nav .nav-container{
-    height: 59px !important;
-    align-items: center;
-}
-
-/* 왼쪽 '전체분야/카테고리' 버튼 영역 */
-#category-nav .all-menu-wrapper{
-    height: 100%;
-}
+/*!* 왼쪽 '전체분야/카테고리' 버튼 영역 *!*/
+/*#category-nav .all-menu-wrapper{*/
+/*    height: 100%;*/
+/*}*/
 
 /* 버튼: 둥글게 금지 + 높이 꽉 채우기 + 글자 살짝 키우기 */
 #category-nav .all-menu-btn{
@@ -561,7 +564,7 @@ main {
     font-weight: 900 !important;
 
     /* 동그랗게 만들지 말 것 */
-    border-radius: 0 !important;
+    border-radius: 0;
 }
 
 /* 퀵 메뉴(베스트셀러/신간 등)도 세로로 가운데 + 납작함 방지 */
@@ -579,9 +582,4 @@ main {
     padding: 0 8px;
     font-size: 15px;
     font-weight: 700;
-}
-
-/* 메가 메뉴 위치는 nav 높이에 맞춰서만 보정 (카테고리 영역 내부만) */
-#category-nav .mega-menu{
-    top: 80px !important;
 }
