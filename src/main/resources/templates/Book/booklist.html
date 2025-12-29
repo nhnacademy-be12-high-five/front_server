@@ -313,8 +313,24 @@
 
             <!-- =================== 페이지네이션 =================== -->
             <div class="pagination"
-                 th:if="${searchType != 'AI' and pageInfo != null and pageInfo.totalPages > 1}">
-                <!-- 이전 버튼 -->
+                 th:if="${searchType != 'AI' and pageInfo != null and pageInfo.totalPages > 1}"
+                 th:with="start=${(page / 10) * 10},
+                          end=${(pageInfo.totalPages == 0) ? 0 :
+                                ((start + 9 < pageInfo.totalPages) ? (start + 9) : (pageInfo.totalPages - 1))}">
+
+                <a class="page-link first"
+                   th:if="${page > 0}"
+                   th:href="@{${searchType == 'AI' ? '/rag-search' : '/search'}(
+                        keyword=${keyword},
+                        searchType=${searchType},
+                        categoryId=${categoryId},
+                        categoryName=${categoryName},
+                        sort=${sort},
+                        page=0
+                   )}">
+                    &lt;&lt;
+                </a>
+
                 <a class="page-link prev"
                    th:if="${page > 0}"
                    th:href="@{${searchType == 'AI' ? '/rag-search' : '/search'}(
@@ -328,8 +344,7 @@
                     이전
                 </a>
 
-                <!-- 번호 버튼 -->
-                <span th:each="p : ${#numbers.sequence(0, pageInfo.totalPages - 1)}">
+                <span th:each="p : ${#numbers.sequence(start, end)}">
                     <a th:if="${p != page}"
                        class="page-link"
                        th:href="@{${searchType == 'AI' ? '/rag-search' : '/search'}(
@@ -347,7 +362,6 @@
                           th:text="${p + 1}">1</span>
                 </span>
 
-                <!-- 다음 버튼 -->
                 <a class="page-link next"
                    th:if="${page < pageInfo.totalPages - 1}"
                    th:href="@{${searchType == 'AI' ? '/rag-search' : '/search'}(
@@ -359,6 +373,19 @@
                         page=${page + 1}
                    )}">
                     다음
+                </a>
+
+                <a class="page-link last"
+                   th:if="${page < pageInfo.totalPages - 1}"
+                   th:href="@{${searchType == 'AI' ? '/rag-search' : '/search'}(
+                        keyword=${keyword},
+                        searchType=${searchType},
+                        categoryId=${categoryId},
+                        categoryName=${categoryName},
+                        sort=${sort},
+                        page=${pageInfo.totalPages - 1}
+                   )}">
+                    &gt;&gt;
                 </a>
             </div>
         </section>

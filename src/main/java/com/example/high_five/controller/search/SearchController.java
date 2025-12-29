@@ -38,15 +38,21 @@ public class SearchController {
 
         if ("CATEGORY".equalsIgnoreCase(searchType) && categoryId != null) {
             // BookClient를 통해 북 서버의 API 호출
-            List<BookResponse> books = bookClient.getBooksByCategory(categoryId.intValue());
+            PagedResponse<BookResponse> books = bookClient.getBooksByCategory(categoryId.intValue(), page, PAGE_SIZE);
+
+            if (books == null) {
+                books = new PagedResponse<>();
+            }
 
             model.addAttribute("searchType", "CATEGORY");
             model.addAttribute("categoryId", categoryId);
             model.addAttribute("categoryName", categoryName); // HTML에서 제목으로 사용
-            model.addAttribute("books", books); // 검색 결과 리스트
+            model.addAttribute("books", books.getContent()); // 검색 결과 리스트
 
             // 페이징이나 AI 요약은 카테고리 검색에선 사용하지 않으므로 null 처리
-            model.addAttribute("pageInfo", null);
+            model.addAttribute("pageInfo", books);
+            model.addAttribute("page", books.getNumber());
+            model.addAttribute("sort", sort);
             model.addAttribute("aiSummary", null);
 
             return "Book/booklist";

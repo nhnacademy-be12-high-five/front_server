@@ -458,7 +458,9 @@ a {
     font-size: 14px;
 }
 
-.pagination a {
+/* 링크(a)와 현재 페이지(span) 공통 스타일 적용 */
+.pagination a,
+.pagination .page-link {
     min-width: 28px;
     padding: 4px 8px;
     text-align: center;
@@ -466,13 +468,16 @@ a {
     text-decoration: none;
     color: #555;
     border: 1px solid transparent;
+    display: inline-block; /* span에도 크기/여백 적용되도록 설정 */
+    cursor: pointer;
 }
 
-.pagination a.active {
+/* 활성화(현재 페이지) 스타일 */
+.pagination .active {
     background-color: #3654ff;
     color: #fff;
     border-color: #3654ff;
-    font-weight: 600;
+    font-weight: 800 !important; /* 굵기 강화 (600 -> 800) */
 }
 
 .pagination a.page-arrow {
