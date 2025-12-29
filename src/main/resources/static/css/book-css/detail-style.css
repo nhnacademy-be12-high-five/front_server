@@ -1500,3 +1500,10 @@ main#container{
 .detail-tab-content{
     scroll-margin-top: calc(var(--header-height) + var(--tabs-height) + 16px) !important;
 }
+
+.faq-item details { border-bottom: 1px solid #eee; }
+.faq-item summary { padding: 15px; cursor: pointer; list-style: none; font-weight: bold; position: relative; }
+.faq-item summary::after { content: '+'; position: absolute; right: 15px; font-weight: normal; }
+.faq-item details[open] summary::after { content: '-'; }
+.faq-item p { padding: 15px; background: #f9f9f9; color: #555; margin: 0; line-height: 1.6; }
+.q-badge { display: inline-block; background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-right: 8px; color: #666; }
