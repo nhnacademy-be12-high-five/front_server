@@ -44,7 +44,7 @@ class OrderAdminControllerTest {
     @DisplayName("주문 관리 페이지 조회 - 데이터 있음")
     void getOrderPage_WithData() throws Exception {
         CommonPageResponse<OrderResponse> pageResponse = new CommonPageResponse<>();
-        pageResponse.setData(Collections.emptyList());
+//        pageResponse.setData(Collections.emptyList());
 
         given(orderClient.getAdminOrders(anyInt(), anyInt(), any())).willReturn(pageResponse);
 

@@ -21,9 +21,4 @@ public class CommonPageResponse<T> {
     public boolean isLast() {
         return this.pageNumber >= this.totalPages - 1;
     }
-
-
-    public void setData(List<Object> objects) {
-
-    }
 }
