@@ -2,7 +2,10 @@ package com.example.high_five.controller.auth;
 
 import com.example.high_five.dto.member.request.LoginRequest;
 import com.example.high_five.dto.member.response.TokenDto;
+import com.example.high_five.exception.LoginErrorMapper;
 import com.example.high_five.service.AuthService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,11 +17,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import com.fasterxml.jackson.databind.JsonNode;      // ★ readTree의 반환 타입
-import com.fasterxml.jackson.databind.ObjectMapper;  // ★ readTree 메서드를 가진 클래스
-import feign.FeignException;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,6 +29,7 @@ public class AuthController {
     private final AuthService authService;
     private final ObjectMapper objectMapper;
 
+    private record FeignError(String code, String message) {}
 
     @Value("${jwt.expiration_time}")
     private Long accessExpirationTime;
@@ -38,14 +40,25 @@ public class AuthController {
     private static final boolean IS_SECURE = true;
 
     @GetMapping("/member/login")
-    public String loginForm() {
+    public String loginForm(
+            @RequestParam(value = "errorCode", required = false) String errorCode,
+            Model model
+    ) {
+        if (errorCode != null && !errorCode.isBlank()) {
+            model.addAttribute(
+                    "errorMessage",
+                    LoginErrorMapper.toMessage(errorCode)
+            );
+        }
         return "member/login";
     }
 
     @PostMapping("/auth/login")
-    public String login(@ModelAttribute LoginRequest loginRequest,
-                        HttpServletResponse response,
-                        RedirectAttributes rttr) {
+    public String login(
+            @ModelAttribute LoginRequest loginRequest,
+            HttpServletResponse response,
+            RedirectAttributes rttr
+    ) {
         try {
             ResponseEntity<TokenDto> apiResponse = authService.login(loginRequest);
             TokenDto tokens = apiResponse.getBody();
@@ -56,19 +69,20 @@ public class AuthController {
 
             setCookie(response, "access-token", tokens.getAccessToken(), accessExpirationTime);
             setCookie(response, "refresh-token", tokens.getRefreshToken(), refreshExpirationTime);
+
             return "redirect:/";
 
         } catch (FeignException e) {
-            // [수정] Feign 에러(4xx, 5xx)인 경우 서버 메시지 파싱
-            String serverMessage = extractFeignMessage(e);
-            log.warn("로그인 실패 (Feign): {}", serverMessage);
-            rttr.addFlashAttribute("error", serverMessage); // 서버 메시지 그대로 전달
+            FeignError fe = extractFeignError(e);
+            log.warn("로그인 실패 (Feign): code={}, message={}", fe.code(), fe.message());
+
+            rttr.addAttribute("errorCode", fe.code());
             return "redirect:/member/login";
 
         } catch (Exception e) {
-            // 그 외 알 수 없는 에러
+
             log.error("로그인 시스템 오류", e);
-            rttr.addFlashAttribute("error", "시스템 오류가 발생했습니다.");
+            rttr.addAttribute("errorCode", "C002");
             return "redirect:/member/login";
         }
     }
@@ -117,57 +131,85 @@ public class AuthController {
     }
 
     @GetMapping("/login/oauth2/code/{provider}")
-    public String socialLoginCallback(@PathVariable String provider, @RequestParam("code") String code,
-                                      HttpServletResponse response, RedirectAttributes redirectAttributes) {
+    public String socialLoginCallback(
+            @PathVariable String provider,
+            @RequestParam("code") String code,
+            HttpServletResponse response,
+            RedirectAttributes rttr
+    ) {
         try {
             ResponseEntity<TokenDto> apiResponse = authService.loginSocial(provider, code);
             TokenDto tokens = apiResponse.getBody();
 
-            if (tokens == null) throw new RuntimeException("소셜 로그인 실패");
+            if (tokens == null) {
+                throw new RuntimeException("소셜 로그인 실패");
+            }
 
             setCookie(response, "access-token", tokens.getAccessToken(), accessExpirationTime);
             setCookie(response, "refresh-token", tokens.getRefreshToken(), refreshExpirationTime);
 
             if (!tokens.isProfileComplete()) {
-                redirectAttributes.addFlashAttribute("alertMessage", "필수 정보를 입력해주세요.");
+                rttr.addFlashAttribute("alertMessage", "필수 정보를 입력해주세요.");
                 return "redirect:/mypage?tab=info";
             }
+
             return "redirect:/";
 
         } catch (Exception e) {
-            log.error("소셜 로그인 실패: {}", e.getMessage());
-            redirectAttributes.addFlashAttribute("error", "소셜 로그인 중 오류가 발생했습니다.");
+            log.error("소셜 로그인 실패", e);
+            rttr.addAttribute("errorCode", "C002");
             return "redirect:/member/login";
         }
     }
 
-    private void setCookie(HttpServletResponse response, String name, String value, long maxAgeSeconds) {
+    private void setCookie(HttpServletResponse response, String name, String value, long maxAgeMillis) {
         ResponseCookie cookie = ResponseCookie.from(name, value)
-                .path("/").httpOnly(true).secure(IS_SECURE).sameSite("Lax")
-                .maxAge(maxAgeSeconds / 1000).build();
+                .path("/")
+                .httpOnly(true)
+                .secure(IS_SECURE)
+                .sameSite("Lax")
+                .maxAge(maxAgeMillis / 1000)
+                .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     private String resolveCookie(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie c : cookies) {
-                if (name.equals(c.getName())) return c.getValue();
-            }
+        if (cookies == null) return null;
+
+        for (Cookie c : cookies) {
+            if (name.equals(c.getName())) return c.getValue();
         }
         return null;
     }
 
-    private String extractFeignMessage(FeignException e) {
+    private FeignError extractFeignError(FeignException e) {
         try {
             String body = e.contentUTF8();
-            if (body == null || body.isBlank()) return "로그인에 실패했습니다.";
+
+            if (body == null || body.isBlank()) {
+                body = e.responseBody()
+                        .map(bb -> java.nio.charset.StandardCharsets.UTF_8.decode(bb).toString())
+                        .orElse("");
+            }
+
+            if (body.isBlank()) {
+                if (e.status() == 401) {
+                    return new FeignError("A002", "아이디 또는 비밀번호가 올바르지 않습니다.");
+                }
+                return new FeignError("C002", "로그인에 실패했습니다.");
+            }
 
             JsonNode node = objectMapper.readTree(body);
-            if (node.has("message")) return node.get("message").asText();
-            return "로그인에 실패했습니다.";
+            String code = node.has("code") ? node.get("code").asText() : "C002";
+            String msg  = node.has("message") ? node.get("message").asText() : "로그인에 실패했습니다.";
+            return new FeignError(code, msg);
+
         } catch (Exception ex) {
-            return "로그인에 실패했습니다.";
+            if (e.status() == 401) {
+                return new FeignError("A002", "아이디 또는 비밀번호가 올바르지 않습니다.");
+            }
+            return new FeignError("C002", "로그인에 실패했습니다.");
         }
     }
 }
