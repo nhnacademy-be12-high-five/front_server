@@ -38,7 +38,7 @@
             <button type="button" class="tab-btn active" id="tabMember">회원 로그인</button>
             <button type="button" class="tab-btn unactive" id="tabGuest">비회원 주문조회</button>
         </div>
-        <div th:if="${error}" class="error-message" th:text="${error}"></div>
+        <div th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></div>
 
         <form id="formMember" class="login-form" action="/auth/login" method="post">
             <div class="input-group">

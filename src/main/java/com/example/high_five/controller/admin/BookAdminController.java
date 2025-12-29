@@ -102,4 +102,16 @@ public class BookAdminController {
         return "redirect:/admin/books";
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseBody
+    public ResponseEntity<String> deleteBook(@PathVariable Long id) {
+        try {
+            log.info("도서 삭제 요청 - I: {}", id);
+            bookClient.deleteBook(id);
+            return ResponseEntity.ok("삭제되었습니다.");
+        }catch (Exception e) {
+            log.error("도서 삭제 실패", e);
+            return ResponseEntity.status(500).body("삭제 실패: " + e.getMessage());
+        }
+    }
 }
