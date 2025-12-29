@@ -18,11 +18,11 @@
     margin-top: 5px;
 }
 
-.container2 {
-    max-width: 700px !important;
-    /*margin: 120px auto 50px !important;*/
-    display: block !important;
-}
+/*.container2 {*/
+/*    max-width: 700px !important;*/
+/*    !*margin: 120px auto 50px !important;*!*/
+/*    display: block !important;*/
+/*}*/
 
 .container2 nav {
     display: flex;
@@ -45,7 +45,7 @@
     display: inline-block; /* a 태그 레이아웃 보정 */
 }
 
-.container2 nav button.active {
+.container2 nav .tab-btn.active {
     color: var(--color-primary);
     font-weight: 700;
     border-bottom: 3px solid var(--color-primary);
