@@ -1,28 +1,30 @@
 
 
+
+
 /* =========================================
    1. 메인 배너 슬라이드 로직
    ========================================= */
-const slides = document.getElementById("slides");
-
-// slides가 있을 때만 실행 (중복 제거됨)
-if (slides) {
-    const dots = Array.from(document.querySelectorAll(".dot"));
-    let idx = 0;
-
-    function go(n) {
-        if (!dots.length) return;
-        idx = (n + dots.length) % dots.length;
-        slides.style.transform = `translateX(-${idx * 100}%)`;
-        dots.forEach((d, i) => d.classList.toggle("active", i === idx));
-    }
-
-    dots.forEach((d) =>
-        d.addEventListener("click", (e) => go(+e.target.dataset.idx))
-    );
-
-    setInterval(() => go(idx + 1), 5000);
-}
+// const slides = document.getElementById("slides");
+//
+// // slides가 있을 때만 실행 (중복 제거됨)
+// if (slides) {
+//     const dots = Array.from(document.querySelectorAll(".dot"));
+//     let idx = 0;
+//
+//     function go(n) {
+//         if (!dots.length) return;
+//         idx = (n + dots.length) % dots.length;
+//         slides.style.transform = `translateX(-${idx * 100}%)`;
+//         dots.forEach((d, i) => d.classList.toggle("active", i === idx));
+//     }
+//
+//     dots.forEach((d) =>
+//         d.addEventListener("click", (e) => go(+e.target.dataset.idx))
+//     );
+//
+//     setInterval(() => go(idx + 1), 5000);
+// }
 
 /* =========================================
    2. 탭 메뉴 로직
