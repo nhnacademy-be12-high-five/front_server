@@ -1,7 +1,7 @@
 package com.example.high_five.controller.member;
 
 import com.example.high_five.common.annotation.LoginRequired;
-import com.example.high_five.dto.member.request.MemberCreateRequestDto;
+import com.example.high_five.dto.member.request.MemberCreateRequest;
 import com.example.high_five.dto.member.request.MemberUpdateRequest;
 import com.example.high_five.exception.FeignErrorParser;
 import com.example.high_five.service.AuthService;
@@ -31,7 +31,7 @@ public class MemberController {
     }
 
     @PostMapping("/member/signup")
-    public String signup(@ModelAttribute MemberCreateRequestDto requestDto) {
+    public String signup(@ModelAttribute MemberCreateRequest requestDto) {
         try {
             authService.signup(requestDto);
             return "redirect:/member/login";

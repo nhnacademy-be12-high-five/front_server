@@ -1,4 +1,4 @@
-package com.example.high_five.dto.member.request;
+package com.example.high_five.dto.member.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

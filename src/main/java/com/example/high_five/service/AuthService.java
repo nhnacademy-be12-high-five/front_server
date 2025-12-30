@@ -22,7 +22,7 @@ public interface AuthService {
     ResponseEntity<TokenDto> loginSocial(@PathVariable("provider") String provider, @RequestParam("code") String code);
 
     @PostMapping("/api/accounts/signup")
-    ResponseEntity<Void> signup(@RequestBody MemberCreateRequestDto request);
+    ResponseEntity<Void> signup(@RequestBody MemberCreateRequest request);
 
     @GetMapping("/api/accounts/check-id")
     ResponseEntity<Boolean> checkId(@RequestParam("loginId") String loginId);

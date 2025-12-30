@@ -6,6 +6,7 @@ import com.example.high_five.service.AuthService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -31,7 +32,7 @@ public class AccountController {
 
     @PostMapping("/api/find/id")
     @ResponseBody
-    public ResponseEntity<String> findId(@RequestBody EmailVerifyRequest request) {
+    public ResponseEntity<String> findId(@RequestBody @Valid EmailVerifyRequest request) {
         try {
             return authService.findId(request);
         } catch (FeignException e) {
@@ -42,7 +43,7 @@ public class AccountController {
 
     @PostMapping("/api/find/password")
     @ResponseBody
-    public ResponseEntity<String> resetPassword(@RequestBody PasswordResetRequest request) {
+    public ResponseEntity<String> resetPassword(@RequestBody @Valid PasswordResetRequest request) {
         try {
             authService.resetPassword(request);
             return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");

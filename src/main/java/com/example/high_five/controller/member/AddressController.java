@@ -5,6 +5,7 @@ import com.example.high_five.dto.member.request.AddressRequest;
 import com.example.high_five.dto.member.response.AddressListResponse;
 import com.example.high_five.dto.member.response.AddressResponse;
 import com.example.high_five.service.AddressService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -32,7 +33,6 @@ public class AddressController {
             // 백엔드 응답 가져오기
             AddressListResponse response = addressService.getAddressList().getBody();
 
-            // [수정 포인트] response가 null이거나, 그 안의 리스트가 null일 경우를 모두 대비해 '빈 리스트'로 처리
             List<AddressResponse> list = (response != null && response.getAddressList() != null)
                     ? response.getAddressList()
                     : Collections.emptyList();
@@ -40,7 +40,6 @@ public class AddressController {
             model.addAttribute("addresses", list);
         } catch (Exception e) {
             log.error("배송지 목록 조회 실패", e);
-            // 에러 나면 빈 리스트 넣어서 화면 안 깨지게 방어
             model.addAttribute("addresses", Collections.emptyList());
         }
         model.addAttribute("currentTab", "address");
@@ -89,7 +88,7 @@ public class AddressController {
     @PostMapping("/{id}/update")
     @LoginRequired
     public String updateAddress(@PathVariable Long id,
-                                @ModelAttribute AddressRequest request,
+                                @ModelAttribute @Valid AddressRequest request,
                                 RedirectAttributes rttr) {
         try {
             log.info("프론트엔드 컨트롤러에 들어온 값: {}", request.isDefaultAddress());
