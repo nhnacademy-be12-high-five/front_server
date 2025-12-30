@@ -18,12 +18,11 @@ import java.time.LocalDate;
 public class MemberCreateRequest {
 
     @NotBlank(message = "아이디는 필수 입력 값입니다.")
-    @Size(min = 4, max = 20, message = "아이디는 4자 이상 20자 이하로 입력해주세요.")
     private String loginId;
 
     @NotBlank(message = "비밀번호는 필수 입력 값입니다.")
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,20}$",
-            message = "비밀번호는 8~20자여야 하며, 영문, 숫자, 특수문자를 반드시 포함해야 합니다.")
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[^\\s]{8,20}$",
+            message = "비밀번호는 8~20자여야 하며, 영문과 숫자를 반드시 포함해야 합니다.")
     private String password;
 
     @NotBlank(message = "이름은 필수 입력 값입니다.")
