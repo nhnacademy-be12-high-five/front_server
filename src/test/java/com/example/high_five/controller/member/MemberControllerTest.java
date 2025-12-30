@@ -1,6 +1,6 @@
 package com.example.high_five.controller.member;
 
-import com.example.high_five.dto.member.request.MemberCreateRequestDto;
+import com.example.high_five.dto.member.request.MemberCreateRequest;
 import com.example.high_five.dto.member.request.MemberUpdateRequest;
 import com.example.high_five.dto.member.response.MemberResponse;
 import com.example.high_five.service.AuthService;
@@ -25,7 +25,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -69,11 +68,11 @@ class MemberControllerTest {
     @DisplayName("회원가입 처리 - 성공")
     void signup_Success() throws Exception {
         mockMvc.perform(post("/member/signup")
-                        .flashAttr("memberCreateRequestDto", new MemberCreateRequestDto("id", "pw", "name", null, null, null, null)))
+                        .flashAttr("memberCreateRequestDto", new MemberCreateRequest("id", "pw", "name", null, null, null, null)))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/member/login"));
 
-        verify(authService).signup(any(MemberCreateRequestDto.class));
+        verify(authService).signup(any(MemberCreateRequest.class));
     }
 
     @Test
@@ -82,7 +81,7 @@ class MemberControllerTest {
         doThrow(new RuntimeException("Fail")).when(authService).signup(any());
 
         mockMvc.perform(post("/member/signup")
-                        .flashAttr("memberCreateRequestDto", new MemberCreateRequestDto()))
+                        .flashAttr("memberCreateRequestDto", new MemberCreateRequest()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/member/signup?error=true"));
     }

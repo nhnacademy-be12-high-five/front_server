@@ -8,6 +8,7 @@ import com.example.high_five.service.MemberService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class AuthRestController {
     private final MemberService memberService;
 
     @PostMapping("/email/send")
-    public ResponseEntity<String> sendEmail(@RequestBody EmailRequest email) {
+    public ResponseEntity<String> sendEmail(@RequestBody @Valid EmailRequest email) {
         try {
             authService.sendEmail(email);
             return ResponseEntity.ok("인증번호가 발송되었습니다.");
@@ -33,7 +34,7 @@ public class AuthRestController {
     }
 
     @PostMapping("/email/verify")
-    public ResponseEntity<String> verifyEmail(@RequestBody EmailVerifyRequest request) {
+    public ResponseEntity<String> verifyEmail(@RequestBody @Valid EmailVerifyRequest request) {
         try {
             return authService.verifyEmail(request);
         } catch (FeignException e) {
@@ -52,7 +53,7 @@ public class AuthRestController {
     }
 
     @PostMapping("/email/find-id")
-    public ResponseEntity<String> sendFindIdCode(@RequestBody EmailRequest email) {
+    public ResponseEntity<String> sendFindIdCode(@RequestBody @Valid EmailRequest email) {
         try {
             authService.sendFindIdCode(email);
             return ResponseEntity.ok("인증번호가 발송되었습니다.");
@@ -63,7 +64,7 @@ public class AuthRestController {
     }
 
     @PostMapping("/email/password-reset")
-    public ResponseEntity<String> sendPasswordResetCode(@RequestBody EmailRequest email) {
+    public ResponseEntity<String> sendPasswordResetCode(@RequestBody @Valid EmailRequest email) {
         try {
             authService.sendPasswordResetCode(email);
             return ResponseEntity.ok("인증번호가 발송되었습니다.");
@@ -88,7 +89,7 @@ public class AuthRestController {
     }
 
     @PostMapping("/dormant/send")
-    public ResponseEntity<String> sendDormantCode(@RequestBody DormantRequest request) {
+    public ResponseEntity<String> sendDormantCode(@RequestBody @Valid DormantRequest request) {
         try {
             memberService.checkDormantMember(request);
 
@@ -102,7 +103,7 @@ public class AuthRestController {
     }
 
     @PostMapping("/dormant/verify")
-    public ResponseEntity<String> verifyAndActivate(@RequestBody DormantRequest request) {
+    public ResponseEntity<String> verifyAndActivate(@RequestBody @Valid DormantRequest request) {
         try {
             memberService.activateDormant(request);
 
