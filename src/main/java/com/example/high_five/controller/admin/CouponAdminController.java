@@ -100,10 +100,29 @@ public class CouponAdminController {
 
     @LoginRequired(adminOnly = true)
     @PostMapping("/admin/coupons/{couponId}/status")
-    public String updateCouponStatus(@PathVariable("couponId") Long couponId, @RequestParam String status) {
-        CouponStatusRequestDto requestDto = new CouponStatusRequestDto(status);
-         couponService.updateCouponStatus(couponId, requestDto);
-         return "redirect:/admin/coupons/page";
+    public String updateCouponStatus(@PathVariable("couponId") Long couponId,
+                                     @RequestParam String status,
+                                     RedirectAttributes redirectAttributes) {
+        try {
+            CouponStatusRequestDto requestDto = new CouponStatusRequestDto(status);
+            couponService.updateCouponStatus(couponId, requestDto);
+            redirectAttributes.addFlashAttribute("message", "쿠폰 상태가 변경되었습니다.");
+        } catch (FeignException e) {
+            // 상세 에러 로그 출력 (콘솔 확인용)
+            e.printStackTrace();
+
+            // 사용자 알림 메시지 설정
+            String errorMsg = "상태 변경 실패: ";
+            if (e.status() == 400) errorMsg += "잘못된 요청 값입니다.";
+            else if (e.status() == 404) errorMsg += "해당 쿠폰을 찾을 수 없습니다.";
+            else errorMsg += "서버 통신 오류 (" + e.status() + ")";
+
+            redirectAttributes.addFlashAttribute("errorMessage", errorMsg);
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "시스템 오류가 발생했습니다.");
+        }
+        return "redirect:/admin/coupons/page";
     }
 
     @LoginRequired(adminOnly=true)
