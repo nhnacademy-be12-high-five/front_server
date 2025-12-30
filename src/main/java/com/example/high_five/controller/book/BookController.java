@@ -58,6 +58,13 @@ public class BookController {
                         .map(category -> Long.valueOf(category.categoryId()))
                         .collect(Collectors.toList());
             }
+            if (book.categoryId() != null) {
+                categoryIds.add(Long.valueOf(book.categoryId()));
+            }
+            if (book.parentId() != null) {
+                categoryIds.add(Long.valueOf(book.parentId()));
+            }
+            categoryIds = categoryIds.stream().distinct().collect(Collectors.toList());
             log.info("Book ID: {}, Extracted Category IDs: {}", id, categoryIds);
             List<CouponTemplateDto> coupons = couponService.getBookCoupons(id, categoryIds, false);
             model.addAttribute("coupons", coupons);
