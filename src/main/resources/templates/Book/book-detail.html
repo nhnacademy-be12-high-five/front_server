@@ -55,8 +55,8 @@
 
                         <th:block th:if="${book.categories != null}" th:each="category : ${book.categories}">
                             <span class="separator">&gt;</span>
-                            <a th:href="@{/BookCategories/{id}(id=${category.categoryId()})}"
-                               th:text="${category.categoryName}">카테고리명</a>
+                            <a th:href="@{/search(searchType='CATEGORY', categoryId=${category.categoryId}, categoryName=${category.categoryName})}" th:text="${category.categoryName}">
+                                카테고리명</a>
                         </th:block>
 
                         <span class="separator">&gt;</span>
