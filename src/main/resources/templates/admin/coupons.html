@@ -125,7 +125,7 @@
                                     </td>
                                     <td>
                                         <form th:if="${policy.status == 'ACTIVE'}"
-                                              th:action="@{/admin/coupons/{id}/status(id=${coupon.id})}"
+                                              th:action="@{/admin/coupons/policies/{id}(id=${policy.id})}"
                                               method="post"
                                               onsubmit="return confirm('정말 이 정책을 비활성화하시겠습니까?\n\n[주의] 해당 정책으로 발급된 모든 미사용 쿠폰이 \\'만료(EXPIRED)\\' 처리되며, 더 이상 복구할 수 없습니다.');">
                                             <button type="submit"
@@ -256,9 +256,12 @@
                                     </td>
                                     <td>
                                         <form th:if="${coupon.status == 'ACTIVE'}"
-                                              th:action="@{/admin/coupons/{id}/deactivate(id=${coupon.id})}"
+                                              th:action="@{/admin/coupons/{id}/status(id=${coupon.id})}"
                                               method="post"
                                               onsubmit="return confirm('정말 이 쿠폰 발급을 중단하시겠습니까?');">
+
+                                            <input type="hidden" name="status" value="INACTIVE">
+
                                             <button type="submit"
                                                     style="background-color:#dc3545; color:#fff; border:none; padding:6px 10px; border-radius:10px; cursor:pointer;">
                                                 비활성화
