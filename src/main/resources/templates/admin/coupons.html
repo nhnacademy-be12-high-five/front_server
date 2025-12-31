@@ -75,16 +75,12 @@
                                     </select>
                                 </div>
 
-                                <input type="hidden" id="categoryId" name="categoryId">
+                                <input type="hidden" id="categoryId" name="targetCategoryIds">
                             </div>
 
                             <div class="form-row" style="margin-top: -10px;">
                                 <label></label>
                                 <ul id="selectedCategoryList" style="flex: 1; list-style: none; padding: 0; margin-top: 5px;"></ul>
-                            </div>
-
-                            <div class="form-row" style="display:none;">
-                                <input type="text" name="targetCategoryIds" id="targetCategoryIds">
                             </div>
 
                             <button type="submit" class="save-btn">정책 생성</button>
@@ -260,9 +256,12 @@
                                     </td>
                                     <td>
                                         <form th:if="${coupon.status == 'ACTIVE'}"
-                                              th:action="@{/admin/coupons/{id}/deactivate(id=${coupon.id})}"
+                                              th:action="@{/admin/coupons/{id}/status(id=${coupon.id})}"
                                               method="post"
                                               onsubmit="return confirm('정말 이 쿠폰 발급을 중단하시겠습니까?');">
+
+                                            <input type="hidden" name="status" value="INACTIVE">
+
                                             <button type="submit"
                                                     style="background-color:#dc3545; color:#fff; border:none; padding:6px 10px; border-radius:10px; cursor:pointer;">
                                                 비활성화

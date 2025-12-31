@@ -21,8 +21,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -50,7 +52,21 @@ public class BookController {
         model.addAttribute("book", book);
 
         try {
-            List<CouponTemplateDto> coupons = couponService.getBookCoupons(id);
+            List<Long> categoryIds = new ArrayList<>();
+            if (book.categories() != null) {
+                categoryIds = book.categories().stream()
+                        .map(category -> Long.valueOf(category.categoryId()))
+                        .collect(Collectors.toList());
+            }
+            if (book.categoryId() != null) {
+                categoryIds.add(Long.valueOf(book.categoryId()));
+            }
+            if (book.parentId() != null) {
+                categoryIds.add(Long.valueOf(book.parentId()));
+            }
+            categoryIds = categoryIds.stream().distinct().collect(Collectors.toList());
+            log.info("Book ID: {}, Extracted Category IDs: {}", id, categoryIds);
+            List<CouponTemplateDto> coupons = couponService.getBookCoupons(id, categoryIds, false);
             model.addAttribute("coupons", coupons);
         } catch (Exception e) {
             // 쿠폰 서비스 장애 시에도 상세 페이지는 나와야 하므로 빈 리스트 처리
