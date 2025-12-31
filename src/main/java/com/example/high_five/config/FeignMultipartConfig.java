@@ -1,6 +1,5 @@
 package com.example.high_five.config;
 
-
 import feign.codec.Encoder;
 import feign.form.spring.SpringFormEncoder;
 import org.springframework.beans.factory.ObjectFactory;

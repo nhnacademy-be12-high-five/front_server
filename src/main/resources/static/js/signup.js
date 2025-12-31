@@ -1,3 +1,5 @@
+
+
 document.addEventListener("DOMContentLoaded", () => {
     // 1. 서버 에러 메시지 확인 및 Alert
     const errorInput = document.getElementById('server-error-msg');
@@ -14,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = "/member/login";
         });
     }
+
 });
 
 // --- 변수 선언 ---
