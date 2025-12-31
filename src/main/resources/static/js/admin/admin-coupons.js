@@ -46,7 +46,7 @@
 
         console.log("1차 카테고리 로딩 시작..."); // [디버깅용 로그]
 
-        fetch('/api/categories/root')
+        fetch('/categories/root')
             .then(res => {
                 if (!res.ok) throw new Error(`카테고리 조회 실패 (${res.status})`);
                 return res.json();
@@ -83,7 +83,7 @@
 
         console.log("2차 카테고리 요청: parentId=" + parentId); // [디버깅용 로그]
 
-        fetch(`/api/categories/${parentId}/children`)
+        fetch(`/categories/${parentId}/children`)
             .then(res => res.json())
             .then(data => {
                 if (!subSelect) return;
