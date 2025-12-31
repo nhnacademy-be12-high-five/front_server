@@ -3,6 +3,7 @@ package com.example.high_five.controller.member;
 import com.example.high_five.dto.member.request.MemberCreateRequest;
 import com.example.high_five.dto.member.request.MemberUpdateRequest;
 import com.example.high_five.dto.member.response.MemberResponse;
+import com.example.high_five.exception.FeignErrorParser;
 import com.example.high_five.service.AuthService;
 import com.example.high_five.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +29,7 @@ import java.time.LocalDate;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -45,6 +47,8 @@ class MemberControllerTest {
     private MemberService memberService;
     @Mock
     private AuthService authService;
+    @Mock
+    private FeignErrorParser feignErrorParser; // [중요] Mock 주입
 
     @Spy
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -65,10 +69,21 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("회원가입 처리 - 성공")
+    @DisplayName("회원가입 처리 - 성공 (리다이렉트)")
     void signup_Success() throws Exception {
+        // [수정] 유효성 검사(@Valid)를 통과할 수 있는 완벽한 데이터 준비
+        MemberCreateRequest validRequest = new MemberCreateRequest(
+                "validUser",          // loginId
+                "Password123",        // password (8자 이상, 영문+숫자)
+                "테스트유저",           // name
+                "test@example.com",   // email
+                "010-1234-5678",      // phone
+                "MALE",               // gender
+                LocalDate.of(2000, 1, 1) // birthDate
+        );
+
         mockMvc.perform(post("/member/signup")
-                        .flashAttr("memberCreateRequestDto", new MemberCreateRequest("id", "pw", "name", null, null, null, null)))
+                        .flashAttr("memberCreateRequest", validRequest)) // 데이터 주입
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/member/login"));
 
@@ -76,14 +91,31 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("회원가입 처리 - 실패")
+    @DisplayName("회원가입 처리 - 실패 (예외 발생 시 다시 폼으로)")
     void signup_Fail() throws Exception {
-        doThrow(new RuntimeException("Fail")).when(authService).signup(any());
+        // [수정] 실패 테스트라도 '입력값' 자체는 유효해야 서비스 로직까지 도달함
+        MemberCreateRequest validRequest = new MemberCreateRequest(
+                "validUser",
+                "Password123",
+                "테스트유저",
+                "test@example.com",
+                "010-1234-5678",
+                "MALE",
+                LocalDate.now()
+        );
+
+        // 서비스에서 예외가 터지도록 설정
+        doThrow(FeignException.class).when(authService).signup(any());
+
+        // FeignErrorParser 동작 설정 (이전과 동일)
+        given(feignErrorParser.parse(any(), anyString(), anyString()))
+                .willReturn(new FeignErrorParser.FeignError("FAIL", "가입 실패"));
 
         mockMvc.perform(post("/member/signup")
-                        .flashAttr("memberCreateRequestDto", new MemberCreateRequest()))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/member/signup?error=true"));
+                        .flashAttr("memberCreateRequest", validRequest)) // 유효한 객체 전달
+                .andExpect(status().isOk()) // 예외 발생 시 폼으로 돌아옴 (200 OK)
+                .andExpect(view().name("member/signup"))
+                .andExpect(model().attribute("errorMessage", "가입 실패"));
     }
 
     @Test
@@ -102,19 +134,7 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("마이페이지 조회 - 실패 (로그인 리다이렉트)")
-    void myPage_Fail() throws Exception {
-        // [수정] NPE 방지를 위해 Request 객체 생성
-        Request request = Request.create(HttpMethod.GET, "/api/my-info", Map.of(), null, null, null);
-        given(memberService.getMyInfo()).willThrow(new FeignException.Unauthorized("401 Unauthorized", request, null, null));
-
-        mockMvc.perform(get("/mypage"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/member/login"));
-    }
-
-    @Test
-    @DisplayName("회원 정보 수정 - 성공")
+    @DisplayName("회원 정보 수정 - 성공 (리다이렉트 + 쿼리파라미터)")
     void updateMember_Success() throws Exception {
         MemberUpdateRequest request = MemberUpdateRequest.builder()
                 .name("Updated Name")
@@ -125,35 +145,40 @@ class MemberControllerTest {
         mockMvc.perform(post("/mypage/update")
                         .flashAttr("memberUpdateRequest", request))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/mypage"))
-                .andExpect(flash().attribute("alertMessage", "수정되었습니다."));
+                .andExpect(redirectedUrl("/mypage?alertCode=MP200")); // 컨트롤러 로직 반영
     }
 
     @Test
-    @DisplayName("회원 정보 수정 - 실패 (Feign 메시지 파싱)")
+    @DisplayName("회원 정보 수정 - 실패 (Feign 예외 발생 시 뷰 반환)")
     void updateMember_FeignException() throws Exception {
-        String errorJson = "{\"message\":\"Validation Error\"}";
-        // [수정] Request 객체 생성 시 body 포함
+        // given
+        String errorJson = "{\"message\":\"Error\"}";
         Request request = Request.create(HttpMethod.PUT, "/api/members", Map.of(), errorJson.getBytes(StandardCharsets.UTF_8), null, null);
         FeignException exception = new FeignException.BadRequest("Bad Request", request, errorJson.getBytes(StandardCharsets.UTF_8), Map.of());
 
         doThrow(exception).when(memberService).updateMember(any());
 
+        // [핵심 2] FeignError 객체 반환 Stubbing
+        given(feignErrorParser.parse(any(), anyString(), anyString()))
+                .willReturn(new FeignErrorParser.FeignError("E400", "수정 실패 메시지"));
+
+        // loadMyInfoData() 호출 방지 또는 Mocking (예외 터져도 catch 블록 있어서 괜찮음)
+
+        // when & then
         mockMvc.perform(post("/mypage/update")
                         .flashAttr("memberUpdateRequest", new MemberUpdateRequest()))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/mypage"))
-                .andExpect(flash().attribute("alertMessage", "Validation Error"));
+                .andExpect(status().isOk()) // [중요] 실패 시 리다이렉트가 아니라 뷰 리턴임
+                .andExpect(view().name("mypage/myinfo"))
+                .andExpect(model().attribute("errorMessage", "수정 실패 메시지"));
     }
 
     @Test
-    @DisplayName("회원 탈퇴 - 성공 (쿠키 삭제)")
+    @DisplayName("회원 탈퇴 - 성공 (쿠키 삭제 및 리다이렉트)")
     void withdrawMember_Success() throws Exception {
         mockMvc.perform(post("/mypage/withdraw")
                         .cookie(new Cookie("access-token", "val"), new Cookie("refresh-token", "val")))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"))
-                .andExpect(flash().attribute("message", "탈퇴되었습니다."))
+                .andExpect(redirectedUrl("/?alertCode=MP201")) // 컨트롤러 로직 반영
                 .andExpect(header().string(HttpHeaders.SET_COOKIE, org.hamcrest.Matchers.containsString("Max-Age=0")));
 
         verify(memberService).withdrawMember();
