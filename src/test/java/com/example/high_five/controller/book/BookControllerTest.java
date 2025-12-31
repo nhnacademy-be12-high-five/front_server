@@ -23,8 +23,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -64,7 +63,7 @@ class BookControllerTest {
         );
 
         given(bookClient.getBookDetail(bookId)).willReturn(mockBook);
-        given(couponService.getBookCoupons(bookId)).willReturn(Collections.emptyList());
+        given(couponService.getBookCoupons(eq(bookId), anyList(), eq(false))).willReturn(Collections.emptyList());
         given(reviewService.getReviews(eq(bookId), any(PageRequest.class)))
                 .willReturn(new PageImpl<>(Collections.emptyList()));
 
@@ -93,7 +92,7 @@ class BookControllerTest {
         BookReviewResponse myReview = new BookReviewResponse(1L, userId, "123", "Content", 3, ZonedDateTime.now(), null, 3, false); // 필요한 필드 채워 생성
 
         given(bookClient.getBookDetail(bookId)).willReturn(mockBook);
-        given(couponService.getBookCoupons(bookId)).willReturn(Collections.emptyList());
+        given(couponService.getBookCoupons(eq(bookId), anyList(), eq(false))).willReturn(Collections.emptyList());
         given(reviewService.getMyReview(bookId)).willReturn(myReview);
         given(reviewService.getReviews(eq(bookId), any(PageRequest.class)))
                 .willReturn(new PageImpl<>(Collections.emptyList()));
@@ -126,7 +125,7 @@ class BookControllerTest {
         given(bookClient.getBookDetail(bookId)).willReturn(mockBook);
 
         // 예외 상황 시뮬레이션
-        given(couponService.getBookCoupons(bookId)).willThrow(new RuntimeException("Coupon Service Down"));
+        given(couponService.getBookCoupons(eq(bookId), anyList(), eq(false))).willThrow(new RuntimeException("Coupon Service Down"));
         given(reviewService.getMyReview(bookId)).willThrow(new RuntimeException("Review Service Down"));
         given(bookClient.getLikeStatus(bookId)).willThrow(new RuntimeException("Like Service Down"));
 

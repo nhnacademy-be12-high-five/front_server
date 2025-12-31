@@ -52,7 +52,9 @@ public interface CouponService {
     CouponPolicyResponseDto getCouponPolicy(@PathVariable("id") Long id);
 
     @GetMapping("/api/coupons/books/{book-id}")
-    List<CouponTemplateDto> getBookCoupons(@PathVariable("book-id") Long bookId);
+    List<CouponTemplateDto> getBookCoupons(@PathVariable("book-id") Long bookId,
+                                           @RequestParam("category-ids") List<Long> categoryIds,
+                                           @RequestParam("include-global") boolean includeGlobal);
 
     @GetMapping("/api/coupons/members/order")
     List<MemberCouponResponseDto> getUsableCoupons(@RequestHeader(name = "X-USER-ID", required = false) Long memberId,

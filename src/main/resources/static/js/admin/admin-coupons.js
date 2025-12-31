@@ -1,6 +1,7 @@
 /**
  * /static/js/admin/admin-coupons.js
  * 통합 버전: 도서 검색 + 카테고리 1차/2차 선택
+ * 수정 사항: '추가' 버튼 type="button" 명시, prepareSubmit 함수 추가
  */
 
 (() => {
@@ -42,17 +43,17 @@
     // 1차 카테고리 로드
     function loadCouponRootCategories() {
         const select = $("category-select-1");
-        if (!select) return; // 카테고리 선택 태그가 없으면 종료
+        if (!select) return;
 
-        console.log("1차 카테고리 로딩 시작..."); // [디버깅용 로그]
+        console.log("1차 카테고리 로딩 시작...");
 
-        fetch('/api/categories/root')
+        fetch('/categories/root')
             .then(res => {
                 if (!res.ok) throw new Error(`카테고리 조회 실패 (${res.status})`);
                 return res.json();
             })
             .then(data => {
-                console.log("1차 카테고리 데이터 수신:", data); // [디버깅용 로그]
+                console.log("1차 카테고리 데이터 수신:", data);
                 select.innerHTML = '<option value="">1차 카테고리 선택</option>';
                 data.forEach(cat => {
                     const option = document.createElement('option');
@@ -81,9 +82,9 @@
             return;
         }
 
-        console.log("2차 카테고리 요청: parentId=" + parentId); // [디버깅용 로그]
+        console.log("2차 카테고리 요청: parentId=" + parentId);
 
-        fetch(`/api/categories/${parentId}/children`)
+        fetch(`/categories/${parentId}/children`)
             .then(res => res.json())
             .then(data => {
                 if (!subSelect) return;
@@ -97,10 +98,9 @@
                         option.text = cat.categoryName;
                         subSelect.appendChild(option);
                     });
-                    if (finalInput) finalInput.value = ""; // 2차 선택 대기
+                    if (finalInput) finalInput.value = "";
                 } else {
                     subSelect.disabled = true;
-                    // 하위 카테고리가 없으면 1차 카테고리 ID를 최종값으로 사용
                     if (finalInput) finalInput.value = parentId;
                 }
             })
@@ -139,6 +139,8 @@
             div.innerHTML = `<span><strong>${b.title}</strong> (${b.author})</span>`;
 
             const btn = document.createElement("button");
+            // [수정] 버튼 타입을 button으로 명시하여 폼 자동 전송 방지
+            btn.type = "button";
             btn.innerText = "추가";
             btn.style.cssText = "padding:4px 8px; background:#007bff; color:white; border:none; border-radius:4px; cursor:pointer;";
             btn.onclick = () => {
@@ -163,6 +165,7 @@
         selected.forEach((b, key) => {
             ids.push(key);
             const li = document.createElement("li");
+            // [참고] 삭제 버튼은 이미 type="button"이 innerHTML 문자열에 포함되어 있어 정상 동작함
             li.innerHTML = `${b.title} <button type="button" style="margin-left:10px; color:red; border:none; background:none; cursor:pointer;">[삭제]</button>`;
             li.querySelector("button").onclick = () => {
                 selected.delete(key);
@@ -189,9 +192,20 @@
         }
     }
 
+    // [추가] 폼 제출 전처리 함수 (HTML onsubmit에서 호출됨)
+    function prepareSubmit() {
+        // 도서가 선택되었는지 확인
+        const targetBookIds = $("targetBookIds").value;
+        if (!targetBookIds) {
+            showToast("최소 한 권 이상의 도서를 추가해주세요.", "warn");
+            return false; // 전송 중단
+        }
+        return true; // 전송 진행
+    }
+
     // ====== [Init] 초기화 실행 ======
     function init() {
-        console.log("Admin Coupons JS Initialized!"); // [디버깅용 로그]
+        console.log("Admin Coupons JS Initialized!");
 
         // 1. 카테고리 로드 시도
         loadCouponRootCategories();
@@ -207,5 +221,6 @@
     window.searchBooks = searchBooks;
     window.loadCouponSubCategories = loadCouponSubCategories;
     window.setFinalCouponCategory = setFinalCouponCategory;
+    window.prepareSubmit = prepareSubmit; // [추가]
 
 })();

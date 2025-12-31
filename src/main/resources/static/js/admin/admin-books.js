@@ -241,7 +241,7 @@ function setFormReadOnly(isUpdateMode) {
 
 // 1차 카테고리 로드
 function loadRootCategories() {
-    fetch('/api/categories/root')
+    fetch('/categories/root')
         .then(res => res.json())
         .then(data => {
             const parentSelect = document.getElementById('parentCategory');
@@ -272,7 +272,7 @@ function loadSubCategories(parentId, selectedSubId = null) {
         return;
     }
 
-    fetch(`/api/categories/${parentId}/children`)
+    fetch(`/categories/${parentId}/children`)
         .then(res => res.json())
         .then(data => {
             subSelect.innerHTML = '<option value="">2차 카테고리 선택</option>';

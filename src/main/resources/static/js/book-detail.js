@@ -162,8 +162,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("관심 도서 처리에 실패했습니다.");
             }
         } catch (e) {
-            console.error(e);
-            alert("서버와 통신 중 오류가 발생했습니다.");
+            if(confirm("로그인이 필요한 서비스입니다. 로그인 페이지로 이동하시겠습니까?")) {
+                location.href = "/member/login";
+            }
         }
     });
 });
