@@ -54,10 +54,16 @@
 
                     <div class="breadcrumb">
 
-                        <th:block th:if="${category.categories != null}" th:each="category : ${book.categories}">
+                        <th:block th:if="${book.categories != null and !book.categories.isEmpty()}"
+                                  th:each="category : ${book.categories}">
+
                             <span class="separator">&gt;</span>
-                            <a th:href="@{/search(searchType='CATEGORY', categoryId=${category.categoryId}, categoryName=${category.categoryName})}" th:text="${category.categoryName}">
-                                카테고리명</a>
+
+                            <a th:href="@{/search(searchType='CATEGORY', categoryId=${category.categoryId}, categoryName=${category.categoryName})}"
+                               th:text="${category.categoryName}">
+                                카테고리명
+                            </a>
+
                         </th:block>
 
                         <span class="separator">&gt;</span>
