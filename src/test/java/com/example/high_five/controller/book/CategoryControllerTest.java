@@ -41,7 +41,7 @@ class CategoryControllerTest {
         CategoryResponse cat1 = new CategoryResponse(1, "Domestic");
         given(categoryFeignClient.getParentCategories()).willReturn(List.of(cat1));
 
-        mockMvc.perform(get("/api/categories/root"))
+        mockMvc.perform(get("/categories/root"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].categoryName").value("Domestic"));
     }
@@ -53,7 +53,7 @@ class CategoryControllerTest {
         CategoryResponse cat2 = new CategoryResponse(2, "Novel");
         given(categoryFeignClient.getChildCategories(parentId)).willReturn(List.of(cat2));
 
-        mockMvc.perform(get("/api/categories/{parentId}/children", parentId))
+        mockMvc.perform(get("/categories/{parentId}/children", parentId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].categoryName").value("Novel"));
     }

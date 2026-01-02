@@ -1,13 +1,11 @@
 package com.example.high_five.controller.order;
 
+import com.example.high_five.dto.member.response.AddressListResponse;
 import com.example.high_five.dto.order.*;
 import com.example.high_five.dto.payment.PaymentConfirmRequest;
 import com.example.high_five.dto.payment.PaymentConfirmResponse;
 import com.example.high_five.dto.point.PointBalanceResponse;
-import com.example.high_five.service.CouponService;
-import com.example.high_five.service.FrontOrderService;
-import com.example.high_five.service.MemberService;
-import com.example.high_five.service.PaymentService;
+import com.example.high_five.service.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import feign.Request;
@@ -54,6 +52,9 @@ class OrderControllerTest {
     @Mock
     private CouponService couponService;
 
+    @Mock
+    private AddressService addressService;
+
     private MockMvc mockMvc;
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -72,15 +73,19 @@ class OrderControllerTest {
     @Test
     @DisplayName("주문서 작성 페이지 조회")
     void orderSheet() throws Exception {
-        OrderResponse mockOrderSheet = new OrderResponse();
-        mockOrderSheet.setName("Test User");
+        OrderResponse mockOrderSheet = OrderResponse.builder()
+                .name("Test User")
+                .coupons(Collections.emptyList())
+                .build();
         given(frontOrderService.createOrderSheet(any(), any(), any(), any())).willReturn(mockOrderSheet);
 
         PointBalanceResponse point = new PointBalanceResponse(1L, 1000L, 5000L);
         given(memberService.getMyBalance(any())).willReturn(ResponseEntity.ok(point));
 
-        given(couponService.getUsableCoupons(any(), any())).willReturn(Collections.emptyList());
         given(paymentService.getAllMethods()).willReturn(Collections.emptyList());
+
+        AddressListResponse addressListResponse = new AddressListResponse(Collections.emptyList());
+        given(addressService.getAddressList()).willReturn(ResponseEntity.ok(addressListResponse));
 
         mockMvc.perform(get("/orders/sheet")
                         .param("bookIds", "1,2")
@@ -89,7 +94,7 @@ class OrderControllerTest {
                         .header("Authorization", "token"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("order/order"))
-                .andExpect(model().attributeExists("orderSheet", "point", "coupons", "paymentMethods"));
+                .andExpect(model().attributeExists("orderSheet", "point", "coupons", "paymentMethods", "savedAddresses"));
     }
 
     @Test
