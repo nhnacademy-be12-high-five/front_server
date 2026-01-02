@@ -57,12 +57,11 @@ class AuthRestControllerTest {
 
     @BeforeEach
     void setUp() {
-        // [핵심 수정] StringHttpMessageConverter를 UTF-8로 강제 설정하여 등록
         mockMvc = MockMvcBuilders.standaloneSetup(authRestController)
                 .addFilters(new CharacterEncodingFilter("UTF-8", true))
                 .setMessageConverters(
-                        new StringHttpMessageConverter(StandardCharsets.UTF_8), // 문자열 반환 시 UTF-8 처리
-                        new MappingJackson2HttpMessageConverter() // JSON 처리
+                        new StringHttpMessageConverter(StandardCharsets.UTF_8),
+                        new MappingJackson2HttpMessageConverter()
                 )
                 .build();
     }
@@ -90,9 +89,11 @@ class AuthRestControllerTest {
         doThrow(exception).when(authService).sendEmail(any(EmailRequest.class));
 
         // when & then
+        // [수정] "wrong"은 이메일 형식이 아니라 @Valid에서 400 발생 (Controller 진입 전).
+        // Feign 예외를 테스트하려면 유효한 이메일 형식을 보내서 Service까지 도달시켜야 함.
         mockMvc.perform(post("/auth/email/send")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"wrong\"}"))
+                        .content("{\"email\":\"valid@test.com\"}")) // 형식은 맞게
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Invalid Email"));
     }
@@ -160,9 +161,10 @@ class AuthRestControllerTest {
     void sendDormantCode() throws Exception {
         given(memberService.checkDormantMember(any())).willReturn(ResponseEntity.ok(true));
 
+        // [수정] DormantRequest 필수 필드 포함 (loginId, authCode)
         mockMvc.perform(post("/auth/dormant/send")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"dormant@test.com\"}"))
+                        .content("{\"loginId\":\"testUser\", \"email\":\"dormant@test.com\", \"authCode\":\"123456\"}"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("인증번호가 발송되었습니다."));
 
@@ -173,9 +175,10 @@ class AuthRestControllerTest {
     @Test
     @DisplayName("휴면 계정 해제 인증")
     void verifyAndActivate() throws Exception {
+        // [수정] DormantRequest 필수 필드 포함
         mockMvc.perform(post("/auth/dormant/verify")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"test@test.com\"}"))
+                        .content("{\"loginId\":\"testUser\", \"email\":\"test@test.com\", \"authCode\":\"123456\"}"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("휴면 상태가 해제되었습니다."));
 
@@ -187,9 +190,10 @@ class AuthRestControllerTest {
     void verifyAndActivate_Fail() throws Exception {
         doThrow(new RuntimeException("Fail")).when(memberService).activateDormant(any());
 
+        // [수정] DormantRequest 필수 필드 포함
         mockMvc.perform(post("/auth/dormant/verify")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"test@test.com\"}"))
+                        .content("{\"loginId\":\"testUser\", \"email\":\"test@test.com\", \"authCode\":\"123456\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("인증번호가 틀렸거나 오류가 발생했습니다."));
     }

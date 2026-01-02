@@ -88,8 +88,13 @@ class AddressControllerTest {
     @Test
     @DisplayName("배송지 등록 처리 - 성공")
     void registerAddress_Success() throws Exception {
+        // [수정] 유효한 AddressRequest 생성
+        AddressRequest validRequest = new AddressRequest(
+                "Home", "Road 123", "Detail 101", "Recipient", "010-1234-5678", "12345", false
+        );
+
         mockMvc.perform(post("/mypage/address/register")
-                        .flashAttr("addressRequest", new AddressRequest()))
+                        .flashAttr("addressRequest", validRequest))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/mypage/address"))
                 .andExpect(flash().attributeExists("message"));
@@ -115,8 +120,13 @@ class AddressControllerTest {
     @Test
     @DisplayName("배송지 수정 처리 - 성공")
     void updateAddress_Success() throws Exception {
+        // [수정] 유효한 AddressRequest 생성
+        AddressRequest validRequest = new AddressRequest(
+                "Office", "Road 456", "Detail 202", "Recipient", "010-9876-5432", "54321", true
+        );
+
         mockMvc.perform(post("/mypage/address/1/update")
-                        .flashAttr("addressRequest", new AddressRequest()))
+                        .flashAttr("addressRequest", validRequest))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/mypage/address"))
                 .andExpect(flash().attributeExists("message"));
