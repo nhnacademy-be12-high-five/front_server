@@ -87,7 +87,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!bookId) return;
 
     function buildHeaders() {
-        return { 'Content-Type': 'application/json' };
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+
+        // 1. HTML의 meta 태그에서 user-id 값을 찾음
+        const userIdMeta = document.querySelector('meta[name="user-id"]');
+
+        // 2. 값이 존재하면 헤더에 추가
+        if (userIdMeta && userIdMeta.content) {
+            headers['X-USER-ID'] = userIdMeta.content;
+        }
+
+        return headers;
     }
 
     async function redirectToLoginIfNeeded(res) {

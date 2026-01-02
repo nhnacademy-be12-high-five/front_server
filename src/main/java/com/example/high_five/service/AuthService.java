@@ -44,5 +44,4 @@ public interface AuthService {
 
     @PostMapping("/api/emails/verify")
     ResponseEntity<String> verifyEmail(@RequestBody EmailVerifyRequest request);
-
 }
