@@ -63,10 +63,8 @@ class FrontOrderServiceTest {
         given(memberService.getMyBalance(token)).willReturn(ResponseEntity.ok(point));
 
         // 3. Coupon Mock
-        Map<String, Object> couponMap = new HashMap<>();
-        couponMap.put("content", List.of(new HashMap<>()));
-        given(couponService.getMemberCoupons(anyString(), anyInt(), anyInt())).willReturn(couponMap);
-        given(objectMapper.convertValue(any(), any(TypeReference.class))).willReturn(List.of(new MemberCouponResponseDto()));
+        MemberCouponResponseDto couponDto = new MemberCouponResponseDto();
+        given(couponService.getUsableCoupons(eq(userId), eq(bookIds), anyList())).willReturn(List.of(couponDto));
 
         // 4. Book Mock
         BookResponse book = new BookResponse(10L, "Book Title", null, null, 10000, "img", null, null, null, null, null, 0.0, 0L, null, null, 1, null);

@@ -13,10 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -44,12 +41,22 @@ public class FrontOrderService {
 
         int deliveryFee = calculateDeliveryFee(itemsResult.totalProductPrice(), policy);
 
+        List<MemberCouponResponseDto> usableCoupons = new ArrayList<>();
+        if (userId != null) {
+            try {
+                // bookIds와 함께 itemsResult에서 반환된 categoryIds를 전달
+                usableCoupons = couponService.getUsableCoupons(userId, bookIds, itemsResult.categoryIds());
+            } catch (Exception e) {
+                log.warn("주문 가능 쿠폰 조회 실패: {}", e.getMessage());
+            }
+        }
+
         return OrderResponse.builder()
                 .name(memberInfo.member() != null ? memberInfo.member().getName() : "")
                 .phoneNumber(memberInfo.member() != null ? memberInfo.member().getPhone() : "")
                 .email(memberInfo.member() != null ? memberInfo.member().getEmail() : "")
                 .myPoint(memberInfo.point())
-                .coupons(memberInfo.coupons())
+                .coupons(usableCoupons)
                 .orderItems(itemsResult.items())
                 .wrappers(wrappers)
                 .totalProductPrice(itemsResult.totalProductPrice())
@@ -115,6 +122,7 @@ public class FrontOrderService {
 
     private OrderItemsResult createOrderItems(List<Long> bookIds, List<Integer> quantities) {
         List<OrderResponse.OrderItem> items = new ArrayList<>();
+        Set<Long> categoryIds = new HashSet<>();
         int totalProductPrice = 0;
 
         for (int i = 0; i < bookIds.size(); i++) {
@@ -126,6 +134,10 @@ public class FrontOrderService {
                 if (bookInfo != null) {
                     int price = bookInfo.price();
                     int itemTotal = price * qty;
+
+                    if (bookInfo.categories() != null) {
+                        bookInfo.categories().forEach(cat -> categoryIds.add(cat.categoryId().longValue()));
+                    }
 
                     items.add(OrderResponse.OrderItem.builder()
                             .bookId(bookId)
@@ -142,7 +154,7 @@ public class FrontOrderService {
                 log.error("책 정보 조회 실패 (bookId={}): {}", bookId, e.getMessage());
             }
         }
-        return new OrderItemsResult(items, totalProductPrice);
+        return new OrderItemsResult(items, totalProductPrice, new ArrayList<>(categoryIds));
     }
 
     private List<OrderResponse.WrapperDto> fetchWrappers() {
@@ -235,5 +247,5 @@ public class FrontOrderService {
     }
 
     private record MemberInfoResult(MemberResponse member, Integer point, List<MemberCouponResponseDto> coupons) {}
-    private record OrderItemsResult(List<OrderResponse.OrderItem> items, int totalProductPrice) {}
+    private record OrderItemsResult(List<OrderResponse.OrderItem> items, int totalProductPrice, List<Long> categoryIds) {}
 }

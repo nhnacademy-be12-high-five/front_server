@@ -57,11 +57,6 @@ public class OrderController {
                              @RequestHeader(value = "Authorization", required = false) String token,
                              Model model) {
 
-        // 주문 시트
-        OrderResponse orderSheet =
-                frontOrderService.createOrderSheet(userId, token, bookIds, quantities);
-        model.addAttribute("orderSheet", orderSheet);
-
         // 포인트
         Long point = 0L;
         try {
@@ -77,13 +72,16 @@ public class OrderController {
         model.addAttribute("point", point);
         model.addAttribute("userId", userId);
 
+        // 주문 시트
+        OrderResponse orderSheet =
+                frontOrderService.createOrderSheet(userId, token, bookIds, quantities);
+        model.addAttribute("orderSheet", orderSheet);
+
         // 쿠폰
-        List<MemberCouponResponseDto> coupons = Collections.emptyList();
-        if (userId != null) {
-            try {
-                coupons = couponService.getUsableCoupons(userId, bookIds);
-            } catch (Exception ignore) {
-            }
+        List<MemberCouponResponseDto> coupons = orderSheet.getCoupons();
+
+        if (coupons == null) {
+            coupons = Collections.emptyList();
         }
         model.addAttribute("coupons", coupons);
 
