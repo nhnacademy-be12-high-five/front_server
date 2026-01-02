@@ -77,8 +77,8 @@ class AuthControllerTest {
                         .param("loginId", "test")
                         .param("password", "1234"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/member/login"))
-                .andExpect(flash().attributeExists("error"));
+                // [수정] flash().attributeExists("error") 제거 -> 쿼리 파라미터로 전달됨
+                .andExpect(redirectedUrl("/member/login?errorCode=C002"));
     }
 
     @Test
@@ -150,7 +150,7 @@ class AuthControllerTest {
         mockMvc.perform(get("/login/oauth2/code/google")
                         .param("code", "auth_code"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/member/login"))
-                .andExpect(flash().attributeExists("error"));
+                // [수정] flash().attributeExists("error") 제거 -> 쿼리 파라미터로 전달됨
+                .andExpect(redirectedUrl("/member/login?errorCode=C002"));
     }
 }

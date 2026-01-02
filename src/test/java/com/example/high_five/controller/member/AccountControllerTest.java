@@ -1,7 +1,6 @@
 package com.example.high_five.controller.member;
 
 import com.example.high_five.dto.member.request.EmailVerifyRequest;
-import com.example.high_five.dto.member.request.PasswordResetRequest;
 import com.example.high_five.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
@@ -28,7 +27,6 @@ import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -49,7 +47,6 @@ class AccountControllerTest {
 
     @BeforeEach
     void setUp() {
-        // [수정] 한글 깨짐 방지를 위한 메시지 컨버터 및 필터 추가
         mockMvc = MockMvcBuilders.standaloneSetup(accountController)
                 .addFilters(new CharacterEncodingFilter("UTF-8", true))
                 .setMessageConverters(
@@ -82,6 +79,7 @@ class AccountControllerTest {
 
         mockMvc.perform(post("/account/api/find/id")
                         .contentType(MediaType.APPLICATION_JSON)
+                        // [수정] 유효한 JSON 전달
                         .content("{\"email\":\"test@test.com\", \"code\":\"123456\"}"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("testId"));
@@ -98,7 +96,8 @@ class AccountControllerTest {
 
         mockMvc.perform(post("/account/api/find/id")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}"))
+                        // [수정] 빈 JSON({}) 대신 유효성 검사를 통과할 수 있는 데이터 전달
+                        .content("{\"email\":\"test@test.com\", \"code\":\"123456\"}"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User Not Found"));
     }
@@ -106,10 +105,18 @@ class AccountControllerTest {
     @Test
     @DisplayName("비밀번호 재설정 API - 성공")
     void resetPassword_Success() throws Exception {
+        // [수정] PasswordResetRequest의 필수 필드 및 정규식(8자 이상, 영문+숫자) 만족 필요
+        String validJson = "{" +
+                "\"loginId\":\"testUser\"," +
+                "\"email\":\"test@test.com\"," +
+                "\"authCode\":\"123456\"," +
+                "\"newPassword\":\"NewPass123!\"" +
+                "}";
+
         mockMvc.perform(post("/account/api/find/password")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"test@test.com\", \"password\":\"newPass\"}"))
+                        .content(validJson))
                 .andExpect(status().isOk())
-                .andExpect(content().string("비밀번호가 성공적으로 변경되었습니다.")); // 이제 깨지지 않음
+                .andExpect(content().string("비밀번호가 성공적으로 변경되었습니다."));
     }
 }
