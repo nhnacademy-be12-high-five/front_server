@@ -79,11 +79,8 @@ public class OrderController {
 
         // 쿠폰
         List<MemberCouponResponseDto> coupons = Collections.emptyList();
-        if (userId != null) {
-            try {
-                coupons = couponService.getUsableCoupons(userId, bookIds);
-            } catch (Exception ignore) {
-            }
+        if (coupons == null) {
+            coupons = Collections.emptyList();
         }
         model.addAttribute("coupons", coupons);
 

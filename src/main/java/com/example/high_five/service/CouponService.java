@@ -58,5 +58,6 @@ public interface CouponService {
 
     @GetMapping("/api/coupons/members/order")
     List<MemberCouponResponseDto> getUsableCoupons(@RequestHeader(name = "X-USER-ID", required = false) Long memberId,
-                                                   @RequestParam("bookIds") List<Long> bookIds);
+                                                   @RequestParam("bookIds") List<Long> bookIds,
+                                                   @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds);
 }
