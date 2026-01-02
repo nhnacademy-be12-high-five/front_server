@@ -170,3 +170,17 @@ header {
     font-size: medium;
     font-weight: 600;
 }
+
+#editor {
+    width: 100% !important;       /* 부모 요소 너비에 강제로 맞춤 */
+    max-width: 100% !important;   /* 부모 요소를 절대 넘지 않도록 제한 */
+    box-sizing: border-box;       /* 테두리와 패딩을 전체 너비에 포함 */
+    display: block;               /* 블록 요소로 확실하게 처리 */
+    overflow: hidden;             /* 혹시라도 넘치는 내부 콘텐츠 숨김 */
+}
+
+/* 에디터 내부의 툴바나 미리보기 영역도 반응형으로 잘 동작하도록 보정 */
+.toastui-editor-defaultUI {
+    width: 100% !important;
+    max-width: 100% !important;
+}

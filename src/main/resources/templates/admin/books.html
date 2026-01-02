@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/css/admin-css/admin-common.css">
     <link rel="stylesheet" href="/css/admin-css/admin-book.css">
     <link rel="stylesheet" href="/css/admin-css/admin-layout-fix.css">
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
 
 </head>
 
@@ -126,9 +127,9 @@
                 </div>
 
                 <div class="form-row2">
-                    <label for="description" class="des">설명</label>
-                    <textarea id="description" name="description" placeholder="도서 설명" rows="5"
-                              style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 10px;"></textarea>
+                    <label class="des">설명</label>
+                    <div id="editor"></div>
+                    <input type="hidden" id="description" name="description">
                 </div>
 
                 <div style="margin-top: 20px; display: flex; gap: 10px;">
@@ -148,6 +149,7 @@
 </div>
 
 <!-- 원본에 있던 스크립트는 DOM 로딩 안정성을 위해 body 끝으로 이동 -->
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 <script src="/js/admin/admin-books.js"></script>
 </body>
 </html>

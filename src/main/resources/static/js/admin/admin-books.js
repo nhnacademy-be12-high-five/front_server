@@ -1,6 +1,31 @@
+let editor;
+
 document.addEventListener("DOMContentLoaded", function () {
     loadRootCategories(); // 페이지 로드 시 1차 카테고리 가져오기
+    initEditor();         // Tui Editor 초기화
+
+    // [2] 폼 제출 시 에디터 내용을 hidden input에 담기
+    const form = document.getElementById('bookForm');
+    if (form) {
+        form.addEventListener('submit', function () {
+            const descriptionInput = document.getElementById('description');
+            // 에디터에 작성된 마크다운 텍스트를 가져와서 input 값으로 설정
+            descriptionInput.value = editor.getMarkdown();
+        });
+    }
 });
+
+// [3] 에디터 초기화 함수
+function initEditor() {
+    const Editor = toastui.Editor;
+    editor = new Editor({
+        el: document.querySelector('#editor'), // html에 만든 <div id="editor">
+        height: '500px',
+        initialEditType: 'markdown',          // or 'wysiwyg'
+        previewStyle: 'vertical',
+        initialValue: ''
+    });
+}
 
 // 1. 도서 검색 (관리자 DB 검색)
 async function searchBooks() {
@@ -169,9 +194,8 @@ function fillForm(book, isReadOnly) {
 
     // 설명 (WYSIWYG 에디터 대응)
     const desc = book.description || book.content || '';
+    editor.setMarkdown(desc);
     document.getElementById('description').value = desc;
-    const descField = document.getElementById('description');
-    descField.value = desc;
 
     // 필드 잠금 설정 (수정 모드면 잠금, AI 모드면 해제)
     setFormReadOnly(isReadOnly);
@@ -190,6 +214,8 @@ function resetForm() {
     const form = document.getElementById('bookForm');
     form.action = "/admin/books";
     form.reset();
+
+    editor.setMarkdown('');
 
     document.getElementById('bookId').value = '';
     document.getElementById('imgPreview').style.display = 'none';
