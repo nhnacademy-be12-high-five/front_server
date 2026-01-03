@@ -114,17 +114,17 @@
                                     <td th:text="${policy.discountType}">FIXED</td>
                                     <td>
                                         <span th:text="${policy.discountValue}">1000</span>
-                                        <span th:if="${policy.discountType == 'FIXED'}">원</span>
-                                        <span th:if="${policy.discountType == 'PERCENTAGE'}">%</span>
+                                        <span th:if="${policy.discountType != null and policy.discountType.name() == 'FIXED'}">원</span>
+                                        <span th:if="${policy.discountType != null and policy.discountType.name() == 'PERCENTAGE'}">%</span>
                                     </td>
                                     <td>
                                         <span th:text="${policy.status}"
-                                              th:style="${policy.status == 'ACTIVE'} ? 'color:green; font-weight:bold;' : 'color:gray;'">
+                                              th:style="${policy.status != null and policy.status.name() == 'ACTIVE'} ? 'color:green; font-weight:bold;' : 'color:gray;'">
                                             ACTIVE
                                         </span>
                                     </td>
                                     <td>
-                                        <form th:if="${policy.status == 'ACTIVE'}"
+                                        <form th:if="${policy.status != null and policy.status.name() == 'ACTIVE'}"
                                               th:action="@{/admin/coupons/policies/{id}(id=${policy.id})}"
                                               method="post"
                                               onsubmit="return confirm('정말 이 정책을 비활성화하시겠습니까?\n\n[주의] 해당 정책으로 발급된 모든 미사용 쿠폰이 \\'만료(EXPIRED)\\' 처리되며, 더 이상 복구할 수 없습니다.');">
@@ -133,7 +133,7 @@
                                                 비활성화
                                             </button>
                                         </form>
-                                        <span th:unless="${policy.status == 'ACTIVE'}">-</span>
+                                        <span th:unless="${policy.status != null and policy.status.name() == 'ACTIVE'}">-</span>
                                     </td>
                                 </tr>
                                 <tr th:if="${#lists.isEmpty(policies)}">

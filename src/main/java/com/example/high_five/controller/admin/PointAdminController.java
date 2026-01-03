@@ -1,5 +1,6 @@
 package com.example.high_five.controller.admin;
 
+import com.example.high_five.common.annotation.LoginRequired;
 import com.example.high_five.dto.point.PointAdminAdjustmentRequest;
 import com.example.high_five.dto.point.PointAdminPolicyRequest;
 import com.example.high_five.dto.point.PointAdminPolicyResponse;
@@ -25,6 +26,7 @@ public class PointAdminController {
     private final MemberService memberService;
 
     @GetMapping("/policy")
+    @LoginRequired(adminOnly = true)
     public String getPointPage(Model model) {
         try {
             PointAdminPolicyResponse policy = memberService.getPolicy().getBody();
@@ -38,6 +40,7 @@ public class PointAdminController {
     }
 
     @PostMapping("/policy")
+    @LoginRequired(adminOnly = true)
     public String updatePointPolicy(@ModelAttribute PointAdminPolicyRequest request, RedirectAttributes redirectAttributes) {
         try {
             memberService.updatePolicy(request);
@@ -50,6 +53,7 @@ public class PointAdminController {
     }
 
     @PostMapping("/adjustment")
+    @LoginRequired(adminOnly = true)
     public String adjustmentMemberPoint(@ModelAttribute PointAdminAdjustmentRequest request, RedirectAttributes redirectAttributes) {
         try {
             memberService.manualAdjustment(request);
@@ -74,6 +78,7 @@ public class PointAdminController {
     }
 
     @GetMapping
+    @LoginRequired(adminOnly = true)
     public String index() {
         return "redirect:/admin/points/policy";
     }
