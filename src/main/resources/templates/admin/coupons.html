@@ -157,6 +157,7 @@
                                 <select name="id" required>
                                     <option value="">-- 정책을 선택하세요 --</option>
                                     <option th:each="policy : ${policies}"
+                                            th:if="${policy.status != null and policy.status.name() == 'ACTIVE'}"
                                             th:value="${policy.id}"
                                             th:text="${policy.name}">
                                         정책 이름
@@ -295,6 +296,7 @@
                                 <select name="couponId" required>
                                     <option value="">-- 쿠폰 선택 --</option>
                                     <option th:each="coupon : ${coupons}"
+                                            th:if="${coupon.status == 'ACTIVE'}"
                                             th:value="${coupon.id}"
                                             th:text="${coupon.couponName} + ' (ID: ' + ${coupon.id} + ')'">
                                         쿠폰명
