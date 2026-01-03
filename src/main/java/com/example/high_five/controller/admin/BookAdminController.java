@@ -30,7 +30,7 @@ public class BookAdminController {
     private final BookFeignClient bookFeignClient;
 
     @GetMapping
-    @LoginRequired
+    @LoginRequired(adminOnly = true)
     public String bookPage(Model model) {
         return "admin/books";
     }
@@ -49,6 +49,7 @@ public class BookAdminController {
 
     @GetMapping("/{id}")
     @ResponseBody
+    @LoginRequired(adminOnly = true)
     public ResponseEntity<BookResponse> getBookDetail(@PathVariable Long id) {
         try {
             BookResponse book = bookClient.getBookDetail(id);
@@ -60,7 +61,7 @@ public class BookAdminController {
     }
 
     @PostMapping
-    @LoginRequired
+    @LoginRequired(adminOnly = true)
     public String createBook(@ModelAttribute BookRequest bookRequest,
                              RedirectAttributes redirectAttributes) {
         try {
@@ -76,13 +77,14 @@ public class BookAdminController {
 
     @GetMapping("/search-api")
     @ResponseBody
+    @LoginRequired(adminOnly = true)
     public ResponseEntity<BookInfoDto> searchBookWithAi(@RequestParam("isbn") String isbn) {
         // Book Server로 요청 위임
         return bookFeignClient.searchBookByIsbn(isbn);
     }
 
     @PostMapping("/{id}/update")
-    @LoginRequired
+    @LoginRequired(adminOnly = true)
     public String updateBook(@PathVariable Long id,
                              @ModelAttribute BookAdminUpdateRequest updateRequest,
                              RedirectAttributes redirectAttributes) {
@@ -104,6 +106,7 @@ public class BookAdminController {
 
     @DeleteMapping("/{id}")
     @ResponseBody
+    @LoginRequired(adminOnly = true)
     public ResponseEntity<String> deleteBook(@PathVariable Long id) {
         try {
             log.info("도서 삭제 요청 - I: {}", id);

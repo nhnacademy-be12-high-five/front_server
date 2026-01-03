@@ -13,11 +13,11 @@ public class CouponPolicyResponseDto {
     private Long id;
     private String name;
     private String comment;
-    private String discountType;
+    private DiscountType discountType;
     private Long discountValue;
     private Long minOrderValue;
     private Long maxDiscountValue;
-    private String status;
+    private CouponPolicyStatus status;
     private List<Long> targetBookIds;
     private List<Long> targetCategoryIds;
 }
