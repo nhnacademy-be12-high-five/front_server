@@ -138,11 +138,83 @@ header {
     text-align: right;
 }
 
-.search-container { margin-bottom: 20px; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-.search-result-list { margin-top: 10px; max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; background: #fff; display: none; }
-.search-result-item img { width: 40px; height: 60px; object-fit: cover; border-radius: 4px; }
-.form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-.preview-img { max-width: 100px; margin-top: 10px; border: 1px solid #ddd; border-radius: 4px; }
+/* 검색 결과 영역 컨테이너 */
+#searchResultArea {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* 아이템 간 간격 */
+    max-height: 500px; /* 너무 길어지면 스크롤 */
+    overflow-y: auto;
+    padding: 5px; /* 그림자 잘림 방지 여백 */
+}
+
+/* 검색 결과 아이템 (카드 스타일) */
+.search-result-item {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 호버 효과: 살짝 떠오르면서 그림자 진하게 */
+.search-result-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-color: #3b82f6; /* 포인트 컬러 (파란색 계열) */
+}
+
+/* 책 표지 이미지 */
+.search-result-item img {
+    width: 60px;
+    height: 85px; /* 책 비율 (약 1:1.4) 유지 */
+    object-fit: cover; /* 이미지가 찌그러지지 않게 채움 */
+    border-radius: 4px;
+    margin-right: 15px;
+    border: 1px solid #f0f0f0;
+    flex-shrink: 0; /*공간이 좁아져도 이미지 크기 유지 */
+}
+
+/* 텍스트 정보 영역 */
+.search-result-item .book-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1; /* 남은 공간 모두 차지 */
+    overflow: hidden; /* 텍스트 넘침 방지 */
+}
+
+/* 책 제목 */
+.search-result-item .book-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* 제목 길면 ... 처리 */
+}
+
+/* 메타 정보 (저자, 가격, ISBN) */
+.search-result-item .book-meta {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.4;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px; /* 항목 사이 간격 */
+    align-items: center;
+}
+
+/* 메타 정보 사이 구분선 (|) 스타일링 (선택 사항) */
+.search-result-item .book-meta span {
+    display: inline-block;
+}
 
 
 .form-row2{

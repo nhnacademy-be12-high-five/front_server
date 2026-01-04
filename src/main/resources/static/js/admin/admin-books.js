@@ -59,7 +59,7 @@ async function searchBooks() {
             const authorStr = Array.isArray(book.authors) ? book.authors.join(', ') : (book.author || '');
 
             item.innerHTML = `
-                    <img src="${book.image || '/img/no-image.png'}" alt="표지">
+                    <img src="${book.imageUrl || '/img/no-image.png'}" alt="표지">
                     <div class="book-info">
                         <div class="book-title">${book.title}</div>
                         <div class="book-meta">${authorStr} | ${book.price}원 | ISBN: ${book.isbn}</div>
