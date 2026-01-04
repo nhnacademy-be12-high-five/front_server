@@ -73,12 +73,14 @@
         const subSelect = $("category-select-2");
         const finalInput = $("categoryId");
 
+        if (finalInput) {
+            finalInput.value = parentId || "";
+        }
         if (!parentId) {
             if (subSelect) {
                 subSelect.innerHTML = '<option value="">2차 카테고리 선택</option>';
                 subSelect.disabled = true;
             }
-            if (finalInput) finalInput.value = "";
             return;
         }
 
@@ -98,10 +100,8 @@
                         option.text = cat.categoryName;
                         subSelect.appendChild(option);
                     });
-                    if (finalInput) finalInput.value = "";
                 } else {
                     subSelect.disabled = true;
-                    if (finalInput) finalInput.value = parentId;
                 }
             })
             .catch(err => console.error(err));
@@ -110,9 +110,20 @@
     // 최종 카테고리 ID 설정
     function setFinalCouponCategory(subId) {
         const finalInput = $("categoryId");
-        if (subId && finalInput) {
+        const parentSelect = $("category-select-1");
+        if (!finalInput) return;
+        if (subId) {
+            // 2차 카테고리를 선택했을 때 -> 해당 ID로 설정
             finalInput.value = subId;
-            console.log("최종 카테고리 선택됨:", subId);
+            console.log("최종 카테고리 선택됨 (Sub):", subId);
+        } else {
+            // [핵심 수정 3] 2차 카테고리를 '선택(전체)'로 되돌렸을 때 -> 1차 ID로 복구
+            if (parentSelect && parentSelect.value) {
+                finalInput.value = parentSelect.value;
+                console.log("최종 카테고리 선택됨 (Parent 복구):", parentSelect.value);
+            } else {
+                finalInput.value = "";
+            }
         }
     }
 
