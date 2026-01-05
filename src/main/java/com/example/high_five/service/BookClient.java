@@ -49,8 +49,8 @@ public interface BookClient {
     List<BookResponse> getBestSellers(@RequestParam("size") int size);
 
     // 도서 좋아요 조회
-    @GetMapping("/members/me/likes")
-    Boolean getBookLike(@PathVariable("book-id") Long id);
+    @GetMapping("/api/my-page/likes")
+    Boolean getBookLike();
 
     // 좋아요 토글
     @PostMapping("/api/books/{bookId}/likes")
@@ -59,7 +59,7 @@ public interface BookClient {
     );
 
     // 좋아요 상태 조회
-    @GetMapping("/api/books/{bookId}/likes/status")
+    @GetMapping("/api/books/{bookId}/likes")
     ResponseEntity<Boolean> getLikeStatus(
             @PathVariable("bookId") Long bookId
     );
@@ -88,8 +88,9 @@ public interface BookClient {
                                                    @RequestParam("size") int size);
 
     // [마이페이지] 내가 좋아요 누른 도서 목록 조회
-    @GetMapping("/api/books/my-page/likes")
+    @GetMapping("/api/books/{bookId}/likes/status")
+    List<BookResponse> getMyLikedBooks(@PathVariable("bookId") int bookId);
+
+    @GetMapping("/api/my-page/likes")
     List<BookResponse> getMyLikedBooks();
-
-
 }

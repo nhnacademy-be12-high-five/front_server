@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 // 성공 후 상태 재조회
-                const statusRes = await fetch(`/books/${bookId}/likes/status`, {
+                const statusRes = await fetch(`/books/${bookId}/likes`, {
                     method: 'GET',
                     headers: buildHeaders(),
                     credentials: 'include'
