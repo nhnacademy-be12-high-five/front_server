@@ -41,7 +41,7 @@ class BookLikeControllerTest {
         Long bookId = 1L;
         given(bookClient.getLikeStatus(bookId)).willReturn(ResponseEntity.ok(true));
 
-        mockMvc.perform(get("/api/books/{bookId}/likes/status", bookId))
+        mockMvc.perform(get("/books/{bookId}/likes/status", bookId))
                 .andExpect(status().isOk())
                 .andExpect(content().string("true"));
 
@@ -54,7 +54,7 @@ class BookLikeControllerTest {
         Long bookId = 1L;
         given(bookClient.toggleLike(bookId)).willReturn(ResponseEntity.ok(false)); // 좋아요 취소됨
 
-        mockMvc.perform(post("/api/books/{bookId}/likes", bookId))
+        mockMvc.perform(post("/books/{bookId}/likes", bookId))
                 .andExpect(status().isOk())
                 .andExpect(content().string("false"));
 
