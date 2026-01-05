@@ -151,5 +151,20 @@
 <!-- 원본에 있던 스크립트는 DOM 로딩 안정성을 위해 body 끝으로 이동 -->
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 <script src="/js/admin/admin-books.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // 컨트롤러에서 redirectAttributes로 넘겨준 값 받기
+    const successMessage = [[${message}]];
+    const errorMessage = [[${errorMessage}]];
+
+    if (successMessage) {
+        alert(successMessage);
+    }
+
+    if (errorMessage) {
+        alert(errorMessage);
+    }
+    /*]]>*/
+</script>
 </body>
 </html>

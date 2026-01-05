@@ -317,5 +317,17 @@
 
 </div>
 <script src="/js/admin/admin-coupons.js?v=reset"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const errorMessage = [[${errorMessage}]];
+    if (errorMessage) {
+        alert(errorMessage);
+    }
+    const message = [[${message}]];
+    if (message) {
+        alert(message);
+    }
+    /*]]>*/
+</script>
 </body>
 </html>
