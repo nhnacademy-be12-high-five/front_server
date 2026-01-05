@@ -23,7 +23,7 @@ public class BookLikeController {
 
     // 좋아요 토글: POST /api/books/{bookId}/likes
     @LoginRequired
-    @PostMapping("/{book-id}/likes")
+    @PostMapping("/api/books/{bookId}/likes")
     public ResponseEntity<Boolean> toggle(@PathVariable("book-id") Long bookId) {
         return bookClient.toggleLike(bookId);
     }
