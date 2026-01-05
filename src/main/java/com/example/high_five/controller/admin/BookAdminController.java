@@ -9,6 +9,7 @@ import com.example.high_five.dto.book.request.BookRequest;
 import com.example.high_five.dto.book.response.BookResponse;
 import com.example.high_five.service.BookClient;
 import com.example.high_five.service.BookFeignClient;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -68,9 +69,13 @@ public class BookAdminController {
             bookClient.createBook(bookRequest);
             log.info("도서 동록 성공 : {}",bookRequest);
             redirectAttributes.addFlashAttribute("message", "도서가 성공적으로 등록되었습니다.");
-        } catch (Exception e) {
-            log.error("도서 등록 실패", e);
-//            redirectAttributes.addFlashAttribute("errorMessage", "도서 등록에 실패했습니다.");
+        } catch (FeignException e) {
+            log.error("도서 등록 실패 (Status: {}): {}", e.status(), e.getMessage());
+            if (e.status() == 409) { // 409 Conflict (중복)
+                redirectAttributes.addFlashAttribute("errorMessage", "이미 등록된 도서(ISBN 중복)입니다.");
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "도서 등록에 실패했습니다. 입력 값을 확인해주세요.");
+            }
         }
         return "redirect:/admin/books";
     }
