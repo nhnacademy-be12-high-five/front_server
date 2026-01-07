@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 초기 상태 조회
     (async function loadLikeStatus() {
         try {
-            const response = await fetch(`/books/${bookId}/likes/status`, {
+            const response = await fetch(`/books/${bookId}/likes`, {
                 method: 'GET',
                 headers: buildHeaders(),
                 credentials: 'include'
