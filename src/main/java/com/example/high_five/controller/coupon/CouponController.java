@@ -66,7 +66,7 @@ public class CouponController {
         // 1. 임시 사용자 ID (로그인 구현 전이므로 1번 사용자로 고정)
         if (accessToken == null || accessToken.isBlank()) {
             redirectAttributes.addFlashAttribute("errorMessage", "로그인이 필요한 서비스입니다.");
-            return "redirect:/member/login.html";
+            return "redirect:/member/login";
         }
 
         try {
@@ -98,7 +98,7 @@ public class CouponController {
                                Model model) {
 
         if (accessToken == null) {
-            return "redirect:/member/login.html";
+            return "redirect:/member/login";
         }
 
         List<MemberCouponResponseDto> myCoupons = Collections.emptyList();
@@ -125,7 +125,7 @@ public class CouponController {
             }
         } catch (FeignException e) {
             log.error("쿠폰 조회 실패 (Feign): {}", e.getMessage());
-            if(e.status() == 401) return "redirect:/member/login.html";
+            if(e.status() == 401) return "redirect:/member/login";
         } catch (Exception e) {
             log.error("시스템 오류: {}", e.getMessage());
         }
