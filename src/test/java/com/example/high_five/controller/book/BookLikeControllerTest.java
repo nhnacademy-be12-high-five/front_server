@@ -41,7 +41,7 @@ class BookLikeControllerTest {
         Long bookId = 1L;
         given(bookClient.getLikeStatus(bookId)).willReturn(ResponseEntity.ok(true));
 
-        mockMvc.perform(get("/books/{bookId}/likes/status", bookId))
+        mockMvc.perform(get("/books/{bookId}/likes", bookId))
                 .andExpect(status().isOk())
                 .andExpect(content().string("true"));
 

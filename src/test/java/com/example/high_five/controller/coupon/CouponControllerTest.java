@@ -89,7 +89,7 @@ class CouponControllerTest {
                         .param("couponId", "1")
                         .header("Referer", "/books"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/member/login.html"))
+                .andExpect(redirectedUrl("/member/login"))
                 .andExpect(flash().attribute("errorMessage", "로그인이 필요한 서비스입니다."));
     }
 
@@ -168,7 +168,7 @@ class CouponControllerTest {
     void myCouponPage_NoLogin() throws Exception {
         mockMvc.perform(get("/mypage/coupons"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/member/login.html"));
+                .andExpect(redirectedUrl("/member/login"));
     }
 
     @Test
@@ -215,7 +215,7 @@ class CouponControllerTest {
         mockMvc.perform(get("/mypage/coupons")
                         .cookie(new Cookie("access-token", "invalid")))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/member/login.html"));
+                .andExpect(redirectedUrl("/member/login"));
     }
 
     @Test
