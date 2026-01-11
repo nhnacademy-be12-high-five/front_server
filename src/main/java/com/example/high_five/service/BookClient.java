@@ -43,7 +43,6 @@ public interface BookClient {
     @GetMapping("/api/books/popular")
     List<BookResponse> getPopularBooks(@RequestParam("size") int size);
 
-
     // 베스트셀러
     @GetMapping("/api/books/best-seller")
     List<BookResponse> getBestSellers(@RequestParam("size") int size);
@@ -93,4 +92,8 @@ public interface BookClient {
 
     @GetMapping("/api/my-page/likes")
     List<BookResponse> getMyLikedBooks();
+
+    @PostMapping("/api/books/{bookId}/best-seller")
+    ResponseEntity<Void> updateBestSeller(@PathVariable("bookId") Long bookId,
+                                          @RequestBody Integer quantity);
 }
