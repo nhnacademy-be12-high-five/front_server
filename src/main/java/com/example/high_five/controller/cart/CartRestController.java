@@ -16,9 +16,10 @@ public class CartRestController {
     // Book Server와 통신하는 Feign Client (이미 있다고 가정)
     private final BookFeignClient bookFeignClient;
 
-    @PostMapping("/books/recommendations") // JS의 fetch 주소와 일치해야 함
+    @PostMapping("/books/recommendations")
     public ResponseEntity<List<BookResponse>> getAiRecommendations(@RequestBody List<String> titles) {
         // Book Server로 요청 위임
+        System.out.println("프론트로 들어오는지");
         return bookFeignClient.getAiRecommendations(titles);
     }
 }

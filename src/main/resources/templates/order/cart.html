@@ -100,19 +100,19 @@
                 </div>
             </aside>
         </div>
+    </div>
+    <div class="ai-recommend-container">
+        <h4>🤖 AI가 고객님의 취향을 분석하여 추천드려요!</h4>
 
-        <div class="ai-recommend-container">
-            <h4>🤖 AI가 고객님의 취향을 분석하여 추천드려요!</h4>
+        <div id="ai-loading" class="loading-box">
+            <div class="spinner"></div>
+            <p>관련 도서를 찾는 중입니다...</p>
+        </div>
 
-            <div id="ai-loading" class="loading-box">
-                <div class="spinner"></div>
-                <p>관련 도서를 찾는 중입니다...</p>
-            </div>
-
-            <div id="ai-book-list" class="ai-book-list" style="display: none;">
-            </div>
+        <div id="ai-book-list" class="ai-book-list" style="display: none;">
         </div>
     </div>
+
 </main>
 
 <div th:replace="~{layout/footer :: footer}"></div>

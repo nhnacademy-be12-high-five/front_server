@@ -394,18 +394,17 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function loadAiRecommendations() {
-    // 1. 화면에 있는 장바구니 책 제목들 긁어오기
-    // (Thymeleaf로 렌더링된 요소에서 텍스트 추출)
-    const titles = Array.from(document.querySelectorAll('.cart-item-title'))
+    // [수정 1] HTML에 작성된 클래스명(.item-title)으로 변경
+    const titles = Array.from(document.querySelectorAll('.item-title'))
         .map(el => el.textContent.trim());
 
+    // 장바구니가 비어있으면 추천 영역 숨김
     if (titles.length === 0) {
         document.querySelector('.ai-recommend-container').style.display = 'none';
         return;
     }
 
-    // 2. 백엔드 API 호출 (Front Controller -> Book Server Feign Client 경유 권장)
-    fetch('/cart/recommendations', { // Front Server에 프록시 API 생성 필요
+    fetch('/books/recommendations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(titles)
@@ -415,28 +414,27 @@ function loadAiRecommendations() {
             const loadingDiv = document.getElementById('ai-loading');
             const listDiv = document.getElementById('ai-book-list');
 
-            loadingDiv.style.display = 'none'; // 로딩 숨김
+            loadingDiv.style.display = 'none';
 
             if (books.length > 0) {
-                listDiv.style.display = 'flex'; // 리스트 보임
+                listDiv.style.display = 'flex';
 
                 books.forEach(book => {
+                    // [수정 2] CSS 파일에 정의된 클래스(.ai-card 등)를 사용하도록 마크업 변경
+                    // 기존 Bootstrap 클래스(card, col 등) 대신 작성하신 CSS 클래스 적용
                     const cardHtml = `
-                    <div class="col">
-                        <div class="card h-100 shadow-sm">
-                            <img src="${book.thumbnail}" class="card-img-top" alt="${book.title}">
-                            <div class="card-body">
-                                <h5 class="card-title">${book.title}</h5>
-                                <p class="card-text text-muted">${book.author}</p>
-                                <a href="/books/${book.id}" class="btn btn-outline-primary btn-sm">상세보기</a>
-                            </div>
+                    <div class="ai-card">
+                        <img src="${book.thumbnail}" alt="${book.title}">
+                        <div class="ai-card-body">
+                            <h5 class="ai-card-title">${book.title}</h5>
+                            <p class="card-text text-muted" style="font-size:13px; margin-bottom:10px;">${book.author}</p>
+                            <a href="/books/${book.id}" class="btn btn-primary btn-sm" style="display:block; text-align:center;">상세보기</a>
                         </div>
                     </div>
                 `;
                     listDiv.insertAdjacentHTML('beforeend', cardHtml);
                 });
             } else {
-                // 추천 결과가 없거나 실패 시 영역 전체 숨김
                 document.querySelector('.ai-recommend-container').style.display = 'none';
             }
         })
