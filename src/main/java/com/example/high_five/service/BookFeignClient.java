@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @FeignClient(name = "gateway-server", contextId = "couponBookSearchClient", url = "${gateway.uri}")
 public interface BookFeignClient {
 
@@ -26,4 +28,7 @@ public interface BookFeignClient {
 
     @GetMapping("/api/admin/books/search-api")
     ResponseEntity<BookInfoDto> searchBookByIsbn(@RequestParam("isbn") String isbn);
+
+    @GetMapping("/api/books/recommendations")
+    ResponseEntity<List<BookResponse>> getAiRecommendations(List<String> titles);
 }

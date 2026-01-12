@@ -388,3 +388,60 @@ function orderSelected() {
     const url = `/orders/sheet?bookIds=${bookIds.join(",")}&quantities=${quantities.join(",")}`;
     location.href = url;
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    loadAiRecommendations();
+});
+
+function loadAiRecommendations() {
+    // 1. 화면에 있는 장바구니 책 제목들 긁어오기
+    // (Thymeleaf로 렌더링된 요소에서 텍스트 추출)
+    const titles = Array.from(document.querySelectorAll('.cart-item-title'))
+        .map(el => el.textContent.trim());
+
+    if (titles.length === 0) {
+        document.querySelector('.ai-recommend-container').style.display = 'none';
+        return;
+    }
+
+    // 2. 백엔드 API 호출 (Front Controller -> Book Server Feign Client 경유 권장)
+    fetch('/cart/recommendations', { // Front Server에 프록시 API 생성 필요
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(titles)
+    })
+        .then(response => response.json())
+        .then(books => {
+            const loadingDiv = document.getElementById('ai-loading');
+            const listDiv = document.getElementById('ai-book-list');
+
+            loadingDiv.style.display = 'none'; // 로딩 숨김
+
+            if (books.length > 0) {
+                listDiv.style.display = 'flex'; // 리스트 보임
+
+                books.forEach(book => {
+                    const cardHtml = `
+                    <div class="col">
+                        <div class="card h-100 shadow-sm">
+                            <img src="${book.thumbnail}" class="card-img-top" alt="${book.title}">
+                            <div class="card-body">
+                                <h5 class="card-title">${book.title}</h5>
+                                <p class="card-text text-muted">${book.author}</p>
+                                <a href="/books/${book.id}" class="btn btn-outline-primary btn-sm">상세보기</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                    listDiv.insertAdjacentHTML('beforeend', cardHtml);
+                });
+            } else {
+                // 추천 결과가 없거나 실패 시 영역 전체 숨김
+                document.querySelector('.ai-recommend-container').style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error("AI 추천 로드 실패:", error);
+            document.querySelector('.ai-recommend-container').style.display = 'none';
+        });
+}
