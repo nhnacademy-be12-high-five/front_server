@@ -393,53 +393,92 @@ document.addEventListener("DOMContentLoaded", function() {
     loadAiRecommendations();
 });
 
-function loadAiRecommendations() {
-    // [수정 1] HTML에 작성된 클래스명(.item-title)으로 변경
-    const titles = Array.from(document.querySelectorAll('.item-title'))
-        .map(el => el.textContent.trim());
+// [수정] AI 추천 도서 로드 함수
+async function loadAiRecommendations() {
+    const container = document.querySelector('.ai-rec-body');
+    if (!container) return;
 
-    // 장바구니가 비어있으면 추천 영역 숨김
-    if (titles.length === 0) {
-        document.querySelector('.ai-recommend-container').style.display = 'none';
-        return;
-    }
+    try {
+        const response = await fetch('/cart/ai-recommendations');
+        if (!response.ok) throw new Error('AI request failed');
 
-    fetch('/books/recommendations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(titles)
-    })
-        .then(response => response.json())
-        .then(books => {
-            const loadingDiv = document.getElementById('ai-loading');
-            const listDiv = document.getElementById('ai-book-list');
+        const books = await response.json();
 
-            loadingDiv.style.display = 'none';
+        if (!books || books.length === 0) {
+            container.innerHTML = '<div class="ai-placeholder"><span>추천 가능한 연관 도서가 없습니다.</span></div>';
+            return;
+        }
 
-            if (books.length > 0) {
-                listDiv.style.display = 'flex';
+        const displayBooks = books.slice(0, 5);
 
-                books.forEach(book => {
-                    // [수정 2] CSS 파일에 정의된 클래스(.ai-card 등)를 사용하도록 마크업 변경
-                    // 기존 Bootstrap 클래스(card, col 등) 대신 작성하신 CSS 클래스 적용
-                    const cardHtml = `
-                    <div class="ai-card">
-                        <img src="${book.thumbnail}" alt="${book.title}">
-                        <div class="ai-card-body">
-                            <h5 class="ai-card-title">${book.title}</h5>
-                            <p class="card-text text-muted" style="font-size:13px; margin-bottom:10px;">${book.author}</p>
-                            <a href="/books/${book.id}" class="btn btn-primary btn-sm" style="display:block; text-align:center;">상세보기</a>
-                        </div>
+        // 1. 도서 리스트 영역 생성
+        let html = '<div class="ai-content-wrapper">';
+        html += '<div class="ai-book-list">';
+
+        displayBooks.forEach(book => {
+            const price = book.price ? book.price.toLocaleString() + '원' : '';
+            // 요약문이 없으면 기본 멘트 사용
+            const summary = book.aiSummary
+                ? book.aiSummary.replace(/"/g, '&quot;')
+                : "이 책은 장바구니에 담긴 도서와 유사한 주제를 다루고 있어 추천되었습니다.";
+
+            // data-reason 속성에 요약글 저장
+            html += `
+                <div class="ai-book-item" 
+                     onclick="location.href='/books/${book.id}'"
+                     onmouseenter="updateAiReason(this.getAttribute('data-reason'))"
+                     data-reason="${summary}">
+                    
+                    <div class="ai-book-thumb">
+                        <img src="${book.imageUrl}" alt="${book.title}" onerror="this.src='/img/no-image.png'">
                     </div>
-                `;
-                    listDiv.insertAdjacentHTML('beforeend', cardHtml);
-                });
-            } else {
-                document.querySelector('.ai-recommend-container').style.display = 'none';
-            }
-        })
-        .catch(error => {
-            console.error("AI 추천 로드 실패:", error);
-            document.querySelector('.ai-recommend-container').style.display = 'none';
+                    <div class="ai-book-info">
+                        <div class="ai-book-title" title="${book.title}">${book.title}</div>
+                        <div class="ai-book-price">${price}</div>
+                    </div>
+                </div>
+            `;
         });
+        html += '</div>'; // ai-book-list 닫기
+
+        // 2. [추가] 하단 설명(요약) 박스 영역 생성
+        html += `
+            <div class="ai-description-box">
+                <div class="ai-desc-title">🤖 AI 추천 사유</div>
+                <div class="ai-desc-text" id="aiReasonText">
+                    도서에 마우스를 올려보세요. AI가 추천하는 이유를 알려드립니다.
+                </div>
+            </div>
+        `;
+
+        html += '</div>'; // ai-content-wrapper 닫기
+
+        container.innerHTML = html;
+
+    } catch (error) {
+        console.error("AI Loading Error:", error);
+        container.innerHTML = '<div class="ai-placeholder"><span>추천 서비스를 불러오는 중 오류가 발생했습니다.</span></div>';
+    }
 }
+
+// [추가] 마우스 오버 시 설명 텍스트 업데이트 함수
+function updateAiReason(text) {
+    const textBox = document.getElementById('aiReasonText');
+    if (textBox && text) {
+        textBox.innerHTML = text;
+    }
+}
+
+// 초기화 이벤트 리스너에 함수 추가
+document.addEventListener("DOMContentLoaded", () => {
+    updateTotals();
+    updateCartBadge();
+    setTimeout(() => {
+        checkAndMergeCart();
+
+        // 만약 아까 추가한 AI 추천 로드 함수가 있다면 여기서 같이 호출해도 좋습니다.
+        if (typeof loadAiRecommendations === 'function') {
+            loadAiRecommendations();
+        }
+    }, 100); // 0.1초 딜레이
+});

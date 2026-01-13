@@ -253,12 +253,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    if (confirm("로그인이 필요합니다.\n로그인 페이지로 이동하시겠습니까?")) {
-                        window.location.href = "/member/login.html";
-                    }
+                    // [수정] 0.1초 지연 실행으로 포커스 문제 해결
+                    setTimeout(() => {
+                        if (confirm("로그인이 필요합니다.\n로그인 페이지로 이동하시겠습니까?")) {
+                            window.location.href = "/member/login";
+                        }
+                    }, 100);
                     return;
                 } else if (response.status === 409) {
-                    alert("재고가 부족하여 장바구니에 담을 수 없습니다.");
+                    setTimeout(() => alert("재고가 부족하여 장바구니에 담을 수 없습니다."), 100);
                     return;
                 }
 
@@ -266,13 +269,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            if (confirm("장바구니에 상품이 담겼습니다.\n장바구니로 이동하시겠습니까?")) {
-                window.location.href = "/cart";
-            }
+            // [수정] 장바구니 담기 성공 알림창도 지연 실행
+            setTimeout(() => {
+                if (confirm("장바구니에 상품이 담겼습니다.\n장바구니로 이동하시겠습니까?")) {
+                    window.location.href = "/cart";
+                }
+            }, 100);
 
         } catch (error) {
             console.error(error);
-            alert("서버 연결 상태가 원활하지 않습니다.");
+            setTimeout(() => alert("서버 연결 상태가 원활하지 않습니다."), 100);
         }
     });
 });

@@ -168,9 +168,29 @@ function fillForm(book, isReadOnly) {
     document.getElementById('title').value = book.title || '';
     document.getElementById('publisher').value = book.publisher || '';
 
-    let pDate = book.publishedDate || book.pubDate || '';
-    if (pDate.includes('T')) pDate = pDate.substring(0, 10);
-    document.getElementById('publishedDate').value = pDate;
+    let rawDate = book.publishedDate || book.pubDate || '';
+    let finalDate = '';
+
+    if (rawDate) {
+        // 1. 문자열로 확실하게 변환
+        rawDate = String(rawDate);
+
+        // 2. 'T'가 있으면(ISO형식) 자르고, 없으면 그대로 사용 (2025-01-10 대응)
+        if (rawDate.includes('T')) {
+            finalDate = rawDate.split('T')[0];
+        } else {
+            finalDate = rawDate; // "2025-01-10"은 여기로 들어옴
+        }
+    }
+
+    // 3. ID가 'publishedDate'인 요소에 값 넣기
+    const dateEl = document.getElementById('publishedDate');
+    if (dateEl) {
+        dateEl.value = finalDate;
+    } else {
+        // 만약 HTML ID가 다르면 여기서 에러를 잡을 수 있음
+        console.error("❌ HTML에 id='publishedDate'인 태그가 없습니다. HTML파일의 input id를 확인해주세요!");
+    }
     document.getElementById('price').value = book.price || 0;
     if (book.parentId) {
         document.getElementById('parentCategory').value = book.parentId;

@@ -510,66 +510,157 @@ main {
 /*    padding-top: var(--header-offset);*/
 /*}*/
 
-.ai-recommend-container {
-    margin-top: 50px;
-    padding-top: 30px;
-    border-top: 1px solid #ddd;
+/* ... 위쪽 기존 CSS 생략 ... */
+
+/* =========================
+   AI 도서 추천 섹션 스타일
+   ========================= */
+.ai-recommendation-container {
+    margin-top: 30px; /* 장바구니 영역과의 간격 */
     width: 100%;
+    /* .panel 클래스의 스타일(배경, 테두리 등)을 상속받습니다 */
 }
-.ai-recommend-container h4 {
-    margin-bottom: 20px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
+
+.ai-rec-body {
+    padding: 20px;
+    min-height: 240px; /* 빈 공간의 최소 높이 확보 */
+    background-color: #fafafa; /* 콘텐츠 영역 배경색 */
 }
-.loading-box {
-    text-align: center;
-    padding: 40px;
-    color: #666;
-}
-.spinner {
-    width: 40px;
-    height: 40px;
-    margin: 0 auto 15px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+
+/* AI 도서 리스트 컨테이너 */
 .ai-book-list {
     display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
+    gap: 16px; /* 간격 조정 */
+    width: 100%;
+    overflow-x: auto;
+    padding: 10px 5px;
+    justify-content: flex-start; /* 왼쪽 정렬 */
+    align-items: stretch; /* 모든 카드 높이 맞춤 */
 }
-.ai-card {
-    flex: 1 1 calc(33.333% - 20px);
-    border: 1px solid #eee;
-    border-radius: 8px;
-    overflow: hidden;
-    background: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+
+/* 개별 도서 아이템 */
+.ai-book-item {
+    flex: 0 0 160px; /* 고정 너비 */
     display: flex;
     flex-direction: column;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #eee; /* 카드 외곽선 추가 */
+    overflow: hidden; /* 둥근 모서리 유지 */
 }
-.ai-card img {
+
+.ai-book-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-color: #4f46e5;
+}
+
+/* 썸네일 영역 */
+.ai-book-thumb {
     width: 100%;
-    height: 200px;
-    object-fit: cover;
-    background: #f8f8f8;
+    height: 200px; /* 높이 고정 */
+    background-color: #f8f9fa; /* 빈 공간은 은은한 회색 */
+    border-bottom: 1px solid #eee;
+
+    /* 이미지를 중앙에 예쁘게 배치 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px; /* 내부 여백을 줘서 책이 꽉 끼지 않게 함 */
+    position: relative;
 }
-.ai-card-body {
-    padding: 15px;
+
+.ai-book-thumb img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;  /* 가로세로 비율 유지 */
+    height: auto; /* 가로세로 비율 유지 */
+    object-fit: contain;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1); /* 책 표지에 그림자 효과 */
 }
-.ai-card-title {
-    font-size: 16px;
-    margin-bottom: 5px;
-    font-weight: bold;
-    white-space: nowrap;
+
+/* 정보 영역 */
+.ai-book-info {
+    padding: 12px 10px;
+    text-align: center;
+    flex: 1; /* 남은 공간 채우기 */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* 제목 위, 가격/뱃지 아래 */
+}
+
+.ai-book-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    line-height: 1.4;
+
+    /* 두 줄 말줄임 */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
+    height: 36px; /* 높이 고정으로 카드 흔들림 방지 */
+}
+
+.ai-book-price {
+    font-size: 13px;
+    color: #666;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+/* 전체 래퍼: 세로 정렬 (도서목록 위, 설명박스 아래) */
+.ai-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 20px;
+}
+
+/* =========================
+   2. 하단 설명(요약) 박스 스타일
+   ========================= */
+.ai-description-box {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-left: 5px solid #4f46e5; /* 포인트 컬러 (왼쪽 굵은 선) */
+    border-radius: 4px;
+    padding: 15px 20px;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.ai-desc-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: #4f46e5;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.ai-desc-text {
+    font-size: 13px;
+    color: #444;
+    line-height: 1.5;
+    word-break: keep-all; /* 한글 줄바꿈 예쁘게 */
+}
+
+/* 하단 'AI 추천' 뱃지 */
+.ai-reason-badge {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 2px 6px;
+    background-color: #eef2ff;
+    color: #4f46e5;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 4px;
+    border: 1px solid #c7d2fe;
 }
 

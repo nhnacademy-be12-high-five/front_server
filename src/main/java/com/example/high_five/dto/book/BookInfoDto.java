@@ -13,7 +13,7 @@ public class BookInfoDto {
     private String title;
     private List<String> authors;
     private String publisher;
-    private String pubDate;
+    private String publishedDate;
     private Integer price;
     private String image;
     private String description;

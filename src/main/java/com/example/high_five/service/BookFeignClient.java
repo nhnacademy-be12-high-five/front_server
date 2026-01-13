@@ -29,6 +29,6 @@ public interface BookFeignClient {
     @GetMapping("/api/admin/books/search-api")
     ResponseEntity<BookInfoDto> searchBookByIsbn(@RequestParam("isbn") String isbn);
 
-    @GetMapping("/api/books/recommendations")
-    ResponseEntity<List<BookResponse>> getAiRecommendations(List<String> titles);
+    @GetMapping("/api/search/rag-search")
+    ResponseEntity<List<BookResponse>> getAiRecommendations(@RequestParam("keyword") String keyword);
 }
