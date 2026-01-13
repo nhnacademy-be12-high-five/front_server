@@ -72,11 +72,6 @@
                         <button class="del" onclick="deleteItem(this)">×</button>
                     </article>
                 </div>
-
-                <div class="cart-toolbar">
-                    <div><label><input type="checkbox" id="chkAllBottom" checked/> 전체선택</label></div>
-                    <button class="btn" onclick="clearCart()">전체비우기</button>
-                </div>
             </section>
 
             <aside class="panel">
@@ -99,9 +94,18 @@
                     <button class="order-btn" onclick="orderSelected()">주문하기</button>
                 </div>
             </aside>
+            </div> <section class="panel ai-recommendation-container">
+            <div class="hd">
+                <h2>이 책은 어때요?</h2>
+            </div>
+            <div class="ai-rec-body">
+                <div class="ai-placeholder">
+                    <span>추천 도서를 불러올 공간입니다.</span>
+                </div>
+            </div>
+            </section>
         </div>
-    </div>
-</main>
+    </main>
 
 <div th:replace="~{layout/footer :: footer}"></div>
 
