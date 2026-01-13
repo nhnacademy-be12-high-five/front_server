@@ -25,6 +25,55 @@
         <div class="admin-topbar__actions">
             <a class="btn btn-outline" href="/admin">관리자 홈</a>
         </div>
+
+        <style>
+            /* AI 로딩 오버레이 스타일 */
+            .ai-loading-overlay {
+                position: fixed;        /* 화면에 고정 */
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.7); /* 배경 어둡게 */
+                z-index: 99999;         /* 다른 모든 요소보다 위에 */
+                display: none;          /* 기본은 숨김 (JS가 켜줌) */
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(4px); /* 배경 흐림 효과 */
+            }
+
+            .spinner-container {
+                text-align: center;
+                color: #fff;
+                background: rgba(0, 0, 0, 0.5); /* 텍스트 가독성을 위한 배경 */
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            }
+
+            /* 스피너 애니메이션 */
+            .ai-spinner {
+                width: 50px;
+                height: 50px;
+                border: 5px solid rgba(255, 255, 255, 0.3);
+                border-top: 5px solid #ffd700; /* 노란색 포인트 */
+                border-radius: 50%;
+                margin: 0 auto 20px auto;
+                animation: spin 1s linear infinite;
+            }
+
+            .loading-text {
+                font-size: 18px;
+                font-weight: 700;
+                line-height: 1.6;
+                margin: 0;
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
     </header>
 
     <main class="admin-content">
@@ -147,6 +196,18 @@
         </div>
     </main>
 
+</div>
+<div id="aiLoadingOverlay" class="ai-loading-overlay" style="display: none;">
+    <div class="spinner-container">
+        <div class="ai-spinner"></div>
+        <p class="loading-text">
+            AI가 도서 정보를 분석 중입니다... <br>
+            <span style="color: #ffd700; font-size: 1.2em;">
+                (<span id="aiTimer">0</span>초 경과)
+            </span><br>
+            잠시만 기다려 주세요.
+        </p>
+    </div>
 </div>
 
 <!-- 원본에 있던 스크립트는 DOM 로딩 안정성을 위해 body 끝으로 이동 -->

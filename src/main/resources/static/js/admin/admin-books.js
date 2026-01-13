@@ -1,4 +1,5 @@
 let editor;
+let aiTimerInterval;
 
 document.addEventListener("DOMContentLoaded", function () {
     loadRootCategories(); // 페이지 로드 시 1차 카테고리 가져오기
@@ -91,41 +92,86 @@ async function loadBookDetail(bookId) {
 
 // 3. [추가] AI 도서 가져오기 (Google Books + Gemini)
 async function fetchBookInfoByAi() {
-    // HTML에 id="aiIsbnInput" 인 input 박스와 검색 버튼이 있다고 가정
-    const isbnInput = document.getElementById('aiIsbnInput'); // 혹은 prompt 사용 가능
+    // 1. HTML에 있는 ID들과 정확히 일치시킴
+    const isbnInput = document.getElementById('aiIsbnInput');
+    const overlay = document.getElementById('aiLoadingOverlay');
+    const timerSpan = document.getElementById('aiTimer');
+    const btn = document.getElementById('aiSearchBtn'); // HTML의 버튼 ID
 
+    // 2. ISBN 입력값 검증
     let isbn = isbnInput ? isbnInput.value.trim().replace(/-/g, "") : "";
-
     if (!isbn || !isbn.trim()) {
         alert("ISBN을 입력해주세요.");
         return;
     }
 
-    // 로딩 표시 (선택 사항)
-    const btn = document.getElementById('aiSearchBtn'); // 버튼 ID 확인 필요
-    if(btn) btn.innerText = "AI 검색 중...";
+    // --- [오버레이 시작] ---
+
+    // 1) 화면 덮기 (로딩창 표시)
+    if (overlay) overlay.style.display = 'flex';
+
+    // 2) 타이머 작동 (0초, 1초, 2초...)
+    if (timerSpan) {
+        let seconds = 0;
+        timerSpan.innerText = seconds;
+
+        // 혹시 켜져 있던 타이머가 있다면 끄기
+        if (aiTimerInterval) clearInterval(aiTimerInterval);
+
+        // 1초마다 숫자 증가
+        aiTimerInterval = setInterval(() => {
+            seconds++;
+            timerSpan.innerText = seconds;
+        }, 1000);
+    }
+
+    // 3) 버튼 텍스트 변경 (로딩 중 표시) 및 비활성화
+    let originalBtnText = "AI 가져오기";
+    if(btn) {
+        originalBtnText = btn.innerText;
+        btn.innerText = "분석 중...";
+        btn.disabled = true; // 중복 클릭 방지
+    }
 
     try {
-        // 백엔드 AI 검색 API 호출
+        // --- [API 호출] 데이터 올 때까지 여기서 대기 ---
         const response = await fetch(`/admin/books/search-api?isbn=${encodeURIComponent(isbn)}`);
 
         if (!response.ok) {
-            throw new Error("도서 정보를 찾을 수 없습니다. (Google Books에 없거나 오류 발생)");
+            throw new Error("도서 정보를 찾을 수 없습니다.\n(Google Books에 없거나 통신 오류)");
         }
 
         const bookData = await response.json();
 
-        // 폼 초기화 후 데이터 채우기 (false = 신규 등록 모드라 수정 가능하게)
-        resetForm();
-        fillForm(bookData, false);
+        // 4) 데이터 채우기
+        resetForm(); // 기존 내용 지우기
+        fillForm(bookData, false); // 새 데이터 채우기
 
-        alert("AI가 도서 정보와 추천 서평을 가져왔습니다! 내용을 확인해주세요.");
+        // 성공 알림 (오버레이 꺼진 뒤 0.1초 뒤 실행)
+        setTimeout(() => {
+            alert("✅ AI가 도서 정보와 서평을 성공적으로 가져왔습니다!");
+        }, 100);
 
     } catch (error) {
         console.error(error);
-        alert("실패: " + error.message);
+        alert("❌ 실패: " + error.message);
     } finally {
-        if(btn) btn.innerText = "ISBN 검색";
+        // --- [오버레이 종료] 무조건 실행 ---
+
+        // 1) 화면 덮기 해제
+        if (overlay) overlay.style.display = 'none';
+
+        // 2) 타이머 정지
+        if (aiTimerInterval) {
+            clearInterval(aiTimerInterval);
+            aiTimerInterval = null;
+        }
+
+        // 3) 버튼 원상복구
+        if(btn) {
+            btn.innerText = originalBtnText;
+            btn.disabled = false;
+        }
     }
 }
 
